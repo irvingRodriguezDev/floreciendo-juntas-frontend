@@ -12,7 +12,7 @@ const Footer = ({}) => {
         color: "white", // texto blanco
         py: 2, // padding vertical
         px: 3, // padding horizontal
-        position: "absolute", // siempre fijo
+        position: "fixed", // siempre fijo
         bottom: 0, // al final de la página
         left: 0,
         textAlign: "center",

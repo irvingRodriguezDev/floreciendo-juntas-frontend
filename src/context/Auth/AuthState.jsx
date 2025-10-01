@@ -37,7 +37,7 @@ const AuthState = (props) => {
     tokenAuth(token);
 
     try {
-      const { data } = await MethodGet("me"); // sin la barra inicial
+      const { data } = await MethodGet("/auth/me"); // sin la barra inicial
 
       dispatch({ type: types.OBTENER_USUARIO, payload: data });
       return true;
@@ -86,7 +86,9 @@ const AuthState = (props) => {
     }
   };
 
-  const registerUser = (data, history) => {
+  const registerUser = (data) => {
+    // return;
+
     let url = "/auth/register";
     MethodPost(url, data)
       .then((res) => {
