@@ -8,8 +8,10 @@ const Courses = () => {
   return (
     <Layout>
       <FullScreenVideo />
-      <NewCourses />
-      <TopCourses />
+      <div style={{ backgroundColor: "#000" }}>
+        <NewCourses />
+        <TopCourses />
+      </div>
     </Layout>
   );
 };

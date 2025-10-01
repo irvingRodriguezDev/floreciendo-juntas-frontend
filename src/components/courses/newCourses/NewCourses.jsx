@@ -79,7 +79,7 @@ const NewCourses = () => {
       <Swiper
         modules={[Navigation, Pagination]}
         spaceBetween={10}
-        slidesPerView={3}
+        slidesPerView={2}
         navigation
         loop={true}
         // pagination={{ clickable: true }}

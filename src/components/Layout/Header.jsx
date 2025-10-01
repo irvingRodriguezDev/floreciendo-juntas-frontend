@@ -50,17 +50,19 @@ const Header = () => {
       >
         <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
           {/* Logo */}
-          <Typography
-            variant='h6'
-            sx={{
-              color: "#E53888",
-              fontFamily: "fantasy",
-              fontWeight: "bold",
-              fontSize: "30px",
-            }}
-          >
-            Floreciendo Juntas
-          </Typography>
+          <Link style={{ textDecoration: "none" }} to='/cursos'>
+            <Typography
+              variant='h6'
+              sx={{
+                color: "#E53888",
+                fontFamily: "fantasy",
+                fontWeight: "bold",
+                fontSize: "30px",
+              }}
+            >
+              Floreciendo Juntas
+            </Typography>
+          </Link>
 
           {/* Menú Desktop centrado */}
           {!isMobile && (
@@ -103,31 +105,33 @@ const Header = () => {
             <Box sx={{ display: "flex", gap: 2 }}>
               <Button
                 component={Link}
-                to='/iniciar-sesion'
+                to={"/iniciar-sesion"}
                 variant='outlined'
+                size='large'
                 sx={{
                   color: "#E53888",
                   borderColor: "#E53888",
                   borderRadius: "10px",
-                  "&:hover": {
-                    backgroundColor: "rgba(229, 56, 136, 0.1)",
-                  },
+                  "&:hover": { backgroundColor: "rgba(229, 56, 136, 0.1)" },
+                  "&:focus": { outline: "none" },
+                  "&:focus-visible": { outline: "none" },
                 }}
               >
                 Sign In
               </Button>
-
               <Button
+                variant='contained'
                 component={Link}
-                to='/registro'
-                variant='outlined'
+                to={"/registro"}
+                size='large'
                 sx={{
-                  color: "#E53888",
+                  color: "#fff",
+                  backgroundColor: "#E53888",
                   borderColor: "#E53888",
                   borderRadius: "10px",
-                  "&:hover": {
-                    backgroundColor: "rgba(229, 56, 136, 0.1)",
-                  },
+                  "&:hover": { backgroundColor: "#E53888" },
+                  "&:focus": { outline: "none" },
+                  "&:focus-visible": { outline: "none" },
                 }}
               >
                 Sign Up

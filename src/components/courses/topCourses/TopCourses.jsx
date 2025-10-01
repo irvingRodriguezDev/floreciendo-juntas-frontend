@@ -47,7 +47,7 @@ const courses = [
 const TopCourses = () => {
   return (
     <div className='top-movies-container'>
-      <h2>Los cursos top</h2>
+      <h2 className='title'>Los cursos top</h2>
       <div className='movies-list'>
         {courses.map((movie) => (
           <div key={movie.id} className='movie-card'>
