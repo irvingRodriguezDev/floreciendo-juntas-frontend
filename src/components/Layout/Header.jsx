@@ -14,13 +14,18 @@ import {
   useMediaQuery,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
+import { Link } from "react-router-dom";
 
 const menuItems = [
-  "Cursos",
-  "Certificaciones",
-  "El salón de tus sueños",
-  "Tienda",
-  "Manicurista exitosa: 10 secretos",
+  {
+    name: "Cursos",
+    path: "/cursos",
+  },
+  { name: "Certificaciones", path: "/certificaciones" },
+  { name: "El salón de tus sueños", path: "/el-salon-de-tus-sueños" },
+  { name: "Manicurista exitosa: 10 secretos", path: "/10-secretos" },
+  { name: "Tienda", path: "/tienda" },
+  { name: "Eventos", path: "/eventos" },
 ];
 
 const Header = () => {
@@ -68,25 +73,27 @@ const Header = () => {
               }}
             >
               {menuItems.map((item) => (
-                <Typography
-                  key={item}
-                  variant='h6'
-                  sx={{
-                    cursor: "pointer",
-                    color: "#E53888",
-                    px: 2,
-                    py: 1,
-                    borderRadius: "10px",
-                    "&:hover": {
-                      backgroundColor: "rgba(238, 158, 234, 0.2)",
-                      boxShadow: "0 4px 30px rgba(0, 0, 0, 0.1)",
-                      backdropFilter: "blur(11px)",
-                      border: "1px solid rgba(238, 158, 234, 0.3)",
-                    },
-                  }}
-                >
-                  {item}
-                </Typography>
+                <Link to={item.path} style={{ textDecoration: "none" }}>
+                  <Typography
+                    key={item}
+                    variant='h6'
+                    sx={{
+                      cursor: "pointer",
+                      color: "#E53888",
+                      px: 2,
+                      py: 1,
+                      borderRadius: "10px",
+                      "&:hover": {
+                        backgroundColor: "rgba(238, 158, 234, 0.2)",
+                        boxShadow: "0 4px 30px rgba(0, 0, 0, 0.1)",
+                        backdropFilter: "blur(11px)",
+                        border: "1px solid rgba(238, 158, 234, 0.3)",
+                      },
+                    }}
+                  >
+                    {item.name}
+                  </Typography>
+                </Link>
               ))}
             </Box>
           )}
@@ -95,30 +102,32 @@ const Header = () => {
           {!isMobile && (
             <Box sx={{ display: "flex", gap: 2 }}>
               <Button
+                component={Link}
+                to='/iniciar-sesion'
                 variant='outlined'
-                size='large'
                 sx={{
                   color: "#E53888",
                   borderColor: "#E53888",
                   borderRadius: "10px",
-                  "&:hover": { backgroundColor: "rgba(229, 56, 136, 0.1)" },
-                  "&:focus": { outline: "none" },
-                  "&:focus-visible": { outline: "none" },
+                  "&:hover": {
+                    backgroundColor: "rgba(229, 56, 136, 0.1)",
+                  },
                 }}
               >
                 Sign In
               </Button>
+
               <Button
-                variant='contained'
-                size='large'
+                component={Link}
+                to='/registro'
+                variant='outlined'
                 sx={{
-                  color: "#fff",
-                  backgroundColor: "#E53888",
+                  color: "#E53888",
                   borderColor: "#E53888",
                   borderRadius: "10px",
-                  "&:hover": { backgroundColor: "#E53888" },
-                  "&:focus": { outline: "none" },
-                  "&:focus-visible": { outline: "none" },
+                  "&:hover": {
+                    backgroundColor: "rgba(229, 56, 136, 0.1)",
+                  },
                 }}
               >
                 Sign Up
@@ -150,23 +159,25 @@ const Header = () => {
                   <List>
                     {menuItems.map((item) => (
                       <ListItem key={item} disablePadding>
-                        <ListItemButton
-                          onClick={() => setOpen(false)}
-                          sx={{
-                            borderRadius: "16px",
-                            "&:hover": {
-                              backgroundColor: "rgba(238, 158, 234, 0.2)",
-                              boxShadow: "0 4px 30px rgba(0, 0, 0, 0.1)",
-                              backdropFilter: "blur(11px)",
-                              border: "1px solid rgba(238, 158, 234, 0.3)",
-                            },
-                          }}
-                        >
-                          <ListItemText
-                            primary={item}
-                            sx={{ color: "#E53888" }}
-                          />
-                        </ListItemButton>
+                        <Link to={item.path} style={{ textDecoration: "none" }}>
+                          <ListItemButton
+                            onClick={() => setOpen(false)}
+                            sx={{
+                              borderRadius: "16px",
+                              "&:hover": {
+                                backgroundColor: "rgba(238, 158, 234, 0.2)",
+                                boxShadow: "0 4px 30px rgba(0, 0, 0, 0.1)",
+                                backdropFilter: "blur(11px)",
+                                border: "1px solid rgba(238, 158, 234, 0.3)",
+                              },
+                            }}
+                          >
+                            <ListItemText
+                              primary={item.name}
+                              sx={{ color: "#E53888" }}
+                            />
+                          </ListItemButton>
+                        </Link>
                       </ListItem>
                     ))}
                   </List>
@@ -179,6 +190,8 @@ const Header = () => {
                     }}
                   >
                     <Button
+                      component={Link}
+                      to='/iniciar-sesion'
                       variant='outlined'
                       sx={{
                         color: "#E53888",
@@ -191,13 +204,18 @@ const Header = () => {
                     >
                       Sign In
                     </Button>
+
                     <Button
-                      variant='contained'
+                      component={Link}
+                      to='/registro'
+                      variant='outlined'
                       sx={{
-                        color: "#fff",
-                        backgroundColor: "#E53888",
+                        color: "#E53888",
+                        borderColor: "#E53888",
                         borderRadius: "10px",
-                        "&:hover": { backgroundColor: "#E53888" },
+                        "&:hover": {
+                          backgroundColor: "rgba(229, 56, 136, 0.1)",
+                        },
                       }}
                     >
                       Sign Up

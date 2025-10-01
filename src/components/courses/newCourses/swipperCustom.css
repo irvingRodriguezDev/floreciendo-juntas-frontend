@@ -1,0 +1,15 @@
+.swiper-button-next,
+.swiper-button-prev {
+  color: #ff69b4; /* rosado */
+  font-weight: bold;
+  transition: color 0.3s ease;
+}
+
+.swiper-button-next:hover,
+.swiper-button-prev:hover {
+  color: #ff1493; /* rosado más intenso al hover */
+}
+
+.swipper-pagination {
+  color: transparent;
+}

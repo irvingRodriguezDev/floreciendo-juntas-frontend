@@ -1,12 +1,23 @@
-import { StrictMode } from "react";
-import { createRoot } from "react-dom/client";
-import "./index.css";
+// src/main.jsx
+import React from "react";
+import ReactDOM from "react-dom/client";
 import App from "./App.jsx";
-import Home from "./containers/Home/Home.jsx";
-import Courses from "./containers/Courses/Courses.jsx";
+// ¡Ahora estas importaciones funcionarán!
+// import "@fontsource/roboto/300.css";
+// import "@fontsource/roboto/400.css";
+// import "@fontsource/roboto/500.css";
+// import "@fontsource/roboto/700.css";
 
-createRoot(document.getElementById("root")).render(
-  <StrictMode>
-    <Courses />
-  </StrictMode>
+// Para una mejor práctica, también puedes agregar la normalización CSS
+import CssBaseline from "@mui/material/CssBaseline";
+import { BrowserRouter } from "react-router-dom";
+
+ReactDOM.createRoot(document.getElementById("root")).render(
+  <React.StrictMode>
+    <BrowserRouter>
+      {/* CssBaseline se encarga de normalizar los estilos de forma consistente */}
+      <CssBaseline />
+      <App />
+    </BrowserRouter>
+  </React.StrictMode>
 );
