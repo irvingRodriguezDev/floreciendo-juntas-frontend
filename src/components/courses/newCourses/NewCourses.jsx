@@ -96,7 +96,8 @@ const NewCourses = () => {
             <Card sx={{ borderRadius: "8px" }}>
               <CardMedia
                 component='img'
-                height='194'
+                width='100%'
+                height='250'
                 image={c.image}
                 alt={c.name}
               />

@@ -1,5 +1,13 @@
 import React from "react";
 import "./TopCourses.css"; // aquí guardaremos los estilos extra
+import {
+  Box,
+  Card,
+  CardContent,
+  CardMedia,
+  Grid,
+  Typography,
+} from "@mui/material";
 
 const courses = [
   {
@@ -46,18 +54,45 @@ const courses = [
 
 const TopCourses = () => {
   return (
-    <div className='top-movies-container'>
-      <h2 className='title'>Los cursos top</h2>
-      <div className='movies-list'>
+    <Box className='top-movies-container'>
+      <Typography variant='h5' className='title'>
+        Los cursos top
+      </Typography>
+
+      <Grid container spacing={2} className='movies-list'>
         {courses.map((movie) => (
-          <div key={movie.id} className='movie-card'>
-            <span className='movie-rank'>{movie.id}</span>
-            <img src={movie.img} alt={movie.title} className='movie-img' />
-            <p className='movie-title'>{movie.title}</p>
-          </div>
+          <Grid size={{ xs: 12, md: 6, lg: 4, xl: 3 }}>
+            <Card
+              key={movie.id}
+              className='movie-card'
+              sx={{ backgroundColor: "transparent" }}
+            >
+              <span className='movie-rank'>{movie.id}</span>
+
+              <CardMedia
+                component='img'
+                image={movie.img}
+                alt={movie.title}
+                className='movie-img'
+                sx={{ ml: 20, borderRadius: "20px" }}
+              />
+
+              <CardContent sx={{ p: 1 }}>
+                <Typography
+                  variant='body1'
+                  className='movie-title'
+                  color='white'
+                  fontSize='30px'
+                  fontWeight='bold'
+                >
+                  {movie.title}
+                </Typography>
+              </CardContent>
+            </Card>
+          </Grid>
         ))}
-      </div>
-    </div>
+      </Grid>
+    </Box>
   );
 };
 

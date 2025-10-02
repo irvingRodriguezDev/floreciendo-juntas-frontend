@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useContext } from "react";
 import {
   AppBar,
   Box,
@@ -37,8 +37,7 @@ const menuItems = [
 
 const Header = () => {
   const [open, setOpen] = useState(false);
-  // const { autentcado } = useContext(AuthContext);
-  const autenticado = true;
+  const { autenticado } = useContext(AuthContext);
   const isMobile = useMediaQuery("(max-width:900px)");
 
   // Filtrar menú según auth

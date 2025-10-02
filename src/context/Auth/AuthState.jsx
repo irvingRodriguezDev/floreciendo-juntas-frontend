@@ -13,7 +13,7 @@ import { SHOW_ERRORS_API, types } from "../../types";
 const AuthState = (props) => {
   const initialState = {
     token: localStorage.getItem("token"),
-    autenticado: true,
+    autenticado: false,
     usuario: null,
     role: null,
     cargando: true,
