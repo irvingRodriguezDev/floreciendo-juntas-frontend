@@ -8,7 +8,15 @@ const Courses = () => {
   return (
     <Layout>
       <FullScreenVideo />
-      <div style={{ backgroundColor: "#000" }}>
+      <div
+      // style={{
+      //   background:
+      //     "linear-gradient(135deg, #1a0029 0%, #2d0f40 40%, #000000 100%)",
+      //   backgroundAttachment: "fixed",
+      //   backgroundSize: "cover",
+      //   color: "#fff",
+      // }}
+      >
         <NewCourses />
         <TopCourses />
       </div>

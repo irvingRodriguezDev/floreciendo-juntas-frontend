@@ -17,7 +17,10 @@ const Login = () => {
         container
         justifyContent='center'
         alignItems='center'
-        sx={{ mt: { xs: "30%", md: "10%" } }}
+        sx={{
+          mt: { xs: "30%", sm: "30%", md: "20%" },
+          mb: { xs: "10%", md: "10%" },
+        }}
       >
         <Grid item size={{ xs: 11, md: 6 }}>
           <Paper

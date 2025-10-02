@@ -51,7 +51,7 @@ const Register = () => {
         container
         justifyContent='center'
         alignItems='center'
-        sx={{ mt: { xs: "22%", md: "10%" }, mb: { xs: "30px", md: 0 } }}
+        sx={{ mt: { xs: "25%", md: "15%" }, mb: { xs: "30%", md: "10%" } }}
       >
         <Grid size={{ xs: 11, md: 8, lg: 6 }}>
           <Paper

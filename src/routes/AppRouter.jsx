@@ -14,6 +14,7 @@ import Saloon from "../containers/Saloon/Salon";
 import Secrets from "../containers/Secrets/Secrets";
 import Shop from "../containers/Shop/Shop";
 import Profile from "../containers/Profile/Profile";
+import DetailEvent from "../containers/Events/EventDetail/DetailEvent";
 function AppRouter({ isAuthenticated }) {
   const { autenticado, usuarioAutenticado, cargando } = useContext(AuthContext);
 
@@ -48,6 +49,7 @@ function AppRouter({ isAuthenticated }) {
         <Route path='/certificaciones' element={<Certifications />} />
         <Route path='/tienda' element={<Shop />} />
         <Route path='/eventos' element={<Events />} />
+        <Route path='/detalle-evento/:id' element={<DetailEvent />} />
         <Route path='/10-secretos' element={<Secrets />} />
         <Route path='/el-salon-de-tus-sueños' element={<Saloon />} />
         <Route path='/mi-perfil' element={<Profile />} />
