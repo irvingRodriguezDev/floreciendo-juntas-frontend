@@ -7,7 +7,7 @@ const VideoPlayer = () => {
       <video className='video-player' autoPlay muted loop playsInline controls>
         <source
           src={
-            "https://pruebapersonalirving.s3.us-east-2.amazonaws.com/video.mp4"
+            "https://pruebapersonalirving.s3.us-east-2.amazonaws.com/3997851-uhd_4096_2160_25fps.mp4"
           }
           type='video/mp4'
         />

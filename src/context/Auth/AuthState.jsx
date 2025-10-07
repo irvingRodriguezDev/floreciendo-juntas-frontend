@@ -29,7 +29,6 @@ const AuthState = (props) => {
     const token = localStorage.getItem("token");
 
     if (!token) {
-      console.log("No hay token");
       dispatch({ type: types.LOGIN_ERROR });
       return false;
     }

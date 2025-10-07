@@ -17,18 +17,11 @@ const Footer = () => {
     <Box
       component='footer'
       sx={{
-        width: "98%",
-        mx: "auto", // centra horizont
-        color: "white",
-        mb: 3,
-        py: 3,
-        px: 3,
-        textAlign: "center",
-        background: "rgba(238, 158, 234, 0.2)",
+        backgroundColor: "rgba(241, 189, 206, 0.31)",
         borderRadius: "16px",
         boxShadow: "0 4px 30px rgba(0, 0, 0, 0.1)",
         backdropFilter: "blur(5px)",
-        borderTop: "2px solid rgba(229, 56, 136, 0.3)",
+        border: "1px solid rgba(241, 189, 206, 0.3)",
       }}
     >
       <Container maxWidth='lg'>
@@ -40,28 +33,28 @@ const Footer = () => {
         >
           {/* Enlaces */}
           <Stack direction='row' spacing={3}>
-            <Link href='/about' underline='hover' color='inherit'>
+            <Link href='/about' underline='hover' color='#E53888'>
               Acerca de
             </Link>
-            <Link href='/privacy' underline='hover' color='inherit'>
+            <Link href='/privacy' underline='hover' color='#E53888'>
               Privacidad
             </Link>
-            <Link href='/contact' underline='hover' color='inherit'>
+            <Link href='/contact' underline='hover' color='#E53888'>
               Contacto
             </Link>
           </Stack>
 
           {/* Redes sociales */}
-          <Stack direction='row' spacing={1}>
+          <Stack direction='row' spacing={2} sx={{ padding: 5 }}>
             <IconButton
-              color='inherit'
+              color='#E53888'
               href='https://facebook.com'
               target='_blank'
             >
               <FacebookIcon width={50} />
             </IconButton>
             <IconButton
-              color='inherit'
+              color='#E53888'
               href='https://instagram.com'
               target='_blank'
             >
@@ -69,7 +62,7 @@ const Footer = () => {
             </IconButton>
 
             <IconButton
-              color='inherit'
+              color='#E53888'
               href='https://youtube.com'
               target='_blank'
             >
@@ -79,7 +72,11 @@ const Footer = () => {
         </Stack>
 
         {/* Derechos reservados */}
-        <Typography variant='body2' sx={{ mt: 2, opacity: 0.7 }}>
+        <Typography
+          color='#e53888'
+          fontWeight='bold'
+          sx={{ mt: 1, opacity: 0.9, mb: 3 }}
+        >
           © 2025 Wapizima. Todos los derechos reservados.
         </Typography>
       </Container>

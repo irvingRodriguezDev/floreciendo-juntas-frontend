@@ -6,75 +6,82 @@ import "swiper/css/navigation";
 import "swiper/css/pagination";
 import { Navigation, Pagination } from "swiper/modules";
 import "./swipperCustom.css";
+import { motion } from "framer-motion";
 const NewCourses = () => {
   const cursos = [
     {
       name: "curso1",
       image:
-        "https://images.pexels.com/photos/7470497/pexels-photo-7470497.jpeg",
+        "https://cloud.wapizima.com.mx/production/courses/mobile/114-mobile",
     },
     {
       name: "curso2",
       image:
-        "https://images.pexels.com/photos/5429781/pexels-photo-5429781.jpeg",
+        "https://cloud.wapizima.com.mx/production/courses/mobile/112-mobile",
     },
     {
       name: "curso3",
       image:
-        "https://images.pexels.com/photos/10396658/pexels-photo-10396658.jpeg",
+        "https://cloud.wapizima.com.mx/production/courses/mobile/111-mobile",
     },
     {
       name: "curso3",
       image:
-        "https://images.pexels.com/photos/10396658/pexels-photo-10396658.jpeg",
+        "https://cloud.wapizima.com.mx/production/courses/mobile/110-mobile",
     },
     {
       name: "curso3",
       image:
-        "https://images.pexels.com/photos/10396658/pexels-photo-10396658.jpeg",
+        "https://cloud.wapizima.com.mx/production/courses/mobile/109-mobile",
     },
     {
       name: "curso3",
       image:
-        "https://images.pexels.com/photos/10396658/pexels-photo-10396658.jpeg",
+        "https://cloud.wapizima.com.mx/production/courses/mobile/68-mobile",
     },
     {
       name: "curso3",
       image:
-        "https://images.pexels.com/photos/10396658/pexels-photo-10396658.jpeg",
+        "https://cloud.wapizima.com.mx/production/courses/mobile/67-mobile",
     },
     {
       name: "curso3",
       image:
-        "https://images.pexels.com/photos/10396658/pexels-photo-10396658.jpeg",
+        "https://cloud.wapizima.com.mx/production/courses/mobile/63-mobile",
     },
     {
       name: "curso3",
       image:
-        "https://images.pexels.com/photos/10396658/pexels-photo-10396658.jpeg",
+        "https://cloud.wapizima.com.mx/production/courses/mobile/60-mobile",
     },
     {
       name: "curso3",
       image:
-        "https://images.pexels.com/photos/10396658/pexels-photo-10396658.jpeg",
+        "https://cloud.wapizima.com.mx/production/courses/mobile/55-mobile",
     },
   ];
 
   return (
     <>
-      <Typography
-        sx={{
-          color: "white",
-          fontWeight: "bold",
-          fontSize: "30px",
-          textAlign: "left",
-          position: "absolute",
-          ml: 5,
-          mt: -15,
-        }}
+      <motion.div
+        initial={{ opacity: 0, y: 50 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
       >
-        Recien Subidos
-      </Typography>
+        <Typography
+          sx={{
+            color: "white",
+            fontWeight: "bold",
+            fontSize: "30px",
+            textAlign: "left",
+            position: "absolute",
+            ml: 5,
+            mt: -15,
+          }}
+        >
+          Recien Subidos
+        </Typography>
+      </motion.div>
 
       <Swiper
         modules={[Navigation, Pagination]}

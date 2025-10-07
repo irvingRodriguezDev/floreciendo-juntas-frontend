@@ -2,12 +2,13 @@ import {
   Box,
   Button,
   Card,
+  CardContent,
   CardMedia,
   Chip,
   Divider,
   Grid,
-  Paper,
   Typography,
+  Paper,
 } from "@mui/material";
 import React from "react";
 import Layout from "../../../components/Layout/Layout";
@@ -25,112 +26,194 @@ const DetailEvent = () => {
     },
     {
       img: "https://histudy.pixcelsthemes.com/livepreview/histudy/assets/images/event/grid-type-02.jpg",
-      title: "International Education Fair 2024",
+      title: "Global Technology Summit",
       date: "15 Feb 2024",
-      time: "8:00 am - 5:00 pm",
-      location: "IAC Building",
+      time: "9:00 am - 6:00 pm",
+      location: "Tech Expo Center",
       id: 2,
     },
   ];
 
   return (
     <Layout>
-      {/* Header */}
-      <Grid container spacing={2}>
-        <Grid size={12}>
-          <Paper sx={{ width: "100%", color: "white", padding: 2 }}>
-            <Typography
-              variant='h4'
-              color='black'
-              textAlign='left'
-              paddingLeft={2}
-            >
-              Nombre del evento
-            </Typography>
-          </Paper>
-        </Grid>
-      </Grid>
+      {/* Hero compacto */}
+      <Box sx={{ position: "relative", height: "30vh", mt: 8 }}>
+        <CardMedia
+          component='img'
+          image='https://histudy.pixcelsthemes.com/livepreview/histudy/assets/images/event/grid-type-01.jpg'
+          alt='Evento'
+          sx={{
+            height: "100%",
+            width: "100%",
+            objectFit: "cover",
+            borderRadius: 0,
+            filter: "brightness(65%)",
+          }}
+        />
+        <Box
+          sx={{
+            position: "absolute",
+            bottom: 20,
+            left: "50%",
+            transform: "translateX(-50%)",
+            textAlign: "center",
+            color: "white",
+          }}
+        >
+          <Typography variant='h3' fontWeight='bold'>
+            Nombre del evento
+          </Typography>
+          <Typography variant='subtitle1' sx={{ mt: 1 }}>
+            11 de Enero 2024 | IAC Building
+          </Typography>
+        </Box>
+      </Box>
 
       {/* Contenido principal */}
-      <Grid container spacing={2} sx={{ padding: 2 }}>
+      <Grid container spacing={4} justifyContent='center' sx={{ mt: 4 }}>
         {/* Columna izquierda */}
-        <Grid size={8}>
-          <Box sx={{ bgcolor: "#333", p: 2 }}>
-            <Grid container spacing={2}>
-              {/* Imagen */}
-              <Grid size={12} sx={{ bgcolor: "gray", p: 1 }}>
-                <Card>
-                  <CardMedia
-                    component='img'
-                    height='auto'
-                    width='auto'
-                    image='https://histudy.pixcelsthemes.com/livepreview/histudy/assets/images/event/grid-type-01.jpg'
-                    alt='evento-name'
-                  />
-                </Card>
-              </Grid>
+        <Grid item xs={12} md={8}>
+          {/* Sobre el evento */}
+          <Paper
+            elevation={0}
+            sx={{
+              mb: 4,
+              borderRadius: 2,
+              p: 3,
+              border: "1px solid #eee",
+              bgcolor: "#fafafa",
+            }}
+          >
+            <Typography variant='h5' fontWeight='bold' gutterBottom>
+              Sobre el evento
+            </Typography>
+            <Typography variant='body1' color='text.secondary'>
+              Este evento conecta a estudiantes, universidades y empresas de
+              tecnología. Habrá más de 30 expositores, talleres prácticos y
+              ponencias internacionales.
+            </Typography>
+          </Paper>
 
-              {/* Contenido */}
-              <Grid size={12} sx={{ bgcolor: "yellow", p: 2 }}>
-                EventContent
-              </Grid>
-              <Grid size={12} sx={{ bgcolor: "red", p: 2 }}>
-                Event description
-              </Grid>
+          {/* Agenda */}
+          <Paper
+            elevation={0}
+            sx={{
+              mb: 4,
+              borderRadius: 2,
+              p: 3,
+              border: "1px solid #eee",
+            }}
+          >
+            <Typography variant='h5' fontWeight='bold' gutterBottom>
+              Agenda
+            </Typography>
+            <Typography variant='body2' color='text.secondary'>
+              📌 8:00 am - Registro <br />
+              📌 9:00 am - Conferencia de apertura <br />
+              📌 11:00 am - Talleres <br />
+              📌 2:00 pm - Networking <br />
+              📌 5:00 pm - Clausura
+            </Typography>
+          </Paper>
 
-              {/* Eventos similares */}
-              <Grid size={12}>
-                <Divider>
-                  <Chip
-                    label='Eventos Similares'
-                    sx={{ color: "white", backgroundColor: "green" }}
-                  />
-                </Divider>
-              </Grid>
+          {/* Eventos similares */}
+          <Divider sx={{ my: 4 }}>
+            <Chip
+              label='Eventos Similares'
+              sx={{ fontWeight: "bold", px: 2 }}
+              color='secondary'
+              variant='outlined'
+            />
+          </Divider>
 
-              <Grid size={12}>
-                <Grid container spacing={2} sx={{ justifyContent: "center" }}>
-                  {similarEvents.map((e) => (
-                    <Grid size={6} key={e.id}>
-                      <CardEvent event={e} />
-                    </Grid>
-                  ))}
-                  <Button variant='contained' size='large'>
-                    Ver más eventos
-                  </Button>
-                </Grid>
+          <Grid container spacing={3}>
+            {similarEvents.map((e) => (
+              <Grid item xs={12} sm={6} key={e.id}>
+                <CardEvent event={e} />
               </Grid>
-            </Grid>
+            ))}
+          </Grid>
+
+          <Box textAlign='center' sx={{ mt: 3 }}>
+            <Button
+              variant='contained'
+              size='large'
+              sx={{
+                borderRadius: 3,
+                textTransform: "none",
+                fontWeight: "bold",
+              }}
+            >
+              Ver más eventos
+            </Button>
           </Box>
         </Grid>
 
         {/* Columna derecha sticky */}
-        <Grid size={4}>
-          <Box sx={{ position: "relative", height: "100%" }}>
-            <Box
+        <Grid item xs={12} md={4}>
+          <Box
+            sx={{
+              position: "sticky",
+              top: 100,
+              display: "flex",
+              flexDirection: "column",
+              gap: 3,
+            }}
+          >
+            {/* Info general */}
+            <Paper
+              elevation={0}
               sx={{
-                position: "sticky",
-                top: 20,
-                display: "flex",
-                flexDirection: "column",
-                gap: 2,
+                p: 3,
+                borderRadius: 2,
+                border: "1px solid #eee",
+                bgcolor: "#fff",
               }}
             >
-              {[1, 2, 3, 4].map((item) => (
-                <Box
-                  key={item}
-                  sx={{
-                    bgcolor: "#111",
-                    color: "white",
-                    p: 3,
-                    borderRadius: 2,
-                    textAlign: "center",
-                  }}
-                >
-                  Item {item}
-                </Box>
-              ))}
-            </Box>
+              <Typography
+                variant='h6'
+                fontWeight='bold'
+                gutterBottom
+                textAlign='center'
+              >
+                Información del Evento
+              </Typography>
+              <Typography variant='body2' color='text.secondary'>
+                📍 IAC Building
+              </Typography>
+              <Typography variant='body2' color='text.secondary'>
+                📅 11 Enero 2024
+              </Typography>
+              <Typography variant='body2' color='text.secondary'>
+                🕒 8:00 am - 5:00 pm
+              </Typography>
+              <Button
+                variant='contained'
+                fullWidth
+                sx={{ mt: 2, borderRadius: 2, textTransform: "none" }}
+              >
+                Registrarme
+              </Button>
+            </Paper>
+
+            {/* Extra info / recomendaciones */}
+            <Paper
+              elevation={0}
+              sx={{
+                p: 3,
+                borderRadius: 2,
+                border: "1px solid #eee",
+                bgcolor: "#fafafa",
+              }}
+            >
+              <Typography variant='subtitle1' fontWeight='bold' gutterBottom>
+                Recomendaciones
+              </Typography>
+              <Typography variant='body2' color='text.secondary'>
+                ✅ Llegar 30 min antes <br />
+                ✅ Traer identificación <br />✅ Usar ropa cómoda
+              </Typography>
+            </Paper>
           </Box>
         </Grid>
       </Grid>

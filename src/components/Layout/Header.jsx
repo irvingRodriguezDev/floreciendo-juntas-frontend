@@ -57,11 +57,11 @@ const Header = () => {
           mt: 2,
           left: "50%",
           transform: "translateX(-50%)",
-          backgroundColor: "rgba(238, 158, 234, 0.2)",
+          backgroundColor: "rgba(241, 189, 206, 0.31)",
           borderRadius: "16px",
           boxShadow: "0 4px 30px rgba(0, 0, 0, 0.1)",
-          backdropFilter: "blur(11px)",
-          border: "1px solid rgba(238, 158, 234, 0.3)",
+          backdropFilter: "blur(5px)",
+          border: "1px solid rgba(241, 189, 206, 0.3)",
         }}
       >
         <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
