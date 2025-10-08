@@ -63,7 +63,7 @@ const NewCourses = () => {
 
   return (
     <>
-      <Grid size={12} sx={{ paddingLeft: "100px" }}>
+      <Grid size={12} sx={{ paddingLeft: { xs: "12px", lg: "100px" } }}>
         <motion.div
           initial={{ opacity: 0, y: 50 }}
           animate={{ opacity: 1, y: 0 }}

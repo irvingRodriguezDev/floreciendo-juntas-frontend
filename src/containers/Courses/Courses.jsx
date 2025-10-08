@@ -1,23 +1,11 @@
 import React from "react";
 import Layout from "../../components/Layout/Layout";
 import FullScreenVideo from "../../components/FullScreenVideo";
-
 import NewCourses from "../../components/courses/newCourses/NewCourses";
 import TopCourses from "../../components/courses/topCourses/TopCourses";
-import SearchCourses from "../../components/courses/SearchCourses";
-import AllCourses from "../../components/courses/AllCourses/AllCourses";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
-import {
-  Button,
-  Card,
-  CardContent,
-  CardMedia,
-  Grid,
-  Typography,
-} from "@mui/material";
-import NailIconOne from "../../components/icons/NailIconOne";
-import NailIconTwo from "../../components/icons/NailIconTwo";
-import NailIconThree from "../../components/icons/NailIconThree";
+import { Button, Grid, Typography } from "@mui/material";
+
 import Systems from "../Systems/Systems";
 const Courses = () => {
   return (
@@ -25,7 +13,12 @@ const Courses = () => {
       <FullScreenVideo />
       <NewCourses />
       <Grid container spacing={2}>
-        <Grid size={12} sx={{ paddingLeft: "100px" }}>
+        <Grid
+          size={12}
+          sx={{
+            paddingLeft: { xs: "10px", sm: "10px", mf: "0px", lg: "0px" },
+          }}
+        >
           <Typography fontWeight='semibold' fontSize='45px'>
             Explora
           </Typography>
@@ -43,7 +36,7 @@ const Courses = () => {
         </Grid>
         <TopCourses />
         <Grid size={12} sx={{}}>
-          <Grid size={12} sx={{ paddingLeft: "100px" }}>
+          <Grid size={12} sx={{ paddingLeft: { xs: "12px", lg: "100px" } }}>
             <Typography fontWeight='semibold' fontSize='45px'>
               Encuentra
             </Typography>
@@ -77,7 +70,7 @@ const Courses = () => {
           </Grid>
         </Grid>
         <Grid>
-          <Grid size={12} sx={{ paddingLeft: "100px" }}>
+          <Grid size={12} sx={{ paddingLeft: { xs: "12px", lg: "100px" } }}>
             <Typography fontWeight='semibold' fontSize='45px'>
               Eventos
             </Typography>

@@ -1,63 +1,139 @@
 .top-movies-container {
   padding: 20px;
   color: white;
-  background: #0000;
+  background: transparent; /* O rgba(0, 0, 0, 0) si prefieres */
+  overflow-x: hidden; /* Previene scroll horizontal */
+  max-width: 100%; /* Asegura que no exceda el viewport */
+  box-sizing: border-box; /* Incluye padding en el ancho total */
 }
 
 .movies-list {
   display: flex;
-  gap: 40px;
+  gap: 20px; /* Reducido de 40px para menos espacio horizontal */
   flex-wrap: wrap;
+  justify-content: center; /* Centra las tarjetas si hay espacio */
+  width: 100%; /* Asegura que ocupe todo el ancho disponible */
 }
 
 .movie-card {
-  position: relative;
+  position: relative; /* Para posicionar el rank relativo a esta card */
   display: flex;
   flex-direction: column;
   align-items: center;
   background-color: transparent;
-  border-radius: 100px;
+  border-radius: 12px; /* Reducido de 100px para esquinas suaves sin exagerar */
+  flex: 0 1 200px; /* Flex-grow: 0, flex-shrink: 1, flex-basis: 200px → ancho controlado y adaptable */
+  max-width: auto; /* Límite máximo para evitar desborde */
+  padding: 10px; /* Padding interno moderado */
+  box-sizing: border-box;
 }
 
 .movie-rank {
   position: absolute;
-  font-size: 18rem;
+  font-size: 4rem; /* Reducido drásticamente de 18rem; ajusta según necesites (ej. 3rem para más pequeño) */
   font-weight: 800;
-  left: -20px;
+  left: 0; /* Cambiado de -50px para que no se salga a la izquierda */
   top: 50%;
-  transform: translateY(-50%);
+  transform: translate(
+    -50%,
+    -50%
+  ); /* Centra horizontal y verticalmente respecto a su posición */
   z-index: 1;
   color: #e53888;
-  /*👇 Glass effect  SOLO en el número*/
+  /* Glass effect SOLO en el número: Ajustado para que funcione mejor sin padding extra */
   background: rgba(229, 56, 136, 0.4);
+  -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
-  /* Opcional: contorno para mejor visibilidad */
-  -webkit-text-stroke: 2px rgba(255, 255, 255, 0.3);
-  padding: 15px 25px;
+  /* Contorno para visibilidad */
+  -webkit-text-stroke: 1px rgba(255, 255, 255, 0.5); /* Reducido de 2px para sutileza */
+  /* Eliminé padding: 15px 25px porque no se aplica bien con background-clip: text.
+     Si necesitas espacio alrededor, envuelve el rank en un <div> con padding. */
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3); /* Sombra sutil para profundidad */
 }
 
 .movie-img {
-  width: 400px;
-  height: 300px;
+  width: 100%; /* Cambiado de 'auto' para que se ajuste al contenedor */
+  height: 250px; /* Reducido ligeramente de 300px para mejor proporción */
   border-radius: 8px;
   object-fit: cover;
-  margin-left: 100px;
   z-index: 2;
+  /* Desplazamos la imagen ligeramente a la derecha para "superponer" con el rank */
 }
 
 .movie-title {
   margin-top: 10px;
-  font-size: 2rem;
+  font-size: 1.5rem; /* Reducido de 2rem para mejor proporción */
   text-align: center;
   z-index: 2;
-  margin-left: 100px;
+  margin-left: 0; /* Eliminado el 100px problemático */
   font-weight: bold;
   color: #e53888;
+  /* Aseguramos que no desborde */
+  word-wrap: break-word;
+  max-width: 100%;
 }
+
 .title {
-  text-align: left;
+  text-align: left; /* O 'center' si prefieres para el heading principal */
   font-weight: bold;
-  font-size: xx-large;
+  font-size: 2.5rem; /* Ajustado de xx-large para consistencia (xx-large es ~3rem) */
   color: #e53888;
+  margin-bottom: 20px; /* Espacio debajo para separar del lista */
+  /* Si este es un heading fuera de las cards, asegúrate de que esté en el contenedor */
+}
+
+/* Media queries para responsive (evita overflow en móviles) */
+@media (max-width: 768px) {
+  .top-movies-container {
+    padding: 10px;
+  }
+
+  .movies-list {
+    gap: 10px; /* Aún más pequeño en móviles */
+    justify-content: flex-start; /* O center si quieres */
+  }
+
+  .movie-card {
+    flex: 0 1 150px; /* Más estrechas en móviles */
+    max-width: 150px;
+    padding: 8px;
+  }
+
+  .movie-rank {
+    font-size: 2.5rem; /* Más pequeño en móviles */
+  }
+
+  .movie-img {
+    height: 200px;
+  }
+
+  .movie-title {
+    font-size: 1.2rem;
+  }
+
+  .title {
+    font-size: 2rem;
+    text-align: center; /* Centra en móviles para mejor UX */
+  }
+}
+
+@media (max-width: 480px) {
+  .movies-list {
+    flex-direction: column; /* Stack vertical en pantallas muy pequeñas para eliminar cualquier riesgo de horizontal */
+    align-items: center;
+  }
+
+  .movie-card {
+    max-width: 100%;
+    width: 100%;
+  }
+
+  .movie-rank {
+    position: static; /* En móviles, coloca el rank arriba o abajo para simplicidad */
+    transform: none;
+    margin-bottom: 10px;
+    text-align: center;
+    width: 100%;
+  }
 }

@@ -72,7 +72,7 @@ const TopCourses = () => {
                 boxShadow: "0 4px 30px rgba(0, 0, 0, 0.1)",
                 backdropFilter: "blur(5px)",
                 border: "1px solid rgba(241, 189, 206, 0.3)",
-                padding: "10px",
+                // padding: "10px",
               }}
             >
               <span className='movie-rank'>{movie.id}</span>
@@ -83,10 +83,10 @@ const TopCourses = () => {
                 alt={movie.title}
                 className='movie-img'
                 sx={{
-                  ml: 10,
+                  // ml: 10,
                   width: "300px",
                   height: "400px",
-                  borderRadius: "30px",
+                  borderRadius: "16px",
                 }}
               />
               <motion.div

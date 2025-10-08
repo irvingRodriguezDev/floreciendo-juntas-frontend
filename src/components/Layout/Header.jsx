@@ -89,7 +89,6 @@ const Header = () => {
               variant='h6'
               sx={{
                 color: scrolled ? "#E53888" : "#fff",
-                fontFamily: "fantasy",
                 fontWeight: "bold",
                 fontSize: "30px",
                 textShadow: scrolled ? "none" : "0 2px 6px rgba(0,0,0,0.2)",
@@ -218,12 +217,20 @@ const Header = () => {
                 <Box
                   sx={{
                     width: 250,
-                    p: 2,
-                    bgcolor: "#fff",
+                    p: 2, // Shorthand for padding in MUI; overrides the full 'padding' below if needed
+                    // bgcolor: "#fff", // Commented out as in original
                     height: "100vh",
                     display: "flex",
                     flexDirection: "column",
                     justifyContent: "space-between",
+                    background: "rgba(255, 255, 255, 0.1)",
+                    backdropFilter: "blur(10px)",
+                    WebkitBackdropFilter: "blur(10px)", // Vendor prefix for Safari support (camelCase in sx)
+                    borderTopRightRadius: "16px",
+                    borderBottomRightRadius: "16px",
+                    border: "1px solid rgba(255, 255, 255, 0.2)",
+                    // padding: "20px", // Commented out to avoid conflict with 'p: 2'; use one or the other
+                    color: "#ff4081",
                   }}
                 >
                   <Box>
@@ -251,7 +258,7 @@ const Header = () => {
                             >
                               <ListItemText
                                 primary={item.name}
-                                sx={{ color: "#E53888" }}
+                                sx={{ color: "#E53888", fontWeight: "bold" }}
                               />
                             </ListItemButton>
                           </Link>
