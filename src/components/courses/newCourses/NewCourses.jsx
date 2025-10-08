@@ -1,5 +1,5 @@
 import React from "react";
-import { Card, CardMedia, Typography } from "@mui/material";
+import { Card, CardMedia, Grid, Typography } from "@mui/material";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import "swiper/css/navigation";
@@ -63,25 +63,28 @@ const NewCourses = () => {
 
   return (
     <>
-      <motion.div
-        initial={{ opacity: 0, y: 50 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-      >
-        <Typography
-          sx={{
-            color: "white",
-            fontWeight: "bold",
-            fontSize: "30px",
-            textAlign: "left",
-            position: "absolute",
-            ml: 5,
-            mt: -15,
-          }}
+      <Grid size={12} sx={{ paddingLeft: "100px" }}>
+        <motion.div
+          initial={{ opacity: 0, y: 50 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
         >
-          Recien Subidos
-        </Typography>
-      </motion.div>
+          <Typography fontWeight='semibold' fontSize='45px'>
+            Descubre
+          </Typography>
+          <Typography
+            fontWeight='bold'
+            fontSize='70px'
+            fontFamily='sans-serif'
+            sx={{
+              textShadow:
+                "2px 2px 4px rgba(0,0,0,0.5), -1px -1px 2px rgba(255,0,0,0.3)",
+            }}
+          >
+            Nuestro contenido nuevo
+          </Typography>
+        </motion.div>
+      </Grid>
 
       <Swiper
         modules={[Navigation, Pagination]}
@@ -96,15 +99,16 @@ const NewCourses = () => {
           1024: { slidesPerView: 3 },
           1440: { slidesPerView: 4 },
         }}
-        style={{ padding: "40px", marginTop: -100 }}
+        style={{ padding: "40px" }}
       >
         {cursos.map((c, index) => (
           <SwiperSlide key={index}>
-            <Card sx={{ borderRadius: "8px" }}>
+            <Card>
               <CardMedia
                 component='img'
                 width='100%'
                 height='250'
+                style={{ borderRadius: "12px" }}
                 image={c.image}
                 alt={c.name}
               />

@@ -14,7 +14,7 @@ const theme = createTheme({
     },
     background: {
       default: "#FBFAFF", // fondo general
-      paper: "#F1BDCE", // fondo de tarjetas/papers
+      paper: "#F8E7F0", // fondo de tarjetas/papers
     },
     text: {
       primary: "#E893B5",

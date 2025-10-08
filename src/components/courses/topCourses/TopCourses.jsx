@@ -56,10 +56,6 @@ const courses = [
 const TopCourses = () => {
   return (
     <Box className='top-movies-container'>
-      <Typography variant='h5' className='title'>
-        Los cursos top
-      </Typography>
-
       <Grid container spacing={2} className='movies-list'>
         {courses.map((movie, index) => (
           <Grid

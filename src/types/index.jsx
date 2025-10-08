@@ -13,3 +13,6 @@ export const types = {
 };
 
 export const SHOW_ERRORS_API = "SHOW_ERRORS_API";
+
+//systems
+export const GET_ALL_SYSTEMS = "GET_ALL_SYSTEMS";

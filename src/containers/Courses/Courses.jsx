@@ -10,13 +10,8 @@ import { Card, CardContent, CardMedia, Grid, Typography } from "@mui/material";
 import NailIconOne from "../../components/icons/NailIconOne";
 import NailIconTwo from "../../components/icons/NailIconTwo";
 import NailIconThree from "../../components/icons/NailIconThree";
+import Systems from "../Systems/Systems";
 const Courses = () => {
-  const systems = [
-    { icon: <NailIconOne width={100} />, name: "Uñas uno" },
-    { icon: <NailIconTwo width={100} />, name: "Uñas dos" },
-    { icon: <NailIconThree width={100} />, name: "Uñas Tres" },
-    { icon: <NailIconOne width={100} />, name: "Uñas cuatro" },
-  ];
   return (
     <Layout>
       <FullScreenVideo />
@@ -39,7 +34,7 @@ const Courses = () => {
           </Typography>
         </Grid>
         <TopCourses />
-        <Grid size={12} sx={{ bgcolor: "#F7F6FA" }}>
+        <Grid size={12} sx={{}}>
           <Grid size={12} sx={{ paddingLeft: "100px" }}>
             <Typography fontWeight='semibold' fontSize='45px'>
               Encuentra
@@ -61,20 +56,38 @@ const Courses = () => {
             sx={{
               display: "flex",
               justifyContent: "end",
-              paddingRight: "20px",
+              padding: "20px",
+              borderRadius: "12px",
             }}
           >
-            {systems.map((s) => (
+            <Systems />
+            {/* {systems.map((s) => (
               <Typography sx={{ padding: "10px" }} fontWeight='bold'>
                 {s.name}
               </Typography>
-            ))}
+            ))} */}
+          </Grid>
+        </Grid>
+        <Grid>
+          <Grid size={12} sx={{ paddingLeft: "100px" }}>
+            <Typography fontWeight='semibold' fontSize='45px'>
+              Eventos
+            </Typography>
+            <Typography
+              fontWeight='bold'
+              fontSize='70px'
+              fontFamily='sans-serif'
+              sx={{
+                textShadow:
+                  "2px 2px 4px rgba(0,0,0,0.5), -1px -1px 2px rgba(255,0,0,0.3)",
+              }}
+            >
+              Siempre cerca de ti
+            </Typography>
           </Grid>
           <TopCourses />
         </Grid>
       </Grid>
-      <SearchCourses />
-      <AllCourses />
     </Layout>
   );
 };
