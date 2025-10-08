@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import {
   AppBar,
   Box,
@@ -16,6 +16,7 @@ import {
 import MenuIcon from "@mui/icons-material/Menu";
 import { Link } from "react-router-dom";
 import AuthContext from "../../context/Auth/AuthContext";
+
 const menuItems = [
   { name: "Cursos", path: "/cursos", auth: "both" },
   { name: "Certificaciones", path: "/certificaciones", auth: "both" },
@@ -31,16 +32,22 @@ const menuItems = [
   },
   { name: "Tienda", path: "/tienda", auth: "both" },
   { name: "Eventos", path: "/eventos", auth: "both" },
-  // { name: "Mis Cursos", path: "/mis-cursos", auth: true }, // solo autenticado
-  // { name: "Panel Admin", path: "/admin", auth: true }, // solo autenticado
 ];
 
 const Header = () => {
   const [open, setOpen] = useState(false);
   const { autenticado } = useContext(AuthContext);
   const isMobile = useMediaQuery("(max-width:900px)");
+  const [scrolled, setScrolled] = useState(false);
 
-  // Filtrar menú según auth
+  // 🔹 Detectar scroll
+  useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 40);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  // 🔹 Filtrar menú según auth
   const filteredMenu = menuItems.filter((item) => {
     if (item.auth === "both") return true;
     if (item.auth === true && autenticado) return true;
@@ -51,36 +58,49 @@ const Header = () => {
   return (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar
-        position='absolute'
+        position='fixed'
+        elevation={scrolled ? 4 : 0}
         sx={{
           width: "98%",
           mt: 2,
           left: "50%",
           transform: "translateX(-50%)",
-          backgroundColor: "rgba(241, 189, 206, 0.31)",
           borderRadius: "16px",
-          boxShadow: "0 4px 30px rgba(0, 0, 0, 0.1)",
-          backdropFilter: "blur(5px)",
-          border: "1px solid rgba(241, 189, 206, 0.3)",
+          boxShadow: scrolled
+            ? "0 4px 20px rgba(0,0,0,0.15)"
+            : "0 4px 30px rgba(0, 0, 0, 0.1)",
+          backgroundColor: scrolled
+            ? "rgba(255, 255, 255, 0.9)"
+            : "rgba(241, 189, 206, 0.3)",
+          backdropFilter: "blur(12px)",
+          border: scrolled
+            ? "1px solid rgba(255, 255, 255, 0.4)"
+            : "1px solid rgba(241, 189, 206, 0.3)",
+          transition: "all 0.3s ease",
+          color: scrolled ? "#E53888" : "#E53888",
         }}
       >
-        <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
-          {/* Logo */}
+        <Toolbar
+          sx={{ display: "flex", justifyContent: "space-between", px: 2 }}
+        >
+          {/* LOGO */}
           <Link style={{ textDecoration: "none" }} to='/cursos'>
             <Typography
               variant='h6'
               sx={{
-                color: "#E53888",
+                color: scrolled ? "#E53888" : "#fff",
                 fontFamily: "fantasy",
                 fontWeight: "bold",
                 fontSize: "30px",
+                textShadow: scrolled ? "none" : "0 2px 6px rgba(0,0,0,0.2)",
+                transition: "all 0.3s ease",
               }}
             >
               Floreciendo Juntas
             </Typography>
           </Link>
 
-          {/* Menú Desktop centrado */}
+          {/* MENÚ DESKTOP */}
           {!isMobile && (
             <Box
               sx={{
@@ -97,18 +117,19 @@ const Header = () => {
                   style={{ textDecoration: "none" }}
                 >
                   <Typography
-                    variant='h6'
+                    variant='subtitle1'
                     sx={{
                       cursor: "pointer",
-                      color: "#E53888",
+                      color: scrolled ? "#E53888" : "#fff",
                       px: 2,
                       py: 1,
                       borderRadius: "10px",
+                      fontWeight: 500,
+                      transition: "all 0.3s ease",
                       "&:hover": {
-                        backgroundColor: "rgba(238, 158, 234, 0.2)",
-                        boxShadow: "0 4px 30px rgba(0, 0, 0, 0.1)",
-                        backdropFilter: "blur(11px)",
-                        border: "1px solid rgba(238, 158, 234, 0.3)",
+                        backgroundColor: scrolled
+                          ? "rgba(229, 56, 136, 0.1)"
+                          : "rgba(255,255,255,0.15)",
                       },
                     }}
                   >
@@ -119,7 +140,7 @@ const Header = () => {
             </Box>
           )}
 
-          {/* Botones de acción */}
+          {/* BOTONES ACCIÓN */}
           {!isMobile && (
             <Box sx={{ display: "flex", gap: 2 }}>
               {!autenticado ? (
@@ -130,10 +151,15 @@ const Header = () => {
                     variant='outlined'
                     size='large'
                     sx={{
-                      color: "#E53888",
-                      borderColor: "#E53888",
+                      color: scrolled ? "#E53888" : "#fff",
+                      borderColor: scrolled ? "#E53888" : "#fff",
                       borderRadius: "10px",
-                      "&:hover": { backgroundColor: "rgba(229, 56, 136, 0.1)" },
+                      "&:hover": {
+                        backgroundColor: scrolled
+                          ? "rgba(229, 56, 136, 0.1)"
+                          : "rgba(255,255,255,0.15)",
+                      },
+                      transition: "all 0.3s ease",
                     }}
                   >
                     Sign In
@@ -147,7 +173,7 @@ const Header = () => {
                       color: "#fff",
                       backgroundColor: "#E53888",
                       borderRadius: "10px",
-                      "&:hover": { backgroundColor: "#E53888" },
+                      "&:hover": { backgroundColor: "#d82e7a" },
                     }}
                   >
                     Sign Up
@@ -163,7 +189,7 @@ const Header = () => {
                     color: "#fff",
                     backgroundColor: "#E53888",
                     borderRadius: "10px",
-                    "&:hover": { backgroundColor: "#E53888" },
+                    "&:hover": { backgroundColor: "#d82e7a" },
                   }}
                 >
                   Mi Perfil
@@ -172,14 +198,17 @@ const Header = () => {
             </Box>
           )}
 
-          {/* Menú Mobile */}
+          {/* MENÚ MOBILE */}
           {isMobile && (
             <>
               <IconButton
                 edge='start'
                 sx={{
-                  color: "#E53888",
-                  "&:hover": { backgroundColor: "rgba(229, 56, 136, 0.1)" },
+                  color: scrolled ? "#E53888" : "#fff",
+                  "&:hover": {
+                    backgroundColor: "rgba(229, 56, 136, 0.1)",
+                  },
+                  transition: "color 0.3s ease",
                 }}
                 onClick={() => setOpen(true)}
               >
@@ -190,50 +219,50 @@ const Header = () => {
                   sx={{
                     width: 250,
                     p: 2,
-                    bgcolor: "#000",
+                    bgcolor: "#fff",
                     height: "100vh",
-                    // borderTopRightRadius: "18px",
-                    // borderBottomRightRadius: "18px",
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "space-between",
                   }}
                 >
-                  <Typography
-                    variant='h6'
-                    sx={{ color: "#E53888", fontWeight: "bold", mb: 2 }}
-                  >
-                    Menú
-                  </Typography>
-                  <List>
-                    {filteredMenu.map((item) => (
-                      <ListItem key={item.path} disablePadding>
-                        <Link to={item.path} style={{ textDecoration: "none" }}>
-                          <ListItemButton
-                            onClick={() => setOpen(false)}
-                            sx={{
-                              borderRadius: "16px",
-                              "&:hover": {
-                                backgroundColor: "rgba(238, 158, 234, 0.2)",
-                                boxShadow: "0 4px 30px rgba(0, 0, 0, 0.1)",
-                                backdropFilter: "blur(11px)",
-                                border: "1px solid rgba(238, 158, 234, 0.3)",
-                              },
-                            }}
+                  <Box>
+                    <Typography
+                      variant='h6'
+                      sx={{ color: "#E53888", fontWeight: "bold", mb: 2 }}
+                    >
+                      Menú
+                    </Typography>
+                    <List>
+                      {filteredMenu.map((item) => (
+                        <ListItem key={item.path} disablePadding>
+                          <Link
+                            to={item.path}
+                            style={{ textDecoration: "none" }}
                           >
-                            <ListItemText
-                              primary={item.name}
-                              sx={{ color: "#E53888" }}
-                            />
-                          </ListItemButton>
-                        </Link>
-                      </ListItem>
-                    ))}
-                  </List>
+                            <ListItemButton
+                              onClick={() => setOpen(false)}
+                              sx={{
+                                borderRadius: "12px",
+                                "&:hover": {
+                                  backgroundColor: "rgba(238, 158, 234, 0.15)",
+                                },
+                              }}
+                            >
+                              <ListItemText
+                                primary={item.name}
+                                sx={{ color: "#E53888" }}
+                              />
+                            </ListItemButton>
+                          </Link>
+                        </ListItem>
+                      ))}
+                    </List>
+                  </Box>
+
+                  {/* Botones dentro del drawer */}
                   <Box
-                    sx={{
-                      mt: 2,
-                      display: "flex",
-                      flexDirection: "column",
-                      gap: 1,
-                    }}
+                    sx={{ display: "flex", flexDirection: "column", gap: 1 }}
                   >
                     {!autenticado ? (
                       <>
@@ -252,11 +281,12 @@ const Header = () => {
                         <Button
                           component={Link}
                           to='/registro'
-                          variant='outlined'
+                          variant='contained'
                           sx={{
-                            color: "#E53888",
-                            borderColor: "#E53888",
+                            color: "#fff",
+                            backgroundColor: "#E53888",
                             borderRadius: "10px",
+                            "&:hover": { backgroundColor: "#d82e7a" },
                           }}
                         >
                           Sign Up
@@ -271,6 +301,7 @@ const Header = () => {
                           color: "#fff",
                           backgroundColor: "#E53888",
                           borderRadius: "10px",
+                          "&:hover": { backgroundColor: "#d82e7a" },
                         }}
                       >
                         Mi Perfil

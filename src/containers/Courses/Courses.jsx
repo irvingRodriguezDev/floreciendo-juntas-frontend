@@ -6,7 +6,15 @@ import NewCourses from "../../components/courses/newCourses/NewCourses";
 import TopCourses from "../../components/courses/topCourses/TopCourses";
 import SearchCourses from "../../components/courses/SearchCourses";
 import AllCourses from "../../components/courses/AllCourses/AllCourses";
-import { Card, CardContent, CardMedia, Grid, Typography } from "@mui/material";
+import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
+import {
+  Button,
+  Card,
+  CardContent,
+  CardMedia,
+  Grid,
+  Typography,
+} from "@mui/material";
 import NailIconOne from "../../components/icons/NailIconOne";
 import NailIconTwo from "../../components/icons/NailIconTwo";
 import NailIconThree from "../../components/icons/NailIconThree";
@@ -85,7 +93,19 @@ const Courses = () => {
               Siempre cerca de ti
             </Typography>
           </Grid>
-          <TopCourses />
+          <Grid size={12}>
+            <TopCourses />
+          </Grid>
+          <Grid size={12} sx={{ display: "flex", justifyContent: "center" }}>
+            <Button
+              size='large'
+              variant='contained'
+              startIcon={<CalendarMonthIcon />}
+              sx={{ padding: "10px", mb: 5, borderRadius: "12px" }}
+            >
+              Ver todos los eventos
+            </Button>
+          </Grid>
         </Grid>
       </Grid>
     </Layout>
