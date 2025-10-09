@@ -1,12 +1,13 @@
 import { Routes, Route, Navigate } from "react-router-dom";
+import { useContext, useEffect } from "react";
+import { Box, Grid } from "@mui/material";
+
+import AuthContext from "../context/Auth/AuthContext";
+
+// Componentes
 import Login from "../components/auth/Login";
 import Register from "../components/auth/Register";
 import ForgotPassword from "../components/auth/ForgotPassword";
-import { PublicRoute } from "./PublicRoute";
-import { PrivateRoute } from "./PrivateRoute";
-import AuthContext from "../context/Auth/AuthContext";
-import { useContext, useEffect } from "react";
-import { Box, Grid } from "@mui/material";
 import Courses from "../containers/Courses/Courses";
 import Certifications from "../containers/Certificationes/Certifications";
 import Events from "../containers/Events/Events";
@@ -15,50 +16,74 @@ import Secrets from "../containers/Secrets/Secrets";
 import Shop from "../containers/Shop/Shop";
 import Profile from "../containers/Profile/Profile";
 import DetailEvent from "../containers/Events/EventDetail/DetailEvent";
-function AppRouter({ isAuthenticated }) {
+
+function AppRouter() {
   const { autenticado, usuarioAutenticado, cargando } = useContext(AuthContext);
 
   useEffect(() => {
     usuarioAutenticado();
   }, []);
+
   if (cargando) {
     return (
-      <Grid size={12}>
-        <Box
-          sx={{
-            width: "105%",
-            height: "177%",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          cargando
-        </Box>
+      <Grid
+        container
+        justifyContent='center'
+        alignItems='center'
+        sx={{ minHeight: "100vh" }}
+      >
+        <Box>Cargando...</Box>
       </Grid>
     );
   }
+
+  // Rutas siempre accesibles
+  const alwaysRoutes = [
+    { path: "/cursos", element: <Courses /> },
+    { path: "/certificaciones", element: <Certifications /> },
+    { path: "/tienda", element: <Shop /> },
+    { path: "/eventos", element: <Events /> },
+    { path: "/detalle-evento/:id", element: <DetailEvent /> },
+    { path: "/10-secretos", element: <Secrets /> },
+    { path: "/el-salon-de-tus-sueños", element: <Saloon /> },
+  ];
+
+  // Rutas públicas solo para no autenticados
+  const publicOnlyRoutes = [
+    { path: "/iniciar-sesion", element: <Login /> },
+    { path: "/registro", element: <Register /> },
+    { path: "/recuperar-contraseña", element: <ForgotPassword /> },
+  ];
+
+  // Rutas privadas solo para autenticados
+  const privateRoutes = [{ path: "/mi-perfil", element: <Profile /> }];
+
   return (
     <Routes>
-      {/* Rutas públicas */}
-      <Route element={<PublicRoute isAuthenticated={autenticado} />}>
-        <Route path='/iniciar-sesion' element={<Login />} />
-        <Route path='/registro' element={<Register />} />
-        <Route path='/recuperar-contraseña' element={<ForgotPassword />} />
-        <Route path='/cursos' element={<Courses />} />
-        <Route path='/certificaciones' element={<Certifications />} />
-        <Route path='/tienda' element={<Shop />} />
-        <Route path='/eventos' element={<Events />} />
-        <Route path='/detalle-evento/:id' element={<DetailEvent />} />
-        <Route path='/10-secretos' element={<Secrets />} />
-        <Route path='/el-salon-de-tus-sueños' element={<Saloon />} />
-        <Route path='/mi-perfil' element={<Profile />} />
-      </Route>
+      {/* Rutas públicas solo si NO está autenticado */}
+      {publicOnlyRoutes.map(({ path, element }) => (
+        <Route
+          key={path}
+          path={path}
+          element={autenticado ? <Navigate to='/cursos' replace /> : element}
+        />
+      ))}
 
-      {/* Rutas privadas */}
-      <Route element={<PrivateRoute isAuthenticated={autenticado} />}>
-        {/* <Route path='/cursoses' element={<Courses />} /> */}
-      </Route>
+      {/* Rutas siempre accesibles */}
+      {alwaysRoutes.map(({ path, element }) => (
+        <Route key={path} path={path} element={element} />
+      ))}
+
+      {/* Rutas privadas solo si está autenticado */}
+      {privateRoutes.map(({ path, element }) => (
+        <Route
+          key={path}
+          path={path}
+          element={
+            autenticado ? element : <Navigate to='/iniciar-sesion' replace />
+          }
+        />
+      ))}
 
       {/* Ruta por defecto */}
       <Route path='*' element={<Navigate to='/cursos' replace />} />

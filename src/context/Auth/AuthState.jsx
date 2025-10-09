@@ -38,7 +38,7 @@ const AuthState = (props) => {
     try {
       const { data } = await MethodGet("/auth/me"); // sin la barra inicial
 
-      dispatch({ type: types.OBTENER_USUARIO, payload: data });
+      dispatch({ type: types.OBTENER_USUARIO, payload: data.user });
       return true;
     } catch (error) {
       console.error(
@@ -86,8 +86,6 @@ const AuthState = (props) => {
   };
 
   const registerUser = (data) => {
-    // return;
-
     let url = "/auth/register";
     MethodPost(url, data)
       .then((res) => {

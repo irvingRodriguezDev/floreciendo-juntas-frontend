@@ -4,7 +4,7 @@ import "./VideoPlayer.css";
 const VideoPlayer = () => {
   return (
     <div className='video-container'>
-      <video className='video-player' autoPlay muted loop playsInline controls>
+      <video className='video-player' autoPlay loop playsInline>
         <source
           src={
             "https://pruebapersonalirving.s3.us-east-2.amazonaws.com/3997851-uhd_4096_2160_25fps.mp4"

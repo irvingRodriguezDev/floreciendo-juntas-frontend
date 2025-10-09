@@ -15,9 +15,9 @@ import { Formik, Form } from "formik";
 import * as Yup from "yup";
 import AuthContext from "../../context/Auth/AuthContext";
 import svg from "../../assets/svg/undraw_access-account_aydp.svg";
+
 const RegisterSchema = Yup.object().shape({
   name: Yup.string().required("El nombre es requerido"),
-  direction: Yup.string().required("La dirección es requerida"),
   phone: Yup.string().required("El teléfono es requerido"),
   email: Yup.string()
     .email("Correo inválido")
@@ -53,42 +53,36 @@ const Register = () => {
         justifyContent='center'
         alignItems='center'
         sx={{ minHeight: "100vh", px: { xs: 2, sm: 4 }, py: { xs: 4, md: 8 } }}
+        spacing={4}
       >
-        <Grid
-          item
-          size={{ xs: 12, sm: 6, md: 5 }}
-          sx={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
+        {/* Ilustración */}
+        <Grid size={{ xs: 12, sm: 6, md: 5 }} sx={{ mt: { xs: 10 } }}>
           <Paper
             elevation={0}
             sx={{
-              padding: { xs: "10px", sm: "20px" },
-              borderRadius: "16px",
+              p: { xs: 2, sm: 3 },
               textAlign: "center",
               bgcolor: "transparent",
             }}
           >
             <img
               src={svg}
-              alt='Login Illustration'
+              alt='Register Illustration'
               style={{ width: "100%", maxWidth: "400px" }}
             />
           </Paper>
         </Grid>
-        <Grid item size={{ xs: 12, sm: 8, md: 5 }} sx={{ mt: 5 }}>
+
+        {/* Formulario */}
+        <Grid size={{ xs: 12, sm: 8, md: 5 }}>
           <Paper
             elevation={4}
             sx={{
               p: { xs: 3, sm: 4 },
               borderRadius: "16px",
-              bgcolor: "white",
               textAlign: "center",
               maxWidth: "600px",
-              bgcolor: "transparent",
+              bgcolor: "white",
             }}
           >
             <Formik
@@ -98,15 +92,16 @@ const Register = () => {
                 password: "",
                 password_confirmation: "",
                 phone: "",
-                direction: "",
               }}
               validationSchema={RegisterSchema}
-              onSubmit={(values) => registerUser(values)}
+              onSubmit={(values) => {
+                registerUser(values);
+              }}
             >
               {({ values, errors, touched, handleChange, handleBlur }) => (
                 <Form>
                   <Grid container spacing={2}>
-                    <Grid item size={12}>
+                    <Grid size={12}>
                       <Typography
                         textAlign='center'
                         fontWeight='bold'
@@ -118,10 +113,7 @@ const Register = () => {
                     </Grid>
 
                     {/* Nombre */}
-                    <Grid
-                      item
-                      size={{ xs: 12, sm: 12, md: 12, lg: 12, xl: 12 }}
-                    >
+                    <Grid size={12}>
                       <FormControl fullWidth>
                         <TextField
                           label='Nombre completo'
@@ -138,8 +130,8 @@ const Register = () => {
                       </FormControl>
                     </Grid>
 
-                    {/* Email y Teléfono */}
-                    <Grid item size={{ xs: 12, md: 12, lg: 12, xl: 12 }}>
+                    {/* Correo */}
+                    <Grid size={12}>
                       <FormControl fullWidth>
                         <TextField
                           label='Correo Electrónico'
@@ -157,11 +149,11 @@ const Register = () => {
                       </FormControl>
                     </Grid>
 
-                    <Grid item size={{ xs: 12, md: 12, lg: 12, xl: 12 }}>
+                    {/* Teléfono */}
+                    <Grid size={12}>
                       <FormControl fullWidth>
                         <TextField
                           label='Teléfono'
-                          type='text'
                           name='phone'
                           placeholder='7223224221'
                           value={values.phone}
@@ -174,9 +166,8 @@ const Register = () => {
                         />
                       </FormControl>
                     </Grid>
-
-                    {/* Contraseña y Confirmación */}
-                    <Grid item size={{ xs: 12, md: 12, lg: 12, xl: 12 }}>
+                    {/* Contraseña */}
+                    <Grid size={12}>
                       <FormControl fullWidth>
                         <TextField
                           label='Contraseña'
@@ -194,7 +185,8 @@ const Register = () => {
                       </FormControl>
                     </Grid>
 
-                    <Grid item size={{ xs: 12, md: 12, lg: 12, xl: 12 }}>
+                    {/* Confirmación */}
+                    <Grid size={12}>
                       <FormControl fullWidth>
                         <TextField
                           label='Confirma tu contraseña'
@@ -219,28 +211,30 @@ const Register = () => {
                     </Grid>
 
                     {/* Botón Registrarse */}
-                    <Grid item size={12}>
+                    <FormControl fullWidth margin='normal'>
                       <Button
                         variant='contained'
                         fullWidth
-                        size='large'
                         type='submit'
+                        size='large'
                         sx={{
                           py: 1.5,
                           fontWeight: "bold",
-                          background: "#BF2369",
                           borderRadius: "12px",
+                          bgcolor: "#D82E7A",
+                          color: "#fff",
                           "&:hover": {
-                            background: "#BF2369",
+                            bgcolor: "#bf2369",
+                            color: "#fff",
                           },
                         }}
                       >
                         Registrarme
                       </Button>
-                    </Grid>
+                    </FormControl>
 
                     {/* Divider */}
-                    <Grid item size={12}>
+                    <Grid size={12}>
                       <Divider>
                         <Chip
                           sx={{ bgcolor: "#D82E7A", color: "white" }}
@@ -250,7 +244,7 @@ const Register = () => {
                     </Grid>
 
                     {/* Link a login */}
-                    <Grid item size={12}>
+                    <Grid size={12}>
                       <Link
                         to='/iniciar-sesion'
                         style={{ textDecoration: "none" }}
@@ -275,11 +269,6 @@ const Register = () => {
                           Iniciar sesión
                         </Button>
                       </Link>
-                    </Grid>
-
-                    {/* Espacio para SVG */}
-                    <Grid item xs={12}>
-                      <div style={{ height: "80px" }} />
                     </Grid>
                   </Grid>
                 </Form>

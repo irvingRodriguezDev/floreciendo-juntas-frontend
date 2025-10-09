@@ -61,23 +61,24 @@ const Header = () => {
         position='fixed'
         elevation={scrolled ? 4 : 0}
         sx={{
-          width: "98%",
-          mt: 2,
+          width: "100%",
+          mt: 0,
           left: "50%",
           transform: "translateX(-50%)",
-          borderRadius: "16px",
+          borderBottomLeftRadius: "16px",
+          borderBottomRightRadius: "16px",
           boxShadow: scrolled
-            ? "0 4px 20px rgba(0,0,0,0.15)"
-            : "0 4px 30px rgba(0, 0, 0, 0.1)",
-          backgroundColor: scrolled
-            ? "rgba(241, 189, 206, 0.3)"
-            : "rgba(241, 189, 206, 0.3)",
-          backdropFilter: "blur(12px)",
-          border: scrolled
-            ? "1px solid rgba(255, 255, 255, 0.4)"
-            : "1px solid rgba(241, 189, 206, 0.3)",
-          transition: "all 0.3s ease",
-          color: scrolled ? "#E53888" : "#E53888",
+            ? "0 8px 25px rgba(229, 56, 136, 0.15)"
+            : "0 4px 30px rgba(0,0,0,0.25)",
+          background: scrolled
+            ? "rgba(255, 255, 255, 0.25)"
+            : "rgba(0, 0, 0, 0.25)",
+          backdropFilter: "blur(14px)",
+          border: "1px solid rgba(255, 255, 255, 0.25)",
+          transition: "all 0.4s ease",
+          color: scrolled ? "#E53888" : "#FFFFFF",
+          textShadow: scrolled ? "none" : "0 1px 6px rgba(0,0,0,0.4)",
+          zIndex: 1000,
         }}
       >
         <Toolbar
@@ -181,7 +182,7 @@ const Header = () => {
               ) : (
                 <Button
                   component={Link}
-                  to={"/perfil"}
+                  to={"/mi-perfil"}
                   variant='contained'
                   size='large'
                   sx={{
@@ -302,7 +303,7 @@ const Header = () => {
                     ) : (
                       <Button
                         component={Link}
-                        to='/perfil'
+                        to='/mi-perfil'
                         variant='contained'
                         sx={{
                           color: "#fff",
