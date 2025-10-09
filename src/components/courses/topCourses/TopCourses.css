@@ -30,15 +30,15 @@
 
 .movie-rank {
   position: absolute;
-  font-size: 4rem; /* Reducido drásticamente de 18rem; ajusta según necesites (ej. 3rem para más pequeño) */
+  font-size: 20rem; /* Reducido drásticamente de 18rem; ajusta según necesites (ej. 3rem para más pequeño) */
   font-weight: 800;
-  left: 0; /* Cambiado de -50px para que no se salga a la izquierda */
+  left: "1px"; /* Cambiado de -50px para que no se salga a la izquierda */
   top: 50%;
   transform: translate(
     -50%,
     -50%
   ); /* Centra horizontal y verticalmente respecto a su posición */
-  z-index: 1;
+  z-index: 3;
   color: #e53888;
   /* Glass effect SOLO en el número: Ajustado para que funcione mejor sin padding extra */
   background: rgba(229, 56, 136, 0.4);
@@ -101,7 +101,7 @@
   }
 
   .movie-rank {
-    font-size: 2.5rem; /* Más pequeño en móviles */
+    font-size: 8rem; /* Más pequeño en móviles */
   }
 
   .movie-img {

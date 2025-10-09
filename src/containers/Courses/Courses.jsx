@@ -16,7 +16,7 @@ const Courses = () => {
         <Grid
           size={12}
           sx={{
-            paddingLeft: { xs: "10px", sm: "10px", mf: "0px", lg: "0px" },
+            paddingLeft: { xs: "10px", sm: "10px", mf: "0px", lg: "100px" },
           }}
         >
           <Typography fontWeight='semibold' fontSize='45px'>
