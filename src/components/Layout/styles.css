@@ -1,0 +1,18 @@
+/* src/styles.css */
+
+/* Importas la fuente desde Google Fonts */
+@import url("https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap");
+
+/* Clase para textos con esa fuente */
+.signature-text {
+  font-family: "Great Vibes", cursive;
+  font-size: 7rem; /* puedes ajustar el tamaño */
+  color: #e893b5; /* opcional: color rosa */
+}
+
+/* Puedes crear más estilos si gustas */
+.sub-signature {
+  font-family: "Great Vibes", cursive;
+  font-size: 1.5rem;
+  color: #333;
+}

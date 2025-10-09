@@ -7,7 +7,6 @@ import { ThemeProvider } from "@mui/material/styles";
 // Para una mejor práctica, también puedes agregar la normalización CSS
 import CssBaseline from "@mui/material/CssBaseline";
 import { BrowserRouter } from "react-router-dom";
-
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <BrowserRouter>

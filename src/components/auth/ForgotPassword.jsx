@@ -1,14 +1,20 @@
 import React from "react";
 import Layout from "../Layout/Layout";
-import {
-  Button,
-  Divider,
-  Grid,
-  Paper,
-  TextField,
-  Typography,
-} from "@mui/material";
+import { Button, Grid, Paper, TextField, Typography } from "@mui/material";
 import { Link } from "react-router-dom";
+import svg from "../../assets/svg/undraw_forgot-password_nttj.svg";
+const inputStyles = {
+  mb: 2,
+  "& .MuiOutlinedInput-root": {
+    borderRadius: "12px",
+    "& fieldset": { borderColor: "rgba(216,46,136,0.3)" },
+    "&:hover fieldset": { borderColor: "#D82E7A" },
+    "&.Mui-focused fieldset": { borderColor: "#D82E7A" },
+  },
+  "& .MuiInputBase-input": { color: "black" },
+  "& .MuiInputLabel-root": { color: "#D82E7A" },
+  "& .MuiInputLabel-root.Mui-focused": { color: "#D82E7A" },
+};
 
 const ForgotPassword = () => {
   return (
@@ -17,139 +23,101 @@ const ForgotPassword = () => {
         container
         justifyContent='center'
         alignItems='center'
-        sx={{ mt: { xs: "30%", md: "10%" } }}
+        sx={{ minHeight: "100vh", px: { xs: 2, sm: 4 }, py: { xs: 3, md: 2 } }}
       >
-        <Grid item size={{ xs: 11, md: 6 }}>
+        <Grid
+          item
+          size={{ xs: 12, sm: 6, md: 5 }}
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
           <Paper
+            elevation={0}
             sx={{
-              p: 4,
-              background:
-                "linear-gradient(145deg, rgba(238,158,234,0.15), rgba(229,56,136,0.1))",
-              borderRadius: "20px",
-              boxShadow: "0 8px 40px rgba(229, 56, 136, 0.2)",
-              backdropFilter: "blur(8px)",
-              border: "1px solid rgba(238, 158, 234, 0.3)",
-              color: "white",
+              padding: { xs: "10px", sm: "20px" },
+              borderRadius: "16px",
               textAlign: "center",
+              bgcolor: "transparent",
+            }}
+          >
+            <img
+              src={svg}
+              alt='Login Illustration'
+              style={{ width: "100%", maxWidth: "400px" }}
+            />
+          </Paper>
+        </Grid>
+        <Grid item size={{ xs: 12, sm: 8, md: 6 }}>
+          <Paper
+            elevation={4}
+            sx={{
+              p: { xs: 3, sm: 4 },
+              borderRadius: "16px",
+              textAlign: "center",
+              maxWidth: "400px",
+              bgcolor: "transparent",
             }}
           >
             <Typography
               variant='h4'
               sx={{
-                color: "#E53888",
+                color: "#D82E7A",
                 fontWeight: "bold",
                 mb: 3,
-                textShadow: "0px 0px 10px rgba(229, 56, 136, 0.6)",
               }}
             >
               Restablecer Contraseña
             </Typography>
+
+            {/* Email */}
             <TextField
               label='Correo Electrónico'
               type='email'
               fullWidth
               variant='outlined'
               placeholder='carolina@floreciendo-juntas.com.mx'
-              sx={{
-                mb: 2,
-                "& .MuiOutlinedInput-root": {
-                  borderRadius: "12px",
-                  "& fieldset": { borderColor: "rgba(229, 56, 136, 0.5)" },
-                  "&:hover fieldset": { borderColor: "#E53888" },
-                  "&.Mui-focused fieldset": { borderColor: "#E53888" },
-                },
-                "& .MuiInputBase-input": {
-                  color: "white",
-                },
-                "& .MuiInputLabel-root": {
-                  // 🔹 color normal
-                  color: "#E53888",
-                },
-                "& .MuiInputLabel-root.Mui-focused": {
-                  // 🔹 color enfocado
-                  color: "#E53888",
-                },
-                "& .MuiInputLabel-root.Mui-disabled": {
-                  // 🔹 color si está deshabilitado
-                  color: "#E53888",
-                },
-              }}
+              sx={inputStyles}
             />
+
+            {/* Contraseña */}
             <TextField
               label='Contraseña'
               type='password'
               fullWidth
               variant='outlined'
               placeholder='**********'
-              sx={{
-                mb: 2,
-                "& .MuiOutlinedInput-root": {
-                  borderRadius: "12px",
-                  "& fieldset": { borderColor: "rgba(229, 56, 136, 0.5)" },
-                  "&:hover fieldset": { borderColor: "#E53888" },
-                  "&.Mui-focused fieldset": { borderColor: "#E53888" },
-                },
-                "& .MuiInputBase-input": {
-                  color: "white",
-                },
-                "& .MuiInputLabel-root": {
-                  // 🔹 color normal
-                  color: "#E53888",
-                },
-                "& .MuiInputLabel-root.Mui-focused": {
-                  // 🔹 color enfocado
-                  color: "#E53888",
-                },
-                "& .MuiInputLabel-root.Mui-disabled": {
-                  // 🔹 color si está deshabilitado
-                  color: "#E53888",
-                },
-              }}
+              sx={inputStyles}
             />
+
+            {/* Confirmar Contraseña */}
             <TextField
-              label='Confirmar contraseña'
+              label='Confirmar Contraseña'
               type='password'
               fullWidth
               variant='outlined'
               placeholder='**********'
-              sx={{
-                mb: 2,
-                "& .MuiOutlinedInput-root": {
-                  borderRadius: "12px",
-                  "& fieldset": { borderColor: "rgba(229, 56, 136, 0.5)" },
-                  "&:hover fieldset": { borderColor: "#E53888" },
-                  "&.Mui-focused fieldset": { borderColor: "#E53888" },
-                },
-                "& .MuiInputBase-input": {
-                  color: "white",
-                },
-                "& .MuiInputLabel-root": {
-                  // 🔹 color normal
-                  color: "#E53888",
-                },
-                "& .MuiInputLabel-root.Mui-focused": {
-                  // 🔹 color enfocado
-                  color: "#E53888",
-                },
-                "& .MuiInputLabel-root.Mui-disabled": {
-                  // 🔹 color si está deshabilitado
-                  color: "#E53888",
-                },
-              }}
+              sx={inputStyles}
             />
+
+            {/* Link a login */}
             <Typography textAlign='right' sx={{ mb: 2 }}>
-              Ya la recordaste?{" "}
+              ¿Ya la recordaste?{" "}
               <Link
+                to='/iniciar-sesion'
                 style={{
                   textDecoration: "none",
-                  color: "white",
+                  color: "#D82E7A",
                   fontWeight: "bold",
                 }}
-                to='/iniciar-sesion'
               >
-                <b>Inicia sesión aquí</b>
+                Inicia sesión aquí
               </Link>
             </Typography>
+
+            {/* Botón restablecer */}
             <Button
               variant='contained'
               fullWidth
@@ -157,17 +125,19 @@ const ForgotPassword = () => {
               sx={{
                 py: 1.5,
                 fontWeight: "bold",
-                background: "linear-gradient(90deg, #E53888, #EE9EEA)",
+                background: "#E53888",
                 borderRadius: "12px",
-                boxShadow: "0px 4px 20px rgba(229, 56, 136, 0.5)",
+                boxShadow: "0px 4px 20px rgba(216,46,136,0.5)",
                 "&:hover": {
-                  background: "linear-gradient(90deg, #d42a76, #e285d7)",
-                  boxShadow: "0px 6px 25px rgba(229, 56, 136, 0.7)",
+                  background: "#E53888",
                 },
               }}
             >
               Restablecer contraseña
             </Button>
+
+            {/* Espacio al final para SVG si se desea */}
+            <div style={{ height: "60px" }} />
           </Paper>
         </Grid>
       </Grid>

@@ -69,19 +69,8 @@ const NewCourses = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
-          <Typography fontWeight='semibold' fontSize='45px'>
-            Descubre
-          </Typography>
-          <Typography
-            fontWeight='bold'
-            fontSize='70px'
-            fontFamily='sans-serif'
-            sx={{
-              textShadow:
-                "2px 2px 4px rgba(0,0,0,0.5), -1px -1px 2px rgba(255,0,0,0.3)",
-            }}
-          >
-            Nuestro contenido nuevo
+          <Typography className='signature-text'>
+            Descubre Nuestro contenido nuevo
           </Typography>
         </motion.div>
       </Grid>
@@ -103,7 +92,7 @@ const NewCourses = () => {
       >
         {cursos.map((c, index) => (
           <SwiperSlide key={index}>
-            <Card>
+            <Card sx={{ borderRadius: "12px" }}>
               <CardMedia
                 component='img'
                 width='100%'

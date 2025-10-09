@@ -70,7 +70,7 @@ const Header = () => {
             ? "0 4px 20px rgba(0,0,0,0.15)"
             : "0 4px 30px rgba(0, 0, 0, 0.1)",
           backgroundColor: scrolled
-            ? "rgba(255, 255, 255, 0.9)"
+            ? "rgba(241, 189, 206, 0.3)"
             : "rgba(241, 189, 206, 0.3)",
           backdropFilter: "blur(12px)",
           border: scrolled
