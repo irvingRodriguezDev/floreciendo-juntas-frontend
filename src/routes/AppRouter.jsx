@@ -16,6 +16,8 @@ import Secrets from "../containers/Secrets/Secrets";
 import Shop from "../containers/Shop/Shop";
 import Profile from "../containers/Profile/Profile";
 import DetailEvent from "../containers/Events/EventDetail/DetailEvent";
+import Home from "../containers/Home/Home";
+import DetailsCourse from "../containers/Courses/Details/DetailsCourse";
 
 function AppRouter() {
   const { autenticado, usuarioAutenticado, cargando } = useContext(AuthContext);
@@ -39,13 +41,14 @@ function AppRouter() {
 
   // Rutas siempre accesibles
   const alwaysRoutes = [
-    { path: "/cursos", element: <Courses /> },
+    { path: "/", element: <Home /> },
     { path: "/certificaciones", element: <Certifications /> },
     { path: "/tienda", element: <Shop /> },
     { path: "/eventos", element: <Events /> },
     { path: "/detalle-evento/:id", element: <DetailEvent /> },
     { path: "/10-secretos", element: <Secrets /> },
     { path: "/el-salon-de-tus-sueños", element: <Saloon /> },
+    { path: "/detalle-curso/:id", element: <DetailsCourse /> },
   ];
 
   // Rutas públicas solo para no autenticados
@@ -65,7 +68,7 @@ function AppRouter() {
         <Route
           key={path}
           path={path}
-          element={autenticado ? <Navigate to='/cursos' replace /> : element}
+          element={autenticado ? <Navigate to='/' replace /> : element}
         />
       ))}
 
@@ -86,7 +89,7 @@ function AppRouter() {
       ))}
 
       {/* Ruta por defecto */}
-      <Route path='*' element={<Navigate to='/cursos' replace />} />
+      <Route path='*' element={<Navigate to='/' replace />} />
     </Routes>
   );
 }

@@ -10,11 +10,11 @@ import { BrowserRouter } from "react-router-dom";
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <BrowserRouter>
-      <ThemeProvider theme={theme}>
-        {/* CssBaseline se encarga de normalizar los estilos de forma consistente */}
-        <CssBaseline />
-        <App />
-      </ThemeProvider>
+      {/* <ThemeProvider theme={theme}> */}
+      {/* CssBaseline se encarga de normalizar los estilos de forma consistente */}
+      <CssBaseline />
+      <App />
+      {/* </ThemeProvider> */}
     </BrowserRouter>
   </React.StrictMode>
 );
