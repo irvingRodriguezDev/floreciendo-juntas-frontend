@@ -166,7 +166,7 @@ const LatestEventsSection = () => {
                   </Typography>
                   <Typography
                     variant='caption'
-                    color={primaryPink}
+                    color='#E53888'
                     sx={{ fontWeight: 600 }}
                   >
                     | Por {event.author}
@@ -215,7 +215,7 @@ const LatestEventsSection = () => {
           variant='contained'
           endIcon={<ArrowForwardIcon />}
           sx={{
-            backgroundColor: primaryPink, // Rosa principal
+            backgroundColor: "#E53888", // Rosa principal
             color: "white",
             "&:hover": {
               backgroundColor: "#E53888",

@@ -1,20 +1,31 @@
+// src/components/VideoPlayer.jsx
+import { Box } from "@mui/material";
 import React from "react";
-import "./VideoPlayer.css";
-// import video from "../assets/video/14436214_3840_2160_60fps.mp4";
-const VideoPlayer = () => {
+// Opcional: Puedes seguir usando un archivo CSS si lo necesitas, pero lo haremos con SX en el modal.
+// import "./VideoPlayer.css";
+
+const VideoPlayer = ({ videoSrc }) => {
   return (
-    <div className='video-container'>
-      <video className='video-player' autoPlay loop playsInline>
-        <source
-          src={
-            "https://pruebapersonalirving.s3.us-east-2.amazonaws.com/3997851-uhd_4096_2160_25fps.mp4"
-          }
-          type='video/mp4'
-        />
+    <Box
+      sx={{
+        width: "100%",
+        // Controla el aspecto del video, ajusta según la resolución del video
+        aspectRatio: "16 / 9",
+        overflow: "hidden",
+      }}
+    >
+      <video
+        className='video-player'
+        autoPlay
+        loop
+        playsInline
+        // muted // ¡Importante para autoPlay en modales!
+        style={{ width: "100%", height: "100%", objectFit: "cover" }}
+      >
+        <source src={videoSrc} type='video/mp4' />
         Tu navegador no soporta el elemento de video.
       </video>
-      <div className='video-gradient'></div>
-    </div>
+    </Box>
   );
 };
 

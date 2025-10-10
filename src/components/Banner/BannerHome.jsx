@@ -7,12 +7,16 @@ import {
   Stack,
   useTheme,
   IconButton,
+  Tooltip,
 } from "@mui/material";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
-
+import VideoModal from "./VideoModal";
+import image from "../../assets/images/FB_IMG_1760128916351.jpg";
 const BannerHome = () => {
   const theme = useTheme();
+  const videoSource =
+    "https://floreciendo.s3.us-east-2.amazonaws.com/INTROPLATAFORMAHORIZONTAL";
 
   return (
     <Box
@@ -22,7 +26,7 @@ const BannerHome = () => {
         alignItems: "center",
         justifyContent: "center",
         minHeight: "80vh",
-        backgroundColor: "#FFF0F0", // Un color de fondo claro similar al de la imagen
+        background: "#FFF0F0",
         padding: theme.spacing(4),
         position: "relative",
         overflow: "hidden", // Para contener los elementos decorativos
@@ -238,29 +242,7 @@ const BannerHome = () => {
           >
             ¡Quiero Empezar a Florecer!
           </Button>
-          <IconButton
-            sx={{
-              backgroundColor: "#D72E79",
-              "&:hover": { backgroundColor: "#D72E79" },
-            }}
-          >
-            <PlayArrowIcon sx={{ fontSize: "40PX", color: "#fff" }} />
-          </IconButton>
-          <Typography
-            sx={{
-              borderColor: "transparent", // Sin borde visible
-              color: "text.primary",
-              //   "&:hover": {
-              //     backgroundColor: "rgba(0, 0, 0, 0.04)",
-              //     borderColor: "transparent",
-              //   },
-              fontWeight: 600,
-              padding: "10px 15px",
-              borderRadius: "8px",
-            }}
-          >
-            Ver nuestro video
-          </Typography>
+          <VideoModal buttonText='Ver nuestro video' videoUrl={videoSource} />
         </Stack>
         <Box
           component='img'
@@ -292,7 +274,7 @@ const BannerHome = () => {
       >
         <Box
           component='img'
-          src='https://floreciendo.wapizima.com.mx/static/media/carolina1.c68fa0c110d31ee40a04.jpg' // Reemplaza con la URL de tu imagen
+          src={image} // Reemplaza con la URL de tu imagen
           alt='caro'
           sx={{
             width: "100%",
