@@ -8,6 +8,7 @@ import NewCourses from "../../components/courses/newCourses/NewCourses";
 import TopCourses from "../../components/courses/topCourses/TopCourses";
 import WhyChooseUsSection from "../../components/WhyChose/WhyChoseUsSection";
 import LatestEventsSection from "../../components/events/LatestEventsSections";
+import SocialLinks from "../../components/SocialLinks/SocialLinks";
 const Home = () => {
   return (
     <Layout>
@@ -32,6 +33,9 @@ const Home = () => {
         </Grid>
         <Grid size={12}>
           <LatestEventsSection />
+        </Grid>
+        <Grid size={12}>
+          <SocialLinks />
         </Grid>
       </Grid>
     </Layout>

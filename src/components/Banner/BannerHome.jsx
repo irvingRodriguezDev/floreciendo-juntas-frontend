@@ -8,6 +8,7 @@ import {
   useTheme,
   IconButton,
   Tooltip,
+  Chip,
 } from "@mui/material";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
@@ -227,7 +228,7 @@ const BannerHome = () => {
           spacing={2}
           justifyContent={{ xs: "center", md: "flex-start" }}
         >
-          <Button
+          <Chip
             variant='contained'
             sx={{
               backgroundColor: "#D72E79", // Amarillo
@@ -235,13 +236,14 @@ const BannerHome = () => {
               "&:hover": {
                 backgroundColor: "#D72E79", // Un tono más oscuro de amarillo
               },
-              fontWeight: 600,
-              padding: "10px 25px",
-              borderRadius: "8px",
+              fontWeight: "bold",
+              padding: "20px 25px",
+              borderRadius: "12px",
+              fontSize: "20px",
             }}
-          >
-            ¡Quiero Empezar a Florecer!
-          </Button>
+            label='¡Quiero empezar a florecer!'
+          />
+
           <VideoModal buttonText='Ver nuestro video' videoUrl={videoSource} />
         </Stack>
         <Box

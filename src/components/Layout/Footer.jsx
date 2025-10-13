@@ -31,7 +31,7 @@ const Footer = () => {
         {/* Enlaces */}
         <Stack
           direction={{ xs: "column", sm: "row" }}
-          justifyContent='space-between'
+          justifyContent='center'
           alignItems='center'
           spacing={3}
           sx={{ mb: 3 }}
@@ -59,44 +59,6 @@ const Footer = () => {
               >
                 {item.text}
               </Link>
-            ))}
-          </Stack>
-
-          {/* Redes sociales */}
-          <Stack direction='row' spacing={2}>
-            {[
-              {
-                href: "https://facebook.com",
-                icon: <FacebookIcon width={28} />,
-              },
-              {
-                href: "https://instagram.com",
-                icon: <InstagramIcon width={28} />,
-              },
-              {
-                href: "https://tiktok.com",
-                icon: <TiktokIcon width={28} />,
-              },
-              {
-                href: "https://youtube.com",
-                icon: <YoutubeIcon width={28} />,
-              },
-            ].map((item, index) => (
-              <IconButton
-                key={index}
-                href={item.href}
-                target='_blank'
-                sx={{
-                  color: "#E53888",
-                  transition: "transform 0.3s ease, color 0.3s ease",
-                  "&:hover": {
-                    color: "#ff69b4",
-                    transform: "scale(1.2)",
-                  },
-                }}
-              >
-                {item.icon}
-              </IconButton>
             ))}
           </Stack>
         </Stack>

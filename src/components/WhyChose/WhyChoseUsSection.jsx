@@ -13,28 +13,28 @@ const features = [
     title: "Mentoras Expertas",
     description:
       "Contamos con profesionales de élite en el sector de uñas para darte el mejor soporte y guía.",
-    iconColor: "#ffc107", // Amarillo
+    iconColor: "#E46F9F", // Amarillo
   },
   {
     icon: HeadsetMicIcon,
     title: "Soporte Dedicado",
     description:
       "Siempre estamos listas para ayudarte a resolver dudas y problemas 24/7. ¡No estás sola!",
-    iconColor: "#4caf50", // Verde
+    iconColor: "#E46F9F", // Verde
   },
   {
     icon: SchoolIcon,
     title: "Aprendizaje Digital",
     description:
       "Accede a tus cursos desde cualquier dispositivo, a tu ritmo, con lecciones claras y concisas.",
-    iconColor: "#9575cd", // Violeta
+    iconColor: "#E46F9F", // Violeta
   },
   {
     icon: EmojiEventsIcon,
     title: "Certificado de Éxito",
     description:
       "Obtén tu certificación que avala tus conocimientos y te impulsa a emprender con credibilidad.",
-    iconColor: "#e91e63", // Rosa principal
+    iconColor: "#E46F9F", // Rosa principal
   },
 ];
 
