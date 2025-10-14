@@ -85,7 +85,7 @@ const Header = () => {
           sx={{ display: "flex", justifyContent: "space-between", px: 2 }}
         >
           {/* LOGO */}
-          <Link style={{ textDecoration: "none" }} to='/cursos'>
+          <Link style={{ textDecoration: "none" }} to='/'>
             <Typography
               variant='h6'
               sx={{

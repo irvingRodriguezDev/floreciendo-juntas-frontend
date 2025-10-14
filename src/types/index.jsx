@@ -16,3 +16,7 @@ export const SHOW_ERRORS_API = "SHOW_ERRORS_API";
 
 //systems
 export const GET_ALL_SYSTEMS = "GET_ALL_SYSTEMS";
+
+//courses
+export const GET_ALL_COURSES = "GET_ALL_COURSES";
+export const GET_ALL_COURSES_PAGINATE = "GET_ALL_COURSES_PAGINATE";

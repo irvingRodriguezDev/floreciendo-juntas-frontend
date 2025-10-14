@@ -42,6 +42,7 @@ function AppRouter() {
   // Rutas siempre accesibles
   const alwaysRoutes = [
     { path: "/", element: <Home /> },
+    { path: "/cursos", element: <Courses /> },
     { path: "/certificaciones", element: <Certifications /> },
     { path: "/tienda", element: <Shop /> },
     { path: "/eventos", element: <Events /> },

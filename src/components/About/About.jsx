@@ -14,7 +14,7 @@ import PeopleAltIcon from "@mui/icons-material/PeopleAlt";
 import PersonIcon from "@mui/icons-material/Person";
 import CameraAltIcon from "@mui/icons-material/CameraAlt";
 import WorkspacePremiumIcon from "@mui/icons-material/WorkspacePremium";
-
+import Graduados from "../../assets/images/graduados.jpg";
 // Componente para las tarjetas de estadísticas (KPIs)
 const StatisticCard = ({ icon: Icon, value, label, color }) => (
   <Stack direction='row' spacing={2} alignItems='center' sx={{ mb: 2 }}>
@@ -96,11 +96,11 @@ const About = () => {
             {/* Imagen 2: Estudiante/Modelo (La chica con gafas) */}
             <Box
               component='img'
-              src='https://i.pinimg.com/1200x/02/36/94/0236941ffc750b990ca078d23f4ff4e9.jpg' // Reemplaza con la URL de la imagen principal
+              src={Graduados} // Reemplaza con la URL de la imagen principal
               alt='Estudiante de Uñas'
               sx={{
                 width: { xs: 250, sm: 300, md: 350 },
-                height: { xs: 350, sm: 400, md: 450 },
+                height: { xs: 350, sm: 400, md: 550 },
                 objectFit: "cover",
                 borderRadius: "16px",
                 clipPath: "polygon(0 0, 100% 0, 100% 90%, 0 100%)", // Simula el corte de la imagen
