@@ -18,7 +18,7 @@ const CourseTitle = ({
     <Box
       sx={{
         backgroundColor: softBgColor, // Fondo de color suave
-        padding: theme.spacing(25, 4), // Padding generoso
+        padding: theme.spacing(20, 4), // Padding generoso
         position: "relative", // Para posicionar los adornos
         overflow: "hidden",
         minHeight: { xs: "250px", sm: "200px" }, // Altura mínima para que los adornos se vean bien
@@ -36,7 +36,7 @@ const CourseTitle = ({
       <Box
         sx={{
           position: "absolute",
-          top: "15%",
+          top: "10%",
           left: "5%",
           width: "60px",
           height: "30px",

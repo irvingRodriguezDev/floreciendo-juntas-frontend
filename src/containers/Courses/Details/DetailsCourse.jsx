@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext, useEffect } from "react";
 import {
   Box,
   Typography,
@@ -17,7 +17,9 @@ import PeopleAltIcon from "@mui/icons-material/PeopleAlt";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import Layout from "../../../components/Layout/Layout";
 import CourseTitle from "./CouseTitle";
-
+import CoursesContext from "../../../context/Courses/CoursesContext";
+import { useParams } from "react-router-dom";
+import VideoPlayer from "./VideoPlayer";
 // --- Contenido de Ejemplo del Curso ---
 const courseData = {
   title: "Técnicas Avanzadas de Esculpido con Polygel",
@@ -45,6 +47,15 @@ const courseData = {
 };
 
 const CourseDetailScreen = () => {
+  const videoUrl =
+    "https://d3uummb9o2cvmk.cloudfront.net/23-3D básico San Valentín con Ivette López - Wapizima (1080p, h264)/3D básico San Valentín con Ivette López - Wapizima (1080p, h264).m3u8"; // tu URL HLS de CloudFront
+  const params = useParams();
+  const { id } = params;
+  const { course, getCourseById } = useContext(CoursesContext);
+  useEffect(() => {
+    getCourseById(id);
+  }, [id]);
+
   const theme = useTheme();
 
   const primaryPink = "#e91e63";
@@ -195,7 +206,7 @@ const CourseDetailScreen = () => {
     <Layout>
       <Box sx={{ backgroundColor: softBgColor, minHeight: "100vh" }}>
         {/* Banner Superior con Adornos */}
-        <CourseTitle title={courseData.title} />
+        <CourseTitle title={course.title} />
 
         {/* Contenido Principal */}
         <Grid
@@ -206,7 +217,7 @@ const CourseDetailScreen = () => {
           {/* Columna Derecha: Tarjeta de Info y Últimos Cursos */}
           <Grid size={{ xs: 12, md: 4 }} order={{ xs: 2, md: 2 }}>
             <InfoCard />
-            <LatestCourseCard />
+            {/* <LatestCourseCard /> */}
           </Grid>
 
           {/* Columna Izquierda: Imagen y Contenido */}
@@ -215,31 +226,17 @@ const CourseDetailScreen = () => {
               {/* Imagen Principal del Curso (Simil al diseño) */}
               <Box
                 sx={{
-                  position: "relative",
-                  width: "100%",
-                  height: { xs: 250, sm: 350 },
-                  borderRadius: "16px",
-                  overflow: "hidden",
-                  boxShadow: theme.shadows[8],
+                  maxWidth: "900px",
+                  margin: "0 auto",
+                  padding: "20px",
                 }}
               >
-                <Box
-                  component='img'
-                  // Usaremos la imagen de la chica con el fondo amarillo para simular la portada
-                  src='https://i.pinimg.com/736x/d1/e4/75/d1e47547bb78f24d79dd5f58d5fe3b2b.jpg'
-                  alt='Portada del Curso'
-                  sx={{ width: "100%", height: "100%", objectFit: "cover" }}
-                />
+                <VideoPlayer src={videoUrl} poster={course.cover_image_url} />
               </Box>
 
               {/* Navegación (Tabs/Pestañas) - Usamos solo botones por simplicidad visual */}
               <Stack direction='row' spacing={1}>
-                {[
-                  "Visión General",
-                  "Currículum",
-                  "Instructora",
-                  "Opiniones",
-                ].map((tab, index) => (
+                {["Descripción", "Reseñas"].map((tab, index) => (
                   <Button
                     key={tab}
                     variant={index === 0 ? "contained" : "outlined"}
@@ -266,15 +263,17 @@ const CourseDetailScreen = () => {
 
               {/* --- Sección de Visión General --- */}
               <Box>
-                <Typography variant='h5' sx={{ fontWeight: 700, mb: 2 }}>
+                {/* <Typography variant='h5' sx={{ fontWeight: 700, mb: 2 }}>
                   Visión General del Curso
-                </Typography>
+                </Typography> */}
                 <Typography
                   variant='body1'
                   color='text.secondary'
                   sx={{ mb: 3 }}
                 >
-                  {courseData.description}
+                  <div
+                    dangerouslySetInnerHTML={{ __html: course.description }}
+                  />
                 </Typography>
 
                 <Typography

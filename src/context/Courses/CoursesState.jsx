@@ -2,12 +2,18 @@ import React, { useCallback, useReducer } from "react";
 import MethodGet, { MethodPost, MethodPut } from "../../config/Service";
 import CoursesReducer from "./CoursesReducer";
 import CoursesContext from "./CoursesContext";
-import { GET_ALL_COURSES, GET_ALL_COURSES_PAGINATE } from "../../types";
+import {
+  GET_ALL_COURSES,
+  GET_ALL_COURSES_PAGINATE,
+  GET_COURSE_BY_ID,
+  GET_LATEST_COURSES,
+} from "../../types";
 /**Importar componente token headers */
 
 const CoursesState = ({ children }) => {
   const initialState = {
     courses: [],
+    course: {},
     totalItems: 0,
     totalPages: 0,
     currentPage: 0,
@@ -53,6 +59,32 @@ const CoursesState = ({ children }) => {
         console.error("Ocurrió un error al obtener los cursos:", error);
       });
   };
+  const getLastestCourses = () => {
+    let url = "/courses/lastAdded";
+    MethodGet(url)
+      .then((res) => {
+        dispatch({
+          type: GET_LATEST_COURSES,
+          payload: res.data,
+        });
+      })
+      .catch((error) => {
+        console.log(error, "ocurrio un error al obtener los ultimos cursos");
+      });
+  };
+  const getCourseById = (id) => {
+    let url = `/courses/${id}`;
+    MethodGet(url)
+      .then((res) => {
+        dispatch({
+          type: GET_COURSE_BY_ID,
+          payload: res.data,
+        });
+      })
+      .catch((error) => {
+        console.log(error, "Ocurrio un error al obtener el curso");
+      });
+  };
   return (
     <CoursesContext.Provider
       value={{
@@ -60,8 +92,11 @@ const CoursesState = ({ children }) => {
         totalItems: state.totalItems,
         totalPages: state.totalPages,
         currentPage: state.currentPage,
+        course: state.course,
         getAllCourses,
         getAllCoursesPaginate,
+        getLastestCourses,
+        getCourseById,
       }}
     >
       {children}

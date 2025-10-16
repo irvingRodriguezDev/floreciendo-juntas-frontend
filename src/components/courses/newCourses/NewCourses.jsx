@@ -1,4 +1,4 @@
-import React, { useRef } from "react"; // Necesitas useRef para la navegación personalizada si la usas
+import React, { useContext, useEffect, useRef } from "react"; // Necesitas useRef para la navegación personalizada si la usas
 import {
   Box,
   Typography,
@@ -20,9 +20,14 @@ import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 import { Link } from "react-router-dom";
+import CoursesContext from "../../../context/Courses/CoursesContext";
 // NOTA: No necesitamos el archivo "./swipperCustom.css" si manejamos la navegación con useRef y estilos de MUI.
 
 const NewCourses = () => {
+  const { courses, getLastestCourses } = useContext(CoursesContext);
+  useEffect(() => {
+    getLastestCourses();
+  }, []);
   const theme = useTheme();
 
   // Referencias para los botones de navegación personalizados (Necesario para loop=true)
@@ -206,7 +211,7 @@ const NewCourses = () => {
           // El padding lateral es ahora manejado por el contenedor y las breakpoints
           style={{ padding: theme.spacing(8, 4) }}
         >
-          {cursos.map((c, index) => (
+          {courses.map((c, index) => (
             <SwiperSlide key={index}>
               <Link
                 to={`/detalle-curso/${c.id}`}
@@ -228,8 +233,8 @@ const NewCourses = () => {
                     component='img'
                     width='100%'
                     height='280' // Altura ligeramente ajustada para mejor aspecto
-                    image={c.image}
-                    alt={c.name}
+                    image={c.cover_image_url}
+                    alt={c.title}
                     sx={{ objectFit: "cover" }}
                   />
                   <Box sx={{ padding: theme.spacing(2) }}>
@@ -238,7 +243,7 @@ const NewCourses = () => {
                       variant='body1'
                       sx={{ fontWeight: 600, color: primaryPink }}
                     >
-                      {c.name}
+                      {c.title}
                     </Typography>
                   </Box>
                 </Card>
