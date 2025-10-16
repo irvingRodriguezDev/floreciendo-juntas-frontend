@@ -52,7 +52,7 @@ const Register = () => {
         container
         justifyContent='center'
         alignItems='center'
-        sx={{ minHeight: "100vh", px: { xs: 2, sm: 4 }, py: { xs: 4, md: 8 } }}
+        sx={{ minHeight: "100vh", px: { xs: 2, sm: 4 }, py: { xs: 4, md: 10 } }}
         spacing={4}
       >
         {/* Ilustración */}
@@ -118,6 +118,7 @@ const Register = () => {
                         <TextField
                           label='Nombre completo'
                           name='name'
+                          autoComplete='off'
                           placeholder='Carolina Tavera'
                           value={values.name}
                           onChange={handleChange}
@@ -131,11 +132,12 @@ const Register = () => {
                     </Grid>
 
                     {/* Correo */}
-                    <Grid size={12}>
+                    <Grid size={{ xs: 12, sm: 6, md: 6 }}>
                       <FormControl fullWidth>
                         <TextField
                           label='Correo Electrónico'
                           type='email'
+                          autoComplete='off'
                           name='email'
                           placeholder='carolina@floreciendo-juntas.com.mx'
                           value={values.email}
@@ -150,11 +152,12 @@ const Register = () => {
                     </Grid>
 
                     {/* Teléfono */}
-                    <Grid size={12}>
+                    <Grid size={{ xs: 12, sm: 6, md: 6 }}>
                       <FormControl fullWidth>
                         <TextField
                           label='Teléfono'
                           name='phone'
+                          autoComplete='off'
                           placeholder='7223224221'
                           value={values.phone}
                           onChange={handleChange}
@@ -167,12 +170,13 @@ const Register = () => {
                       </FormControl>
                     </Grid>
                     {/* Contraseña */}
-                    <Grid size={12}>
+                    <Grid size={{ xs: 12, sm: 6, md: 6, lg: 6, xl: 6 }}>
                       <FormControl fullWidth>
                         <TextField
                           label='Contraseña'
                           type='password'
                           name='password'
+                          autoComplete='off'
                           placeholder='**********'
                           value={values.password}
                           onChange={handleChange}
@@ -186,11 +190,12 @@ const Register = () => {
                     </Grid>
 
                     {/* Confirmación */}
-                    <Grid size={12}>
+                    <Grid size={{ xs: 12, sm: 6, md: 6, lg: 6, xl: 6 }}>
                       <FormControl fullWidth>
                         <TextField
                           label='Confirma tu contraseña'
                           type='password'
+                          autoComplete='off'
                           name='password_confirmation'
                           placeholder='**********'
                           value={values.password_confirmation}

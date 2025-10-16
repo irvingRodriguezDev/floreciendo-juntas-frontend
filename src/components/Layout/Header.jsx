@@ -16,7 +16,7 @@ import {
 import MenuIcon from "@mui/icons-material/Menu";
 import { Link } from "react-router-dom";
 import AuthContext from "../../context/Auth/AuthContext";
-
+import Logo from "../../assets/images/logo_carolina_tavera.png";
 const menuItems = [
   { name: "Cursos", path: "/cursos", auth: "both" },
   { name: "Certificaciones", path: "/certificaciones", auth: "both" },
@@ -86,7 +86,7 @@ const Header = () => {
         >
           {/* LOGO */}
           <Link style={{ textDecoration: "none" }} to='/'>
-            <Typography
+            {/* <Typography
               variant='h6'
               sx={{
                 color: scrolled ? "#E53888" : "#fff",
@@ -97,7 +97,8 @@ const Header = () => {
               }}
             >
               Floreciendo Juntas
-            </Typography>
+            </Typography> */}
+            <img src={Logo} width='100%' height='80px' />
           </Link>
 
           {/* MENÚ DESKTOP */}
@@ -162,9 +163,9 @@ const Header = () => {
                       transition: "all 0.3s ease",
                     }}
                   >
-                    Sign In
+                    Iniciar
                   </Button>
-                  <Button
+                  {/* <Button
                     variant='contained'
                     component={Link}
                     to={"/registro"}
@@ -177,7 +178,7 @@ const Header = () => {
                     }}
                   >
                     Sign Up
-                  </Button>
+                  </Button> */}
                 </>
               ) : (
                 <Button
@@ -284,9 +285,9 @@ const Header = () => {
                             borderRadius: "10px",
                           }}
                         >
-                          Sign In
+                          Iniciar
                         </Button>
-                        <Button
+                        {/* <Button
                           component={Link}
                           to='/registro'
                           variant='contained'
@@ -298,7 +299,7 @@ const Header = () => {
                           }}
                         >
                           Sign Up
-                        </Button>
+                        </Button> */}
                       </>
                     ) : (
                       <Button

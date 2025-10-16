@@ -18,6 +18,7 @@ import Profile from "../containers/Profile/Profile";
 import DetailEvent from "../containers/Events/EventDetail/DetailEvent";
 import Home from "../containers/Home/Home";
 import DetailsCourse from "../containers/Courses/Details/DetailsCourse";
+import PinkSpinner from "../components/Loading/PinkSpinner";
 
 function AppRouter() {
   const { autenticado, usuarioAutenticado, cargando } = useContext(AuthContext);
@@ -27,16 +28,7 @@ function AppRouter() {
   }, []);
 
   if (cargando) {
-    return (
-      <Grid
-        container
-        justifyContent='center'
-        alignItems='center'
-        sx={{ minHeight: "100vh" }}
-      >
-        <Box>Cargando...</Box>
-      </Grid>
-    );
+    return <PinkSpinner label='Cargando' />;
   }
 
   // Rutas siempre accesibles

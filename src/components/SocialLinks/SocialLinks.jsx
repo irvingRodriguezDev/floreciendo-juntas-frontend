@@ -91,10 +91,11 @@ const SocialCards = () => {
           spacing={2}
           sx={{ display: "flex", justifyContent: "center" }}
         >
-          {socialData.map((item) => (
+          {socialData.map((item, index) => (
             <Grid
               size={{ xs: 12, sm: 6, md: 4, lg: 4 }}
               sx={{ backgroundColor: "transparent" }}
+              key={index}
             >
               <Card
                 key={item.id}

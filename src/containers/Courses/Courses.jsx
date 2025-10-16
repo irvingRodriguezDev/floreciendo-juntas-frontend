@@ -9,6 +9,7 @@ import AllCourses from "../../components/courses/AllCourses/AllCourses";
 import Pagination from "../../components/Pagination/Pagination";
 import Spinner from "../../components/Common/Spinner";
 import { useDebounce } from "use-debounce";
+import PinkSpinner from "../../components/Loading/PinkSpinner";
 const Courses = () => {
   const {
     courses,
@@ -59,7 +60,7 @@ const Courses = () => {
 
       {/* Contenido principal */}
       {loading ? (
-        <Spinner message='Cargando cursos...' />
+        <PinkSpinner label='Cargando cursos' />
       ) : (
         <>
           <Grid

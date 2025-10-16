@@ -20,35 +20,12 @@ import CourseTitle from "./CouseTitle";
 import CoursesContext from "../../../context/Courses/CoursesContext";
 import { useParams } from "react-router-dom";
 import VideoPlayer from "./VideoPlayer";
+import PinkSpinner from "../../../components/Loading/PinkSpinner";
 // --- Contenido de Ejemplo del Curso ---
-const courseData = {
-  title: "Técnicas Avanzadas de Esculpido con Polygel",
-  description:
-    "Aprende a dominar el Polygel, el híbrido perfecto entre acrílico y gel. Este curso cubre desde la preparación de la uña natural hasta la aplicación de formas esculturales complejas, tipología avanzada y el uso de dual forms. Transforma tu pasión en una habilidad de nivel profesional.",
-  metadata: {
-    duration: "15 Horas",
-    lessons: 28,
-    videos: "8 Horas",
-    students: "Más de 5.2K",
-    language: "Español",
-    level: "Intermedio/Avanzado",
-  },
-  benefits: [
-    "El dominio total del sistema Polygel para cualquier tipo de cliente.",
-    "Certificado de finalización válido para emprendimiento.",
-    "Acceso a nuestra comunidad exclusiva de Mentoras y Alumnas.",
-    "Técnicas de encapsulado y Baby Boomer con Polygel.",
-  ],
-  latestCourse: {
-    title: "Nail Art 3D y 4D para Novias",
-    date: "10 Oct 2025",
-    image: "https://cloud.wapizima.com.mx/production/courses/mobile/110-mobile",
-  },
-};
 
 const CourseDetailScreen = () => {
-  const videoUrl =
-    "https://d3uummb9o2cvmk.cloudfront.net/23-3D básico San Valentín con Ivette López - Wapizima (1080p, h264)/3D básico San Valentín con Ivette López - Wapizima (1080p, h264).m3u8"; // tu URL HLS de CloudFront
+  // const videoUrl =
+  // "https://d3uummb9o2cvmk.cloudfront.net/6-1760642135708-Diseños con Gel Temática Coco la película - Wapizima (1080p, h264)/1760642135708-Diseños con Gel Temática Coco la película - Wapizima (1080p, h264).m3u8"; // tu URL HLS de CloudFront
   const params = useParams();
   const { id } = params;
   const { course, getCourseById } = useContext(CoursesContext);
@@ -119,29 +96,29 @@ const CourseDetailScreen = () => {
           {
             icon: AccessTimeIcon,
             label: "Duración",
-            value: courseData.metadata.duration,
+            value: 2332,
           },
           {
             icon: LibraryBooksIcon,
             label: "Lecciones",
-            value: courseData.metadata.lessons,
+            value: 20,
           },
           {
             icon: PlayArrowIcon,
             label: "Videos",
-            value: courseData.metadata.videos,
+            value: 10,
           },
           {
             icon: PeopleAltIcon,
             label: "Estudiantes",
-            value: courseData.metadata.students,
+            value: 10,
           },
           {
             icon: "language",
             label: "Idioma",
-            value: courseData.metadata.language,
+            value: "español",
           },
-          { icon: "level", label: "Nivel", value: courseData.metadata.level },
+          { icon: "level", label: "Nivel", value: "principiante" },
         ].map((item, index) => (
           <Stack key={index} direction='row' justifyContent='space-between'>
             <Stack direction='row' alignItems='center' spacing={1}>
@@ -162,152 +139,92 @@ const CourseDetailScreen = () => {
   );
 
   // --- Componente de la Tarjeta de Último Curso (Simil Blog) ---
-  const LatestCourseCard = () => (
-    <Paper
-      sx={{
-        p: 2,
-        mt: 3,
-        borderRadius: "12px",
-        boxShadow: theme.shadows[1],
-        backgroundColor: "#fafafa",
-      }}
-    >
-      <Typography
-        variant='h6'
-        sx={{ fontWeight: 700, mb: 2, color: primaryPink }}
-      >
-        Últimos Cursos
-      </Typography>
-      <Stack direction='row' spacing={2} alignItems='center'>
-        <Box
-          component='img'
-          src={courseData.latestCourse.image}
-          alt={courseData.latestCourse.title}
-          sx={{
-            width: 60,
-            height: 60,
-            borderRadius: "8px",
-            objectFit: "cover",
-          }}
-        />
-        <Box>
-          <Typography variant='body2' sx={{ fontWeight: 600 }}>
-            {courseData.latestCourse.title}
-          </Typography>
-          <Typography variant='caption' color='text.secondary'>
-            {courseData.latestCourse.date}
-          </Typography>
-        </Box>
-      </Stack>
-    </Paper>
-  );
 
   return (
     <Layout>
-      <Box sx={{ backgroundColor: softBgColor, minHeight: "100vh" }}>
-        {/* Banner Superior con Adornos */}
-        <CourseTitle title={course.title} />
+      {course ? (
+        <Box sx={{ backgroundColor: softBgColor, minHeight: "100vh" }}>
+          {/* Banner Superior con Adornos */}
+          <CourseTitle title={course.title} />
 
-        {/* Contenido Principal */}
-        <Grid
-          container
-          spacing={4}
-          sx={{ maxWidth: 1440, margin: "0 auto", p: 4 }}
-        >
-          {/* Columna Derecha: Tarjeta de Info y Últimos Cursos */}
-          <Grid size={{ xs: 12, md: 4 }} order={{ xs: 2, md: 2 }}>
-            <InfoCard />
-            {/* <LatestCourseCard /> */}
-          </Grid>
+          {/* Contenido Principal */}
+          <Grid
+            container
+            spacing={4}
+            sx={{ maxWidth: 1440, margin: "0 auto", p: 4 }}
+          >
+            {/* Columna Derecha: Tarjeta de Info y Últimos Cursos */}
+            <Grid size={{ xs: 12, md: 4 }} order={{ xs: 2, md: 2 }}>
+              <InfoCard />
+              {/* <LatestCourseCard /> */}
+            </Grid>
 
-          {/* Columna Izquierda: Imagen y Contenido */}
-          <Grid size={{ xs: 12, md: 8 }} order={{ xs: 1, md: 1 }}>
-            <Stack spacing={4}>
-              {/* Imagen Principal del Curso (Simil al diseño) */}
-              <Box
-                sx={{
-                  maxWidth: "900px",
-                  margin: "0 auto",
-                  padding: "20px",
-                }}
-              >
-                <VideoPlayer src={videoUrl} poster={course.cover_image_url} />
-              </Box>
-
-              {/* Navegación (Tabs/Pestañas) - Usamos solo botones por simplicidad visual */}
-              <Stack direction='row' spacing={1}>
-                {["Descripción", "Reseñas"].map((tab, index) => (
-                  <Button
-                    key={tab}
-                    variant={index === 0 ? "contained" : "outlined"}
+            {/* Columna Izquierda: Imagen y Contenido */}
+            <Grid size={{ xs: 12, md: 8 }} order={{ xs: 1, md: 1 }}>
+              <Stack spacing={4}>
+                {/* Imagen Principal del Curso (Simil al diseño) */}
+                {course && (
+                  <Box
                     sx={{
-                      borderRadius: "8px",
-                      textTransform: "none",
-                      fontWeight: 600,
-                      backgroundColor:
-                        index === 0 ? highlightYellow : "transparent", // Amarillo para la pestaña activa
-                      color: index === 0 ? "white" : primaryPink,
-                      borderColor: primaryPink,
-                      "&:hover": {
-                        backgroundColor:
-                          index === 0 ? highlightYellow : primaryPink,
-                        color: index === 0 ? "white" : "white",
-                        borderColor: primaryPink,
-                      },
+                      maxWidth: "900px",
+                      margin: "0 auto",
+                      padding: "20px",
                     }}
                   >
-                    {tab}
-                  </Button>
-                ))}
-              </Stack>
+                    <VideoPlayer
+                      src={
+                        course?.video_url &&
+                        typeof course.video_url === "string"
+                          ? course.video_url.trim()
+                          : ""
+                      }
+                      poster={course.cover_image_url}
+                    />
+                  </Box>
+                )}
 
-              {/* --- Sección de Visión General --- */}
-              <Box>
-                {/* <Typography variant='h5' sx={{ fontWeight: 700, mb: 2 }}>
-                  Visión General del Curso
-                </Typography> */}
-                <Typography
-                  variant='body1'
-                  color='text.secondary'
-                  sx={{ mb: 3 }}
-                >
-                  <div
-                    dangerouslySetInnerHTML={{ __html: course.description }}
-                  />
-                </Typography>
-
-                <Typography
-                  variant='h6'
-                  sx={{ fontWeight: 700, mb: 2, color: primaryPink }}
-                >
-                  ¿Por Qué Elegir Este Curso?
-                </Typography>
-                <Stack spacing={1}>
-                  {courseData.benefits.map((benefit, index) => (
-                    <Stack
-                      key={index}
-                      direction='row'
-                      spacing={1}
-                      alignItems='flex-start'
+                {/* Navegación (Tabs/Pestañas) - Usamos solo botones por simplicidad visual */}
+                <Stack direction='row' spacing={1}>
+                  {["Descripción", "Reseñas"].map((tab, index) => (
+                    <Button
+                      key={tab}
+                      variant={index === 0 ? "contained" : "outlined"}
+                      sx={{
+                        borderRadius: "8px",
+                        textTransform: "none",
+                        fontWeight: 600,
+                        backgroundColor:
+                          index === 0 ? highlightYellow : "transparent", // Amarillo para la pestaña activa
+                        color: index === 0 ? "white" : primaryPink,
+                        borderColor: primaryPink,
+                        "&:hover": {
+                          backgroundColor:
+                            index === 0 ? highlightYellow : primaryPink,
+                          color: index === 0 ? "white" : "white",
+                          borderColor: primaryPink,
+                        },
+                      }}
                     >
-                      <CheckCircleIcon
-                        sx={{
-                          fontSize: 20,
-                          color: theme.palette.success.main,
-                          mt: 0.5,
-                        }}
-                      />
-                      <Typography variant='body1' color='text.primary'>
-                        {benefit}
-                      </Typography>
-                    </Stack>
+                      {tab}
+                    </Button>
                   ))}
                 </Stack>
-              </Box>
-            </Stack>
+                <Box>
+                  <Typography
+                    variant='body1'
+                    color='text.secondary'
+                    sx={{ mb: 3 }}
+                    component='div' // ✅ permite usar div semántico y HTML dentro
+                    dangerouslySetInnerHTML={{ __html: course.description }}
+                  />
+                </Box>
+              </Stack>
+            </Grid>
           </Grid>
-        </Grid>
-      </Box>
+        </Box>
+      ) : (
+        <PinkSpinner label='Cargando información del curso' />
+      )}
     </Layout>
   );
 };

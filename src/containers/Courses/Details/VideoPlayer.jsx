@@ -16,7 +16,7 @@ const VideoPlayer = ({ src, poster }) => {
         hls.attachMedia(videoRef.current);
 
         hls.on(Hls.Events.MANIFEST_PARSED, () => {
-          videoRef.current.play();
+          console.log("HLS listo para reproducirse");
         });
 
         return () => {
@@ -32,13 +32,14 @@ const VideoPlayer = ({ src, poster }) => {
     <video
       ref={videoRef}
       controls
-      // poster={poster}
+      // muted // 👈 importante
+      autoPlay // 👈 para que arranque solo
+      poster={poster}
       style={{
-        // 1. Establecer el tamaño fijo deseado para el contenedor y el póster
-        maxWidth: "100%", // Limita el ancho máximo a 600px
-        height: "auto", // Fija la altura a 300px
-        objectFit: "contain", // Muestra toda la imagen del póster, manteniendo su relación de aspecto.
-        width: "100%", // Permite que sea responsivo hasta 600px
+        maxWidth: "100%",
+        height: "auto",
+        objectFit: "contain",
+        width: "100%",
         borderRadius: "16px",
         boxShadow: "0 4px 20px rgba(0,0,0,0.1)",
       }}
