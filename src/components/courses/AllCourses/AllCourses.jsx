@@ -38,10 +38,10 @@ const AllCourses = ({ courses }) => {
           <Box sx={{ position: "relative", padding: "10px" }}>
             <CardMedia
               component='img'
-              // image={courses.cover_image_url}
-              image={
-                "https://cloud.wapizima.com.mx/production/courses/mobile/112-mobile"
-              }
+              image={courses.cover_image_url}
+              // image={
+              //   "https://cloud.wapizima.com.mx/production/courses/mobile/112-mobile"
+              // }
               alt={courses.name}
               sx={{
                 objectFit: "cover",

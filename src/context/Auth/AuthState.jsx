@@ -3,20 +3,20 @@ import AuthContext from "./AuthContext";
 import AuthReducer from "./AuthReducer";
 import MethodGet, { MethodPost, MethodPut } from "../../config/Service";
 import headerConfig from "../../config/imageHeader";
-import Swal from "sweet-alert";
 
 /**Importar componente token headers */
 import tokenAuth from "../../config/TokenAuth";
 
 import { SHOW_ERRORS_API, types } from "../../types";
+import Swal from "sweetalert2";
 
 const AuthState = (props) => {
   const initialState = {
     token: localStorage.getItem("token"),
-    autenticado: true,
+    autenticado: false,
+    isAuthenticating: true,
     usuario: null,
     role: null,
-    cargando: true,
     success: false,
     directions: [],
     ErrorsApi: [],
@@ -30,15 +30,17 @@ const AuthState = (props) => {
 
     if (!token) {
       dispatch({ type: types.LOGIN_ERROR });
+      dispatch({ type: types.FIN_AUTENTICACION });
       return false;
     }
 
     tokenAuth(token);
 
     try {
-      const { data } = await MethodGet("/auth/me"); // sin la barra inicial
+      const { data } = await MethodGet("/auth/me");
 
       dispatch({ type: types.OBTENER_USUARIO, payload: data.user });
+
       return true;
     } catch (error) {
       console.error(
@@ -48,6 +50,8 @@ const AuthState = (props) => {
       );
       dispatch({ type: types.LOGIN_ERROR });
       return false;
+    } finally {
+      dispatch({ type: types.FIN_AUTENTICACION });
     }
   };
   //cuando el usuario inicia sesion
@@ -90,6 +94,7 @@ const AuthState = (props) => {
     MethodPost(url, data)
       .then((res) => {
         const token = res.data.token;
+        localStorage.setItem("token", token);
         // Setea el token en Axios inmediatamente
         tokenAuth(token);
 
@@ -100,7 +105,7 @@ const AuthState = (props) => {
 
         Swal.fire({
           title: "Registrado",
-          text: "Te has registrado de manera exitosa",
+          text: res.data.msg,
           icon: "success",
           timer: 2000,
           showConfirmButton: false,
@@ -327,9 +332,9 @@ const AuthState = (props) => {
       value={{
         token: state.token,
         autenticado: state.autenticado,
+        isAuthenticating: state.isAuthenticating,
         usuario: state.usuario,
         success: state.success,
-        cargando: state.cargando,
         directions: state.directions,
         ErrorsApi: state.ErrorsApi,
         all_users: state.all_users,

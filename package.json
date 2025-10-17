@@ -20,10 +20,12 @@
     "formik": "^2.4.6",
     "framer-motion": "^12.23.22",
     "hls.js": "^1.6.13",
+    "node-cron": "^4.2.1",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "react-router-dom": "^7.9.3",
     "sweet-alert": "^2.0.5",
+    "sweetalert2": "^11.26.2",
     "swiper": "^12.0.2",
     "use-debounce": "^10.0.6",
     "yup": "^1.7.1"

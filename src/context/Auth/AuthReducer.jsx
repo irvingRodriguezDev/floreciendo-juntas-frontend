@@ -8,7 +8,8 @@ export default (state, action) => {
         ...state,
         autenticado: true,
         cargando: false,
-        usuario: action.payload.client,
+        isAuthenticating: true,
+        usuario: action.payload.user,
         token: action.payload.token, // Mantener el token en el estado
       };
     case types.LOGIN_EXITOSO:
@@ -17,6 +18,8 @@ export default (state, action) => {
         ...state,
         autenticado: true,
         cargando: true,
+        isAuthenticating: true,
+        usuario: action.payload.user,
         token: action.payload.token,
       };
     case types.RESET_PASSWORD:
@@ -42,6 +45,19 @@ export default (state, action) => {
         success: true,
       };
     case types.LOGIN_ERROR:
+      localStorage.removeItem("token");
+      return {
+        ...state,
+        token: null,
+        usuario: null,
+        autenticado: false,
+        // isAuthenticating: se maneja en FIN_AUTENTICACION
+      };
+    case types.FIN_AUTENTICACION:
+      return {
+        ...state,
+        isAuthenticating: false, // ¡El spinner se apaga aquí!
+      };
     case types.CERRAR_SESION:
       localStorage.removeItem("token");
       localStorage.removeItem("expires_at");

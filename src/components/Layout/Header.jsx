@@ -21,12 +21,12 @@ const menuItems = [
   { name: "Cursos", path: "/cursos", auth: "both" },
   { name: "Certificaciones", path: "/certificaciones", auth: "both" },
   {
-    name: "El salón de tus sueños",
+    name: "Salon",
     path: "/el-salon-de-tus-sueños",
     auth: "both",
   },
   {
-    name: "Manicurista exitosa: 10 secretos",
+    name: "10 secretos",
     path: "/10-secretos",
     auth: "both",
   },
@@ -37,7 +37,7 @@ const menuItems = [
 const Header = () => {
   const [open, setOpen] = useState(false);
   const { autenticado } = useContext(AuthContext);
-  const isMobile = useMediaQuery("(max-width:900px)");
+  const isMobile = useMediaQuery("(max-width:1100px)");
   const [scrolled, setScrolled] = useState(false);
 
   // 🔹 Detectar scroll
@@ -84,21 +84,8 @@ const Header = () => {
         <Toolbar
           sx={{ display: "flex", justifyContent: "space-between", px: 2 }}
         >
-          {/* LOGO */}
           <Link style={{ textDecoration: "none" }} to='/'>
-            {/* <Typography
-              variant='h6'
-              sx={{
-                color: scrolled ? "#E53888" : "#fff",
-                fontWeight: "bold",
-                fontSize: "30px",
-                textShadow: scrolled ? "none" : "0 2px 6px rgba(0,0,0,0.2)",
-                transition: "all 0.3s ease",
-              }}
-            >
-              Floreciendo Juntas
-            </Typography> */}
-            <img src={Logo} width='100%' height='80px' />
+            <img src={Logo} width='100%' height='90px' />
           </Link>
 
           {/* MENÚ DESKTOP */}
@@ -165,20 +152,6 @@ const Header = () => {
                   >
                     Iniciar
                   </Button>
-                  {/* <Button
-                    variant='contained'
-                    component={Link}
-                    to={"/registro"}
-                    size='large'
-                    sx={{
-                      color: "#fff",
-                      backgroundColor: "#E53888",
-                      borderRadius: "10px",
-                      "&:hover": { backgroundColor: "#d82e7a" },
-                    }}
-                  >
-                    Sign Up
-                  </Button> */}
                 </>
               ) : (
                 <Button
@@ -220,25 +193,31 @@ const Header = () => {
                   sx={{
                     width: 250,
                     p: 2, // Shorthand for padding in MUI; overrides the full 'padding' below if needed
-                    // bgcolor: "#fff", // Commented out as in original
                     height: "100vh",
                     display: "flex",
                     flexDirection: "column",
                     justifyContent: "space-between",
-                    background: "rgba(255, 255, 255, 0.1)",
-                    backdropFilter: "blur(10px)",
-                    WebkitBackdropFilter: "blur(10px)", // Vendor prefix for Safari support (camelCase in sx)
-                    borderTopRightRadius: "16px",
-                    borderBottomRightRadius: "16px",
-                    border: "1px solid rgba(255, 255, 255, 0.2)",
-                    // padding: "20px", // Commented out to avoid conflict with 'p: 2'; use one or the other
-                    color: "#ff4081",
+                    boxShadow: scrolled
+                      ? "0 8px 25px rgba(243, 187, 206, 0.33)"
+                      : "0 4px 30px rgba(243, 187, 206, 0.33)",
+                    background: scrolled
+                      ? "rgba(243, 187, 206, 0.33)"
+                      : "rgba(243, 187, 206, 0.33)",
+                    backdropFilter: "blur(14px)",
+                    border: "1px solid rgba(243, 187, 206, 0.33)",
+                    transition: "all 0.4s ease",
+                    color: scrolled ? "#E53888" : "#FFFFFF",
+                    textShadow: scrolled ? "none" : "0 1px 6px rgba(0,0,0,0.4)",
                   }}
                 >
                   <Box>
                     <Typography
                       variant='h6'
-                      sx={{ color: "#E53888", fontWeight: "bold", mb: 2 }}
+                      sx={{
+                        color: "#E53888",
+                        fontWeight: "bold",
+                        mb: 2,
+                      }}
                     >
                       Menú
                     </Typography>
@@ -287,19 +266,6 @@ const Header = () => {
                         >
                           Iniciar
                         </Button>
-                        {/* <Button
-                          component={Link}
-                          to='/registro'
-                          variant='contained'
-                          sx={{
-                            color: "#fff",
-                            backgroundColor: "#E53888",
-                            borderRadius: "10px",
-                            "&:hover": { backgroundColor: "#d82e7a" },
-                          }}
-                        >
-                          Sign Up
-                        </Button> */}
                       </>
                     ) : (
                       <Button

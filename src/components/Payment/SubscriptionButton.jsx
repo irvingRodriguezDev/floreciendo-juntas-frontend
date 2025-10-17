@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useContext, useState } from "react";
 import {
   Button,
   Box,
@@ -8,25 +8,28 @@ import {
   Radio,
 } from "@mui/material";
 import { useStripe } from "@stripe/react-stripe-js";
-
+import { MethodPost } from "../../config/Service";
+import AuthContext from "../../context/Auth/AuthContext";
+import { Link } from "react-router-dom";
 // Colores de acento
 const PRIMARY_PINK = "#E53888";
 const HOVER_PINK = "#D1789C";
 
-// Definición de los IDs de los planes desde variables de entorno
-// Asegúrate de que estas variables estén definidas en tu archivo .env
 const PRICE_ONETIME = import.meta.env.VITE_STRIPE_PRICE_ONETIME;
 const PRICE_RECURRING = import.meta.env.VITE_STRIPE_PRICE_RECURRING;
+const URL = import.meta.env.VITE_API_BASE_URL;
 
 const SubscriptionForm = ({ userId }) => {
+  const { autenticado } = useContext(AuthContext);
   const stripe = useStripe();
   const [loading, setLoading] = useState(false);
-  // Estado para guardar la opción seleccionada (priceId)
   const [selectedPriceId, setSelectedPriceId] = useState(PRICE_RECURRING);
 
   const handlePriceChange = (event) => {
     setSelectedPriceId(event.target.value);
   };
+  // Asegúrate de que Methodpost se comporta como fetch o que devuelve la promesa de la petición HTTP.
+  // Asumo que Methodpost es una función async que devuelve un objeto Response similar a fetch.
 
   const handleSubscribe = async () => {
     if (!stripe || !selectedPriceId) {
@@ -34,34 +37,56 @@ const SubscriptionForm = ({ userId }) => {
       return;
     }
 
-    setLoading(true);
+    setLoading(true); // Se inicia la carga
 
     try {
-      // 1. Llamada al backend con el ID de precio seleccionado
-      const response = await fetch("/api/create-subscription-session", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          userId: userId,
-          priceId: selectedPriceId, // <-- ENVIAMOS EL ID SELECCIONADO
-        }),
-      });
+      const data = {
+        userId: userId,
+        priceId: selectedPriceId, // Usa 'priceId' para coincidir con el backend
+      };
+      let url = "/payment/create-payment";
 
-      if (!response.ok) throw new Error("Error al crear la sesión de pago.");
+      // 1. Esperar la respuesta del backend
+      const res = await MethodPost(url, data);
 
-      const session = await response.json(); // session = { id: 'cs_test_...' }
+      // --- CORRECCIÓN CLAVE ---
+      // 2. Verificar si el request del backend fue exitoso (res.ok)
+      if (!res.status === 200) {
+        // Asumiendo que res.data contiene detalles de error cuando no es OK
+        const backendErrorMessage =
+          res.data?.message || res.statusText || "Error desconocido";
+        throw new Error(
+          `Error al crear la sesión de pago: ${backendErrorMessage}`
+        );
+      }
 
-      // 2. Redireccionar al usuario a Stripe Checkout
-      const result = await stripe.redirectToCheckout({
-        sessionId: session.id,
-      });
+      // 3. Obtener la sesión directamente del campo 'data', sin 'await'
+      // Ya que MethodPost (asumimos) devuelve el JSON ya parseado en res.data
+      const session = res.data;
+      // --- FIN CORRECCIÓN CLAVE ---
 
+      // Verificación básica del ID de sesión
+      if (!session.id) {
+        throw new Error("El backend no devolvió un ID de sesión válido.");
+      }
+      if (!session.url) {
+        // Stripe ahora devuelve la URL de redirección en el objeto de la sesión.
+        throw new Error(
+          "El backend no devolvió una URL de sesión válida para la redirección."
+        );
+      }
+
+      // 4. Redireccionar al usuario a Stripe Checkout
+      window.location.href = session.url;
+      // Este bloque solo se ejecuta si la redirección falla (ej. error de red)
       if (result.error) {
         console.error("Error de redirección:", result.error.message);
       }
     } catch (error) {
-      console.error("Error en la suscripción:", error);
+      // Captura cualquier error lanzado en el try block
+      console.error("Error en la suscripción:", error.message);
     } finally {
+      // Se ejecuta después de todo el flujo (éxito o fracaso)
       setLoading(false);
     }
   };
@@ -94,7 +119,16 @@ const SubscriptionForm = ({ userId }) => {
       >
         <FormControlLabel
           value={PRICE_RECURRING}
-          control={<Radio sx={{ color: PRIMARY_PINK }} />}
+          control={
+            <Radio
+              sx={{
+                color: PRIMARY_PINK, // Color cuando NO está seleccionado
+                "&.Mui-checked": {
+                  color: PRIMARY_PINK, // Color cuando SÍ está seleccionado
+                },
+              }}
+            />
+          }
           label={
             <Box>
               <Typography fontWeight='bold'>Suscripción Mensual</Typography>
@@ -106,14 +140,23 @@ const SubscriptionForm = ({ userId }) => {
         />
         <FormControlLabel
           value={PRICE_ONETIME}
-          control={<Radio sx={{ color: PRIMARY_PINK }} />}
+          control={
+            <Radio
+              sx={{
+                color: PRIMARY_PINK, // Color cuando NO está seleccionado
+                "&.Mui-checked": {
+                  color: PRIMARY_PINK, // Color cuando SÍ está seleccionado
+                },
+              }}
+            />
+          }
           label={
             <Box>
               <Typography fontWeight='bold'>
-                Pago Único (Acceso por 1 año)
+                Pago Único (Acceso por 1 mes)
               </Typography>
               <Typography variant='caption'>
-                Un solo pago, acceso total por un periodo limitado.
+                Un solo pago, acceso total por un periodo de 30 dias.
               </Typography>
             </Box>
           }
@@ -121,15 +164,27 @@ const SubscriptionForm = ({ userId }) => {
       </RadioGroup>
 
       {/* Botón de Suscripción */}
-      <Button
-        variant='contained'
-        fullWidth
-        onClick={handleSubscribe}
-        disabled={loading || !selectedPriceId}
-        sx={{ bgcolor: PRIMARY_PINK, "&:hover": { bgcolor: HOVER_PINK } }}
-      >
-        {loading ? "Procesando Pago..." : "Continuar con el Pago"}
-      </Button>
+      {autenticado ? (
+        <Button
+          variant='contained'
+          fullWidth
+          onClick={handleSubscribe}
+          disabled={loading || !selectedPriceId}
+          sx={{ bgcolor: PRIMARY_PINK, "&:hover": { bgcolor: HOVER_PINK } }}
+        >
+          {loading ? "Procesando Pago..." : "Continuar con el Pago"}
+        </Button>
+      ) : (
+        <Link to={"/iniciar-sesion"}>
+          <Button
+            variant='contained'
+            fullWidth
+            sx={{ bgcolor: PRIMARY_PINK, "&:hover": { bgcolor: HOVER_PINK } }}
+          >
+            Inicia sesión para suscribirte
+          </Button>
+        </Link>
+      )}
 
       {/* Nota importante */}
       {!selectedPriceId && (
