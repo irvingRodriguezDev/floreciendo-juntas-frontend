@@ -16,6 +16,7 @@ const CoursesBanner = () => {
     overflow: "hidden",
     borderBottom: "1px solid #EBEBEB",
     borderRadius: "16px",
+    marginTop: { md: "90px" },
   };
 
   // --- Estilos para los Adornos (elementos decorativos) ---

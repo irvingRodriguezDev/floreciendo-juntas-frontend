@@ -2,6 +2,7 @@ import {
   GET_ALL_COURSES,
   GET_ALL_COURSES_PAGINATE,
   GET_COURSE_BY_ID,
+  GET_COURSES_BY_SYSTEM_ID,
   GET_LATEST_COURSES,
 } from "../../types";
 
@@ -14,6 +15,15 @@ export default (state, action) => {
         cargando: true,
       };
     case GET_ALL_COURSES_PAGINATE:
+      return {
+        ...state,
+        courses: action.payload.courses,
+        totalItems: action.payload.totalItems,
+        totalPages: action.payload.totalPages,
+        currentPage: action.payload.currentPage,
+        cargando: true,
+      };
+    case GET_COURSES_BY_SYSTEM_ID:
       return {
         ...state,
         courses: action.payload.courses,

@@ -14,6 +14,7 @@ import { Navigation } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
 import SystemContext from "../../context/System/SystemContext";
+import { Link } from "react-router-dom";
 
 const Systems = () => {
   const { getAllSystems, systems } = useContext(SystemContext);
@@ -172,71 +173,77 @@ const Systems = () => {
         >
           {systems.map((system) => (
             <SwiperSlide key={system.id}>
-              <Paper
-                elevation={1}
-                sx={{
-                  p: { xs: 3, sm: 4 },
-                  textAlign: "center",
-                  borderRadius: "16px",
-                  height: "100%",
-                  minHeight: 280,
-                  display: "flex",
-                  flexDirection: "column",
-                  justifyContent: "space-between",
-                  boxShadow: "0px 6px 16px rgba(0, 0, 0, 0.08)",
-                  transition: "transform 0.3s ease, box-shadow 0.3s ease",
-                  "&:hover": {
-                    transform: "translateY(-6px)",
-                    boxShadow: "0px 12px 25px rgba(0, 0, 0, 0.12)",
-                  },
-                }}
+              <Link
+                to={`/cursos/bysystem/${system.id}`}
+                style={{ textDecoration: "none" }}
               >
-                <Box
+                <Paper
+                  elevation={1}
                   sx={{
-                    width: 80,
-                    height: 80,
-                    borderRadius: "50%",
-                    backgroundColor: "#FCE4EC",
+                    p: { xs: 3, sm: 4 },
+                    textAlign: "center",
+                    borderRadius: "16px",
+                    height: "100%",
+                    minHeight: 280,
                     display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    mx: "auto",
-                    mb: 2,
+                    flexDirection: "column",
+                    justifyContent: "space-between",
+                    boxShadow: "0px 6px 16px rgba(0, 0, 0, 0.08)",
+                    transition: "transform 0.3s ease, box-shadow 0.3s ease",
+                    "&:hover": {
+                      transform: "translateY(-6px)",
+                      boxShadow: "0px 12px 25px rgba(0, 0, 0, 0.12)",
+                    },
                   }}
                 >
                   <Box
-                    component='img'
-                    src={system.icon}
-                    alt={system.name}
                     sx={{
-                      width: "60%",
-                      height: "60%",
-                      objectFit: "contain",
+                      width: 80,
+                      height: 80,
+                      borderRadius: "50%",
+                      backgroundColor: "#FCE4EC",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      mx: "auto",
+                      mb: 2,
                     }}
-                  />
-                </Box>
+                  >
+                    <Box
+                      component='img'
+                      src={system.icon}
+                      alt={system.name}
+                      sx={{
+                        width: "60%",
+                        height: "60%",
+                        objectFit: "contain",
+                      }}
+                    />
+                  </Box>
 
-                <Typography variant='h6' sx={{ fontWeight: 700, mb: 1 }}>
-                  {system.name}
-                </Typography>
+                  <Typography variant='h6' sx={{ fontWeight: 700, mb: 1 }}>
+                    {system.name}
+                  </Typography>
 
-                <Typography
-                  variant='body2'
-                  color='text.secondary'
-                  sx={{
-                    flexGrow: 1,
-                    display: "-webkit-box",
-                    WebkitLineClamp: 3,
-                    WebkitBoxOrient: "vertical",
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                    lineHeight: 1.5,
-                    px: 1,
-                  }}
-                >
-                  {system.description}
-                </Typography>
-              </Paper>
+                  <Typography
+                    variant='body2'
+                    color='text.secondary'
+                    textAlign='justify'
+                    sx={{
+                      flexGrow: 1,
+                      display: "-webkit-box",
+                      WebkitLineClamp: 3,
+                      WebkitBoxOrient: "vertical",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      lineHeight: 1.5,
+                      px: 1,
+                    }}
+                  >
+                    {system.description}
+                  </Typography>
+                </Paper>
+              </Link>
             </SwiperSlide>
           ))}
         </Swiper>
@@ -249,9 +256,9 @@ const Systems = () => {
             left: { xs: -5, sm: -50 },
             top: "50%",
             transform: "translateY(-50%)",
-            backgroundColor: "#DC4485",
+            backgroundColor: "#F3BBCE",
             color: "white",
-            "&:hover": { backgroundColor: "#D72E79" },
+            "&:hover": { backgroundColor: "#F3BBCE" },
             zIndex: 10,
             width: 44,
             height: 44,
@@ -268,9 +275,9 @@ const Systems = () => {
             right: { xs: -5, sm: -50 },
             top: "50%",
             transform: "translateY(-50%)",
-            backgroundColor: "#DC4485",
+            backgroundColor: "#F3BBCE",
             color: "white",
-            "&:hover": { backgroundColor: "#D72E79" },
+            "&:hover": { backgroundColor: "#F3BBCE" },
             zIndex: 10,
             width: 44,
             height: 44,

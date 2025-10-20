@@ -196,6 +196,7 @@ const About = () => {
             variant='body1'
             color='text.secondary'
             sx={{ mb: 2, maxWidth: 600 }}
+            textAlign='justify'
           >
             El arte de las uñas es una de las habilidades más valiosas que una
             mujer puede poseer, transformando la pasión en un activo financiero.
@@ -207,6 +208,7 @@ const About = () => {
           <Typography
             variant='body1'
             color='text.secondary'
+            textAlign='justify'
             sx={{ mb: 4, maxWidth: 600 }}
           >
             Nuestro principal beneficio es darte la capacidad de emprender. A

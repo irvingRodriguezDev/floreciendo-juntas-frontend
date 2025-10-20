@@ -28,7 +28,7 @@ const BannerHome = () => {
         justifyContent: "center",
         minHeight: "80vh",
         background: "#FFF0F0",
-        padding: theme.spacing(4),
+        padding: 4,
         position: "relative",
         overflow: "hidden", // Para contener los elementos decorativos
         borderRadius: "16px",
@@ -217,14 +217,15 @@ const BannerHome = () => {
         <Typography
           variant='body1'
           color='text.secondary'
-          sx={{ mb: 4, maxWidth: 500 }}
+          sx={{ mb: 4, maxWidth: 500, padding: 4 }}
+          textAlign='justify'
         >
           Somos la comunidad "Floreciendo Juntas", el impulso que necesitas para
           transformar tu pasión en un negocio exitoso. ¡Únete a nosotras y haz
           tus sueños realidad!
         </Typography>
         <Stack
-          direction='row'
+          direction={{ xs: "column", md: "row" }}
           spacing={2}
           justifyContent={{ xs: "center", md: "flex-start" }}
         >
@@ -307,8 +308,6 @@ const BannerHome = () => {
           }}
         >
           <Avatar sx={{ bgcolor: "#F1D5E1", width: 32, height: 32 }}>
-            {" "}
-            {/* Verde */}
             <CheckCircleOutlineIcon sx={{ fontSize: 18 }} />
           </Avatar>
           <Box>

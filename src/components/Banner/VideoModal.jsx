@@ -19,7 +19,7 @@ const VideoModal = ({ buttonText = "Ver Nuestro Video", videoUrl }) => {
   // Para que el modal sea full screen en móviles, como es común en UX
   const fullScreen = useMediaQuery(theme.breakpoints.down("sm"));
 
-  const primaryPink = "#e91e63";
+  const primaryPink = "#DB4586";
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);

@@ -59,7 +59,7 @@ const FeatureItem = ({ icon: Icon, title, description, iconColor }) => (
     <Typography variant='h6' sx={{ fontWeight: 700, lineHeight: 1.3 }}>
       {title}
     </Typography>
-    <Typography variant='body2' color='text.secondary'>
+    <Typography variant='body2' color='text.secondary' textAlign='justify'>
       {description}
     </Typography>
   </Stack>

@@ -107,7 +107,7 @@ const SubscriptionForm = ({ userId }) => {
         textAlign='center'
         color={PRIMARY_PINK}
       >
-        Elige tu camino para florecer:
+        Elige tu camino para florecer por solo <b>$100.00 MXN</b>
       </Typography>
 
       {/* Selector de Opciones de Pago */}

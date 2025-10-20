@@ -1,43 +1,51 @@
-import Layout from "../../components/Layout/Layout";
-import { motion } from "framer-motion";
-import { Grid } from "@mui/material";
-import SearchCourse from "../../components/courses/SearchCourses";
-import CoursesBanner from "../../components/Banner/CoursesBanner";
-import CoursesContext from "../../context/Courses/CoursesContext";
-import { useContext, useEffect, useState } from "react";
-import AllCourses from "../../components/courses/AllCourses/AllCourses";
-import Pagination from "../../components/Pagination/Pagination";
-import Spinner from "../../components/Common/Spinner";
+import React, { useContext, useEffect, useState } from "react";
+import Layout from "../../../components/Layout/Layout";
+import { Grid, Pagination } from "@mui/material";
+import SystemBanner from "../../../components/Banner/SystemBanner";
+import { useParams } from "react-router-dom";
+import MethodGet from "../../../config/Service";
+import CoursesContext from "../../../context/Courses/CoursesContext";
+import SearchCourse from "../../../components/courses/SearchCourses";
 import { useDebounce } from "use-debounce";
-import PinkSpinner from "../../components/Loading/PinkSpinner";
-const Courses = () => {
-  const {
-    courses,
-    getAllCoursesPaginate,
-    currentPage, // Viene del Contexto (Metadata de la API)
-    totalPages, // Viene del Contexto (Metadata de la API)
-  } = useContext(CoursesContext);
-
-  const [page, setPage] = useState(1);
-  const [rowsPerPage, setRowsPerPage] = useState(12);
+import PinkSpinner from "../../../components/Loading/PinkSpinner";
+import AllCourses from "../../../components/courses/AllCourses/AllCourses";
+const BySystemId = () => {
+  const params = useParams();
+  const { getCoursesBySystemId, courses, currentPage, totalPages } =
+    useContext(CoursesContext);
+  const { id } = params;
+  const [system, setSystem] = useState(null);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(false);
   const [debouncedSearch] = useDebounce(search, 600);
-
+  const [page, setPage] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(9);
+  useEffect(() => {
+    let url = `/systems/${id}`;
+    MethodGet(url)
+      .then((res) => {
+        setSystem(res.data);
+      })
+      .catch((error) => {
+        console.log(
+          error,
+          "ocurrio un error al obtener la informacion del sistema"
+        );
+      });
+  }, [id]);
   useEffect(() => {
     setLoading(true);
 
     if (debouncedSearch.trim() === "") {
-      getAllCoursesPaginate(page, rowsPerPage);
+      getCoursesBySystemId(id, page, rowsPerPage);
     } else {
-      getAllCoursesPaginate(undefined, undefined, debouncedSearch);
+      getCoursesBySystemId(id, undefined, undefined, debouncedSearch);
     }
 
     // Simulamos un pequeño retraso visual antes de ocultar el spinner
     const timer = setTimeout(() => setLoading(false), 600);
     return () => clearTimeout(timer);
-  }, [page, rowsPerPage, debouncedSearch]);
-
+  }, [id, page, rowsPerPage, debouncedSearch]);
   // 2. Función CORRECTA para cambiar de página
   const handlePageChange = (newPage) => {
     if (newPage >= 1 && newPage <= totalPages && newPage !== page) {
@@ -48,16 +56,17 @@ const Courses = () => {
 
   return (
     <Layout>
-      {/* Banner y Buscador */}
       <Grid container spacing={2} sx={{ padding: "20px" }}>
-        <Grid size={12}>
-          <CoursesBanner />
+        <Grid size={12} sx={{ marginTop: 12 }}>
+          <SystemBanner
+            systemName={system ? system.name.trim("") : ""}
+            description={system ? system.description.trim("") : ""}
+          />
         </Grid>
         <Grid size={12}>
           <SearchCourse setSearch={setSearch} />
         </Grid>
       </Grid>
-
       {/* Contenido principal */}
       {loading ? (
         <PinkSpinner label='Cargando cursos' />
@@ -105,4 +114,4 @@ const Courses = () => {
   );
 };
 
-export default Courses;
+export default BySystemId;

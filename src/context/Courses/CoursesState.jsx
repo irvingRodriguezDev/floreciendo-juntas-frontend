@@ -6,6 +6,7 @@ import {
   GET_ALL_COURSES,
   GET_ALL_COURSES_PAGINATE,
   GET_COURSE_BY_ID,
+  GET_COURSES_BY_SYSTEM_ID,
   GET_LATEST_COURSES,
 } from "../../types";
 /**Importar componente token headers */
@@ -85,6 +86,29 @@ const CoursesState = ({ children }) => {
         console.log(error, "Ocurrio un error al obtener el curso");
       });
   };
+  //obtener los cursos por sistema
+  const getCoursesBySystemId = (id, page, limit, search = "") => {
+    let url = `/courses/bySystem?system_id=${id}&page=${page}&limit=${limit}`;
+    // Solo agregamos el parámetro si hay búsqueda
+    if (search.trim() !== "") {
+      url += `&search=${encodeURIComponent(search)}`;
+    }
+    MethodGet(url)
+      .then((res) => {
+        dispatch({
+          type: GET_COURSES_BY_SYSTEM_ID,
+          payload: {
+            courses: res.data.courses,
+            totalItems: res.data.totalItems,
+            totalPages: res.data.totalPages,
+            currentPage: res.data.currentPage,
+          },
+        });
+      })
+      .catch((error) => {
+        console.log(error, "ocurrio un error al obtener los cursos");
+      });
+  };
   return (
     <CoursesContext.Provider
       value={{
@@ -97,6 +121,7 @@ const CoursesState = ({ children }) => {
         getAllCoursesPaginate,
         getLastestCourses,
         getCourseById,
+        getCoursesBySystemId,
       }}
     >
       {children}
