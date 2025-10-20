@@ -23,6 +23,7 @@
     "node-cron": "^4.2.1",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
+    "react-player": "^3.3.3",
     "react-router-dom": "^7.9.3",
     "sweet-alert": "^2.0.5",
     "sweetalert2": "^11.26.2",

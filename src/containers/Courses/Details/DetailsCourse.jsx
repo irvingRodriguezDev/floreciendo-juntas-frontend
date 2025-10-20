@@ -94,6 +94,8 @@ const CourseDetailScreen = () => {
                           : ""
                       }
                       poster={course.cover_image_url}
+                      courseId={id}
+                      userId={userId}
                     />
                   ) : (
                     // 2. Mostrar Bloqueador y Formulario de Pago
