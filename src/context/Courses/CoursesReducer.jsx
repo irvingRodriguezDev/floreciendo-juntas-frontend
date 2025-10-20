@@ -1,9 +1,11 @@
+import TopCourses from "../../components/courses/topCourses/TopCourses";
 import {
   GET_ALL_COURSES,
   GET_ALL_COURSES_PAGINATE,
   GET_COURSE_BY_ID,
   GET_COURSES_BY_SYSTEM_ID,
   GET_LATEST_COURSES,
+  GET_TOP_TEN_COURSES,
 } from "../../types";
 
 export default (state, action) => {
@@ -36,6 +38,11 @@ export default (state, action) => {
       return {
         ...state,
         courses: action.payload,
+      };
+    case GET_TOP_TEN_COURSES:
+      return {
+        ...state,
+        topCourses: action.payload,
       };
     case GET_COURSE_BY_ID:
       return {

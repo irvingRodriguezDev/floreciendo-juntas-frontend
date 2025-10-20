@@ -41,10 +41,10 @@ const VideoPlayer = ({ userId, courseId, src, poster }) => {
         console.log(data, "la dataaaaa");
 
         // Convertir string a número
-        const percent = parseFloat(data.percent || 0);
+        const percent = parseFloat(data.progress || 0);
 
         // Completado si existe completedAt o percent >= 100
-        const isCompleted = !!data.completedAt || percent >= 95;
+        const isCompleted = !!data.completed || percent >= 100;
 
         setProgress(percent);
         setCompleted(isCompleted);
@@ -79,24 +79,25 @@ const VideoPlayer = ({ userId, courseId, src, poster }) => {
   useEffect(() => {
     const interval = setInterval(() => {
       const video = videoRef.current;
-      if (!video) return;
+      if (!video || completedRef.current) return;
 
       const newProgressPercent = durationToPercent(
         video.currentTime,
         video.duration
       );
 
+      // Solo actualizar si avanzó
       if (video.currentTime > progressRef.current) {
         setProgress(newProgressPercent);
         progressRef.current = video.currentTime;
         saveProgress(video.currentTime);
       }
 
-      // Desbloquear certificado al 95%
-      if (newProgressPercent >= 95 && !completedRef.current) {
+      // Marcar completado
+      if (newProgressPercent >= 100 && !completedRef.current) {
         setCompleted(true);
         completedRef.current = true;
-        saveProgress(video.currentTime); // guardar progreso actual
+        saveProgress(video.duration);
       }
     }, 1000);
 

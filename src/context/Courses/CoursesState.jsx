@@ -8,6 +8,7 @@ import {
   GET_COURSE_BY_ID,
   GET_COURSES_BY_SYSTEM_ID,
   GET_LATEST_COURSES,
+  GET_TOP_TEN_COURSES,
 } from "../../types";
 /**Importar componente token headers */
 
@@ -18,6 +19,7 @@ const CoursesState = ({ children }) => {
     totalItems: 0,
     totalPages: 0,
     currentPage: 0,
+    topCourses: [],
   };
 
   const [state, dispatch] = useReducer(CoursesReducer, initialState);
@@ -109,6 +111,21 @@ const CoursesState = ({ children }) => {
         console.log(error, "ocurrio un error al obtener los cursos");
       });
   };
+
+  const getTopTenCourses = () => {
+    let url = "/courses/top-viewed-courses";
+    MethodGet(url)
+      .then((res) => {
+        dispatch({
+          type: GET_TOP_TEN_COURSES,
+          payload: res.data,
+        });
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
   return (
     <CoursesContext.Provider
       value={{
@@ -117,11 +134,13 @@ const CoursesState = ({ children }) => {
         totalPages: state.totalPages,
         currentPage: state.currentPage,
         course: state.course,
+        topCourses: state.topCourses,
         getAllCourses,
         getAllCoursesPaginate,
         getLastestCourses,
         getCourseById,
         getCoursesBySystemId,
+        getTopTenCourses,
       }}
     >
       {children}

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext, useEffect } from "react";
 import {
   Box,
   Card,
@@ -10,61 +10,14 @@ import {
   useTheme,
 } from "@mui/material";
 import { motion } from "framer-motion";
-
-const courses = [
-  {
-    id: 1,
-    title: "French Lover",
-    img: "https://cloud.wapizima.com.mx/production/courses/mobile/30-mobile",
-  },
-  {
-    id: 2,
-    title: "Las Guerreras Kpop",
-    img: "https://cloud.wapizima.com.mx/production/courses/mobile/10-mobile",
-  },
-  {
-    id: 3,
-    title: "Rut y Booz",
-    img: "https://cloud.wapizima.com.mx/production/courses/mobile/13-mobile",
-  },
-  {
-    id: 4,
-    title: "La Llorona",
-    img: "https://cloud.wapizima.com.mx/production/courses/mobile/51-mobile",
-  },
-  {
-    id: 5,
-    title: "Sonic 3",
-    img: "https://cloud.wapizima.com.mx/production/courses/mobile/82-mobile",
-  },
-  {
-    id: 6,
-    title: "Titanes del Pacífico",
-    img: "https://cloud.wapizima.com.mx/production/courses/mobile/20-mobile",
-  },
-  {
-    id: 7,
-    title: "Titanes del Pacífico",
-    img: "https://cloud.wapizima.com.mx/production/courses/mobile/90-mobile",
-  },
-  {
-    id: 8,
-    title: "Titanes del Pacífico",
-    img: "https://cloud.wapizima.com.mx/production/courses/mobile/63-mobile",
-  },
-  {
-    id: 9,
-    title: "Titanes del Pacífico",
-    img: "https://cloud.wapizima.com.mx/production/courses/mobile/63-mobile",
-  },
-  {
-    id: 10,
-    title: "Titanes del Pacífico",
-    img: "https://cloud.wapizima.com.mx/production/courses/mobile/63-mobile",
-  },
-];
-
+import CoursesContext from "../../../context/Courses/CoursesContext";
+import AuthContext from "../../../context/Auth/AuthContext";
 const TopCourses = () => {
+  const { getTopTenCourses, topCourses } = useContext(CoursesContext);
+  const { usuario } = useContext(AuthContext);
+  useEffect(() => {
+    getTopTenCourses();
+  }, []);
   const theme = useTheme();
 
   const primaryPink = "#e91e63";
@@ -144,7 +97,7 @@ const TopCourses = () => {
         justifyContent='center'
         sx={{ maxWidth: "100%", margin: "0 auto" }}
       >
-        {courses.map((course, index) => (
+        {topCourses.map((course, index) => (
           <Grid size={{ xs: 12, sm: 6, md: 4, lg: 3 }} key={course.id}>
             <motion.div
               initial={{ opacity: 0, y: 50 }}
@@ -180,12 +133,12 @@ const TopCourses = () => {
                     lineHeight: 1.2,
                   }}
                 >
-                  #{course.id}
+                  #{index + 1}
                 </Box>
 
                 <CardMedia
                   component='img'
-                  image={course.img}
+                  image={course.cover_image_url}
                   alt={course.title}
                   sx={{
                     width: "100%",
