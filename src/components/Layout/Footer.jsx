@@ -24,7 +24,6 @@ const Footer = () => {
         borderRadius: "20px 20px 0 0",
         boxShadow: "0 8px 32px rgba(0, 0, 0, 0.2)",
         py: 4,
-        mt: 5,
       }}
     >
       <Container maxWidth='lg'>

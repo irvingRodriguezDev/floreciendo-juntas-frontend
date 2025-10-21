@@ -9,6 +9,7 @@ import {
   Typography,
   Divider,
   Chip,
+  Box,
 } from "@mui/material";
 import { Link } from "react-router-dom";
 import { Formik, Form } from "formik";
@@ -48,240 +49,344 @@ const Register = () => {
 
   return (
     <Layout>
-      <Grid
-        container
-        justifyContent='center'
-        alignItems='center'
-        sx={{ minHeight: "100vh", px: { xs: 2, sm: 4 }, py: { xs: 4, md: 10 } }}
-        spacing={4}
+      <Box
+        sx={{
+          minHeight: "100vh",
+          // Fondo con un degradado sutil y un brillo radial
+          background: "linear-gradient(135deg, #fce4ec 0%, #f8bbd9 100%)",
+          position: "relative",
+          overflow: "hidden",
+          "&::before": {
+            content: '""',
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background:
+              "radial-gradient(circle at 80% 20%, rgba(255,255,255,0.4) 0%, transparent 50%)",
+          },
+        }}
       >
-        {/* Ilustración */}
-        <Grid size={{ xs: 12, sm: 6, md: 5 }} sx={{ mt: { xs: 10 } }}>
-          <Paper
-            elevation={0}
-            sx={{
-              p: { xs: 2, sm: 3 },
-              textAlign: "center",
-              bgcolor: "transparent",
-            }}
-          >
-            <img
-              src={svg}
-              alt='Register Illustration'
-              style={{ width: "100%", maxWidth: "400px" }}
-            />
-          </Paper>
-        </Grid>
+        {/* ========================================================= */}
+        {/* ELEMENTOS DECORATIVOS DE FONDO (Iguales al Login)            */}
+        {/* ========================================================= */}
 
-        {/* Formulario */}
-        <Grid size={{ xs: 12, sm: 8, md: 5 }}>
-          <Paper
-            elevation={4}
+        {/* Gran Círculo Superior (Rosa Oscuro, Baja Opacidad) */}
+        <Box
+          sx={{
+            position: "absolute",
+            top: { xs: "-100px", md: "-15%" },
+            left: { xs: "-100px", md: "-10%" },
+            width: { xs: 400, md: 800 },
+            height: { xs: 400, md: 800 },
+            borderRadius: "50%",
+            border: "4px solid #D82E7A",
+            opacity: { xs: 0.1, md: 0.15 },
+            zIndex: 0,
+          }}
+        />
+        {/* Círculo Intermedio (Rosa Vivo) */}
+        <Box
+          sx={{
+            position: "absolute",
+            top: { xs: "50%", md: "-5%" },
+            right: { xs: "0", md: "unset" },
+            left: { xs: "unset", md: "5%" },
+            transform: { xs: "translateY(-50%)", md: "none" },
+            width: { xs: 300, md: 600 },
+            height: { xs: 300, md: 600 },
+            borderRadius: "50%",
+            backgroundColor: "#FF69B4",
+            opacity: { xs: 0.05, md: 0.08 },
+            zIndex: 0,
+          }}
+        />
+        {/* Cuadrado Pequeño Rotado (Esquina Inferior Derecha) */}
+        <Box
+          sx={{
+            position: "absolute",
+            bottom: { xs: "5%", md: "10%" },
+            right: { xs: "5%", md: "10%" },
+            width: { xs: 40, md: 80 },
+            height: { xs: 40, md: 80 },
+            backgroundColor: "#D82E7A",
+            transform: "rotate(45deg)",
+            opacity: { xs: 0.2, md: 0.3 },
+            zIndex: 0,
+            borderRadius: "8px",
+          }}
+        />
+
+        {/* ========================================================= */}
+        {/* CONTENEDOR PRINCIPAL Y FORMULARIO (Centrado)            */}
+        {/* ========================================================= */}
+        <Grid
+          container
+          justifyContent='center'
+          alignItems='center'
+          sx={{
+            minHeight: "100vh",
+            padding: { xs: 2, sm: 4, md: 6 },
+            position: "relative",
+            zIndex: 1,
+            mt: { xs: 15, md: 8 },
+          }}
+        >
+          {/* Formulario */}
+          <Grid
+            item
+            size={{ xs: 12, sm: 10, md: 8, lg: 6 }}
             sx={{
-              p: { xs: 3, sm: 4 },
-              borderRadius: "16px",
-              textAlign: "center",
-              maxWidth: "600px",
-              bgcolor: "white",
+              display: "flex",
+              justifyContent: "center",
             }}
           >
-            <Formik
-              initialValues={{
-                name: "",
-                email: "",
-                password: "",
-                password_confirmation: "",
-                phone: "",
-              }}
-              validationSchema={RegisterSchema}
-              onSubmit={(values) => {
-                registerUser(values);
+            <Paper
+              elevation={12}
+              sx={{
+                padding: { xs: "30px", sm: "40px", md: "50px" },
+                borderRadius: "30px",
+                width: "100%",
+                // Glassmorphism Pink
+                background: "rgba(255, 255, 255, 0.06)",
+                backdropFilter: "blur(5.5px)",
+                border: "1px solid rgba(255, 255, 255, 0.3)",
+                boxShadow: "0 4px 30px rgba(0, 0, 0, 0.1)",
+                position: "relative",
+                overflow: "hidden",
+                "&::before": {
+                  content: '""',
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  height: "6px",
+                },
               }}
             >
-              {({ values, errors, touched, handleChange, handleBlur }) => (
-                <Form>
-                  <Grid container spacing={2}>
-                    <Grid size={12}>
-                      <Typography
-                        textAlign='center'
-                        fontWeight='bold'
-                        fontSize={{ xs: "28px", sm: "32px", md: "35px" }}
-                        color='#D82E7A'
-                      >
-                        Regístrate
-                      </Typography>
-                    </Grid>
+              <Formik
+                initialValues={{
+                  name: "",
+                  email: "",
+                  password: "",
+                  password_confirmation: "",
+                  phone: "",
+                }}
+                validationSchema={RegisterSchema}
+                onSubmit={(values) => {
+                  registerUser(values);
+                }}
+              >
+                {({ values, errors, touched, handleChange, handleBlur }) => (
+                  <Form>
+                    <Typography
+                      variant='h3'
+                      textAlign='center'
+                      fontWeight='bold'
+                      mb={4}
+                      sx={{
+                        background: "linear-gradient(135deg, #ff69b4, #d82e7a)",
+                        backgroundClip: "text",
+                        textFillColor: "transparent",
+                        WebkitBackgroundClip: "text",
+                        WebkitTextFillColor: "transparent",
+                        fontSize: { xs: "36px", sm: "42px" },
+                      }}
+                    >
+                      ¡Únete a la comunidad!
+                    </Typography>
 
-                    {/* Nombre */}
-                    <Grid size={12}>
-                      <FormControl fullWidth>
-                        <TextField
-                          label='Nombre completo'
-                          name='name'
-                          autoComplete='off'
-                          placeholder='Carolina Tavera'
-                          value={values.name}
-                          onChange={handleChange}
-                          onBlur={handleBlur}
-                          error={touched.name && Boolean(errors.name)}
-                          helperText={touched.name && errors.name}
-                          variant='outlined'
-                          sx={inputStyles}
-                        />
-                      </FormControl>
-                    </Grid>
+                    <Grid container spacing={3}>
+                      {/* Nombre */}
+                      <Grid size={12}>
+                        <FormControl fullWidth>
+                          <TextField
+                            label='Nombre completo'
+                            name='name'
+                            placeholder='Nombre y Apellido'
+                            value={values.name}
+                            onChange={handleChange}
+                            onBlur={handleBlur}
+                            error={touched.name && Boolean(errors.name)}
+                            helperText={touched.name && errors.name}
+                            variant='outlined'
+                            sx={inputStyles}
+                          />
+                        </FormControl>
+                      </Grid>
 
-                    {/* Correo */}
-                    <Grid size={{ xs: 12, sm: 6, md: 6 }}>
-                      <FormControl fullWidth>
-                        <TextField
-                          label='Correo Electrónico'
-                          type='email'
-                          autoComplete='off'
-                          name='email'
-                          placeholder='carolina@floreciendo-juntas.com.mx'
-                          value={values.email}
-                          onChange={handleChange}
-                          onBlur={handleBlur}
-                          error={touched.email && Boolean(errors.email)}
-                          helperText={touched.email && errors.email}
-                          variant='outlined'
-                          sx={inputStyles}
-                        />
-                      </FormControl>
-                    </Grid>
+                      {/* Correo */}
+                      <Grid size={{ xs: 12, lg: 6 }}>
+                        <FormControl fullWidth>
+                          <TextField
+                            label='Correo Electrónico'
+                            type='email'
+                            name='email'
+                            placeholder='tu.correo@ejemplo.com'
+                            value={values.email}
+                            onChange={handleChange}
+                            onBlur={handleBlur}
+                            error={touched.email && Boolean(errors.email)}
+                            helperText={touched.email && errors.email}
+                            variant='outlined'
+                            sx={inputStyles}
+                          />
+                        </FormControl>
+                      </Grid>
 
-                    {/* Teléfono */}
-                    <Grid size={{ xs: 12, sm: 6, md: 6 }}>
-                      <FormControl fullWidth>
-                        <TextField
-                          label='Teléfono'
-                          name='phone'
-                          autoComplete='off'
-                          placeholder='7223224221'
-                          value={values.phone}
-                          onChange={handleChange}
-                          onBlur={handleBlur}
-                          error={touched.phone && Boolean(errors.phone)}
-                          helperText={touched.phone && errors.phone}
-                          variant='outlined'
-                          sx={inputStyles}
-                        />
-                      </FormControl>
-                    </Grid>
-                    {/* Contraseña */}
-                    <Grid size={{ xs: 12, sm: 6, md: 6, lg: 6, xl: 6 }}>
-                      <FormControl fullWidth>
-                        <TextField
-                          label='Contraseña'
-                          type='password'
-                          name='password'
-                          autoComplete='off'
-                          placeholder='**********'
-                          value={values.password}
-                          onChange={handleChange}
-                          onBlur={handleBlur}
-                          error={touched.password && Boolean(errors.password)}
-                          helperText={touched.password && errors.password}
-                          variant='outlined'
-                          sx={inputStyles}
-                        />
-                      </FormControl>
-                    </Grid>
+                      {/* Teléfono */}
+                      <Grid size={{ xs: 12, lg: 6 }}>
+                        <FormControl fullWidth>
+                          <TextField
+                            label='Teléfono'
+                            name='phone'
+                            placeholder='Ej: 722 123 4567'
+                            value={values.phone}
+                            onChange={handleChange}
+                            onBlur={handleBlur}
+                            error={touched.phone && Boolean(errors.phone)}
+                            helperText={touched.phone && errors.phone}
+                            variant='outlined'
+                            sx={inputStyles}
+                          />
+                        </FormControl>
+                      </Grid>
+                      {/* Contraseña */}
+                      <Grid size={{ xs: 12, lg: 6 }}>
+                        <FormControl fullWidth>
+                          <TextField
+                            label='Contraseña'
+                            type='password'
+                            name='password'
+                            placeholder='**********'
+                            value={values.password}
+                            onChange={handleChange}
+                            onBlur={handleBlur}
+                            error={touched.password && Boolean(errors.password)}
+                            helperText={touched.password && errors.password}
+                            variant='outlined'
+                            sx={inputStyles}
+                          />
+                        </FormControl>
+                      </Grid>
 
-                    {/* Confirmación */}
-                    <Grid size={{ xs: 12, sm: 6, md: 6, lg: 6, xl: 6 }}>
-                      <FormControl fullWidth>
-                        <TextField
-                          label='Confirma tu contraseña'
-                          type='password'
-                          autoComplete='off'
-                          name='password_confirmation'
-                          placeholder='**********'
-                          value={values.password_confirmation}
-                          onChange={handleChange}
-                          onBlur={handleBlur}
-                          error={
-                            touched.password_confirmation &&
-                            Boolean(errors.password_confirmation)
-                          }
-                          helperText={
-                            touched.password_confirmation &&
-                            errors.password_confirmation
-                          }
-                          variant='outlined'
-                          sx={inputStyles}
-                        />
-                      </FormControl>
-                    </Grid>
+                      {/* Confirmación */}
+                      <Grid size={{ xs: 12, lg: 6 }}>
+                        <FormControl fullWidth>
+                          <TextField
+                            label='Confirma tu contraseña'
+                            type='password'
+                            name='password_confirmation'
+                            placeholder='**********'
+                            value={values.password_confirmation}
+                            onChange={handleChange}
+                            onBlur={handleBlur}
+                            error={
+                              touched.password_confirmation &&
+                              Boolean(errors.password_confirmation)
+                            }
+                            helperText={
+                              touched.password_confirmation &&
+                              errors.password_confirmation
+                            }
+                            variant='outlined'
+                            sx={inputStyles}
+                          />
+                        </FormControl>
+                      </Grid>
 
-                    {/* Botón Registrarse */}
-                    <FormControl fullWidth margin='normal'>
-                      <Button
-                        variant='contained'
-                        fullWidth
-                        type='submit'
-                        size='large'
-                        sx={{
-                          py: 1.5,
-                          fontWeight: "bold",
-                          borderRadius: "12px",
-                          bgcolor: "#D82E7A",
-                          color: "#fff",
-                          "&:hover": {
-                            bgcolor: "#bf2369",
-                            color: "#fff",
-                          },
-                        }}
-                      >
-                        Registrarme
-                      </Button>
-                    </FormControl>
-
-                    {/* Divider */}
-                    <Grid size={12}>
-                      <Divider>
-                        <Chip
-                          sx={{ bgcolor: "#D82E7A", color: "white" }}
-                          label='¿Ya tienes cuenta?'
-                        />
-                      </Divider>
-                    </Grid>
-
-                    {/* Link a login */}
-                    <Grid size={12}>
-                      <Link
-                        to='/iniciar-sesion'
-                        style={{ textDecoration: "none" }}
-                      >
+                      {/* Botón Registrarse */}
+                      <Grid size={12}>
                         <Button
-                          variant='outlined'
+                          variant='contained'
                           fullWidth
+                          type='submit'
                           size='large'
                           sx={{
-                            py: 1.5,
+                            borderRadius: "18px",
+                            background:
+                              "linear-gradient(135deg, #ff69b4, #d82e7a)",
+                            boxShadow: "0 10px 25px rgba(216,46,136,0.4)",
                             fontWeight: "bold",
-                            borderRadius: "12px",
-                            borderColor: "#D82E7A",
-                            color: "#D82E7A",
+                            py: 2,
+                            fontSize: "18px",
+                            textTransform: "uppercase",
+                            letterSpacing: "0.5px",
+                            transition: "all 0.3s ease",
                             "&:hover": {
-                              borderColor: "#bf2369",
-                              color: "#bf2369",
-                              backgroundColor: "rgba(216,46,136,0.05)",
+                              transform: "translateY(-3px)",
+                              boxShadow: "0 15px 30px rgba(216,46,136,0.5)",
+                              background:
+                                "linear-gradient(135deg, #ff59a4, #c8256a)",
+                            },
+                            "&:active": {
+                              transform: "translateY(0)",
                             },
                           }}
                         >
-                          Iniciar sesión
+                          Registrarme
                         </Button>
-                      </Link>
+                      </Grid>
+
+                      {/* Divider */}
+                      <Grid size={12}>
+                        <Divider sx={{ my: 2 }}>
+                          <Chip
+                            sx={{
+                              bgcolor: "transparent",
+                              color: "#D82E7A",
+                              border: "1px solid #D82E7A",
+                              fontWeight: "500",
+                              fontSize: "14px",
+                            }}
+                            label='¿Ya eres parte de la comunidad?'
+                          />
+                        </Divider>
+                      </Grid>
+
+                      {/* Link a login */}
+                      <Grid size={12}>
+                        <Link
+                          to='/iniciar-sesion'
+                          style={{ textDecoration: "none" }}
+                        >
+                          <Button
+                            variant='outlined'
+                            fullWidth
+                            size='large'
+                            sx={{
+                              borderRadius: "18px",
+                              borderColor: "#D82E7A",
+                              borderWidth: "2px",
+                              color: "#D82E7A",
+                              fontWeight: "bold",
+                              py: 2,
+                              fontSize: "18px",
+                              textTransform: "uppercase",
+                              letterSpacing: "0.5px",
+                              transition: "all 0.3s ease",
+                              "&:hover": {
+                                borderColor: "#bf2369",
+                                color: "#bf2369",
+                                bgcolor: "rgba(216, 46, 122, 0.08)",
+                                transform: "translateY(-3px)",
+                                boxShadow: "0 8px 20px rgba(216,46,136,0.2)",
+                              },
+                            }}
+                          >
+                            Iniciar sesión
+                          </Button>
+                        </Link>
+                      </Grid>
                     </Grid>
-                  </Grid>
-                </Form>
-              )}
-            </Formik>
-          </Paper>
+                  </Form>
+                )}
+              </Formik>
+            </Paper>
+          </Grid>
         </Grid>
-      </Grid>
+      </Box>
     </Layout>
   );
 };

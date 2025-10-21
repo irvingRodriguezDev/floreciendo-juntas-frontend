@@ -7,6 +7,7 @@ import {
   Paper,
   TextField,
   Typography,
+  Box,
 } from "@mui/material";
 import { Link } from "react-router-dom";
 import * as Yup from "yup";
@@ -14,6 +15,7 @@ import svg from "../../assets/svg/undraw_secure-login_m11a.svg";
 import AuthContext from "../../context/Auth/AuthContext";
 import { useContext } from "react";
 import { Formik, Form } from "formik";
+
 const LoginSchema = Yup.object().shape({
   email: Yup.string()
     .email("Correo inválido")
@@ -22,199 +24,349 @@ const LoginSchema = Yup.object().shape({
     .min(6, "Mínimo 6 caracteres")
     .required("La contraseña es obligatoria"),
 });
+
 const inputStyles = {
   mb: 2,
   "& .MuiOutlinedInput-root": {
-    borderRadius: "12px",
-    "& fieldset": { borderColor: "rgba(216,46,136,0.3)" },
-    "&:hover fieldset": { borderColor: "#D82E7A" },
-    "&.Mui-focused fieldset": { borderColor: "#D82E7A" },
+    borderRadius: "16px",
+    "& fieldset": {
+      borderColor: "rgba(216,46,136,0.3)",
+      borderWidth: "2px",
+    },
+    "&:hover fieldset": {
+      borderColor: "#D82E7A",
+      boxShadow: "0 0 0 4px rgba(216,46,136,0.1)",
+    },
+    "&.Mui-focused fieldset": {
+      borderColor: "#D82E7A",
+      boxShadow: "0 0 0 4px rgba(216,46,136,0.2)",
+    },
   },
-  "& .MuiInputBase-input": { color: "black" },
-  "& .MuiInputLabel-root": { color: "#D82E7A" },
-  "& .MuiInputLabel-root.Mui-focused": { color: "#D82E7A" },
+  "& .MuiInputBase-input": {
+    color: "#333",
+    padding: "16px 20px",
+    fontSize: "16px",
+  },
+  "& .MuiInputLabel-root": {
+    color: "#D82E7A",
+    fontWeight: "500",
+    fontSize: "16px",
+  },
+  "& .MuiInputLabel-root.Mui-focused": {
+    color: "#D82E7A",
+    fontWeight: "600",
+  },
+  "& .MuiFormHelperText-root": {
+    fontSize: "14px",
+    marginLeft: "8px",
+  },
 };
+
 const Login = () => {
   const { iniciarSesion } = useContext(AuthContext);
 
   return (
     <Layout>
-      <Grid
-        container
-        justifyContent='center'
-        alignItems='center'
-        sx={{ minHeight: "100vh", padding: { xs: 2, sm: 4 } }}
-        spacing={2}
+      <Box
+        sx={{
+          minHeight: "100vh",
+          // Fondo con un degradado sutil y un brillo radial
+          background: "linear-gradient(135deg, #FFF0F0 0%, #ED9FBC 150%)",
+          position: "relative",
+          overflow: "hidden",
+        }}
       >
-        {/* Imagen */}
-        <Grid
-          size={{ xs: 12, sm: 6, md: 5 }}
-          sx={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            mt: { xs: 13, md: 0 },
-          }}
-        >
-          <Paper
-            elevation={0}
-            sx={{
-              padding: { xs: "10px", sm: "20px" },
-              borderRadius: "16px",
-              textAlign: "center",
-              bgcolor: "transparent",
-            }}
-          >
-            <img
-              src={svg}
-              alt='Login Illustration'
-              style={{ width: "100%", maxWidth: "600px" }}
-            />
-          </Paper>
-        </Grid>
+        {/* ========================================================= */}
+        {/* ELEMENTOS DECORATIVOS DE FONDO            */}
+        {/* ========================================================= */}
 
-        {/* Formulario */}
-        <Grid
-          size={{ xs: 12, sm: 6, md: 5 }}
+        {/* Gran Círculo Exterior (Rosa Oscuro, Baja Opacidad) */}
+        <Box
           sx={{
-            display: "flex",
-            justifyContent: "end",
-            marginBottom: { xs: 25, md: 0 },
+            position: "absolute",
+            // Ajuste de posición para móviles
+            top: { xs: "-100px", md: "-15%" },
+            left: { xs: "-100px", md: "-10%" },
+            // Ajuste de tamaño para móviles
+            width: { xs: 400, md: 800 },
+            height: { xs: 400, md: 800 },
+            borderRadius: "50%",
+            border: "4px solid #D82E7A",
+            // Baja opacidad en móviles
+            opacity: { xs: 0.1, md: 0.15 },
+            zIndex: 0,
+          }}
+        />
+        {/* Círculo Intermedio (Rosa Vivo) */}
+        <Box
+          sx={{
+            position: "absolute",
+            top: { xs: "50%", md: "-5%" },
+            right: { xs: "0", md: "unset" },
+            left: { xs: "unset", md: "5%" },
+            transform: { xs: "translateY(-50%)", md: "none" },
+            width: { xs: 300, md: 600 },
+            height: { xs: 300, md: 600 },
+            borderRadius: "50%",
+            backgroundColor: "#FF69B4",
+            opacity: { xs: 0.05, md: 0.08 },
+            zIndex: 0,
+          }}
+        />
+        {/* Cuadrado Pequeño Rotado (Esquina Inferior Derecha) */}
+        <Box
+          sx={{
+            position: "absolute",
+            bottom: { xs: "5%", md: "10%" },
+            right: { xs: "5%", md: "10%" },
+            width: { xs: 40, md: 80 },
+            height: { xs: 40, md: 80 },
+            backgroundColor: "#D82E7A",
+            transform: "rotate(45deg)",
+            opacity: { xs: 0.2, md: 0.3 },
+            zIndex: 0,
+            borderRadius: "12px",
+          }}
+        />
+        {/* Puntos de detalle (Rosa Claro) */}
+        <Box
+          sx={{
+            position: "absolute",
+            bottom: { xs: "20px", md: "15%" },
+            left: { xs: "20px", md: "5%" },
+            width: { xs: "10px", md: "20px" },
+            height: { xs: "10px", md: "20px" },
+            borderRadius: "50%",
+            backgroundColor: "#FFC0CB",
+            opacity: 0.6,
+          }}
+        />
+        <Box
+          sx={{
+            position: "absolute",
+            bottom: { xs: "10px", md: "10%" },
+            left: { xs: "30px", md: "4%" },
+            width: { xs: "5px", md: "10px" },
+            height: { xs: "5px", md: "10px" },
+            borderRadius: "50%",
+            backgroundColor: "#FFC0CB",
+            opacity: 0.8,
+          }}
+        />
+
+        {/* ========================================================= */}
+        {/* CONTENEDOR PRINCIPAL                   */}
+        {/* ========================================================= */}
+        <Grid
+          container
+          justifyContent='center'
+          alignItems='center'
+          sx={{
+            minHeight: "100vh",
+            padding: { xs: 2, sm: 4, md: 6 },
+            position: "relative",
+            mt: { xs: 12, md: 2 },
+            zIndex: 1, // Asegura que el contenido esté sobre los decorativos
           }}
         >
-          <Paper
-            elevation={4}
+          <Grid
+            size={{ xs: 12, md: 10, lg: 6 }}
             sx={{
-              padding: { xs: "20px", sm: "30px" },
-              borderRadius: "16px",
-              width: "100%",
-              maxWidth: "400px",
+              display: "flex",
+              justifyContent: "center",
             }}
           >
-            <Formik
-              initialValues={{
-                email: "",
-                password: "",
-              }}
-              validationSchema={LoginSchema}
-              onSubmit={(values) => {
-                iniciarSesion(values);
+            <Paper
+              elevation={12}
+              sx={{
+                padding: { xs: "30px", sm: "40px", md: "50px" },
+                borderRadius: "30px",
+                width: "100%",
+                // Glassmorphism Pink
+                background: "rgba(255, 255, 255, 0.06)",
+                backdropFilter: "blur(5.5px)",
+                border: "1px solid rgba(255, 255, 255, 0.3)",
+                boxShadow: "0 4px 30px rgba(0, 0, 0, 0.1)",
+                position: "relative",
+                overflow: "hidden",
+                "&::before": {
+                  content: '""',
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  height: "6px",
+                  // background:
+                  //   "linear-gradient(90deg, #ff69b4, #ff1493, #d82e7a)",
+                },
               }}
             >
-              {({ values, errors, touched, handleChange, handleBlur }) => (
-                <Form>
-                  <Typography
-                    textAlign='center'
-                    fontWeight='bold'
-                    fontSize={{ xs: "28px", sm: "32px", md: "35px" }}
-                    mb={3}
-                  >
-                    Iniciar sesión
-                  </Typography>
-                  <Grid container spacing={2}>
-                    <Grid size={12}>
-                      <TextField
-                        label='Correo Electrónico'
-                        type='email'
-                        fullWidth
-                        name='email'
-                        placeholder='carolina@floreciendo-juntas.com.mx'
-                        value={values.email}
-                        onChange={handleChange}
-                        onBlur={handleBlur}
-                        error={touched.email && Boolean(errors.email)}
-                        helperText={touched.email && errors.email}
-                        variant='outlined'
-                        sx={inputStyles}
-                      />
-                    </Grid>
+              <Formik
+                initialValues={{ email: "", password: "" }}
+                validationSchema={LoginSchema}
+                onSubmit={(values) => iniciarSesion(values)}
+              >
+                {({ values, errors, touched, handleChange, handleBlur }) => (
+                  <Form>
+                    <Typography
+                      variant='h3'
+                      textAlign='center'
+                      fontWeight='bold'
+                      mb={4}
+                      sx={{
+                        background: "linear-gradient(135deg, #ff69b4, #d82e7a)",
+                        backgroundClip: "text",
+                        textFillColor: "transparent",
+                        WebkitBackgroundClip: "text",
+                        WebkitTextFillColor: "transparent",
+                        fontSize: { xs: "36px", sm: "42px" },
+                      }}
+                    >
+                      Bienvenid@ de nuevo
+                    </Typography>
 
-                    <Grid size={12}>
-                      <TextField
-                        placeholder='**********'
-                        label='Contraseña'
-                        type='password'
-                        variant='outlined'
-                        fullWidth
-                        name='password'
-                        value={values.password}
-                        onChange={handleChange}
-                        onBlur={handleBlur}
-                        error={touched.password && Boolean(errors.password)}
-                        helperText={touched.password && errors.password}
-                        sx={inputStyles}
-                      />
-                    </Grid>
+                    <Grid container spacing={3}>
+                      <Grid size={12}>
+                        <TextField
+                          label='Correo Electrónico'
+                          type='email'
+                          fullWidth
+                          name='email'
+                          placeholder='ejemplo@email.com'
+                          value={values.email}
+                          onChange={handleChange}
+                          onBlur={handleBlur}
+                          error={touched.email && Boolean(errors.email)}
+                          helperText={touched.email && errors.email}
+                          variant='outlined'
+                          sx={inputStyles}
+                        />
+                      </Grid>
 
-                    <Grid size={12} sx={{ textAlign: "right" }}>
-                      <Typography sx={{ fontSize: { xs: "16px", sm: "18px" } }}>
-                        Olvidaste tu contraseña?{" "}
+                      <Grid size={12}>
+                        <TextField
+                          placeholder='Contraseña'
+                          label='Contraseña'
+                          type='password'
+                          variant='outlined'
+                          fullWidth
+                          name='password'
+                          value={values.password}
+                          onChange={handleChange}
+                          onBlur={handleBlur}
+                          error={touched.password && Boolean(errors.password)}
+                          helperText={touched.password && errors.password}
+                          sx={inputStyles}
+                        />
+                      </Grid>
+
+                      <Grid size={12} sx={{ textAlign: "right" }}>
                         <Link
                           to={"/recuperar-contraseña"}
                           style={{ textDecoration: "none" }}
                         >
-                          <b style={{ color: "#D82E7A" }}>Haz clic aquí</b>
+                          <Typography
+                            variant='body2'
+                            sx={{
+                              color: "#D82E7A",
+                              fontWeight: "600",
+                              transition: "color 0.3s ease",
+                              "&:hover": { color: "#FF69B4" },
+                            }}
+                          >
+                            ¿Olvidaste tu contraseña?
+                          </Typography>
                         </Link>
-                      </Typography>
-                    </Grid>
+                      </Grid>
 
-                    <Grid size={12}>
-                      <Button
-                        variant='contained'
-                        size='large'
-                        fullWidth
-                        type='submit'
-                        sx={{
-                          borderRadius: "12px",
-                          bgcolor: "#D82E7A",
-                          "&:hover": { bgcolor: "#bf2369" },
-                          fontWeight: "bold",
-                          py: 1.5,
-                        }}
-                      >
-                        Iniciar sesión
-                      </Button>
-                    </Grid>
-
-                    <Grid size={12}>
-                      <Divider>
-                        <Chip
-                          sx={{ bgcolor: "#D82E7A", color: "white" }}
-                          label='¿Aún no tienes cuenta?'
-                        />
-                      </Divider>
-                    </Grid>
-
-                    <Grid size={12}>
-                      <Link to={"/registro"}>
+                      <Grid size={12}>
                         <Button
-                          variant='outlined'
+                          variant='contained'
                           size='large'
                           fullWidth
+                          type='submit'
                           sx={{
-                            borderRadius: "12px",
-                            borderColor: "#D82E7A",
-                            color: "#D82E7A",
+                            borderRadius: "18px",
+                            background:
+                              "linear-gradient(135deg, #ff69b4, #d82e7a)",
+                            boxShadow: "0 10px 25px rgba(216,46,136,0.4)",
                             fontWeight: "bold",
-                            py: 1.5,
+                            py: 2,
+                            fontSize: "18px",
+                            textTransform: "uppercase",
+                            letterSpacing: "0.5px",
+                            transition: "all 0.3s ease",
                             "&:hover": {
-                              borderColor: "#bf2369",
-                              color: "#bf2369",
-                              bgcolor: "rgba(216, 46, 122, 0.05)",
+                              transform: "translateY(-3px)",
+                              boxShadow: "0 15px 30px rgba(216,46,136,0.5)",
+                              background:
+                                "linear-gradient(135deg, #ff59a4, #c8256a)",
+                            },
+                            "&:active": {
+                              transform: "translateY(0)",
                             },
                           }}
                         >
-                          Regístrate
+                          Iniciar sesión
                         </Button>
-                      </Link>
+                      </Grid>
+
+                      <Grid size={12}>
+                        <Divider sx={{ my: 2 }}>
+                          <Chip
+                            sx={{
+                              bgcolor: "transparent",
+                              color: "#D82E7A",
+                              border: "1px solid #D82E7A",
+                              fontWeight: "500",
+                              fontSize: "14px",
+                            }}
+                            label='¿Aún no eres parte?'
+                          />
+                        </Divider>
+                      </Grid>
+
+                      <Grid size={12}>
+                        <Link
+                          to={"/registro"}
+                          style={{ textDecoration: "none" }}
+                        >
+                          <Button
+                            variant='outlined'
+                            size='large'
+                            fullWidth
+                            sx={{
+                              borderRadius: "18px",
+                              borderColor: "#D82E7A",
+                              borderWidth: "2px",
+                              color: "#D82E7A",
+                              fontWeight: "bold",
+                              py: 2,
+                              fontSize: "18px",
+                              textTransform: "uppercase",
+                              letterSpacing: "0.5px",
+                              transition: "all 0.3s ease",
+                              "&:hover": {
+                                borderColor: "#bf2369",
+                                color: "#bf2369",
+                                bgcolor: "rgba(216, 46, 122, 0.08)",
+                                transform: "translateY(-3px)",
+                                boxShadow: "0 8px 20px rgba(216,46,136,0.2)",
+                              },
+                            }}
+                          >
+                            Crear cuenta
+                          </Button>
+                        </Link>
+                      </Grid>
                     </Grid>
-                  </Grid>
-                </Form>
-              )}
-            </Formik>
-          </Paper>
+                  </Form>
+                )}
+              </Formik>
+            </Paper>
+          </Grid>
         </Grid>
-      </Grid>
+      </Box>
     </Layout>
   );
 };
