@@ -21,16 +21,21 @@ const AuthState = (props) => {
     directions: [],
     ErrorsApi: [],
     all_users: [],
+    cargando: true,
   };
 
   const [state, dispatch] = useReducer(AuthReducer, initialState);
 
   const usuarioAutenticado = async () => {
+    // Inicia la carga
+    dispatch({ type: types.INICIO_AUTENTICACION });
+
     const token = localStorage.getItem("token");
 
     if (!token) {
+      // 1. No hay token. Se despacha el error.
       dispatch({ type: types.LOGIN_ERROR });
-      dispatch({ type: types.FIN_AUTENTICACION });
+      // 2. El finally garantiza FIN_AUTENTICACION.
       return false;
     }
 
@@ -38,19 +43,15 @@ const AuthState = (props) => {
 
     try {
       const { data } = await MethodGet("/auth/me");
-
+      // 3. Éxito. Se despacha el usuario.
       dispatch({ type: types.OBTENER_USUARIO, payload: data.user });
-
       return true;
     } catch (error) {
-      console.error(
-        "Error usuarioAutenticado:",
-        error.response?.status,
-        error.response?.data
-      );
+      // 4. Fallo. Se despacha el error.
       dispatch({ type: types.LOGIN_ERROR });
       return false;
     } finally {
+      // 5. ¡Garantía! Siempre se ejecuta, poniendo cargando: false.
       dispatch({ type: types.FIN_AUTENTICACION });
     }
   };
@@ -338,6 +339,7 @@ const AuthState = (props) => {
         directions: state.directions,
         ErrorsApi: state.ErrorsApi,
         all_users: state.all_users,
+        cargando: state.cargando,
         iniciarSesion,
         usuarioAutenticado,
         cerrarSesion,

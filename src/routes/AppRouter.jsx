@@ -23,7 +23,6 @@ import BySystemId from "../containers/Courses/BySystem/BySystemId";
 
 function AppRouter() {
   const { autenticado, usuarioAutenticado, cargando } = useContext(AuthContext);
-
   useEffect(() => {
     usuarioAutenticado();
   }, []);

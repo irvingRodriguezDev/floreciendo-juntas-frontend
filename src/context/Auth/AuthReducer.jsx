@@ -2,6 +2,11 @@ import { types } from "../../types";
 
 export default (state, action) => {
   switch (action.type) {
+    case types.INICIO_AUTENTICACION:
+      return {
+        ...state,
+        cargando: true,
+      };
     case types.REGISTRO_EXITOSO:
       localStorage.setItem("token", action.payload.token);
       return {
@@ -28,7 +33,7 @@ export default (state, action) => {
         ...state,
         autenticado: true,
         usuario: action.payload,
-        cargando: false,
+        cargando: false, // ✅ Crucial para el éxito
         success: true,
       };
     case types.USER_CHANGEPASSWORD:
@@ -45,19 +50,20 @@ export default (state, action) => {
         success: true,
       };
     case types.LOGIN_ERROR:
-      localStorage.removeItem("token");
       return {
         ...state,
         token: null,
-        usuario: null,
         autenticado: false,
-        // isAuthenticating: se maneja en FIN_AUTENTICACION
+        usuario: null,
+        cargando: false, // ✅ Crucial para el fallo
       };
     case types.FIN_AUTENTICACION:
       return {
         ...state,
         isAuthenticating: false, // ¡El spinner se apaga aquí!
+        cargando: false,
       };
+
     case types.CERRAR_SESION:
       localStorage.removeItem("token");
       localStorage.removeItem("expires_at");

@@ -21,101 +21,41 @@ import "swiper/css/navigation";
 import "swiper/css/pagination";
 import { Link } from "react-router-dom";
 import CoursesContext from "../../../context/Courses/CoursesContext";
+import AuthContext from "../../../context/Auth/AuthContext";
+import Progress from "../../Progress/Progress";
 // NOTA: No necesitamos el archivo "./swipperCustom.css" si manejamos la navegación con useRef y estilos de MUI.
 
 const NewCourses = () => {
   const { courses, getLastestCourses } = useContext(CoursesContext);
+  const { usuario, autenticado } = useContext(AuthContext);
   useEffect(() => {
-    getLastestCourses();
-  }, []);
+    if (autenticado && usuario) {
+      getLastestCourses(usuario, autenticado);
+    } else if (!autenticado) {
+      getLastestCourses(null, false);
+    }
+  }, [usuario, autenticado]);
   const theme = useTheme();
 
   // Referencias para los botones de navegación personalizados (Necesario para loop=true)
   const swiperPrevRef = useRef(null);
   const swiperNextRef = useRef(null);
 
-  const cursos = [
-    {
-      id: 1,
-      name: "Técnica Acrílica Profesional",
-      image:
-        "https://cloud.wapizima.com.mx/production/courses/mobile/114-mobile",
-    },
-    {
-      id: 2,
-      name: "Diseño con Gel Avanzado",
-      image:
-        "https://cloud.wapizima.com.mx/production/courses/mobile/112-mobile",
-    },
-    {
-      id: 3,
-      name: "Manicura y Pedicura Spa",
-      image:
-        "https://cloud.wapizima.com.mx/production/courses/mobile/111-mobile",
-    },
-    {
-      id: 4,
-      name: "Esmaltado Semipermanente",
-      image:
-        "https://cloud.wapizima.com.mx/production/courses/mobile/110-mobile",
-    },
-    {
-      id: 5,
-      name: "Nail Art 3D y 4D",
-      image:
-        "https://cloud.wapizima.com.mx/production/courses/mobile/109-mobile",
-    },
-    {
-      id: 6,
-      name: "Uñas de Novia y Eventos",
-      image:
-        "https://cloud.wapizima.com.mx/production/courses/mobile/68-mobile",
-    },
-    {
-      id: 7,
-      name: "Sistema Polygel Básico",
-      image:
-        "https://cloud.wapizima.com.mx/production/courses/mobile/67-mobile",
-    },
-    {
-      id: 8,
-      name: "Reconstrucción de Uñas",
-      image:
-        "https://cloud.wapizima.com.mx/production/courses/mobile/63-mobile",
-    },
-    {
-      id: 9,
-      name: "Cuidado de la Uña Natural",
-      image:
-        "https://cloud.wapizima.com.mx/production/courses/mobile/60-mobile",
-    },
-    {
-      id: 10,
-      name: "Marketing para Nail Artists",
-      image:
-        "https://cloud.wapizima.com.mx/production/courses/mobile/55-mobile",
-    },
-  ];
-
   // Definimos los estilos de color rosa que hemos estado usando (asumiendo que están en el tema)
   const primaryPink = "#e91e63";
-  const highlightYellow = "#ffc107";
   const lightYellow = "#ffecb3";
 
   return (
     <Box
       sx={{
-        backgroundColor: theme.palette.background.default || "#fffcf7", // Fondo suave
+        backgroundColor: theme.palette.background.default || "#fffcf7",
         position: "relative",
-        // overflow: "hidden",
-        // border: "3px solid green",
       }}
     >
       <Stack
         alignItems='center'
         sx={{ mb: 6, zIndex: 1, padding: theme.spacing(0, 4) }}
       >
-        {/* Etiqueta Superior */}
         <motion.div
           initial={{ opacity: 0, y: 50 }}
           animate={{ opacity: 1, y: 0 }}
@@ -134,7 +74,6 @@ const NewCourses = () => {
           </Typography>
         </motion.div>
 
-        {/* Título Principal con Resaltado */}
         <Typography
           variant='h3'
           component='h2'
@@ -162,7 +101,7 @@ const NewCourses = () => {
                 bottom: 0,
                 width: "100%",
                 height: "8px",
-                backgroundColor: lightYellow, // Resaltado amarillo suave
+                backgroundColor: lightYellow,
                 zIndex: -1,
                 opacity: 0.7,
                 borderRadius: "4px",
@@ -172,14 +111,12 @@ const NewCourses = () => {
         </Typography>
       </Stack>
 
-      {/* Contenedor del Carrusel para centrado y posición relativa */}
       <Box
         sx={{
           position: "relative",
           maxWidth: "100%",
           margin: 0,
           zIndex: 1,
-          // border: "3px solid green",
           backgroundColor: "transparent",
         }}
       >
@@ -188,12 +125,10 @@ const NewCourses = () => {
           spaceBetween={20}
           slidesPerView={1.5}
           loop={true}
-          // Usamos las referencias para los botones
           navigation={{
             prevEl: swiperPrevRef.current,
             nextEl: swiperNextRef.current,
           }}
-          // Se llama antes de la inicialización para asegurar que Swiper vea las referencias
           onBeforeInit={(swiper) => {
             if (swiper.params.navigation) {
               swiper.params.navigation.prevEl = swiperPrevRef.current;
@@ -201,14 +136,12 @@ const NewCourses = () => {
               swiper.navigation.update();
             }
           }}
-          // pagination={{ clickable: true }}
           breakpoints={{
             640: { slidesPerView: 2.2, spaceBetween: 30 },
             768: { slidesPerView: 3, spaceBetween: 30 },
             1024: { slidesPerView: 3.5, spaceBetween: 40 },
             1440: { slidesPerView: 4.5, spaceBetween: 40 },
           }}
-          // El padding lateral es ahora manejado por el contenedor y las breakpoints
           style={{ padding: theme.spacing(8, 4) }}
         >
           {courses.map((c, index) => (
@@ -219,29 +152,74 @@ const NewCourses = () => {
               >
                 <Card
                   component={motion.div}
-                  whileHover={{ scale: 1.03, transition: { duration: 0.3 } }}
+                  whileHover={{
+                    scale: 1.04,
+                    boxShadow: "0 12px 28px rgba(0, 0, 0, 0.15)",
+                    transition: { duration: 0.3 },
+                  }}
                   sx={{
-                    borderRadius: "16px", // Bordes más suaves
-                    boxShadow: "15px black",
+                    borderRadius: "18px",
                     cursor: "pointer",
-                    border: "1px solid #f0f0f0",
-                    minHeight: 250,
                     overflow: "hidden",
+                    backgroundColor: "#fff",
+                    boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
+                    border: "1px solid rgba(0,0,0,0.05)",
+                    transition: "transform 0.3s ease, box-shadow 0.3s ease",
                   }}
                 >
-                  <CardMedia
-                    component='img'
-                    width='100%'
-                    height='280' // Altura ligeramente ajustada para mejor aspecto
-                    image={c.cover_image_url}
-                    alt={c.title}
-                    sx={{ objectFit: "cover" }}
-                  />
-                  <Box sx={{ padding: theme.spacing(2) }}>
+                  {/* Imagen con efecto hover suave */}
+                  <Box sx={{ position: "relative", overflow: "hidden" }}>
+                    <CardMedia
+                      component='img'
+                      width='100%'
+                      height='260'
+                      image={c.cover_image_url}
+                      alt={c.title}
+                      sx={{
+                        objectFit: "cover",
+                        transition: "transform 0.6s ease",
+                        "&:hover": { transform: "scale(1.05)" },
+                      }}
+                    />
+
+                    {/* Overlay degradado sutil para mejor legibilidad */}
+                    <Box
+                      sx={{
+                        position: "absolute",
+                        bottom: 0,
+                        left: 0,
+                        width: "100%",
+                        height: "30%",
+                        background:
+                          "linear-gradient(to top, rgba(0,0,0,0.35), rgba(0,0,0,0))",
+                      }}
+                    />
+                  </Box>
+
+                  {/* Contenido */}
+                  <Box
+                    sx={{
+                      p: 2,
+                      background:
+                        "linear-gradient(180deg, #fff0f0 0%, #fff6f6 100%)",
+                    }}
+                  >
+                    {usuario !== null && usuario.isSubscribed && (
+                      <Progress progress={c?.user_progress_percentage ?? 0} />
+                    )}
+
                     <Typography
                       textAlign='center'
                       variant='body1'
-                      sx={{ fontWeight: 600, color: primaryPink }}
+                      sx={{
+                        fontWeight: 600,
+                        color: primaryPink,
+                        mt: 1,
+                        fontSize: "1.05rem",
+                        letterSpacing: 0.3,
+                        transition: "color 0.3s ease",
+                        "&:hover": { color: "#d81b60" },
+                      }}
                     >
                       {c.title}
                     </Typography>

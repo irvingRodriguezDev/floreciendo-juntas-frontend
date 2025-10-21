@@ -62,8 +62,11 @@ const CoursesState = ({ children }) => {
         console.error("Ocurrió un error al obtener los cursos:", error);
       });
   };
-  const getLastestCourses = () => {
-    let url = "/courses/lastAdded";
+  const getLastestCourses = (usuario, autenticado) => {
+    let url = autenticado
+      ? `/courses/lastAdded?userId=${usuario.id}`
+      : "/courses/lastAdded";
+
     MethodGet(url)
       .then((res) => {
         dispatch({
