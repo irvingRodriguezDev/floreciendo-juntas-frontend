@@ -33,7 +33,7 @@ const ResetSchema = Yup.object().shape({
   password: Yup.string()
     .min(6, "Mínimo 6 caracteres")
     .required("La contraseña es obligatoria"),
-  password_confirmation: Yup.string()
+  passwordConfirmation: Yup.string()
     .oneOf([Yup.ref("password")], "Las contraseñas deben coincidir")
     .required("Confirma la contraseña"),
 });
@@ -215,20 +215,20 @@ const ForgotPassword = () => {
                       <TextField
                         label='Confirmar Nueva Contraseña'
                         type='password'
-                        name='password_confirmation'
+                        name='passwordConfirmation'
                         fullWidth
                         variant='outlined'
                         placeholder='**********'
-                        value={values.password_confirmation}
+                        value={values.passwordConfirmation}
                         onChange={handleChange}
                         onBlur={handleBlur}
                         error={
-                          touched.password_confirmation &&
-                          Boolean(errors.password_confirmation)
+                          touched.passwordConfirmation &&
+                          Boolean(errors.passwordConfirmation)
                         }
                         helperText={
-                          touched.password_confirmation &&
-                          errors.password_confirmation
+                          touched.passwordConfirmation &&
+                          errors.passwordConfirmation
                         }
                         sx={inputStyles}
                       />

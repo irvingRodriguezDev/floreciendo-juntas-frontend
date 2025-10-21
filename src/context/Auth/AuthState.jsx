@@ -81,7 +81,9 @@ const AuthState = (props) => {
       Swal.fire({
         title: "Error",
         icon: "error",
-        text: error.response.data.message,
+        timer: 2000,
+        showConfirmButton: false,
+        text: error.response.data.msg,
       });
       dispatch({
         type: SHOW_ERRORS_API,
@@ -119,7 +121,7 @@ const AuthState = (props) => {
       .catch((error) => {
         Swal.fire({
           title: "Error",
-          text: error.response?.data?.message || "Error al registrar",
+          text: error.response?.data?.error || "Error al registrar",
           icon: "error",
           showConfirmButton: false,
         });
@@ -127,11 +129,11 @@ const AuthState = (props) => {
   };
 
   const resetPassword = (data) => {
-    let url = "/reset-password";
+    let url = "/auth/reset-password";
     MethodPost(url, data)
       .then((res) => {
         Swal.fire({
-          Title: "Actualizada!",
+          title: "Actualizada!",
           text: "La contraseña se ha restablecido correctamente!",
           icon: "success",
           timer: 2500,

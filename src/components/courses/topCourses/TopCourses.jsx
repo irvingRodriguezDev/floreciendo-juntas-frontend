@@ -12,6 +12,7 @@ import {
 import { motion } from "framer-motion";
 import CoursesContext from "../../../context/Courses/CoursesContext";
 import AuthContext from "../../../context/Auth/AuthContext";
+import { Link } from "react-router-dom";
 const TopCourses = () => {
   const { getTopTenCourses, topCourses } = useContext(CoursesContext);
   const { usuario } = useContext(AuthContext);
@@ -105,61 +106,66 @@ const TopCourses = () => {
               viewport={{ once: true, amount: 0.2 }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
             >
-              <Card
-                sx={{
-                  borderRadius: "16px",
-                  boxShadow: theme.shadows[6], // Sombra más prominente
-                  overflow: "hidden",
-                  position: "relative",
-                  "&:hover": {
-                    transform: "scale(1.03)",
-                    transition: "transform 0.3s",
-                  },
-                }}
+              <Link
+                style={{ textDecoration: "none" }}
+                to={`/detalle-curso/${course.id}`}
               >
-                {/* Clasificación (rank) - Integrada al diseño */}
-                <Box
+                <Card
                   sx={{
-                    position: "absolute",
-                    top: 0,
-                    left: 0,
-                    backgroundColor: primaryPink,
-                    color: "white",
-                    padding: theme.spacing(0.5, 2),
-                    borderBottomRightRadius: "16px",
-                    zIndex: 2,
-                    fontSize: "1.5rem",
-                    fontWeight: "bold",
-                    lineHeight: 1.2,
+                    borderRadius: "16px",
+                    boxShadow: theme.shadows[6], // Sombra más prominente
+                    overflow: "hidden",
+                    position: "relative",
+                    "&:hover": {
+                      transform: "scale(1.03)",
+                      transition: "transform 0.3s",
+                    },
                   }}
                 >
-                  #{index + 1}
-                </Box>
-
-                <CardMedia
-                  component='img'
-                  image={course.cover_image_url}
-                  alt={course.title}
-                  sx={{
-                    width: "100%",
-                    height: 350, // Altura fija
-                    objectFit: "cover",
-                  }}
-                />
-
-                <CardContent sx={{ p: 2 }}>
-                  <Typography
-                    variant='h6' // Usamos h6 para un título más adecuado
+                  {/* Clasificación (rank) - Integrada al diseño */}
+                  <Box
                     sx={{
-                      color: theme.palette.text.primary,
-                      fontWeight: 700,
-                      textAlign: "center",
+                      position: "absolute",
+                      top: 0,
+                      left: 0,
+                      backgroundColor: primaryPink,
+                      color: "white",
+                      padding: theme.spacing(0.5, 2),
+                      borderBottomRightRadius: "16px",
+                      zIndex: 2,
+                      fontSize: "1.5rem",
+                      fontWeight: "bold",
+                      lineHeight: 1.2,
                     }}
                   >
-                    {course.title}
-                  </Typography>
-                </CardContent>
-              </Card>
+                    #{index + 1}
+                  </Box>
+
+                  <CardMedia
+                    component='img'
+                    image={course.cover_image_url}
+                    alt={course.title}
+                    sx={{
+                      width: "100%",
+                      height: 350, // Altura fija
+                      objectFit: "cover",
+                    }}
+                  />
+
+                  <CardContent sx={{ p: 2 }}>
+                    <Typography
+                      variant='h6' // Usamos h6 para un título más adecuado
+                      sx={{
+                        color: theme.palette.text.primary,
+                        fontWeight: 700,
+                        textAlign: "center",
+                      }}
+                    >
+                      {course.title}
+                    </Typography>
+                  </CardContent>
+                </Card>
+              </Link>
             </motion.div>
           </Grid>
         ))}
