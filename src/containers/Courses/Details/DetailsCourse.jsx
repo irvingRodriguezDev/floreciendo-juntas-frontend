@@ -9,6 +9,7 @@ import PinkSpinner from "../../../components/Loading/PinkSpinner";
 import AuthContext from "../../../context/Auth/AuthContext";
 import VideoBlocker from "../VideoBlocker/VideoBlocker";
 import CustomTabs from "../../../components/Custom/CustomTabs";
+import Wall from "../../../components/Posts/Wall";
 const CourseDetailScreen = () => {
   const params = useParams();
   const { id } = params;
@@ -51,8 +52,8 @@ const CourseDetailScreen = () => {
       ),
     },
     {
-      label: "Reseñas del curso",
-      content: <Box>Contenido de la pestaña de galería 📸</Box>,
+      label: "Preguntas y respuestas del curso",
+      content: <Wall />,
     },
   ];
 
