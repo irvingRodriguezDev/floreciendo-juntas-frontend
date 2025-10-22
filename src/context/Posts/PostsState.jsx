@@ -3,7 +3,7 @@ import PostsContext from "./PostsContext";
 import PostsReducer from "./PostsReducer";
 import { io } from "socket.io-client";
 import MethodGet, { MethodPost } from "../../config/Service";
-import imageHeaders from "../../config/imageHeader";
+import headerConfig from "../../config/imageHeader";
 import {
   ADD_COMMENT,
   ADD_POST,
@@ -11,6 +11,7 @@ import {
   SET_SOCKET,
   UPDATE_REACTIONS,
 } from "../../types";
+import clienteAxios from "../../config/Axios";
 const PostsState = ({ children }) => {
   const initialState = {
     posts: [],
@@ -59,26 +60,21 @@ const PostsState = ({ children }) => {
       payload: {
         posts: res.data.posts,
         currentPage: res.data.page,
-        totalPages: res.data.total,
+        totalPages: res.data.totalPages,
       },
     });
   };
 
   // 🔹 Crear un nuevo post
-  const createPost = async (postData) => {
-    const formData = new FormData();
-    formData.append("courseId", postData.courseId);
-    formData.append("content", postData.content);
-    formData.append("attachments", postData.image);
-
-    const res = await MethodPost(`/community/posts`, formData, {
-      imageHeaders,
+  const createPost = async (data) => {
+    const res = await clienteAxios.post(`/community/posts`, data, {
+      headers: { "Content-Type": "multipart/form-data" },
     });
-    // Emitir el evento por socket
+
+    // Emitir evento socket
     state.socket.emit("newPost", res.data);
     dispatch({ type: ADD_POST, payload: res.data });
   };
-
   // 🔹 Crear un comentario
   const createComment = async (postId, content) => {
     const res = await MethodPost(`/community/posts/${postId}/comments`, {

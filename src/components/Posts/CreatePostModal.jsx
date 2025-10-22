@@ -9,7 +9,6 @@ import {
   IconButton,
   Box,
   Typography,
-  ImageList,
   ImageListItem,
   Stack,
   Divider,
@@ -21,53 +20,54 @@ import PostsContext from "../../context/Posts/PostsContext";
 const CreatePostModal = ({ open, onClose, courseId }) => {
   const { createPost } = useContext(PostsContext);
   const [content, setContent] = useState("");
-  const [images, setImages] = useState([]);
+  const [image, setImage] = useState(null);
 
-  // Limpiar URLs de preview para evitar fugas de memoria
-  useEffect(() => {
-    return () => {
-      images.forEach((img) => URL.revokeObjectURL(img.preview));
-    };
-  }, [images]);
+  const handleChangeImage = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      // Liberar la URL anterior si existía
+      if (image?.urlPhoto) URL.revokeObjectURL(image.urlPhoto);
 
-  const handleImageChange = (e) => {
-    const files = Array.from(e.target.files);
-    const newImages = files.map((file) => ({
-      file,
-      preview: URL.createObjectURL(file),
-    }));
-    setImages((prev) => [...prev, ...newImages]);
+      setImage({
+        urlPhoto: URL.createObjectURL(file),
+        file, // El File real para enviar
+      });
+    }
+    e.target.value = null; // Para poder seleccionar el mismo archivo otra vez
   };
 
-  const handleRemoveImage = (index) => {
-    // Revocar URL del objeto eliminado
-    URL.revokeObjectURL(images[index].preview);
-    setImages((prev) => prev.filter((_, i) => i !== index));
+  const handleDeleteImage = () => {
+    if (image?.urlPhoto) URL.revokeObjectURL(image.urlPhoto);
+    setImage(null);
+  };
+
+  const handleClose = () => {
+    setContent("");
+    handleDeleteImage();
+    onClose();
   };
 
   const handleSubmit = async () => {
-    if (!content.trim() && images.length === 0) return;
+    if (!content.trim() && !image) return;
 
-    // Crear un FormData si quieres enviar imágenes al backend
-    const data = {};
-    data.content = content;
-    data.courseId = courseId;
-    data.image = images[0].file;
+    const formData = new FormData();
+    formData.append("courseId", courseId);
+    formData.append("content", content);
 
-    try {
-      await createPost(data); // enviar directamente al context
-      setContent("");
-      setImages([]);
-      onClose();
-    } catch (error) {
-      console.error("Error al crear publicación:", error);
+    if (image) {
+      formData.append("attachment", image.file); // File real
     }
+
+    await createPost(formData);
+    handleClose();
   };
+
+  const isFormValid = content.trim() || image;
 
   return (
     <Dialog
       open={open}
-      onClose={onClose}
+      onClose={handleClose}
       fullWidth
       maxWidth='md'
       PaperProps={{
@@ -80,12 +80,7 @@ const CreatePostModal = ({ open, onClose, courseId }) => {
       }}
     >
       <DialogTitle
-        sx={{
-          fontWeight: 700,
-          textAlign: "center",
-          color: "#d82e7a",
-          pb: 0,
-        }}
+        sx={{ fontWeight: 700, textAlign: "center", color: "#d82e7a", pb: 0 }}
       >
         Crear nueva publicación 💬
       </DialogTitle>
@@ -117,9 +112,8 @@ const CreatePostModal = ({ open, onClose, courseId }) => {
             accept='image/*'
             type='file'
             id='file-input'
-            multiple
             hidden
-            onChange={handleImageChange}
+            onChange={handleChangeImage}
           />
           <label htmlFor='file-input'>
             <IconButton
@@ -139,55 +133,47 @@ const CreatePostModal = ({ open, onClose, courseId }) => {
             color='text.secondary'
             sx={{ fontStyle: "italic" }}
           >
-            Adjuntar imágenes
+            Adjuntar imagen
           </Typography>
         </Stack>
 
-        {images.length > 0 && (
+        {image && (
           <Box sx={{ mt: 3 }}>
             <Typography
               variant='subtitle2'
               sx={{ mb: 1, color: "#d82e7a", fontWeight: 600 }}
             >
-              Vista previa de imágenes
+              Vista previa
             </Typography>
-            <ImageList cols={3} gap={10}>
-              {images.map((img, index) => (
-                <ImageListItem
-                  key={index}
-                  sx={{
-                    position: "relative",
-                    borderRadius: "12px",
-                    overflow: "hidden",
-                    boxShadow: "0 2px 8px rgba(216,46,122,0.15)",
-                  }}
-                >
-                  <img
-                    src={img.preview}
-                    alt={`preview-${index}`}
-                    style={{
-                      width: "100%",
-                      height: "100%",
-                      objectFit: "cover",
-                    }}
-                  />
-                  <IconButton
-                    size='small'
-                    onClick={() => handleRemoveImage(index)}
-                    sx={{
-                      position: "absolute",
-                      top: 6,
-                      right: 6,
-                      bgcolor: "rgba(216,46,122,0.8)",
-                      color: "white",
-                      "&:hover": { bgcolor: "rgba(216,46,122,1)" },
-                    }}
-                  >
-                    <DeleteIcon fontSize='small' />
-                  </IconButton>
-                </ImageListItem>
-              ))}
-            </ImageList>
+            <ImageListItem
+              sx={{
+                position: "relative",
+                borderRadius: "12px",
+                overflow: "hidden",
+                boxShadow: "0 2px 8px rgba(216,46,122,0.15)",
+                width: "100%",
+                height: 250,
+              }}
+            >
+              <img
+                src={image.urlPhoto}
+                alt='preview'
+                style={{ width: "100%", height: "100%", objectFit: "cover" }}
+              />
+              <IconButton
+                onClick={handleDeleteImage}
+                sx={{
+                  position: "absolute",
+                  top: 8,
+                  right: 8,
+                  bgcolor: "rgba(255,255,255,0.7)",
+                  "&:hover": { bgcolor: "white" },
+                  color: "#d82e7a",
+                }}
+              >
+                <DeleteIcon />
+              </IconButton>
+            </ImageListItem>
           </Box>
         )}
       </DialogContent>
@@ -202,7 +188,7 @@ const CreatePostModal = ({ open, onClose, courseId }) => {
         }}
       >
         <Button
-          onClick={onClose}
+          onClick={handleClose}
           sx={{
             color: "#d82e7a",
             fontWeight: 600,
@@ -215,7 +201,7 @@ const CreatePostModal = ({ open, onClose, courseId }) => {
         <Button
           variant='contained'
           onClick={handleSubmit}
-          disabled={!content.trim() && images.length === 0}
+          disabled={!isFormValid}
           sx={{
             bgcolor: "#d82e7a",
             borderRadius: "12px",
