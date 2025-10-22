@@ -26,3 +26,10 @@ export const GET_LATEST_COURSES = "GET_LATEST_COURSES";
 export const GET_COURSE_BY_ID = "GET_COURSE_BY_ID";
 export const GET_COURSES_BY_SYSTEM_ID = "GET_COURSES_BY_SYSTEM_ID";
 export const GET_TOP_TEN_COURSES = "GET_TOP_TEN_COURSES";
+
+//posts
+export const SET_SOCKET = "SET_SOCKET";
+export const ADD_POST = "ADD_POST";
+export const ADD_COMMENT = "ADD_COMMENT";
+export const UPDATE_REACTIONS = "UPDATE_REACTIONS";
+export const SET_POSTS = "SET_POSTS";

@@ -5,6 +5,7 @@ import SystemState from "./context/System/SystemState";
 import AppRouter from "./routes/AppRouter";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements } from "@stripe/react-stripe-js";
+import PostsState from "./context/Posts/PostsState";
 
 // Carga asíncrona de la clave pública
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_KEY);
@@ -15,7 +16,9 @@ function App() {
       <AuthState>
         <SystemState>
           <CoursesState>
-            <AppRouter />
+            <PostsState>
+              <AppRouter />
+            </PostsState>
           </CoursesState>
         </SystemState>
       </AuthState>

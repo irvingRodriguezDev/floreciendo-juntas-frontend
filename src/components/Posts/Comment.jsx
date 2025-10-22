@@ -12,9 +12,7 @@ const Comment = ({ comment }) => {
         backgroundColor: "#fafafa",
       }}
     >
-      <Typography variant='subtitle2' color='text.secondary'>
-        {comment.author}
-      </Typography>
+      <Typography variant='subtitle2' color='text.secondary'></Typography>
       <Typography variant='body2'>{comment.content}</Typography>
       <Box sx={{ mt: 0.5 }}>
         <ReactionButtons target={comment} isComment />

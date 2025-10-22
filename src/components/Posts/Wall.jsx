@@ -1,67 +1,130 @@
-import React, { useState } from "react";
-import { Box, Typography, Button, Stack } from "@mui/material";
+import React, { useContext, useEffect, useState } from "react";
+import {
+  Box,
+  Typography,
+  Button,
+  Stack,
+  CircularProgress,
+  Pagination,
+  Grid,
+  Paper,
+} from "@mui/material";
 import PostCard from "./PostCard";
 import CreatePostModal from "./CreatePostModal";
+import PostsContext from "../../context/Posts/PostsContext";
+import IceIcon from "../icons/IceIcon";
 
-const Wall = () => {
-  const [posts, setPosts] = useState([
-    {
-      id: 1,
-      author: "Irving Rodríguez",
-      content: "¡Hola a todos! Probando el nuevo muro 💬",
-      reactions: { like: 2 },
-      comments: [
-        {
-          id: 11,
-          author: "Ana",
-          content: "Se ve increíble 😍",
-          reactions: { love: 2 },
-        },
-        {
-          id: 12,
-          author: "Luis",
-          content: "Buen trabajo 👏",
-          reactions: { like: 1 },
-        },
-      ],
-    },
-  ]);
+const Wall = ({ courseId }) => {
+  const { getPosts, posts, totalPages } = useContext(PostsContext);
 
+  const [page, setPage] = useState(1);
+  const [rowsPerPage] = useState(10);
+  const [loading, setLoading] = useState(false);
   const [openModal, setOpenModal] = useState(false);
 
-  const handleCreatePost = (content) => {
-    const newPost = {
-      id: Date.now(),
-      author: "Usuario actual",
-      content,
-      reactions: {},
-      comments: [],
+  // 🔹 Cargar posts al montar o cuando cambia el curso o página
+  useEffect(() => {
+    const fetchPosts = async () => {
+      setLoading(true);
+      await getPosts(courseId, page, rowsPerPage);
+      setLoading(false);
     };
-    setPosts([newPost, ...posts]);
-    setOpenModal(false);
-  };
+    if (courseId) fetchPosts();
+  }, [courseId, page, rowsPerPage]);
+
+  const handlePageChange = (_, value) => setPage(value);
+  const handleCreatePost = () => setOpenModal(false);
 
   return (
-    <Box sx={{ maxWidth: "75%", mx: "auto", mt: 4 }}>
-      <Stack spacing={2}>
-        <Button
-          variant='contained'
-          sx={{ bgcolor: "#D82E7A", borderRadius: "12px" }}
-          onClick={() => setOpenModal(true)}
-        >
-          Crear publicación
-        </Button>
+    <Box
+      sx={{
+        maxWidth: "900px",
+        mx: "auto",
+        pt: 4,
+        pb: 6,
+      }}
+    >
+      <Paper
+        elevation={2}
+        sx={{
+          p: { xs: 2, sm: 3 },
+          borderRadius: "16px",
+          backgroundColor: "#fff",
+        }}
+      >
+        <Stack spacing={3} alignItems='center'>
+          {/* 🔹 Botón de crear publicación */}
+          <Button
+            variant='contained'
+            sx={{
+              bgcolor: "#D82E7A",
+              borderRadius: "10px",
+              textTransform: "none",
+              fontWeight: 600,
+              px: 4,
+              py: 1,
+              "&:hover": { bgcolor: "#c4276e" },
+            }}
+            onClick={() => setOpenModal(true)}
+          >
+            Crear publicación
+          </Button>
 
-        <CreatePostModal
-          open={openModal}
-          onClose={() => setOpenModal(false)}
-          onSubmit={handleCreatePost}
-        />
+          <CreatePostModal
+            open={openModal}
+            onClose={() => setOpenModal(false)}
+            onSubmit={handleCreatePost}
+          />
 
-        {posts.map((post) => (
-          <PostCard key={post.id} post={post} />
-        ))}
-      </Stack>
+          {/* 🔹 Estado de carga */}
+          {loading ? (
+            <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
+              <CircularProgress />
+            </Box>
+          ) : (
+            <>
+              {/* 🔹 Estado vacío */}
+              {posts.length === 0 ? (
+                <Box textAlign='center' sx={{ mt: 4 }}>
+                  <Typography variant='body1' color='text.secondary'>
+                    No hay publicaciones todavía.
+                  </Typography>
+                  <Box sx={{ mt: 1 }}>
+                    <IceIcon width={60} />
+                  </Box>
+                  <Typography
+                    variant='subtitle2'
+                    sx={{ color: "#D82E7A", mt: 1, fontWeight: 500 }}
+                  >
+                    ¡Rompe el hielo y crea la primera publicación!
+                  </Typography>
+                </Box>
+              ) : (
+                <>
+                  {/* 🔹 Lista de posts */}
+                  <PostCard posts={posts} />
+                  {/* 🔹 Paginación */}
+                  {totalPages > 1 && (
+                    <Grid
+                      container
+                      justifyContent='center'
+                      sx={{ mt: 3, pb: 2 }}
+                    >
+                      <Pagination
+                        count={totalPages}
+                        page={page}
+                        onChange={handlePageChange}
+                        color='primary'
+                        shape='rounded'
+                      />
+                    </Grid>
+                  )}
+                </>
+              )}
+            </>
+          )}
+        </Stack>
+      </Paper>
     </Box>
   );
 };

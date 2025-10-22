@@ -53,7 +53,11 @@ const CourseDetailScreen = () => {
     },
     {
       label: "Preguntas y respuestas del curso",
-      content: <Wall />,
+      content: (
+        <Box sx={{ position: "relative", zIndex: 1, mt: 2 }}>
+          <Wall courseId={id} />
+        </Box>
+      ),
     },
   ];
 
@@ -63,7 +67,6 @@ const CourseDetailScreen = () => {
         <Box sx={{ minHeight: "100vh" }}>
           {/* Banner Superior */}
           <CourseTitle title={course.title} />
-
           {/* Contenido Principal */}
           <Grid
             container

@@ -38,7 +38,6 @@ const VideoPlayer = ({ userId, courseId, src, poster }) => {
         const { data } = await MethodGet(
           `/progress-video/${userId}/${courseId}`
         );
-        console.log(data, "la dataaaaa");
 
         // Convertir string a número
         const percent = parseFloat(data.progress || 0);
