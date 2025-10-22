@@ -11,12 +11,19 @@ import {
   TextField,
   Avatar,
   IconButton,
+  CardMedia,
+  Paper,
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import ReactionButtons from "./ReactionButtons";
 import Comment from "./Comment";
+import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
+import "dayjs/locale/es"; // español
 
+dayjs.extend(relativeTime);
+dayjs.locale("es");
 const PostCard = ({ posts }) => {
   return (
     <Stack spacing={2}>
@@ -48,39 +55,93 @@ const PostItem = ({ post }) => {
   };
 
   return (
-    <Card
+    <Paper
+      elevation={3}
       sx={{
-        borderRadius: "16px",
-        boxShadow: "0 3px 10px rgba(0,0,0,0.08)",
-        transition: "all 0.2s ease-in-out",
-        "&:hover": { boxShadow: "0 6px 14px rgba(0,0,0,0.1)" },
+        borderRadius: "20px",
+        overflow: "hidden",
+        transition: "all 0.25s ease-in-out",
+        "&:hover": {
+          transform: "translateY(-2px)",
+          boxShadow: "0 8px 20px rgba(0,0,0,0.08)",
+        },
       }}
     >
-      <CardContent>
+      <CardContent sx={{ p: 3 }}>
         {/* Header */}
-        <Stack direction='row' alignItems='center' spacing={1}>
+        <Stack direction='row' alignItems='center' spacing={2} mb={1.5}>
           <Avatar
             alt={post.author.name}
             src={post.author.profileImage || "/static/images/avatar/1.jpg"}
-            sx={{ width: 40, height: 40 }}
+            sx={{
+              width: 48,
+              height: 48,
+              border: "2px solid #FAD1E3",
+              boxShadow: "0 0 0 2px rgba(216,46,136,0.2)",
+            }}
           />
-          <Typography variant='subtitle2' color='text.secondary'>
-            {post.author.name}
-          </Typography>
+          <Box>
+            <Typography
+              variant='subtitle1'
+              sx={{ fontWeight: 600, color: "#333" }}
+            >
+              {post.author.name}
+            </Typography>
+            <Typography variant='caption' color='text.secondary'>
+              {dayjs(post.createdAt).fromNow()}
+            </Typography>
+          </Box>
         </Stack>
 
         {/* Content */}
-        <Typography variant='body1' sx={{ mt: 1, mb: 1 }}>
+        <Typography variant='body1' sx={{ mb: 2, color: "#444" }}>
           {post.content}
         </Typography>
 
-        {/* Reactions */}
-        <ReactionButtons target={post} />
+        {/* Imagen adjunta */}
+        {post.attachment && (
+          <Box
+            sx={{
+              width: "100%",
+              maxHeight: 420,
+              borderRadius: "16px",
+              overflow: "hidden",
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              mb: 2,
+              boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+            }}
+          >
+            <CardMedia
+              component='img'
+              image={post.attachment}
+              alt='Post attachment'
+              sx={{
+                objectFit: "cover",
+                width: "100%",
+                height: "100%",
+              }}
+            />
+          </Box>
+        )}
 
-        <Divider sx={{ my: 1 }} />
+        {/* Reacciones */}
+        <Box sx={{ mb: 1 }}>
+          <ReactionButtons target={post} />
+        </Box>
 
-        {/* Comments toggle */}
-        <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+        <Divider sx={{ my: 2 }} />
+
+        {/* Comentarios */}
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "end",
+            gap: 0.5,
+          }}
+        >
           <Button
             size='small'
             onClick={() => setExpanded((prev) => !prev)}
@@ -92,32 +153,39 @@ const PostItem = ({ post }) => {
               )
             }
           >
-            {expanded ? (
-              <Typography variant='subtitle2' color='#D82E7A'>
-                Ocultar comentarios
-              </Typography>
-            ) : (
-              <Typography variant='subtitle2' color='#D82E7A'>
-                Ver comentarios ({comments.length})
-              </Typography>
-            )}
+            <Typography variant='subtitle2' color='#D82E7A' fontWeight={600}>
+              {expanded
+                ? "Ocultar comentarios"
+                : `Ver comentarios (${comments.length})`}
+            </Typography>
           </Button>
         </Box>
 
-        {/* Comments Section */}
+        {/* Sección de comentarios */}
         <Collapse in={expanded} timeout='auto' unmountOnExit>
-          <Stack spacing={1} sx={{ mt: 1 }}>
+          <Stack spacing={1.5} sx={{ mt: 1 }}>
             {comments.length > 0 ? (
               comments.map((c) => <Comment key={c.id} comment={c} />)
             ) : (
-              <Typography variant='body2' color='text.secondary'>
-                No hay comentarios todavía. Sé el primero en comentar.
+              <Typography
+                variant='body2'
+                color='text.secondary'
+                sx={{ fontStyle: "italic" }}
+              >
+                No hay comentarios todavía. Sé el primero en comentar 💬
               </Typography>
             )}
           </Stack>
 
-          {/* New comment input */}
-          <Box sx={{ display: "flex", gap: 1, mt: 2 }}>
+          {/* Input de nuevo comentario */}
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              gap: 1,
+              mt: 2,
+            }}
+          >
             <TextField
               size='small'
               fullWidth
@@ -138,7 +206,7 @@ const PostItem = ({ post }) => {
                   },
                   "&.Mui-focused fieldset": {
                     borderColor: "#D82E7A",
-                    boxShadow: "0 0 0 4px rgba(216,46,136,0.2)",
+                    boxShadow: "0 0 0 4px rgba(216,46,136,0.15)",
                   },
                 },
               }}
@@ -147,14 +215,20 @@ const PostItem = ({ post }) => {
               variant='contained'
               onClick={handleAddComment}
               disabled={!newComment.trim()}
-              sx={{ bgcolor: "#D82E7A", borderRadius: "12px" }}
+              sx={{
+                bgcolor: "#D82E7A",
+                borderRadius: "12px",
+                textTransform: "none",
+                fontWeight: 600,
+                "&:hover": { bgcolor: "#c0256b" },
+              }}
             >
               Comentar
             </Button>
           </Box>
         </Collapse>
       </CardContent>
-    </Card>
+    </Paper>
   );
 };
 

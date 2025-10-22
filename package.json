@@ -17,6 +17,7 @@
     "@stripe/react-stripe-js": "^5.2.0",
     "@stripe/stripe-js": "^8.1.0",
     "axios": "^1.12.2",
+    "dayjs": "^1.11.18",
     "formik": "^2.4.6",
     "framer-motion": "^12.23.22",
     "hls.js": "^1.6.13",

@@ -1,24 +1,16 @@
 import React, { useContext, useEffect, useState } from "react";
-import {
-  Box,
-  Typography,
-  Button,
-  Stack,
-  CircularProgress,
-  Pagination,
-  Grid,
-  Paper,
-} from "@mui/material";
+import { Box, Typography, Button, Stack, Grid, Paper } from "@mui/material";
 import PostCard from "./PostCard";
 import CreatePostModal from "./CreatePostModal";
 import PostsContext from "../../context/Posts/PostsContext";
 import IceIcon from "../icons/IceIcon";
-
+import PinkSpinner from "../Loading/PinkSpinner";
+import Pagination from "../Pagination/Pagination";
 const Wall = ({ courseId }) => {
   const { getPosts, posts, totalPages } = useContext(PostsContext);
 
   const [page, setPage] = useState(1);
-  const [rowsPerPage] = useState(10);
+  const [rowsPerPage] = useState(5);
   const [loading, setLoading] = useState(false);
   const [openModal, setOpenModal] = useState(false);
 
@@ -32,7 +24,11 @@ const Wall = ({ courseId }) => {
     if (courseId) fetchPosts();
   }, [courseId, page, rowsPerPage]);
 
-  const handlePageChange = (_, value) => setPage(value);
+  const handlePageChange = (newPage) => {
+    if (newPage >= 1 && newPage <= totalPages && newPage !== page) {
+      setPage(newPage);
+    }
+  };
   const handleCreatePost = () => setOpenModal(false);
 
   return (
@@ -80,7 +76,7 @@ const Wall = ({ courseId }) => {
           {/* 🔹 Estado de carga */}
           {loading ? (
             <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
-              <CircularProgress />
+              <PinkSpinner />
             </Box>
           ) : (
             <>
@@ -114,11 +110,9 @@ const Wall = ({ courseId }) => {
                       sx={{ mt: 3, pb: 2 }}
                     >
                       <Pagination
-                        count={totalPages}
-                        page={page}
-                        onChange={handlePageChange}
-                        color='primary'
-                        shape='rounded'
+                        totalPages={totalPages}
+                        currentPage={page}
+                        onPageChange={handlePageChange}
                       />
                     </Grid>
                   )}
