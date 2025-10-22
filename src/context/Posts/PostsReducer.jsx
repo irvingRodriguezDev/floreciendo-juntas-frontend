@@ -2,11 +2,14 @@ import {
   ADD_COMMENT,
   ADD_POST,
   SET_POSTS,
+  SET_SOCKET,
   UPDATE_REACTIONS,
 } from "../../types";
 
 export default (state, action) => {
   switch (action.type) {
+    case SET_SOCKET:
+      return { ...state, socket: action.payload };
     case SET_POSTS:
       return {
         ...state,

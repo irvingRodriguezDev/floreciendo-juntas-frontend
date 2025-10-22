@@ -73,6 +73,7 @@ const Wall = ({ courseId }) => {
           <CreatePostModal
             open={openModal}
             onClose={() => setOpenModal(false)}
+            courseId={courseId}
             onSubmit={handleCreatePost}
           />
 
@@ -102,7 +103,9 @@ const Wall = ({ courseId }) => {
               ) : (
                 <>
                   {/* 🔹 Lista de posts */}
-                  <PostCard posts={posts} />
+                  <Grid size={12}>
+                    <PostCard posts={posts} />
+                  </Grid>
                   {/* 🔹 Paginación */}
                   {totalPages > 1 && (
                     <Grid

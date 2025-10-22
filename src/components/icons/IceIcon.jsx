@@ -8,15 +8,15 @@ const IceIcon = ({ width }) => {
       xmlns='http://www.w3.org/2000/svg'
       aria-hidden='true'
       role='img'
-      class='iconify iconify--noto'
+      className='iconify iconify--noto'
       preserveAspectRatio='xMidYMid meet'
       fill='#000000'
     >
-      <g id='SVGRepo_bgCarrier' stroke-width='0'></g>
+      <g id='SVGRepo_bgCarrier' strokeWidth='0'></g>
       <g
         id='SVGRepo_tracerCarrier'
-        stroke-linecap='round'
-        stroke-linejoin='round'
+        strokeLinecap='round'
+        strokeLinejoin='round'
       ></g>
       <g id='SVGRepo_iconCarrier'>
         <path
@@ -55,8 +55,8 @@ const IceIcon = ({ width }) => {
           gradientTransform='matrix(-.7728 .6347 -.8463 -1.0304 159.288 79.872)'
           gradientUnits='userSpaceOnUse'
         >
-          <stop offset='.1' stop-color='#ffffff' stop-opacity='.9'></stop>
-          <stop offset='1' stop-color='#fcfcfc' stop-opacity='0'></stop>
+          <stop offset='.1' stopColor='#ffffff' stopOpacity='.9'></stop>
+          <stop offset='1' stopColor='#fcfcfc' stopOpacity='0'></stop>
         </radialGradient>
         <path
           fill='url(#IconifyId17ecdb2904d178eab9217)'
@@ -70,8 +70,8 @@ const IceIcon = ({ width }) => {
           gradientTransform='matrix(.8254 .5645 -.6684 .9774 48.117 -37.996)'
           gradientUnits='userSpaceOnUse'
         >
-          <stop offset='.152' stop-color='#32afe0' stop-opacity='.9'></stop>
-          <stop offset='.963' stop-color='#32afe0' stop-opacity='0'></stop>
+          <stop offset='.152' stopColor='#32afe0' stopOpacity='.9'></stop>
+          <stop offset='.963' stopColor='#32afe0' stopOpacity='0'></stop>
         </radialGradient>
         <path
           fill='url(#IconifyId17ecdb2904d178eab9218)'
@@ -85,11 +85,11 @@ const IceIcon = ({ width }) => {
           gradientTransform='matrix(-.002 -1 2.0491 -.0041 -37.616 113.33)'
           gradientUnits='userSpaceOnUse'
         >
-          <stop offset='.256' stop-color='#67ccf9' stop-opacity='.9'></stop>
-          <stop offset='.416' stop-color='#6ccdf9' stop-opacity='.674'></stop>
-          <stop offset='.616' stop-color='#7cd1f9' stop-opacity='.392'></stop>
-          <stop offset='.837' stop-color='#95d8f9' stop-opacity='.081'></stop>
-          <stop offset='.895' stop-color='#9ddaf9' stop-opacity='0'></stop>
+          <stop offset='.256' stopColor='#67ccf9' stopOpacity='.9'></stop>
+          <stop offset='.416' stopColor='#6ccdf9' stopOpacity='.674'></stop>
+          <stop offset='.616' stopColor='#7cd1f9' stopOpacity='.392'></stop>
+          <stop offset='.837' stopColor='#95d8f9' stopOpacity='.081'></stop>
+          <stop offset='.895' stopColor='#9ddaf9' stopOpacity='0'></stop>
         </radialGradient>
         <path
           fill='url(#IconifyId17ecdb2904d178eab9219)'

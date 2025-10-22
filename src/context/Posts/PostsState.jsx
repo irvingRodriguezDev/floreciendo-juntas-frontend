@@ -3,6 +3,7 @@ import PostsContext from "./PostsContext";
 import PostsReducer from "./PostsReducer";
 import { io } from "socket.io-client";
 import MethodGet, { MethodPost } from "../../config/Service";
+import imageHeaders from "../../config/imageHeader";
 import {
   ADD_COMMENT,
   ADD_POST,
@@ -20,31 +21,28 @@ const PostsState = ({ children }) => {
 
   const [state, dispatch] = useReducer(PostsReducer, initialState);
 
-  // 🧠 Inicializar socket.io cuando el contexto se monta
   useEffect(() => {
-    const socket = io(import.meta.env.VITE_SOCKET_URL);
+    // Inicializar socket
+    const socket = io(import.meta.env.VITE_API_BASE_URL, {
+      path: "/api/socket.io",
+    });
+
     dispatch({ type: SET_SOCKET, payload: socket });
 
-    // Escuchar eventos del servidor
+    // Eventos del servidor
     socket.on("postCreated", (post) => {
       dispatch({ type: ADD_POST, payload: post });
     });
 
-    socket.on("commentCreated", (data) => {
-      dispatch({
-        type: ADD_COMMENT,
-        payload: { postId: data.postId, comment: data.comment },
-      });
+    socket.on("commentCreated", ({ postId, comment }) => {
+      dispatch({ type: ADD_COMMENT, payload: { postId, comment } });
     });
 
-    socket.on("reactionUpdated", (data) => {
-      dispatch({
-        type: UPDATE_REACTIONS,
-        payload: { postId: data.postId, reactions: data.reactions },
-      });
+    socket.on("reactionUpdated", ({ postId, reactions }) => {
+      dispatch({ type: UPDATE_REACTIONS, payload: { postId, reactions } });
     });
 
-    // Cerrar conexión al desmontar
+    // Limpiar al desmontar
     return () => {
       socket.disconnect();
     };
@@ -68,7 +66,14 @@ const PostsState = ({ children }) => {
 
   // 🔹 Crear un nuevo post
   const createPost = async (postData) => {
-    const res = await MethodPost(`/community/posts`, postData);
+    const formData = new FormData();
+    formData.append("courseId", postData.courseId);
+    formData.append("content", postData.content);
+    formData.append("attachments", postData.image);
+
+    const res = await MethodPost(`/community/posts`, formData, {
+      imageHeaders,
+    });
     // Emitir el evento por socket
     state.socket.emit("newPost", res.data);
     dispatch({ type: ADD_POST, payload: res.data });

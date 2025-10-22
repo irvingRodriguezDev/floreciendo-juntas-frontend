@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useContext, useState, useEffect } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -16,10 +16,19 @@ import {
 } from "@mui/material";
 import AttachFileIcon from "@mui/icons-material/AttachFile";
 import DeleteIcon from "@mui/icons-material/Delete";
+import PostsContext from "../../context/Posts/PostsContext";
 
-const CreatePostModal = ({ open, onClose, onSubmit }) => {
+const CreatePostModal = ({ open, onClose, courseId }) => {
+  const { createPost } = useContext(PostsContext);
   const [content, setContent] = useState("");
   const [images, setImages] = useState([]);
+
+  // Limpiar URLs de preview para evitar fugas de memoria
+  useEffect(() => {
+    return () => {
+      images.forEach((img) => URL.revokeObjectURL(img.preview));
+    };
+  }, [images]);
 
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files);
@@ -31,14 +40,27 @@ const CreatePostModal = ({ open, onClose, onSubmit }) => {
   };
 
   const handleRemoveImage = (index) => {
+    // Revocar URL del objeto eliminado
+    URL.revokeObjectURL(images[index].preview);
     setImages((prev) => prev.filter((_, i) => i !== index));
   };
 
-  const handleSubmit = () => {
-    if (content.trim() || images.length > 0) {
-      onSubmit({ content, images });
+  const handleSubmit = async () => {
+    if (!content.trim() && images.length === 0) return;
+
+    // Crear un FormData si quieres enviar imágenes al backend
+    const data = {};
+    data.content = content;
+    data.courseId = courseId;
+    data.image = images[0].file;
+
+    try {
+      await createPost(data); // enviar directamente al context
       setContent("");
       setImages([]);
+      onClose();
+    } catch (error) {
+      console.error("Error al crear publicación:", error);
     }
   };
 
@@ -69,7 +91,6 @@ const CreatePostModal = ({ open, onClose, onSubmit }) => {
       </DialogTitle>
 
       <DialogContent sx={{ mt: 1 }}>
-        {/* Campo de texto */}
         <TextField
           multiline
           fullWidth
@@ -89,10 +110,8 @@ const CreatePostModal = ({ open, onClose, onSubmit }) => {
           }}
         />
 
-        {/* Línea divisoria con clip */}
         <Divider sx={{ my: 2, borderColor: "#f8bbd0" }} />
 
-        {/* Botón para adjuntar imagen */}
         <Stack direction='row' alignItems='center' spacing={1}>
           <input
             accept='image/*'
@@ -124,7 +143,6 @@ const CreatePostModal = ({ open, onClose, onSubmit }) => {
           </Typography>
         </Stack>
 
-        {/* Vista previa de imágenes */}
         {images.length > 0 && (
           <Box sx={{ mt: 3 }}>
             <Typography
@@ -151,7 +169,6 @@ const CreatePostModal = ({ open, onClose, onSubmit }) => {
                       width: "100%",
                       height: "100%",
                       objectFit: "cover",
-                      borderRadius: "12px",
                     }}
                   />
                   <IconButton
@@ -206,10 +223,7 @@ const CreatePostModal = ({ open, onClose, onSubmit }) => {
             fontWeight: 600,
             textTransform: "none",
             "&:hover": { bgcolor: "#c0276d" },
-            "&.Mui-disabled": {
-              bgcolor: "#f8bbd0",
-              color: "#fff",
-            },
+            "&.Mui-disabled": { bgcolor: "#f8bbd0", color: "#fff" },
           }}
         >
           Publicar
