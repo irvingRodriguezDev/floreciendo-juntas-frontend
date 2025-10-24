@@ -1,9 +1,7 @@
-import React, { useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import {
-  Card,
   CardContent,
   Typography,
-  Collapse,
   Divider,
   Box,
   Button,
@@ -13,6 +11,7 @@ import {
   IconButton,
   CardMedia,
   Paper,
+  Collapse,
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
@@ -20,37 +19,73 @@ import ReactionButtons from "./ReactionButtons";
 import Comment from "./Comment";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
-import "dayjs/locale/es"; // español
+import "dayjs/locale/es";
+import PostsContext from "../../context/Posts/PostsContext";
+import AuthContext from "../../context/Auth/AuthContext";
 
 dayjs.extend(relativeTime);
 dayjs.locale("es");
+
 const PostCard = ({ posts }) => {
+  const { getReactionsForPosts, reactionsSummary } = useContext(PostsContext);
+  const { usuario } = useContext(AuthContext);
+
+  useEffect(() => {
+    if (posts.length && usuario?.id) {
+      const postIds = posts.map((p) => p.id);
+      getReactionsForPosts(postIds, usuario.id);
+    }
+  }, [usuario?.id]);
+
+  if (!posts || !posts.length) return null;
+
   return (
     <Stack spacing={2}>
-      {posts.map((post) => (
-        <PostItem key={post.id} post={post} />
-      ))}
+      {posts.map((post) => {
+        const reactionsData = reactionsSummary[post.id] || {
+          summary: {},
+          userReaction: null,
+        };
+
+        return (
+          <PostItem
+            key={post.id}
+            post={{
+              ...post,
+              reactions: reactionsData.summary,
+              userReaction: reactionsData.userReaction,
+            }}
+          />
+        );
+      })}
     </Stack>
   );
 };
 
 const PostItem = ({ post }) => {
+  const { createComment, reactionsSummary } = useContext(PostsContext);
+  const { usuario } = useContext(AuthContext);
+
   const [expanded, setExpanded] = useState(false);
   const [newComment, setNewComment] = useState("");
-  const [comments, setComments] = useState(post.comments || []);
 
-  const handleAddComment = () => {
+  // ✅ Elimina estado local de comentarios, ya vienen de `post.comments`
+  const comments = post.comments || [];
+
+  const handleAddComment = async () => {
     const trimmed = newComment.trim();
     if (!trimmed) return;
 
-    const newC = {
-      id: Date.now(),
-      author: { name: "Usuario actual", profileImage: null },
-      content: trimmed,
-      reactions: {},
+    // Body
+    const data = {
+      userId: usuario.id,
+      postId: post.id,
+      comment: trimmed,
     };
 
-    setComments((prev) => [newC, ...prev]);
+    // Params -> userId
+    await createComment(data, usuario.id);
+
     setNewComment("");
   };
 
@@ -93,7 +128,7 @@ const PostItem = ({ post }) => {
           </Box>
         </Stack>
 
-        {/* Content */}
+        {/* Contenido */}
         <Typography variant='body1' sx={{ mb: 2, color: "#444" }}>
           {post.content}
         </Typography>
@@ -128,12 +163,18 @@ const PostItem = ({ post }) => {
 
         {/* Reacciones */}
         <Box sx={{ mb: 1 }}>
-          <ReactionButtons target={post} />
+          <ReactionButtons
+            target={{
+              ...post,
+              reactions: reactionsSummary[post.id] || {},
+              userReaction: post.userReaction || null,
+            }}
+          />
         </Box>
 
         <Divider sx={{ my: 2 }} />
 
-        {/* Comentarios */}
+        {/* Botón para ver comentarios */}
         <Box
           sx={{
             display: "flex",
@@ -178,14 +219,7 @@ const PostItem = ({ post }) => {
           </Stack>
 
           {/* Input de nuevo comentario */}
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              gap: 1,
-              mt: 2,
-            }}
-          >
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1, mt: 2 }}>
             <TextField
               size='small'
               fullWidth
@@ -200,14 +234,8 @@ const PostItem = ({ post }) => {
                     borderColor: "rgba(216,46,136,0.3)",
                     borderWidth: "2px",
                   },
-                  "&:hover fieldset": {
-                    borderColor: "#D82E7A",
-                    boxShadow: "0 0 0 4px rgba(216,46,136,0.1)",
-                  },
-                  "&.Mui-focused fieldset": {
-                    borderColor: "#D82E7A",
-                    boxShadow: "0 0 0 4px rgba(216,46,136,0.15)",
-                  },
+                  "&:hover fieldset": { borderColor: "#D82E7A" },
+                  "&.Mui-focused fieldset": { borderColor: "#D82E7A" },
                 },
               }}
             />

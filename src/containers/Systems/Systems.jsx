@@ -15,7 +15,7 @@ import "swiper/css";
 import "swiper/css/navigation";
 import SystemContext from "../../context/System/SystemContext";
 import { Link } from "react-router-dom";
-
+import PinkSpinner from "../../components/Loading/PinkSpinner";
 const Systems = () => {
   const { getAllSystems, systems } = useContext(SystemContext);
   const theme = useTheme();
@@ -171,81 +171,85 @@ const Systems = () => {
             1200: { slidesPerView: 4, spaceBetween: 35 },
           }}
         >
-          {systems.map((system) => (
-            <SwiperSlide key={system.id}>
-              <Link
-                to={`/cursos/bysystem/${system.id}`}
-                style={{ textDecoration: "none" }}
-              >
-                <Paper
-                  elevation={1}
-                  sx={{
-                    p: { xs: 3, sm: 4 },
-                    textAlign: "center",
-                    borderRadius: "16px",
-                    height: "100%",
-                    minHeight: 280,
-                    display: "flex",
-                    flexDirection: "column",
-                    justifyContent: "space-between",
-                    boxShadow: "0px 6px 16px rgba(0, 0, 0, 0.08)",
-                    transition: "transform 0.3s ease, box-shadow 0.3s ease",
-                    "&:hover": {
-                      transform: "translateY(-6px)",
-                      boxShadow: "0px 12px 25px rgba(0, 0, 0, 0.12)",
-                    },
-                  }}
+          {systems ? (
+            systems.map((system) => (
+              <SwiperSlide key={system.id}>
+                <Link
+                  to={`/cursos/bysystem/${system.id}`}
+                  style={{ textDecoration: "none" }}
                 >
-                  <Box
+                  <Paper
+                    elevation={1}
                     sx={{
-                      width: 80,
-                      height: 80,
-                      borderRadius: "50%",
-                      backgroundColor: "#FCE4EC",
+                      p: { xs: 3, sm: 4 },
+                      textAlign: "center",
+                      borderRadius: "16px",
+                      height: "100%",
+                      minHeight: 280,
                       display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      mx: "auto",
-                      mb: 2,
+                      flexDirection: "column",
+                      justifyContent: "space-between",
+                      boxShadow: "0px 6px 16px rgba(0, 0, 0, 0.08)",
+                      transition: "transform 0.3s ease, box-shadow 0.3s ease",
+                      "&:hover": {
+                        transform: "translateY(-6px)",
+                        boxShadow: "0px 12px 25px rgba(0, 0, 0, 0.12)",
+                      },
                     }}
                   >
                     <Box
-                      component='img'
-                      src={system.icon}
-                      alt={system.name}
                       sx={{
-                        width: "60%",
-                        height: "60%",
-                        objectFit: "contain",
+                        width: 80,
+                        height: 80,
+                        borderRadius: "50%",
+                        backgroundColor: "#FCE4EC",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        mx: "auto",
+                        mb: 2,
                       }}
-                    />
-                  </Box>
+                    >
+                      <Box
+                        component='img'
+                        src={system.icon}
+                        alt={system.name}
+                        sx={{
+                          width: "60%",
+                          height: "60%",
+                          objectFit: "contain",
+                        }}
+                      />
+                    </Box>
 
-                  <Typography variant='h6' sx={{ fontWeight: 700, mb: 1 }}>
-                    {system.name}
-                  </Typography>
+                    <Typography variant='h6' sx={{ fontWeight: 700, mb: 1 }}>
+                      {system.name}
+                    </Typography>
 
-                  <Typography
-                    variant='body2'
-                    color='text.secondary'
-                    textAlign='justify'
-                    sx={{
-                      flexGrow: 1,
-                      display: "-webkit-box",
-                      WebkitLineClamp: 3,
-                      WebkitBoxOrient: "vertical",
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
-                      lineHeight: 1.5,
-                      px: 1,
-                    }}
-                  >
-                    {system.description}
-                  </Typography>
-                </Paper>
-              </Link>
-            </SwiperSlide>
-          ))}
+                    <Typography
+                      variant='body2'
+                      color='text.secondary'
+                      textAlign='justify'
+                      sx={{
+                        flexGrow: 1,
+                        display: "-webkit-box",
+                        WebkitLineClamp: 3,
+                        WebkitBoxOrient: "vertical",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        lineHeight: 1.5,
+                        px: 1,
+                      }}
+                    >
+                      {system.description}
+                    </Typography>
+                  </Paper>
+                </Link>
+              </SwiperSlide>
+            ))
+          ) : (
+            <PinkSpinner />
+          )}
         </Swiper>
 
         {/* --- Botones de navegación --- */}

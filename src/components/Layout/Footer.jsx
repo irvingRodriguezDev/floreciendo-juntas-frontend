@@ -5,67 +5,105 @@ import {
   Typography,
   Link,
   Stack,
-  IconButton,
   Divider,
 } from "@mui/material";
-import TiktokIcon from "../icons/TiktokIcon";
-import FacebookIcon from "../icons/FacebookIcon";
-import InstagramIcon from "../icons/InstagramIcon";
-import YoutubeIcon from "../icons/YoutubeIcon";
+import { motion } from "framer-motion";
 
 const Footer = () => {
   return (
     <Box
       component='footer'
       sx={{
-        background: "rgba(241, 189, 206, 0.12)",
+        position: "relative",
+        overflow: "hidden",
+        background:
+          "linear-gradient(180deg, rgba(255,240,246,0.6) 0%, rgba(241,189,206,0.2) 100%)",
         backdropFilter: "blur(10px)",
-        border: "1px solid rgba(241, 189, 206, 0.2)",
-        borderRadius: "20px 20px 0 0",
-        boxShadow: "0 8px 32px rgba(0, 0, 0, 0.2)",
-        py: 4,
+        borderTop: "1px solid rgba(241,189,206,0.3)",
+        boxShadow: "0 -4px 20px rgba(229,56,136,0.15)",
+        py: { xs: 4, md: 6 },
+        mt: 8,
       }}
     >
-      <Container maxWidth='lg'>
+      {/* Figuras decorativas flotantes */}
+      <Box
+        sx={{
+          position: "absolute",
+          top: "-50px",
+          left: "-60px",
+          width: "180px",
+          height: "180px",
+          background:
+            "radial-gradient(circle at 30% 30%, rgba(229,56,136,0.25), transparent)",
+          borderRadius: "50%",
+          animation: "float 8s ease-in-out infinite",
+          "@keyframes float": {
+            "0%, 100%": { transform: "translateY(0)" },
+            "50%": { transform: "translateY(-15px)" },
+          },
+        }}
+      />
+      <Box
+        sx={{
+          position: "absolute",
+          bottom: "-40px",
+          right: "-60px",
+          width: "220px",
+          height: "220px",
+          background:
+            "radial-gradient(circle at 60% 40%, rgba(255,105,180,0.2), transparent)",
+          borderRadius: "50%",
+          animation: "float2 10s ease-in-out infinite",
+          "@keyframes float2": {
+            "0%, 100%": { transform: "translateY(0)" },
+            "50%": { transform: "translateY(20px)" },
+          },
+        }}
+      />
+
+      <Container maxWidth='lg' sx={{ position: "relative", zIndex: 2 }}>
         {/* Enlaces */}
         <Stack
           direction={{ xs: "column", sm: "row" }}
           justifyContent='center'
           alignItems='center'
-          spacing={3}
+          spacing={4}
           sx={{ mb: 3 }}
         >
-          <Stack direction='row' spacing={4}>
-            {[
-              { text: "Acerca de", href: "/about" },
-              { text: "Privacidad", href: "/privacy" },
-              { text: "Contacto", href: "/contact" },
-            ].map((item) => (
+          {[
+            { text: "Acerca de", href: "/about" },
+            { text: "Privacidad", href: "/privacy" },
+            { text: "Contacto", href: "/contact" },
+          ].map((item, index) => (
+            <motion.div
+              key={item.text}
+              whileHover={{ scale: 1.1 }}
+              transition={{ type: "spring", stiffness: 300 }}
+            >
               <Link
-                key={item.text}
                 href={item.href}
                 underline='none'
                 sx={{
-                  color: "#E53888",
-                  fontWeight: 500,
+                  color: "#e53888",
+                  fontWeight: 600,
                   fontSize: "1rem",
                   transition: "all 0.3s ease",
                   "&:hover": {
                     color: "#ff69b4",
-                    textShadow: "0 0 6px rgba(229, 56, 136, 0.6)",
+                    textShadow: "0 0 8px rgba(229,56,136,0.6)",
                   },
                 }}
               >
                 {item.text}
               </Link>
-            ))}
-          </Stack>
+            </motion.div>
+          ))}
         </Stack>
 
         <Divider
           sx={{
-            borderColor: "rgba(241, 189, 206, 0.3)",
-            mb: 2,
+            borderColor: "rgba(241,189,206,0.4)",
+            mb: 3,
           }}
         />
 
@@ -80,7 +118,8 @@ const Footer = () => {
             opacity: 0.9,
           }}
         >
-          © {new Date().getFullYear()} Wapizima. Todos los derechos reservados.
+          © {new Date().getFullYear()} Floreciendo Juntas 🌸 — Todos los
+          derechos reservados.
         </Typography>
       </Container>
     </Box>

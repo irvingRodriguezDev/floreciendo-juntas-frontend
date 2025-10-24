@@ -99,7 +99,7 @@ const TopCourses = () => {
         sx={{ maxWidth: "100%", margin: "0 auto" }}
       >
         {topCourses.map((course, index) => (
-          <Grid size={{ xs: 12, sm: 6, md: 4, lg: 3 }} key={course.id}>
+          <Grid size={{ xs: 12, sm: 6, md: 4, lg: 3 }} key={index}>
             <motion.div
               initial={{ opacity: 0, y: 50 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -108,7 +108,7 @@ const TopCourses = () => {
             >
               <Link
                 style={{ textDecoration: "none" }}
-                to={`/detalle-curso/${course.id}`}
+                to={`/detalle-curso/${course.courseId}`}
               >
                 <Card
                   sx={{
