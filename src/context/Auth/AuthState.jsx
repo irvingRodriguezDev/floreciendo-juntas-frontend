@@ -3,13 +3,11 @@ import AuthContext from "./AuthContext";
 import AuthReducer from "./AuthReducer";
 import MethodGet, { MethodPost, MethodPut } from "../../config/Service";
 import headerConfig from "../../config/imageHeader";
-
 /**Importar componente token headers */
 import tokenAuth from "../../config/TokenAuth";
 
 import { SHOW_ERRORS_API, types } from "../../types";
 import Swal from "sweetalert2";
-
 const AuthState = (props) => {
   const initialState = {
     token: localStorage.getItem("token"),
@@ -263,12 +261,16 @@ const AuthState = (props) => {
       });
   };
 
-  //Cierrra sesion del usuario
-  const cerrarSesion = () => {
+  const cerrarSesion = (navigate) => {
+    // Limpia cualquier dato del usuario
     localStorage.removeItem("user_id");
-    dispatch({
-      type: types.CERRAR_SESION,
-    });
+    localStorage.removeItem("token");
+
+    // Actualiza el estado global
+    dispatch({ type: types.CERRAR_SESION });
+
+    // Redirige a la pantalla principal o de login
+    navigate("/", { replace: true });
   };
 
   const eliminarCuenta = (id) => {
