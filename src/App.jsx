@@ -6,6 +6,7 @@ import AppRouter from "./routes/AppRouter";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements } from "@stripe/react-stripe-js";
 import PostsState from "./context/Posts/PostsState";
+import UserState from "./context/User/UserState";
 
 // Carga asíncrona de la clave pública
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_KEY);
@@ -14,13 +15,15 @@ function App() {
   return (
     <Elements stripe={stripePromise}>
       <AuthState>
-        <SystemState>
-          <CoursesState>
-            <PostsState>
-              <AppRouter />
-            </PostsState>
-          </CoursesState>
-        </SystemState>
+        <UserState>
+          <SystemState>
+            <CoursesState>
+              <PostsState>
+                <AppRouter />
+              </PostsState>
+            </CoursesState>
+          </SystemState>
+        </UserState>
       </AuthState>
     </Elements>
   );

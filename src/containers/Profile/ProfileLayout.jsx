@@ -48,7 +48,7 @@ const ProfileLayout = () => {
         <ProfileHeader usuario={usuario} />
         <Divider sx={{ my: 4, borderColor: PRIMARY_PINK, opacity: 0.8 }} />
         {/* 2. Sección de Insignias */}
-        {/* <BadgesSection badgeCount={userData.badgeCount} /> */}
+        <BadgesSection />
         <Divider sx={{ my: 4, borderColor: PRIMARY_PINK, opacity: 0.8 }} />
         {/* 3. Sección "El Salón de Tus Sueños" */}
         {/* <DreamSalonSection salonTitle={userData.salonTitle} /> */}
