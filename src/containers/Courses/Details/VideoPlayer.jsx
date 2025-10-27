@@ -1,19 +1,39 @@
 import React, { useState, useEffect, useRef, useContext } from "react";
 import Hls from "hls.js";
 import axios from "axios";
-import { Box, Typography, LinearProgress, Button } from "@mui/material";
+import {
+  Box,
+  Typography,
+  LinearProgress,
+  Button,
+  IconButton,
+} from "@mui/material";
+import PlayArrowIcon from "@mui/icons-material/PlayArrow";
+import PauseIcon from "@mui/icons-material/Pause";
 import MethodGet, { MethodPost } from "../../../config/Service";
 import CoursesContext from "../../../context/Courses/CoursesContext";
 const VideoPlayer = ({ userId, courseId, src, poster, usuario }) => {
   const { downloadCertificate } = useContext(CoursesContext);
   const videoRef = useRef(null);
+  const [isPlaying, setIsPlaying] = useState(false);
   const progressRef = useRef(0);
   const completedRef = useRef(false);
 
   const [progress, setProgress] = useState(0);
   const [completed, setCompleted] = useState(false);
   const [loading, setLoading] = useState(false);
+  const handleTogglePlay = () => {
+    const video = videoRef.current;
+    if (!video) return;
 
+    if (isPlaying) {
+      video.pause();
+      setIsPlaying(false);
+    } else {
+      video.play();
+      setIsPlaying(true);
+    }
+  };
   // 🔹 Inicializar HLS
   useEffect(() => {
     const video = videoRef.current;
@@ -137,14 +157,44 @@ const VideoPlayer = ({ userId, courseId, src, poster, usuario }) => {
           backgroundColor: "#000",
         }}
       >
+        {/* 🎬 Video */}
         <video
           ref={videoRef}
           controls
-          controlsList='nodownload noremoteplayback nofullscreen' // evita algunas acciones
+          controlsList='nodownload noremoteplayback' // ✅ fullscreen permitido
           disablePictureInPicture
+          onPlay={() => setIsPlaying(true)}
+          onPause={() => setIsPlaying(false)}
+          onEnded={() => setIsPlaying(false)}
           style={{ width: "100%", height: "500px", objectFit: "contain" }}
           poster={poster}
-        />
+        >
+          <source src={src} type='video/mp4' />
+          Tu navegador no soporta el video.
+        </video>
+
+        {/* ▶️ / ⏸️ Botón Play-Pause centrado */}
+        <IconButton
+          onClick={handleTogglePlay}
+          sx={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            backgroundColor: "rgba(255,255,255,0.8)",
+            "&:hover": {
+              backgroundColor: "rgba(255,255,255,1)",
+            },
+            width: 80,
+            height: 80,
+          }}
+        >
+          {isPlaying ? (
+            <PauseIcon sx={{ fontSize: 60, color: "#000" }} />
+          ) : (
+            <PlayArrowIcon sx={{ fontSize: 60, color: "#000" }} />
+          )}
+        </IconButton>
       </Box>
 
       {/* Barra de progreso */}
