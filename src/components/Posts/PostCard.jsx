@@ -134,7 +134,7 @@ const PostItem = ({ post }) => {
         </Typography>
 
         {/* Imagen adjunta */}
-        {post.attachment && (
+        {post.attachments && (
           <Box
             sx={{
               width: "100%",
@@ -150,7 +150,7 @@ const PostItem = ({ post }) => {
           >
             <CardMedia
               component='img'
-              image={post.attachment}
+              image={post.attachments}
               alt='Post attachment'
               sx={{
                 objectFit: "cover",
