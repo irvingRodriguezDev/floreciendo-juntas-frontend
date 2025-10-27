@@ -1,17 +1,17 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useContext } from "react";
 import Hls from "hls.js";
 import axios from "axios";
 import { Box, Typography, LinearProgress, Button } from "@mui/material";
 import MethodGet, { MethodPost } from "../../../config/Service";
-
-const VideoPlayer = ({ userId, courseId, src, poster }) => {
+import CoursesContext from "../../../context/Courses/CoursesContext";
+const VideoPlayer = ({ userId, courseId, src, poster, usuario }) => {
+  const { downloadCertificate } = useContext(CoursesContext);
   const videoRef = useRef(null);
   const progressRef = useRef(0);
   const completedRef = useRef(false);
 
   const [progress, setProgress] = useState(0);
   const [completed, setCompleted] = useState(false);
-  const [certificate, setCertificate] = useState(null);
   const [loading, setLoading] = useState(false);
 
   // 🔹 Inicializar HLS
@@ -122,21 +122,6 @@ const VideoPlayer = ({ userId, courseId, src, poster }) => {
     return () => video.removeEventListener("seeking", handleSeeking);
   }, []);
 
-  // 🔹 Obtener certificado
-  const fetchCertificate = async () => {
-    try {
-      setLoading(true);
-      const { data } = await axios.get(
-        `${API_URL}/certificate/${userId}/${courseId}`
-      );
-      setCertificate(data);
-    } catch (error) {
-      console.error("Error al obtener certificado:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   return (
     <Box sx={{ maxWidth: 900, mx: "auto", mt: 4 }}>
       <Box
@@ -196,29 +181,11 @@ const VideoPlayer = ({ userId, courseId, src, poster }) => {
               color: "#DC4485",
               borderRadius: "12px",
             }}
-            onClick={fetchCertificate}
+            onClick={() => downloadCertificate(courseId, usuario.name)}
             disabled={loading}
           >
             {loading ? "Generando certificado..." : "Descargar certificado"}
           </Button>
-
-          {certificate && (
-            <Box sx={{ mt: 3 }}>
-              <Typography variant='body2' color='text.secondary'>
-                Certificado disponible desde:{" "}
-                {new Date(certificate.date).toLocaleDateString()}
-              </Typography>
-              <a
-                href={certificate.certificateUrl}
-                target='_blank'
-                rel='noopener noreferrer'
-              >
-                <Button variant='outlined' sx={{ mt: 1 }}>
-                  Descargar certificado
-                </Button>
-              </a>
-            </Box>
-          )}
         </Box>
       )}
     </Box>

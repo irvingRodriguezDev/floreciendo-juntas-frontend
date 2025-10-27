@@ -2,6 +2,7 @@ import React, { useCallback, useReducer } from "react";
 import MethodGet, { MethodPost, MethodPut } from "../../config/Service";
 import CoursesReducer from "./CoursesReducer";
 import CoursesContext from "./CoursesContext";
+import fileDownload from "js-file-download";
 import {
   GET_ALL_COURSES,
   GET_ALL_COURSES_PAGINATE,
@@ -10,6 +11,8 @@ import {
   GET_LATEST_COURSES,
   GET_TOP_TEN_COURSES,
 } from "../../types";
+import clienteAxios from "../../config/Axios";
+import Swal from "sweetalert2";
 /**Importar componente token headers */
 
 const CoursesState = ({ children }) => {
@@ -129,6 +132,43 @@ const CoursesState = ({ children }) => {
       });
   };
 
+  const downloadCertificate = async (courseId, userName) => {
+    const url = `/courses/download-certificate?courseId=${courseId}&userName=${userName}`;
+
+    // Mostrar el spinner mientras se genera/descarga el certificado
+    Swal.fire({
+      title: "Generando certificado...",
+      text: "Por favor espera un momento.",
+      allowOutsideClick: false,
+      allowEscapeKey: false,
+      didOpen: () => {
+        Swal.showLoading();
+      },
+    });
+
+    try {
+      const res = await clienteAxios.get(url, { responseType: "blob" });
+      // Descargar el archivo PDF
+      fileDownload(res.data, "certificado-curso.pdf");
+      // Mostrar mensaje de éxito
+      Swal.fire({
+        icon: "success",
+        title: "¡Certificado generado correctamente!",
+        text: "Tu certificado ha sido descargado con éxito.",
+        confirmButtonText: "Aceptar",
+      });
+    } catch (error) {
+      console.error("Ocurrió un error al descargar el certificado:", error);
+
+      Swal.fire({
+        icon: "error",
+        title: "Error al generar el certificado",
+        text: "Ocurrió un problema al descargar el certificado. Intenta nuevamente.",
+        confirmButtonText: "Cerrar",
+      });
+    }
+  };
+
   return (
     <CoursesContext.Provider
       value={{
@@ -144,6 +184,7 @@ const CoursesState = ({ children }) => {
         getCourseById,
         getCoursesBySystemId,
         getTopTenCourses,
+        downloadCertificate,
       }}
     >
       {children}

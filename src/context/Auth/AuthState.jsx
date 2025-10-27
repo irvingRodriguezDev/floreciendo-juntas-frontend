@@ -67,13 +67,7 @@ const AuthState = (props) => {
       });
       //Obtener y establecer usuario autenticado
       await usuarioAutenticado();
-      Swal.fire({
-        title: "!Exitoso¡",
-        icon: "success",
-        text: "Ha iniciado sesión correctamente",
-        showConfirmButton: false,
-        timer: 1500,
-      });
+
       return true; //Indicador de éxito
     } catch (error) {
       Swal.fire({
