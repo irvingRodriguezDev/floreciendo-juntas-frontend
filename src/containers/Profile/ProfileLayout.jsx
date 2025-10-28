@@ -54,7 +54,7 @@ const ProfileLayout = () => {
         {/* <DreamSalonSection salonTitle={userData.salonTitle} /> */}
         <Divider sx={{ my: 4, borderColor: PRIMARY_PINK, opacity: 0.8 }} />
         {/* 4. Sección de Diplomas y Certificados */}
-        {/* <CertificatesSection certCount={userData.certCount} /> */}
+        <CertificatesSection />
       </Container>
     </Box>
   );

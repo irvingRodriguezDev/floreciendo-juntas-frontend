@@ -1,73 +1,114 @@
-import React from "react";
-import { Box, Typography, Grid } from "@mui/material";
+import React, { useContext, useEffect } from "react";
+import {
+  Box,
+  Typography,
+  Grid,
+  Button,
+  Card,
+  CardMedia,
+  CardContent,
+} from "@mui/material";
 import SchoolIcon from "@mui/icons-material/School";
+import UserContext from "../../context/User/UserContext";
+import AuthContext from "../../context/Auth/AuthContext";
+import CoursesContext from "../../context/Courses/CoursesContext";
 
 const PRIMARY_PINK = "#E53888";
-const CERT_COLOR = "#F7CDD9"; // Rosa suave para el borde
+const SECONDARY_PINK = "#F7CDD9";
 
-const CertificatesSection = ({ certCount }) => {
-  const certificates = Array.from({ length: certCount }, (_, i) => ({
-    id: i + 1,
-    name: `Certificado ${i + 1}`,
-  }));
+const CertificatesSection = () => {
+  const { completed, getCoursesCompleted } = useContext(UserContext);
+  const { usuario } = useContext(AuthContext);
+  const { downloadCertificate } = useContext(CoursesContext);
+
+  useEffect(() => {
+    if (usuario?.id) getCoursesCompleted(usuario.id);
+  }, [usuario]);
 
   return (
     <Box
       sx={{
-        p: 3,
-        bgcolor: "white",
-        borderRadius: "16px",
-        boxShadow: "0 4px 10px rgba(0,0,0,0.25)",
+        p: 4,
+        // bgcolor: "#fff0f6",
+        borderRadius: "20px",
+        boxShadow: "0 6px 20px rgba(229,56,136,0.2)",
       }}
     >
       <Typography
         variant='h5'
         color={PRIMARY_PINK}
-        sx={{ mb: 3, fontWeight: 600 }}
+        sx={{ mb: 4, fontWeight: 700, textAlign: "center" }}
       >
-        Diplomas y Certificados
+        🎓 Diplomas y Certificados
       </Typography>
 
-      <Grid container spacing={3} justifyContent='center'>
-        {certificates.map((cert) => (
-          <Grid item xs={6} sm={4} md={3} key={cert.id}>
-            <Box
+      <Grid container spacing={4} justifyContent='center'>
+        {completed.length === 0 && (
+          <Typography
+            variant='body1'
+            color={PRIMARY_PINK}
+            sx={{ textAlign: "center", width: "100%", mt: 4 }}
+          >
+            Aún no tienes cursos completados 😔
+          </Typography>
+        )}
+
+        {completed.map((cert) => (
+          <Grid item xs={12} sm={6} md={4} lg={3} key={cert.id}>
+            <Card
               sx={{
-                width: "100%",
-                paddingTop: "75%", // 4:3 Aspect Ratio (simulando un diploma)
-                position: "relative",
-                bgcolor: CERT_COLOR,
-                borderRadius: "8px",
-                border: `4px solid ${PRIMARY_PINK}`,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                transition: "box-shadow 0.3s",
+                borderRadius: "16px",
+                overflow: "hidden",
+                boxShadow: "0 4px 12px rgba(229,56,136,0.3)",
+                transition: "transform 0.3s, box-shadow 0.3s",
                 "&:hover": {
-                  boxShadow: `0 0 10px ${PRIMARY_PINK}`,
+                  transform: "translateY(-5px)",
+                  boxShadow: "0 10px 20px rgba(229,56,136,0.4)",
                 },
               }}
             >
-              <SchoolIcon
+              <CardMedia
+                component='img'
+                image={cert.cover_image_url}
+                alt={cert.title}
                 sx={{
-                  position: "absolute",
-                  top: "50%",
-                  left: "50%",
-                  transform: "translate(-50%, -50%)",
-                  color: PRIMARY_PINK,
-                  fontSize: 50,
-                  opacity: 0.5,
+                  height: 200,
+                  objectFit: "cover",
+                  transition: "transform 0.5s",
+                  "&:hover": {
+                    transform: "scale(1.05)",
+                  },
                 }}
               />
-            </Box>
-            <Typography
-              variant='caption'
-              display='block'
-              textAlign='center'
-              sx={{ mt: 1 }}
-            >
-              {cert.name}
-            </Typography>
+              <CardContent
+                sx={{
+                  bgcolor: SECONDARY_PINK,
+                  textAlign: "center",
+                  py: 2,
+                }}
+              >
+                <Typography
+                  variant='subtitle1'
+                  sx={{ fontWeight: 600, mb: 1, color: PRIMARY_PINK }}
+                >
+                  {cert.title}
+                </Typography>
+                <Button
+                  variant='contained'
+                  fullWidth
+                  sx={{
+                    bgcolor: PRIMARY_PINK,
+                    "&:hover": { bgcolor: "#c52c77" },
+                    fontWeight: 600,
+                    mt: 1,
+                    borderRadius: "12px",
+                  }}
+                  onClick={() => downloadCertificate(cert.id, usuario.name)}
+                >
+                  Descargar Certificado
+                </Button>
+              </CardContent>
+            </Card>
           </Grid>
         ))}
       </Grid>
