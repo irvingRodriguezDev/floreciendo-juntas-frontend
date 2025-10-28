@@ -5,33 +5,36 @@ import {
   CardMedia,
   Typography,
   Box,
-  Button,
   Stack,
+  Button,
+  keyframes,
 } from "@mui/material";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import { Link } from "react-router-dom";
 
+// Animación simple para los pétalos
+const floatPetal = keyframes`
+  0% { transform: translateY(0) rotate(0deg); opacity: 0.8; }
+  50% { transform: translateY(-10px) rotate(20deg); opacity: 1; }
+  100% { transform: translateY(0) rotate(0deg); opacity: 0.8; }
+`;
+
 const CardEvent = ({ event }) => {
   return (
     <Card
       sx={{
-        // borderRadius: 2,
-        bgcolor: "#1e1f25",
-        color: "white",
-        maxWidth: "100%",
         position: "relative",
-        padding: 3,
-        backgroundColor: "rgba(238, 158, 234, 0.2)",
+        bgcolor: "#FDE6F0",
         borderRadius: "16px",
-        boxShadow: "0 4px 30px rgba(0, 0, 0, 0.1)",
-        backdropFilter: "blur(11px)",
-        border: "1px solid rgba(238, 158, 234, 0.3)",
-        transition: "all 0.3s ease",
+        border: "1px solid #E53888",
+        maxWidth: 360,
+        mx: "auto",
+        overflow: "hidden",
+        boxShadow: "0 6px 18px rgba(0,0,0,0.1)",
         "&:hover": {
-          transform: "translateY(-8px)", // se eleva
-          boxShadow: "0 12px 24px rgba(0,0,0,0.4)", // sombra fuerte
-          bgcolor: "rgba(238, 158, 234, 0.2)", // fondo un poco más claro
+          transform: "translateY(-6px)",
+          boxShadow: "0 12px 24px rgba(0,0,0,0.2)",
         },
       }}
     >
@@ -39,62 +42,75 @@ const CardEvent = ({ event }) => {
       <Box sx={{ position: "relative" }}>
         <CardMedia
           component='img'
-          height='auto'
-          width={"100%"}
+          height='220'
           image={event.img}
           alt={event.title}
-          sx={{ borderTopLeftRadius: 12, borderTopRightRadius: 12 }}
         />
-        {/* Badge con fecha */}
         <Box
           sx={{
             position: "absolute",
-            bottom: 10,
-            right: 10,
-            bgcolor: "#e53888",
+            bottom: 12,
+            right: 12,
+            bgcolor: "#E53888",
             color: "white",
             px: 1.5,
-            py: 0.8,
+            py: 0.6,
             borderRadius: "12px",
             fontSize: "0.8rem",
             fontWeight: "bold",
-            zIndex: 2,
           }}
         >
           {event.date}
         </Box>
       </Box>
 
+      {/* Pétalos animados */}
+      {[...Array(5)].map((_, i) => (
+        <Box
+          key={i}
+          sx={{
+            position: "absolute",
+            top: `${10 + i * 15}%`,
+            left: `${5 + i * 15}%`,
+            width: 20,
+            height: 20,
+            bgcolor: "#F7A8C8",
+            borderRadius: "50%",
+            filter: "blur(2px)",
+            animation: `${floatPetal} ${3 + i}s ease-in-out infinite`,
+            opacity: 0.7,
+          }}
+        />
+      ))}
+
       {/* Contenido */}
       <CardContent>
-        <Stack direction='row' spacing={2} alignItems='center' mb={1}>
-          <LocationOnIcon sx={{ fontSize: 18, color: "white" }} />
-          <Typography variant='body2' color='white'>
+        <Stack direction='row' spacing={1.5} alignItems='center' mb={1}>
+          <LocationOnIcon sx={{ fontSize: 18, color: "#E53888" }} />
+          <Typography variant='body2' color='#E53888'>
             {event.location}
           </Typography>
-          <AccessTimeIcon sx={{ fontSize: 18, color: "white", ml: 1 }} />
-          <Typography variant='body2' color='white'>
+          <AccessTimeIcon sx={{ fontSize: 18, color: "#E53888", ml: 1 }} />
+          <Typography variant='body2' color='#E53888'>
             {event.time}
           </Typography>
         </Stack>
 
-        <Typography variant='h6' fontWeight='bold' mb={2}>
+        <Typography variant='h6' fontWeight='bold' mb={2} color='#E53888'>
           {event.title}
         </Typography>
+
         <Link to={`/detalle-evento/${event.id}`}>
           <Button
             variant='contained'
-            size='large'
+            size='medium'
             sx={{
               color: "white",
-              borderColor: "gray",
               textTransform: "none",
               borderRadius: 2,
               bgcolor: "#E53888",
-
               "&:hover": {
-                borderColor: "#7c4dff",
-                bgcolor: "#E53888",
+                bgcolor: "#D32F71",
               },
             }}
           >
