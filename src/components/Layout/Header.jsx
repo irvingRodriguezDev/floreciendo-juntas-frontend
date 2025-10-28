@@ -19,18 +19,18 @@ import AuthContext from "../../context/Auth/AuthContext";
 import Logo from "../../assets/images/logo_carolina_tavera.png";
 const menuItems = [
   { name: "Cursos", path: "/cursos", auth: "both" },
-  { name: "Certificaciones", path: "/certificaciones", auth: "both" },
-  {
-    name: "Salon",
-    path: "/el-salon-de-tus-sueños",
-    auth: "both",
-  },
-  {
-    name: "10 secretos",
-    path: "/10-secretos",
-    auth: "both",
-  },
-  { name: "Tienda", path: "/tienda", auth: "both" },
+  // { name: "Certificaciones", path: "/certificaciones", auth: "both" },
+  // {
+  //   name: "Salon",
+  //   path: "/el-salon-de-tus-sueños",
+  //   auth: "both",
+  // },
+  // {
+  //   name: "10 secretos",
+  //   path: "/10-secretos",
+  //   auth: "both",
+  // },
+  // { name: "Tienda", path: "/tienda", auth: "both" },
   { name: "Eventos", path: "/eventos", auth: "both" },
 ];
 

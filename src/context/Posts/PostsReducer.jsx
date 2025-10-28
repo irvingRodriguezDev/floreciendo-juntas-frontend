@@ -26,7 +26,10 @@ export default (state, action) => {
         ...state,
         posts: state.posts.map((post) =>
           post.id === action.payload.postId
-            ? { ...post, comments: [...post.comments, action.payload.comment] }
+            ? {
+                ...post,
+                comments: [...(post.comments || []), action.payload.comment],
+              }
             : post
         ),
       };

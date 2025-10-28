@@ -1,9 +1,10 @@
-import React, { useReducer, useEffect } from "react";
+import React, { useReducer, useEffect, useContext } from "react";
 import PostsContext from "./PostsContext";
 import PostsReducer from "./PostsReducer";
-import { io } from "socket.io-client";
 import MethodGet, { MethodDelete, MethodPost } from "../../config/Service";
-import headerConfig from "../../config/imageHeader";
+import clienteAxios from "../../config/Axios";
+import { initSocket } from "../../socket"; // socket global
+import AuthContext from "../Auth/AuthContext";
 import {
   ADD_COMMENT,
   ADD_POST,
@@ -14,7 +15,7 @@ import {
   SET_SOCKET,
   UPDATE_REACTIONS,
 } from "../../types";
-import clienteAxios from "../../config/Axios";
+
 const PostsState = ({ children }) => {
   const initialState = {
     posts: [],
@@ -26,22 +27,32 @@ const PostsState = ({ children }) => {
 
   const [state, dispatch] = useReducer(PostsReducer, initialState);
 
-  useEffect(() => {
-    // Inicializar socket
-    const socket = io(import.meta.env.VITE_API_BASE_URL, {
-      path: "/api/socket.io",
-      transports: ["websocket", "polling"],
-    });
+  // 🔹 Obtener usuario actual del AuthContext
+  const { usuario } = useContext(AuthContext);
+  const usuarioId = usuario?.id;
 
+  // 🔹 Inicializar socket global
+  const token = localStorage.getItem("token"); // JWT del usuario
+  const socket = initSocket(token);
+
+  useEffect(() => {
+    if (!socket) return;
+
+    // Guardar socket en el state
     dispatch({ type: SET_SOCKET, payload: socket });
 
-    // Eventos del servidor
+    // ---- Escuchar eventos del backend ----
     socket.on("postCreated", (post) => {
+      if (post.userId === usuarioId) return; // ignorar posts creados por el usuario actual
       dispatch({ type: ADD_POST, payload: post });
     });
 
     socket.on("commentCreated", ({ postId, comment }) => {
-      dispatch({ type: ADD_COMMENT, payload: { postId, comment } });
+      if (comment.userId === usuarioId) return; // ignorar comentarios creados por el usuario actual
+      dispatch({
+        type: ADD_COMMENT,
+        payload: { postId, comment },
+      });
     });
 
     socket.on("reactionUpdated", (data) => {
@@ -56,19 +67,21 @@ const PostsState = ({ children }) => {
         reactions.find((r) => r.userId === usuarioId)?.type || null;
 
       dispatch({
-        type: "UPDATE_REACTIONS",
+        type: UPDATE_REACTIONS,
         payload: { postId, summary, userReaction },
       });
     });
 
-    // Limpiar al desmontar
+    // ---- Cleanup: remover listeners al desmontar ----
     return () => {
-      socket.disconnect();
+      socket.off("postCreated");
+      socket.off("commentCreated");
+      socket.off("reactionUpdated");
     };
-  }, []);
+  }, [socket, usuarioId]);
 
-  // 🔹 Obtener posts del backend
-  const getPosts = async (id, page, rowsPerPage) => {
+  // 🔹 Funciones para manejar posts y comentarios
+  const getPosts = async (id, page = 1, rowsPerPage = 10) => {
     const res = await MethodGet(
       `/community/posts/course/${id}?page=${page}&limit=${rowsPerPage}`
     );
@@ -83,94 +96,66 @@ const PostsState = ({ children }) => {
     });
   };
 
-  // 🔹 Crear un nuevo post
   const createPost = async (data) => {
     const res = await clienteAxios.post(`/community/posts`, data, {
       headers: { "Content-Type": "multipart/form-data" },
     });
 
-    // Emitir evento socket
-    state.socket.emit("newPost", res.data);
+    // Actualizar estado local inmediatamente
     dispatch({ type: ADD_POST, payload: res.data });
-  };
-  // 🔹 Crear un comentario
-  const createComment = async (data) => {
-    try {
-      const { userId, postId } = data; // 👈 lo extraes del body
 
-      const res = await MethodPost(
-        `/community/comments?userId=${userId}`, // lo usas en la URL
-        {
-          postId,
-          content: data.comment,
-        }
-      );
-
-      // Actualiza el estado local inmediatamente
-      dispatch({
-        type: ADD_COMMENT,
-        payload: {
-          postId,
-          comment: res.data,
-        },
-      });
-
-      // Emite el evento socket
-      state.socket.emit("newComment", { postId, comment: res.data });
-
-      return res;
-    } catch (error) {
-      console.error("Error al crear comentario:", error);
-    }
+    // Emitir evento socket para otros usuarios
+    state.socket?.emit("postCreated", res.data);
   };
 
-  // 🔹 Agregar una reacción
+  const createComment = async ({ postId, comment, userId }) => {
+    const res = await MethodPost(`/community/comments?userId=${userId}`, {
+      postId,
+      content: comment,
+    });
+
+    // Actualiza estado local
+    dispatch({
+      type: ADD_COMMENT,
+      payload: { postId, comment: res.data },
+    });
+
+    // Emitir evento socket para otros usuarios
+    state.socket?.emit("commentCreated", { postId, comment: res.data });
+
+    return res.data;
+  };
+
   const addReaction = async (data) => {
     const res = await MethodPost(`/community/reactions/toggle`, data);
-    state.socket.emit("reactionUpdated", {
+
+    state.socket?.emit("reactionUpdated", {
       postId: data.postId,
       reactions: res.data.reactions,
     });
   };
 
   const deleteComment = async (commentId) => {
-    try {
-      await MethodDelete(`/community/comments/${commentId}`);
-
-      dispatch({
-        type: DELETE_COMMENT,
-        payload: commentId,
-      });
-    } catch (error) {
-      console.error("Error al eliminar comentario:", error);
-    }
+    await MethodDelete(`/community/comments/${commentId}`);
+    dispatch({ type: DELETE_COMMENT, payload: commentId });
   };
 
   const getReactions = async (postId) => {
-    try {
-      await MethodGet(`/community/reactions/summary?postId=${postId}`);
-      dispatch({
-        type: GET_REACTIONS_SUMMARY,
-        payload: postId,
-      });
-    } catch (error) {
-      console.error("Error al obtener las reacciones", error);
-    }
+    const { data } = await MethodGet(
+      `/community/reactions/summary?postId=${postId}`
+    );
+    dispatch({
+      type: GET_REACTIONS_SUMMARY,
+      payload: { postId, reactions: data },
+    });
   };
-  const getReactionsForPosts = async (postIds, userId) => {
-    try {
-      const idsParam = postIds.join(",");
-      const { data } = await MethodGet(
-        `/community/reactions/summary/multiple?postIds=${idsParam}&userId=${userId}`
-      );
 
-      dispatch({
-        type: GET_REACTIONS_SUMMARY_MULTIPLE,
-        payload: data,
-      });
-    } catch (err) {
-      console.error("Error al obtener reacciones", err);
-    }
+  const getReactionsForPosts = async (postIds) => {
+    const idsParam = postIds.join(",");
+    const { data } = await MethodGet(
+      `/community/reactions/summary/multiple?postIds=${idsParam}&userId=${usuarioId}`
+    );
+    dispatch({ type: GET_REACTIONS_SUMMARY_MULTIPLE, payload: data });
   };
 
   return (

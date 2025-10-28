@@ -205,6 +205,7 @@ const Register = () => {
                             label='Nombre completo'
                             name='name'
                             placeholder='Nombre y Apellido'
+                            autoComplete='off'
                             value={values.name}
                             onChange={handleChange}
                             onBlur={handleBlur}
@@ -223,6 +224,7 @@ const Register = () => {
                             label='Correo Electrónico'
                             type='email'
                             name='email'
+                            autoComplete='off'
                             placeholder='tu.correo@ejemplo.com'
                             value={values.email}
                             onChange={handleChange}
@@ -241,6 +243,7 @@ const Register = () => {
                           <TextField
                             label='Teléfono'
                             name='phone'
+                            autoComplete='off'
                             placeholder='Ej: 722 123 4567'
                             value={values.phone}
                             onChange={handleChange}
@@ -259,6 +262,7 @@ const Register = () => {
                             label='Contraseña'
                             type='password'
                             name='password'
+                            autoComplete='off'
                             placeholder='**********'
                             value={values.password}
                             onChange={handleChange}
@@ -277,6 +281,7 @@ const Register = () => {
                           <TextField
                             label='Confirma tu contraseña'
                             type='password'
+                            autoComplete='off'
                             name='password_confirmation'
                             placeholder='**********'
                             value={values.password_confirmation}

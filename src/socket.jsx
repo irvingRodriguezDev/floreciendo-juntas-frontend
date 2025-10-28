@@ -2,48 +2,62 @@
 import { io } from "socket.io-client";
 
 // ✅ Usamos la variable de entorno que será la URL de ngrok (https://....)
-// 💡 NOTA: Asegúrate de que tu archivo .env tenga REACT_APP_SOCKET_URL="https://abcd1234.ngrok-free.app"
-const SOCKET_URL = process.env.REACT_APP_SOCKET_URL || "http://localhost:3000";
+const SOCKET_URL = import.meta.env.VITE_SOCKET_URL;
+
+if (!SOCKET_URL) {
+  console.warn(
+    "⚠️ VITE_SOCKET_URL no está definido en el archivo .env. Revisa tu configuración."
+  );
+}
 
 let socket;
 
+/**
+ * Inicializa el socket solo una vez (singleton)
+ * @param {string} token - JWT del usuario para autenticación
+ * @returns {SocketIOClient.Socket} socket
+ */
 export const initSocket = (token) => {
   if (socket) return socket;
 
   socket = io(SOCKET_URL, {
-    auth: { token }, // ✅ Correcto para enviar un token de autenticación
-
-    // 💡 Recomendación: Quitar 'transports' para permitir el fallback a long-polling
-    // transports: ["websocket"],
-
+    path: "/socket.io", // 👈 path coincide con el backend
+    auth: { token },
     autoConnect: true,
+    reconnection: true,
     reconnectionAttempts: 5,
-    reconnectionDelay: 1000, // Opcional: añade un delay para reconexión
+    reconnectionDelay: 1000,
   });
 
-  socket.on("connect_error", (err) => {
-    // ⚠️ Muestra el error de manera más detallada
-    console.error("Socket connect_error:", err.message);
-    console.error("Detalles del error:", err.description);
-  });
-
+  // 🔹 Conexión exitosa
   socket.on("connect", () => {
     console.log("🔗 Socket conectado:", socket.id);
   });
 
-  // Opcional: Añadir un listener para cuando el token falle
+  // 🔹 Manejo de errores de conexión
   socket.on("connect_error", (err) => {
-    if (err.data && err.data.type === "AuthError") {
-      console.error("Fallo de autenticación Socket.IO:", err.data.message);
-      // Aquí podrías redirigir al login
+    console.error("Socket connect_error:", err.message);
+    if (err.data) {
+      console.error("Detalles del error:", err.data);
+      if (err.data.type === "AuthError") {
+        console.error("⚠️ Fallo de autenticación Socket.IO:", err.data.message);
+        // Aquí podrías redirigir al login
+      }
     }
   });
 
   return socket;
 };
 
+/**
+ * Obtiene el socket inicializado
+ * @returns {SocketIOClient.Socket | null}
+ */
 export const getSocket = () => socket;
 
+/**
+ * Desconecta el socket y limpia la instancia
+ */
 export const disconnectSocket = () => {
   if (socket) {
     socket.disconnect();

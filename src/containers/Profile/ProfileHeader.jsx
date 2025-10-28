@@ -1,4 +1,4 @@
-import React from "react";
+import React, { use, useContext, useRef, useState } from "react";
 import {
   Box,
   Typography,
@@ -7,15 +7,28 @@ import {
   Paper,
   Divider,
   Chip,
+  Button,
 } from "@mui/material";
 import SpaOutlinedIcon from "@mui/icons-material/SpaOutlined";
 import FavoriteOutlinedIcon from "@mui/icons-material/FavoriteOutlined";
 import FormatDate from "../../utils/FormatDate";
+import AuthContext from "../../context/Auth/AuthContext";
 const PRIMARY_PINK = "#E53888";
 const LIGHT_PINK = "#FBE3ED";
 const TEXT_COLOR = "#4A4A4A";
 
 const ProfileMain = ({ usuario }) => {
+  const { ChangePhoto } = useContext(AuthContext);
+  const fileInputRef = useRef(null);
+
+  const handleImageUpload = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    // Vista previa local instantánea
+
+    ChangePhoto(file); // Subir al servidor
+  };
   return (
     <Box
       sx={{
@@ -29,7 +42,7 @@ const ProfileMain = ({ usuario }) => {
       }}
     >
       <Grid container spacing={4}>
-        {/* SECCIÓN PRINCIPAL (80%) */}
+        {/* SECCIÓN PRINCIPAL */}
         <Grid size={{ xs: 12, md: 8 }}>
           <Grid
             container
@@ -42,7 +55,9 @@ const ProfileMain = ({ usuario }) => {
               size={{ xs: 12, md: 5 }}
               sx={{
                 display: "flex",
+                flexDirection: "column",
                 justifyContent: "center",
+                alignItems: "center",
                 mb: { xs: 2, md: 0 },
               }}
             >
@@ -55,6 +70,38 @@ const ProfileMain = ({ usuario }) => {
                   border: `5px solid ${PRIMARY_PINK}`,
                   boxShadow: "0 4px 10px rgba(0,0,0,0.15)",
                 }}
+              />
+
+              {/* Botón para subir o actualizar imagen */}
+              <Button
+                variant='contained'
+                onClick={() => fileInputRef.current.click()}
+                sx={{
+                  mt: 2,
+                  bgcolor: PRIMARY_PINK,
+                  color: "white",
+                  borderRadius: "20px",
+                  px: 3,
+                  py: 1,
+                  fontWeight: 600,
+                  textTransform: "none",
+                  boxShadow: "0 4px 10px rgba(229, 56, 136, 0.3)",
+                  "&:hover": {
+                    bgcolor: "#d12d77",
+                    boxShadow: "0 4px 14px rgba(229, 56, 136, 0.4)",
+                  },
+                }}
+              >
+                {usuario?.profileImage ? "Actualizar imagen" : "Cargar imagen"}
+              </Button>
+
+              {/* Input oculto */}
+              <input
+                type='file'
+                accept='image/*'
+                ref={fileInputRef}
+                onChange={handleImageUpload}
+                style={{ display: "none" }}
               />
             </Grid>
 
@@ -92,7 +139,6 @@ const ProfileMain = ({ usuario }) => {
 
               <Divider sx={{ my: 3 }} />
 
-              {/* Frase personal */}
               <Typography
                 variant='body1'
                 sx={{
@@ -109,8 +155,8 @@ const ProfileMain = ({ usuario }) => {
           </Grid>
         </Grid>
 
-        {/* SECCIÓN LATERAL (20%) */}
-        {usuario.subscriptionDetails && (
+        {/* SECCIÓN LATERAL */}
+        {usuario?.subscriptionDetails && (
           <Grid size={{ xs: 12, md: 4 }}>
             <Paper
               elevation={0}

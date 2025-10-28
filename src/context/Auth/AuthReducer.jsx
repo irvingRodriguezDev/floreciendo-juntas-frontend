@@ -45,9 +45,10 @@ export default (state, action) => {
     case types.USER_CHANGEPHOTO:
       return {
         ...state,
-        autenticado: true,
-        cargando: false,
-        success: true,
+        usuario: {
+          ...state.usuario,
+          profileImage: action.payload.profileImage,
+        },
       };
     case types.LOGIN_ERROR:
       return {

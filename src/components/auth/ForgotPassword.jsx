@@ -183,6 +183,7 @@ const ForgotPassword = () => {
                         name='email'
                         fullWidth
                         variant='outlined'
+                        autoComplete='off'
                         placeholder='tu.correo@ejemplo.com'
                         value={values.email}
                         onChange={handleChange}
@@ -201,6 +202,7 @@ const ForgotPassword = () => {
                         name='password'
                         fullWidth
                         variant='outlined'
+                        autoComplete='off'
                         placeholder='**********'
                         value={values.password}
                         onChange={handleChange}
@@ -218,6 +220,7 @@ const ForgotPassword = () => {
                         name='passwordConfirmation'
                         fullWidth
                         variant='outlined'
+                        autoComplete='off'
                         placeholder='**********'
                         value={values.passwordConfirmation}
                         onChange={handleChange}

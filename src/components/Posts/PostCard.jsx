@@ -106,8 +106,8 @@ const PostItem = ({ post }) => {
         {/* Header */}
         <Stack direction='row' alignItems='center' spacing={2} mb={1.5}>
           <Avatar
-            alt={post.author.name}
-            src={post.author.profileImage || "/static/images/avatar/1.jpg"}
+            alt={post.author?.name}
+            src={post.author?.profileImage || "/static/images/avatar/1.jpg"}
             sx={{
               width: 48,
               height: 48,

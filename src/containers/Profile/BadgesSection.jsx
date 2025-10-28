@@ -19,7 +19,6 @@ const BadgesSection = () => {
   //   name: `Experta en Nivel ${i + 1}`,
   //   description: `Completado el módulo avanzado de Técnicas de Uñas ${i + 1}.`,
   // }));
-  console.log(coursesCompleted, "los cursos completados");
 
   return (
     <Box

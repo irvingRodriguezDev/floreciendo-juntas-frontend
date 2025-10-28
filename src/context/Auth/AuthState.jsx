@@ -1,13 +1,14 @@
-import React, { useCallback, useReducer } from "react";
+import React, { useCallback, useEffect, useReducer } from "react";
 import AuthContext from "./AuthContext";
 import AuthReducer from "./AuthReducer";
 import MethodGet, { MethodPost, MethodPut } from "../../config/Service";
 import headerConfig from "../../config/imageHeader";
 /**Importar componente token headers */
 import tokenAuth from "../../config/TokenAuth";
-
+import { initSocket, getSocket } from "../../socket";
 import { SHOW_ERRORS_API, types } from "../../types";
 import Swal from "sweetalert2";
+import clienteAxios from "../../config/Axios";
 const AuthState = (props) => {
   const initialState = {
     token: localStorage.getItem("token"),
@@ -21,8 +22,28 @@ const AuthState = (props) => {
     all_users: [],
     cargando: true,
   };
-
   const [state, dispatch] = useReducer(AuthReducer, initialState);
+  const token = localStorage.getItem("token");
+  const socket = initSocket(token);
+  useEffect(() => {
+    if (!socket || !state.usuario) return;
+
+    // ---- Escuchar el evento de actualización de la foto ----
+    socket.on("profileImageUpdated", (data) => {
+      // Solo actualizar si corresponde al usuario actual
+      if (data.userId === state.usuario.id) {
+        dispatch({
+          type: types.USER_CHANGEPHOTO,
+          payload: { profileImage: data.profileImage },
+        });
+      }
+    });
+
+    // Cleanup al desmontar
+    return () => {
+      socket.off("profileImageUpdated");
+    };
+  }, [socket, state.usuario]);
 
   const usuarioAutenticado = async () => {
     // Inicia la carga
@@ -207,37 +228,26 @@ const AuthState = (props) => {
       });
   };
 
-  //Cambiar la foto de perfil
-  // const UpdateProfileImage = (data) => {
-  //   const id_user = localStorage.getItem("user_id");
-  //   let url = `updateImageClient/${id_user}`;
-  //   MethodPost(url, data)
-  //     .then((res) => {
-  //       // console.log("Actualizó", res.data.data);
-  //       dispatch({
-  //         type: UPDATE_IMAGE_USER,
-  //         payload: res.data.data,
-  //       });
-  //     })
-  //     .catch((error) => {
-  //       console.log(error);
-  //     });
-  // };
-
   //Cambiar Imagen de Perfil
-  const ChangePhoto = (datos) => {
-    let url = "/admin/auth/update-profile-image";
+  const ChangePhoto = (file) => {
+    const url = "/auth/uploadProfileImage";
     const formData = new FormData();
-    formData.append("profileImage", datos.image);
-    MethodPut(url, formData, { headerConfig })
+    formData.append("file", file); // 👈 correcto
+
+    clienteAxios
+      .post(url, formData, {
+        // 👈 usa formData aquí
+        headers: { "Content-Type": "multipart/form-data" },
+      })
       .then((res) => {
         Swal.fire({
-          title: "Usuario!!",
+          title: "Correcto!!",
           text: res.data.message,
           timer: 3000,
           showConfirmButton: false,
           icon: "success",
         });
+
         dispatch({
           type: types.USER_CHANGEPHOTO,
           payload: res.data,
@@ -247,8 +257,9 @@ const AuthState = (props) => {
         Swal.fire({
           title: "Error",
           icon: "error",
-          text: error.response.data.message,
+          text: error?.response?.data?.message || "No se pudo subir la imagen",
         });
+
         dispatch({
           type: SHOW_ERRORS_API,
         });

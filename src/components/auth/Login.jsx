@@ -233,6 +233,7 @@ const Login = () => {
                           fullWidth
                           name='email'
                           placeholder='ejemplo@email.com'
+                          autoComplete='off'
                           value={values.email}
                           onChange={handleChange}
                           onBlur={handleBlur}
@@ -250,6 +251,7 @@ const Login = () => {
                           type='password'
                           variant='outlined'
                           fullWidth
+                          autoComplete='off'
                           name='password'
                           value={values.password}
                           onChange={handleChange}
