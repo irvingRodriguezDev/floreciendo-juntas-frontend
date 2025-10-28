@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext, useEffect } from "react";
 import {
   Box,
   Typography,
@@ -11,43 +11,20 @@ import {
   useTheme,
 } from "@mui/material";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
-
+import EventsContext from "../../context/Events/EventsContext";
+import FormatDate from "../../utils/FormatDate";
+import { Link } from "react-router-dom";
 // Datos de ejemplo para los eventos
-const events = [
-  {
-    id: 1,
-    title: "Workshop de Nail Art 3D: Flores que Enamoran",
-    date: "10 Oct 2025",
-    author: "Mentora Ana S.",
-    image:
-      "https://i.pinimg.com/1200x/ee/79/a9/ee79a90d29fad35a96c8e6cffde03602.jpg", // Reemplaza con tu imagen de evento
-    bgColor: "#f8d22d", // Amarillo del fondo de la imagen
-  },
-  {
-    id: 2,
-    title: "Webinar Gratuito: Precios y Costos para tu Negocio",
-    date: "25 Sep 2025",
-    author: "Mentora Sofía R.",
-    image:
-      "https://i.pinimg.com/736x/1a/69/e4/1a69e478ac737cea0b793a02bf473dba.jpg", // Reemplaza con tu imagen de evento
-    bgColor: "#2b91d9", // Azul del fondo de la imagen
-  },
-  {
-    id: 3,
-    title: "Masterclass: Últimas Tendencias en Polygel",
-    date: "12 Sep 2025",
-    author: "Mentora Camila G.",
-    image:
-      "https://i.pinimg.com/1200x/2f/14/99/2f14995aa38ad7204489eec442b0ad85.jpg", // Reemplaza con tu imagen de evento
-    bgColor: "#33a362", // Verde del fondo de la imagen
-  },
-];
 
 const LatestEventsSection = () => {
+  const { events, getLatestEvents } = useContext(EventsContext);
   const theme = useTheme();
-
+  useEffect(() => {
+    getLatestEvents();
+  }, []);
   const primaryPink = "#e91e63";
   const lightYellow = "#ffecb3";
+  console.log(events);
 
   return (
     <Box
@@ -162,14 +139,11 @@ const LatestEventsSection = () => {
                     color='text.secondary'
                     sx={{ mr: 2 }}
                   >
-                    {event.date}
+                    {FormatDate(event.startDate)}
                   </Typography>
-                  <Typography
-                    variant='caption'
-                    color='#E53888'
-                    sx={{ fontWeight: 600 }}
-                  >
-                    | Por {event.author}
+                  <br />
+                  <Typography variant='caption' sx={{ fontWeight: 100 }}>
+                    {event.location}
                   </Typography>
                 </Box>
 
@@ -187,22 +161,24 @@ const LatestEventsSection = () => {
                 </Typography>
 
                 {/* Botón de Leer / Ver Evento */}
-                <Button
-                  variant='text'
-                  sx={{
-                    color: "#E53888", // Color amarillo para el texto del botón
-                    fontWeight: 600,
-                    alignSelf: "flex-start",
-                    padding: 0,
-                    textTransform: "none",
-                    "&:hover": {
-                      backgroundColor: "transparent",
-                      textDecoration: "none",
-                    },
-                  }}
-                >
-                  Continuar Leyendo
-                </Button>
+                <Link to={`/detalle-evento/${event.id}`}>
+                  <Button
+                    variant='text'
+                    sx={{
+                      color: "#E53888", // Color amarillo para el texto del botón
+                      fontWeight: 600,
+                      alignSelf: "flex-start",
+                      padding: 0,
+                      textTransform: "none",
+                      "&:hover": {
+                        backgroundColor: "transparent",
+                        textDecoration: "none",
+                      },
+                    }}
+                  >
+                    Más detalles
+                  </Button>
+                </Link>
               </CardContent>
             </Card>
           </Grid>
@@ -211,23 +187,25 @@ const LatestEventsSection = () => {
 
       {/* --- Botón de Ver Todos los Eventos --- */}
       <Box sx={{ textAlign: "center", mt: 6 }}>
-        <Button
-          variant='contained'
-          endIcon={<ArrowForwardIcon />}
-          sx={{
-            backgroundColor: "#E53888", // Rosa principal
-            color: "white",
-            "&:hover": {
-              backgroundColor: "#E53888",
-            },
-            fontWeight: 600,
-            padding: "12px 30px",
-            borderRadius: "8px",
-            textTransform: "none",
-          }}
-        >
-          Ver Todos los Eventos
-        </Button>
+        <Link to='/eventos'>
+          <Button
+            variant='contained'
+            endIcon={<ArrowForwardIcon />}
+            sx={{
+              backgroundColor: "#E53888", // Rosa principal
+              color: "white",
+              "&:hover": {
+                backgroundColor: "#E53888",
+              },
+              fontWeight: 600,
+              padding: "12px 30px",
+              borderRadius: "8px",
+              textTransform: "none",
+            }}
+          >
+            Ver Todos los Eventos
+          </Button>
+        </Link>
       </Box>
     </Box>
   );

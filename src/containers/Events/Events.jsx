@@ -1,44 +1,16 @@
-import React from "react";
+import React, { useContext, useEffect } from "react";
 import Layout from "../../components/Layout/Layout";
 import BannerEvents from "../../components/events/BannerEvents";
 import CardEvent from "../../components/events/CardEvent";
 import { Grid } from "@mui/material";
 import EventsBanner from "../../components/Banner/EventsBanner";
+import EventsContext from "../../context/Events/EventsContext";
 const Events = () => {
-  const events = [
-    {
-      img: "https://histudy.pixcelsthemes.com/livepreview/histudy/assets/images/event/grid-type-01.jpg",
-      title: "International Education Fair 2024",
-      date: "11 Jan 2024",
-      time: "8:00 am - 5:00 pm",
-      location: "IAC Building",
-      id: 1,
-    },
-    {
-      img: "https://histudy.pixcelsthemes.com/livepreview/histudy/assets/images/event/grid-type-02.jpg",
-      title: "International Education Fair 2024",
-      date: "15 Feb 2024",
-      time: "8:00 am - 5:00 pm",
-      location: "IAC Building",
-      id: 2,
-    },
-    {
-      img: "https://histudy.pixcelsthemes.com/livepreview/histudy/assets/images/event/grid-type-03.jpg",
-      title: "International Education Fair 2024",
-      date: "12 Jan 2024",
-      time: "8:00 am - 5:00 pm",
-      location: "IAC Building",
-      id: 3,
-    },
-    {
-      img: "https://histudy.pixcelsthemes.com/livepreview/histudy/assets/images/event/grid-type-05.jpg",
-      title: "International Education Fair 2024",
-      date: "19 Jan 2024",
-      time: "8:00 am - 5:00 pm",
-      location: "IAC Building",
-      id: 4,
-    },
-  ];
+  const { getAllEvents, events } = useContext(EventsContext);
+  useEffect(() => {
+    getAllEvents();
+  }, []);
+
   return (
     <Layout>
       <Grid

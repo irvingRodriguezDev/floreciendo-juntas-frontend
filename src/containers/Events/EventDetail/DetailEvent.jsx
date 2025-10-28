@@ -1,3 +1,4 @@
+import React, { useContext, useEffect } from "react";
 import {
   Box,
   Button,
@@ -10,11 +11,24 @@ import {
   Typography,
   Paper,
 } from "@mui/material";
-import React from "react";
 import Layout from "../../../components/Layout/Layout";
 import CardEvent from "../../../components/events/CardEvent";
-
+import EventsContext from "../../../context/Events/EventsContext";
+import { useParams } from "react-router-dom";
+import FormatDate from "../../../utils/FormatDate";
+import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
+import PlaceIcon from "@mui/icons-material/Place";
+import AccessTimeIcon from "@mui/icons-material/AccessTime";
+import MonetizationOnIcon from "@mui/icons-material/MonetizationOn";
+import { formatMexicanCurrency } from "../../../utils/FormatCurrency";
 const DetailEvent = () => {
+  const { id } = useParams();
+  const { event, getEventById } = useContext(EventsContext);
+
+  useEffect(() => {
+    getEventById(id);
+  }, [id]);
+
   const similarEvents = [
     {
       img: "https://histudy.pixcelsthemes.com/livepreview/histudy/assets/images/event/grid-type-01.jpg",
@@ -36,187 +50,239 @@ const DetailEvent = () => {
 
   return (
     <Layout>
-      {/* Hero compacto */}
-      <Box sx={{ position: "relative", height: "30vh", mt: 8 }}>
-        <CardMedia
-          component='img'
-          image='https://histudy.pixcelsthemes.com/livepreview/histudy/assets/images/event/grid-type-01.jpg'
-          alt='Evento'
-          sx={{
-            height: "100%",
-            width: "100%",
-            objectFit: "cover",
-            borderRadius: 0,
-            filter: "brightness(65%)",
-          }}
-        />
-        <Box
-          sx={{
-            position: "absolute",
-            bottom: 20,
-            left: "50%",
-            transform: "translateX(-50%)",
-            textAlign: "center",
-            color: "white",
-          }}
-        >
-          <Typography variant='h3' fontWeight='bold'>
-            Nombre del evento
-          </Typography>
-          <Typography variant='subtitle1' sx={{ mt: 1 }}>
-            11 de Enero 2024 | IAC Building
-          </Typography>
-        </Box>
-      </Box>
-
-      {/* Contenido principal */}
-      <Grid container spacing={4} justifyContent='center' sx={{ mt: 4 }}>
-        {/* Columna izquierda */}
-        <Grid item xs={12} md={8}>
-          {/* Sobre el evento */}
-          <Paper
-            elevation={0}
-            sx={{
-              mb: 4,
-              borderRadius: 2,
-              p: 3,
-              border: "1px solid #eee",
-              bgcolor: "#fafafa",
-            }}
-          >
-            <Typography variant='h5' fontWeight='bold' gutterBottom>
-              Sobre el evento
-            </Typography>
-            <Typography variant='body1' color='text.secondary'>
-              Este evento conecta a estudiantes, universidades y empresas de
-              tecnología. Habrá más de 30 expositores, talleres prácticos y
-              ponencias internacionales.
-            </Typography>
-          </Paper>
-
-          {/* Agenda */}
-          <Paper
-            elevation={0}
-            sx={{
-              mb: 4,
-              borderRadius: 2,
-              p: 3,
-              border: "1px solid #eee",
-            }}
-          >
-            <Typography variant='h5' fontWeight='bold' gutterBottom>
-              Agenda
-            </Typography>
-            <Typography variant='body2' color='text.secondary'>
-              📌 8:00 am - Registro <br />
-              📌 9:00 am - Conferencia de apertura <br />
-              📌 11:00 am - Talleres <br />
-              📌 2:00 pm - Networking <br />
-              📌 5:00 pm - Clausura
-            </Typography>
-          </Paper>
-
-          {/* Eventos similares */}
-          <Divider sx={{ my: 4 }}>
-            <Chip
-              label='Eventos Similares'
-              sx={{ fontWeight: "bold", px: 2 }}
-              color='secondary'
-              variant='outlined'
-            />
-          </Divider>
-
-          <Grid container spacing={3}>
-            {similarEvents.map((e) => (
-              <Grid item xs={12} sm={6} key={e.id}>
-                <CardEvent event={e} />
-              </Grid>
-            ))}
-          </Grid>
-
-          <Box textAlign='center' sx={{ mt: 3 }}>
-            <Button
-              variant='contained'
-              size='large'
-              sx={{
-                borderRadius: 3,
-                textTransform: "none",
-                fontWeight: "bold",
-              }}
-            >
-              Ver más eventos
-            </Button>
-          </Box>
-        </Grid>
-
-        {/* Columna derecha sticky */}
-        <Grid item xs={12} md={4}>
+      {event && (
+        <>
+          {/* HERO con degradado */}
           <Box
             sx={{
-              position: "sticky",
-              top: 100,
+              width: "100%",
+              minHeight: "100vh",
               display: "flex",
               flexDirection: "column",
-              gap: 3,
+              alignItems: "center",
+              py: { xs: 4, md: 8 },
+              px: { xs: 2, md: 8 },
+              marginTop: { xs: 12, md: 10 },
             }}
           >
-            {/* Info general */}
-            <Paper
-              elevation={0}
+            {/* Imagen destacada */}
+            <Box
+              component='img'
+              src={event.image}
+              alt={event.title}
               sx={{
-                p: 3,
-                borderRadius: 2,
-                border: "1px solid #eee",
-                bgcolor: "#fff",
+                width: "100%",
+                maxWidth: "1200px",
+                height: { xs: 250, md: 400 },
+                objectFit: "cover",
+                borderRadius: "20px",
+                boxShadow: "0 8px 24px rgba(229, 56, 136, 0.2)",
               }}
-            >
-              <Typography
-                variant='h6'
-                fontWeight='bold'
-                gutterBottom
-                textAlign='center'
-              >
-                Información del Evento
-              </Typography>
-              <Typography variant='body2' color='text.secondary'>
-                📍 IAC Building
-              </Typography>
-              <Typography variant='body2' color='text.secondary'>
-                📅 11 Enero 2024
-              </Typography>
-              <Typography variant='body2' color='text.secondary'>
-                🕒 8:00 am - 5:00 pm
-              </Typography>
-              <Button
-                variant='contained'
-                fullWidth
-                sx={{ mt: 2, borderRadius: 2, textTransform: "none" }}
-              >
-                Registrarme
-              </Button>
-            </Paper>
+            />
 
-            {/* Extra info / recomendaciones */}
-            <Paper
-              elevation={0}
+            {/* Contenido principal */}
+            <Grid
+              container
+              spacing={4}
               sx={{
-                p: 3,
-                borderRadius: 2,
-                border: "1px solid #eee",
-                bgcolor: "#fafafa",
+                mt: 4,
+                maxWidth: "1200px",
               }}
             >
-              <Typography variant='subtitle1' fontWeight='bold' gutterBottom>
-                Recomendaciones
-              </Typography>
-              <Typography variant='body2' color='text.secondary'>
-                ✅ Llegar 30 min antes <br />
-                ✅ Traer identificación <br />✅ Usar ropa cómoda
-              </Typography>
-            </Paper>
+              {/* Información principal */}
+              <Grid size={{ xs: 12, md: 8 }}>
+                <Typography
+                  variant='h3'
+                  sx={{
+                    fontWeight: "bold",
+                    color: "#E53888",
+                    mb: 2,
+                  }}
+                >
+                  {event.title}
+                </Typography>
+
+                <Typography
+                  variant='body1'
+                  sx={{ color: "#444", mb: 3, lineHeight: 1.7 }}
+                >
+                  {event.description}
+                </Typography>
+
+                <Divider sx={{ my: 3 }} />
+
+                {/* Info de fecha, hora y lugar */}
+                <Box
+                  sx={{ display: "flex", flexDirection: "column", gap: 1.5 }}
+                >
+                  {event.map && (
+                    <>
+                      {" "}
+                      <Typography
+                        variant='h5'
+                        sx={{
+                          textAlign: "center",
+                          fontWeight: "bold",
+                          color: "#E53888",
+                        }}
+                      >
+                        📍 Ubicación del evento
+                      </Typography>
+                      <Box
+                        sx={{
+                          mt: 6,
+                          width: "100%",
+                          maxWidth: "1000px",
+                          mx: "auto",
+                          borderRadius: "16px",
+                          overflow: "hidden",
+                          border: "1px solid #f1c4d9",
+                          boxShadow: "0 8px 20px rgba(229, 56, 136, 0.1)",
+                          bgcolor: "white",
+                          position: "relative",
+                        }}
+                      >
+                        <Box
+                          sx={{
+                            position: "relative",
+                            width: "100%",
+                            height: { xs: 300, md: 450 },
+                            "& iframe": {
+                              border: 0,
+                              width: "100% !important",
+                              height: "100% !important",
+                              borderRadius: "12px",
+                            },
+                          }}
+                          dangerouslySetInnerHTML={{ __html: event.map }}
+                        />
+                      </Box>
+                    </>
+                  )}
+                </Box>
+              </Grid>
+
+              <Grid
+                item
+                size={{ xs: 12, md: 4 }}
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "start",
+                  alignItems: { xs: "center", md: "flex-start" },
+                  gap: 2,
+                }}
+              >
+                <Typography
+                  variant='h6'
+                  sx={{
+                    fontWeight: "bold",
+                    color: "#E53888",
+                    textAlign: { xs: "center", md: "left" },
+                  }}
+                >
+                  ¡Acompáñanos en este evento especial! 🌷
+                </Typography>
+                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                  <CalendarTodayIcon sx={{ color: "#E53888" }} />
+                  <Typography variant='body1' color='#555'>
+                    {FormatDate(event.startDate)}{" "}
+                    {event.endDate ? "- " + FormatDate(event.endDate) : ""}
+                  </Typography>
+                </Box>
+
+                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                  <AccessTimeIcon sx={{ color: "#E53888" }} />
+                  <Typography variant='body1' color='#555'>
+                    {event.time}
+                  </Typography>
+                </Box>
+
+                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                  <PlaceIcon sx={{ color: "#E53888" }} />
+                  <Typography variant='body1' color='#555'>
+                    {event.location}
+                  </Typography>
+                </Box>
+
+                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                  <MonetizationOnIcon sx={{ color: "#E53888" }} />
+                  <Typography variant='body1' color='#555'>
+                    {formatMexicanCurrency(event.price)} MXN
+                  </Typography>
+                </Box>
+
+                <Typography
+                  variant='body2'
+                  sx={{
+                    color: "#555",
+                    textAlign: { xs: "center", md: "left" },
+                  }}
+                >
+                  Reserva tu lugar y sé parte de esta experiencia única donde
+                  floreceremos juntas 💖
+                </Typography>
+
+                <Button
+                  variant='contained'
+                  sx={{
+                    bgcolor: "#E53888",
+                    color: "white",
+                    borderRadius: "50px",
+                    px: 4,
+                    py: 1.2,
+                    textTransform: "none",
+                    fontSize: "1rem",
+                    fontWeight: "bold",
+                    "&:hover": {
+                      bgcolor: "#d12a74",
+                    },
+                  }}
+                >
+                  Comprar boleto
+                </Button>
+              </Grid>
+            </Grid>
+            {/* Sección del mapa */}
           </Box>
-        </Grid>
-      </Grid>
+          {/* Contenido principal */}
+          <Grid
+            container
+            spacing={4}
+            justifyContent='center'
+            sx={{ mt: { xs: 3, md: 6 }, mb: 6, px: { xs: 2, md: 6 } }}
+          >
+            {/* Columna izquierda */}
+            <Grid size={{ xs: 12, md: 8 }}>
+              {/* Descripción */}
+
+              {/* Eventos similares */}
+              <Divider sx={{ my: 4 }}>
+                <Chip
+                  label='Eventos Similares'
+                  sx={{
+                    fontWeight: "bold",
+                    px: 2,
+                    color: "#E53888",
+                    borderColor: "#E53888",
+                  }}
+                  variant='outlined'
+                />
+              </Divider>
+
+              <Grid container spacing={3}>
+                {similarEvents.map((e) => (
+                  <Grid item xs={12} sm={6} key={e.id}>
+                    <CardEvent event={e} />
+                  </Grid>
+                ))}
+              </Grid>
+            </Grid>
+
+            {/* Columna derecha */}
+          </Grid>
+        </>
+      )}
     </Layout>
   );
 };

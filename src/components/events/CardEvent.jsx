@@ -33,7 +33,6 @@ const CardEvent = ({ event }) => {
         overflow: "hidden",
         boxShadow: "0 6px 18px rgba(0,0,0,0.1)",
         "&:hover": {
-          transform: "translateY(-6px)",
           boxShadow: "0 12px 24px rgba(0,0,0,0.2)",
         },
       }}
@@ -43,7 +42,7 @@ const CardEvent = ({ event }) => {
         <CardMedia
           component='img'
           height='220'
-          image={event.img}
+          image={event.image}
           alt={event.title}
         />
         <Box
@@ -103,7 +102,8 @@ const CardEvent = ({ event }) => {
         <Link to={`/detalle-evento/${event.id}`}>
           <Button
             variant='contained'
-            size='medium'
+            size='large'
+            fullWidth
             sx={{
               color: "white",
               textTransform: "none",
@@ -114,7 +114,7 @@ const CardEvent = ({ event }) => {
               },
             }}
           >
-            Boletos
+            Comprar Boletos
           </Button>
         </Link>
       </CardContent>
