@@ -1,14 +1,13 @@
-import React, { useCallback, useEffect, useReducer } from "react";
+import React, { useCallback, useEffect, useReducer, useContext } from "react";
 import AuthContext from "./AuthContext";
 import AuthReducer from "./AuthReducer";
-import MethodGet, { MethodPost, MethodPut } from "../../config/Service";
-import headerConfig from "../../config/imageHeader";
-/**Importar componente token headers */
+import MethodGet, { MethodPost } from "../../config/Service";
 import tokenAuth from "../../config/TokenAuth";
-import { initSocket, getSocket } from "../../socket";
+import { initSocket } from "../../socket";
 import { SHOW_ERRORS_API, types } from "../../types";
 import Swal from "sweetalert2";
 import clienteAxios from "../../config/Axios";
+
 const AuthState = (props) => {
   const initialState = {
     token: localStorage.getItem("token"),
@@ -22,39 +21,50 @@ const AuthState = (props) => {
     all_users: [],
     cargando: true,
   };
+
   const [state, dispatch] = useReducer(AuthReducer, initialState);
+
   const token = localStorage.getItem("token");
   const socket = initSocket(token);
+
+  /**
+   * 🔹 Forzar recarga de imagen para evitar cache del navegador
+   */
+  const getProfileImageUrl = (url) => {
+    if (!url) return null;
+    const cleanUrl = url.replace(/\\"/g, "").replace(/^"|"$/g, "").trim();
+    return `${cleanUrl}?t=${new Date().getTime()}`; // forzar reload
+  };
+
+  // 🔹 Escuchar evento de actualización de imagen
   useEffect(() => {
     if (!socket || !state.usuario) return;
 
-    // ---- Escuchar el evento de actualización de la foto ----
-    socket.on("profileImageUpdated", (data) => {
-      // Solo actualizar si corresponde al usuario actual
+    const handleProfileImageUpdated = (data) => {
       if (data.userId === state.usuario.id) {
         dispatch({
           type: types.USER_CHANGEPHOTO,
-          payload: { profileImage: data.profileImage },
+          payload: { profileImage: getProfileImageUrl(data.profileImage) },
         });
       }
-    });
+    };
 
-    // Cleanup al desmontar
+    socket.on("profileImageUpdated", handleProfileImageUpdated);
+
     return () => {
-      socket.off("profileImageUpdated");
+      socket.off("profileImageUpdated", handleProfileImageUpdated);
     };
   }, [socket, state.usuario]);
 
+  /**
+   * 🔹 Obtener usuario autenticado
+   */
   const usuarioAutenticado = async () => {
-    // Inicia la carga
     dispatch({ type: types.INICIO_AUTENTICACION });
 
     const token = localStorage.getItem("token");
-
     if (!token) {
-      // 1. No hay token. Se despacha el error.
       dispatch({ type: types.LOGIN_ERROR });
-      // 2. El finally garantiza FIN_AUTENTICACION.
       return false;
     }
 
@@ -62,281 +72,218 @@ const AuthState = (props) => {
 
     try {
       const { data } = await MethodGet("/auth/me");
-      // 3. Éxito. Se despacha el usuario.
-      dispatch({ type: types.OBTENER_USUARIO, payload: data.user });
+      dispatch({
+        type: types.OBTENER_USUARIO,
+        payload: {
+          ...data.user,
+          profileImage: getProfileImageUrl(data.user.profileImage),
+        },
+      });
       return true;
     } catch (error) {
-      // 4. Fallo. Se despacha el error.
       dispatch({ type: types.LOGIN_ERROR });
       return false;
     } finally {
-      // 5. ¡Garantía! Siempre se ejecuta, poniendo cargando: false.
       dispatch({ type: types.FIN_AUTENTICACION });
     }
   };
-  //cuando el usuario inicia sesion
+
+  /**
+   * 🔹 Iniciar sesión
+   */
   const iniciarSesion = async (datos) => {
-    let url = "/auth/login";
     try {
-      const res = await MethodPost(url, datos);
-      //Guardar token y datos del usuario
+      const res = await MethodPost("/auth/login", datos);
       localStorage.setItem("token", res.data.token);
-      //Dispatch para actualizar el estado inmediatamente
+
       dispatch({
         type: types.LOGIN_EXITOSO,
         payload: res.data,
       });
-      //Obtener y establecer usuario autenticado
-      await usuarioAutenticado();
 
-      return true; //Indicador de éxito
+      await usuarioAutenticado();
+      return true;
     } catch (error) {
       Swal.fire({
         title: "Error",
         icon: "error",
         timer: 2000,
         showConfirmButton: false,
-        text: error.response.data.msg,
+        text: error.response?.data?.msg || "Error al iniciar sesión",
       });
-      dispatch({
-        type: SHOW_ERRORS_API,
-      });
-      return false; // Indicador de fallo
+      dispatch({ type: SHOW_ERRORS_API });
+      return false;
     }
   };
 
-  const registerUser = (data) => {
-    let url = "/auth/register";
-    MethodPost(url, data)
-      .then((res) => {
-        const token = res.data.token;
-        localStorage.setItem("token", token);
-        // Setea el token en Axios inmediatamente
-        tokenAuth(token);
+  /**
+   * 🔹 Registrar usuario
+   */
+  const registerUser = async (data) => {
+    try {
+      const res = await MethodPost("/auth/register", data);
+      const token = res.data.token;
+      localStorage.setItem("token", token);
+      tokenAuth(token);
 
-        dispatch({
-          type: types.REGISTRO_EXITOSO,
-          payload: res.data,
-        });
-
-        Swal.fire({
-          title: "Registrado",
-          text: res.data.msg,
-          icon: "success",
-          timer: 2000,
-          showConfirmButton: false,
-        });
-
-        // Aquí puedes redirigir o recargar usuario
-        // Por ejemplo, para asegurarte que está autenticado:
-        usuarioAutenticado();
-      })
-      .catch((error) => {
-        Swal.fire({
-          title: "Error",
-          text: error.response?.data?.error || "Error al registrar",
-          icon: "error",
-          showConfirmButton: false,
-        });
+      dispatch({
+        type: types.REGISTRO_EXITOSO,
+        payload: res.data,
       });
+
+      Swal.fire({
+        title: "Registrado",
+        text: res.data.msg,
+        icon: "success",
+        timer: 2000,
+        showConfirmButton: false,
+      });
+
+      await usuarioAutenticado();
+    } catch (error) {
+      Swal.fire({
+        title: "Error",
+        text: error.response?.data?.error || "Error al registrar",
+        icon: "error",
+        showConfirmButton: false,
+      });
+    }
   };
 
-  const resetPassword = (data) => {
-    let url = "/auth/reset-password";
-    MethodPost(url, data)
-      .then((res) => {
-        Swal.fire({
-          title: "Actualizada!",
-          text: "La contraseña se ha restablecido correctamente!",
-          icon: "success",
-          timer: 2500,
-          showConfirmButton: false,
-        }).then(function () {
-          window.location = "/iniciar-sesion";
-        });
-      })
-      .catch((error) => {
-        Swal.fire({
-          title: "Error",
-          text: "Ocurrio un error al recuperar la contraseña, intenta más tarde!",
-          icon: "error",
-          timer: 2000,
-          showConfirmButton: false,
-        });
+  /**
+   * 🔹 Cambiar contraseña
+   */
+  const ChangePasswordUser = async (datos) => {
+    try {
+      await MethodPost("/admin/auth/changePassword", datos);
+      Swal.fire({
+        title: "Contraseña!",
+        text: "Modificada Correctamente",
+        icon: "success",
+        timer: 1000,
+        showConfirmButton: false,
       });
+      dispatch({ type: types.USER_CHANGEPASSWORD });
+    } catch (error) {
+      Swal.fire({
+        title: "Error",
+        text: error.response?.data?.message || "Error al cambiar contraseña",
+        icon: "error",
+      });
+      dispatch({ type: SHOW_ERRORS_API });
+    }
   };
 
-  //cuando el usuario Ccambia de contraseña
-  const ChangePasswordUser = (datos) => {
-    let url = "/admin/auth/changePassword";
-    MethodPost(url, datos)
-      .then((res) => {
-        Swal.fire({
-          title: "Contraseña!",
-          text: "Modificada Correctamente",
-          icon: "success",
-          timer: 1000,
-          showConfirmButton: false,
-        });
-        dispatch({
-          type: types.USER_CHANGEPASSWORD,
-        });
-      })
-      .catch((error) => {
-        Swal.fire({
-          title: "Error",
-          text: error.response.data.message,
-          icon: "error",
-        });
-        dispatch({
-          type: SHOW_ERRORS_API,
-        });
-      });
-  };
-
-  //Cambiar la información del Perfil
-  const UpdateUser = (data) => {
+  /**
+   * 🔹 Actualizar información de usuario
+   */
+  const UpdateUser = async (data) => {
     const id_user = localStorage.getItem("user_id");
-    let url = `updateClient/${id_user}`;
-    // console.log("url", url);
-    MethodPost(url, data)
-      .then((res) => {
-        // console.log("Actualizó", res.data.data);
-        dispatch({
-          type: UPDATE_USER,
-          payload: res.data.data,
-        });
-        Swal.fire({
-          icon: "success",
-          title: "Actualizada",
-          text: "La información de usuario se ha actualizado correctamente!",
-          showConfirmButton: false,
-          timer: 1700,
-        }).then(() => {
-          // 🔄 Recargar lista con status=2 después de aprobar
-          usuarioAutenticado();
-        });
-      })
-      .catch((error) => {
-        Swal.fire({
-          icon: "error",
-          title: "Atención",
-          text: error.response.data.message,
-          showConfirmButton: false,
-          timer: 2500,
-        });
+    try {
+      const res = await MethodPost(`updateClient/${id_user}`, data);
+      dispatch({ type: types.UPDATE_USER, payload: res.data.data });
+
+      Swal.fire({
+        icon: "success",
+        title: "Actualizada",
+        text: "La información de usuario se ha actualizado correctamente!",
+        showConfirmButton: false,
+        timer: 1700,
       });
+
+      await usuarioAutenticado();
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: "Atención",
+        text: error.response?.data?.message || "Error al actualizar usuario",
+        showConfirmButton: false,
+        timer: 2500,
+      });
+    }
   };
 
-  //Cambiar Imagen de Perfil
-  const ChangePhoto = (file) => {
-    const url = "/auth/uploadProfileImage";
+  /**
+   * 🔹 Cambiar foto de perfil
+   */
+  const ChangePhoto = async (file) => {
     const formData = new FormData();
-    formData.append("file", file); // 👈 correcto
+    formData.append("file", file);
 
-    clienteAxios
-      .post(url, formData, {
-        // 👈 usa formData aquí
-        headers: { "Content-Type": "multipart/form-data" },
-      })
-      .then((res) => {
-        Swal.fire({
-          title: "Correcto!!",
-          text: res.data.message,
-          timer: 3000,
-          showConfirmButton: false,
-          icon: "success",
-        });
+    try {
+      const res = await clienteAxios.post(
+        "/auth/uploadProfileImage",
+        formData,
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+        }
+      );
 
-        dispatch({
-          type: types.USER_CHANGEPHOTO,
-          payload: res.data,
-        });
-      })
-      .catch((error) => {
-        Swal.fire({
-          title: "Error",
-          icon: "error",
-          text: error?.response?.data?.message || "No se pudo subir la imagen",
-        });
+      const profileImageUrl = getProfileImageUrl(res.data.profileImage);
 
-        dispatch({
-          type: SHOW_ERRORS_API,
-        });
+      //Dispatch para actualizar estado
+      dispatch({
+        type: types.USER_CHANGEPHOTO,
+        payload: { profileImage: profileImageUrl },
       });
+
+      //Emitir evento a otros clientes
+      socket?.emit("profileImageUpdated", {
+        userId: state.usuario?.id,
+        profileImage: res.data.profileImage,
+      });
+
+      Swal.fire({
+        title: "Correcto!!",
+        text: res.data.msg,
+        timer: 3000,
+        showConfirmButton: false,
+        icon: "success",
+      });
+    } catch (error) {
+      Swal.fire({
+        title: "Error",
+        icon: "error",
+        text: error?.response?.data?.message || "No se pudo subir la imagen",
+      });
+      dispatch({ type: SHOW_ERRORS_API });
+    }
   };
 
+  /**
+   * 🔹 Cerrar sesión
+   */
   const cerrarSesion = (navigate) => {
-    // Limpia cualquier dato del usuario
     localStorage.removeItem("user_id");
     localStorage.removeItem("token");
-
-    // Actualiza el estado global
     dispatch({ type: types.CERRAR_SESION });
-
-    // Redirige a la pantalla principal o de login
     navigate("/", { replace: true });
   };
 
-  const eliminarCuenta = (id) => {
-    Swal.fire({
-      title: "Eliminar mi cuenta",
-      allowOutsideClick: false,
-      html: `
-      <label>Ingresa el texto <b>Eliminar mi cuenta</b></label>
-      <input type="text" id="delete" class="swal2-input" placeholder="Eliminar mi cuenta">`,
-      confirmButtonText: "Confirmar",
-      showCancelButton: true,
-      cancelButtonColor: "#d33",
-      cancelButtonText: "Cancelar",
-      focusConfirm: false,
-      preConfirm: () => {
-        var delete_account = Swal.getPopup().querySelector("#delete").value;
-        if (!delete_account) {
-          Swal.showValidationMessage(
-            `Por favor ingresa ingresa el texto para confirmar`
-          );
-        } else if (delete_account !== "Eliminar mi cuenta") {
-          Swal.showValidationMessage(
-            `El texto ingresado debe ser igual a Eliminar mi cuenta`
-          );
-        }
-        return { delete_account: delete_account };
-      },
-    }).then((result) => {
-      if (result.value) {
-        // console.log(result.value);
-        // delete_account = result.value.delete_account;
-        let url = `/cliente/eliminar/${id}`;
-        const formData = new FormData();
-        formData.append("argument", result.value.delete_account);
-        MethodPost(url, formData)
-          .then((res) => {
-            Swal.fire({
-              icon: "success",
-              title: `Eliminado `,
-              text: "Su cuenta se ha borrado correctamente!",
-              timer: 1500,
-              showConfirmButton: false,
-            });
-            cerrarSesion();
-            // dispatch({
-            //   type: INCREASE_STOCK_PRODUCT,
-            //   payload: res.data,
-            // });
-          })
-          .catch((error) => {
-            Swal.fire({
-              Title: "Error",
-              icon: "error",
-              text: error.response.data.message,
-              timer: 1500,
-              showConfirmButton: false,
-            });
-          });
-      }
-    });
+  /**
+   * 🔹 Resetear contraseña
+   */
+  const resetPassword = async (data) => {
+    try {
+      await MethodPost("/auth/reset-password", data);
+      Swal.fire({
+        title: "Actualizada!",
+        text: "La contraseña se ha restablecido correctamente!",
+        icon: "success",
+        timer: 2500,
+        showConfirmButton: false,
+      }).then(() => (window.location = "/iniciar-sesion"));
+    } catch (error) {
+      Swal.fire({
+        title: "Error",
+        text: "Ocurrió un error al recuperar la contraseña, intenta más tarde!",
+        icon: "error",
+        timer: 2000,
+        showConfirmButton: false,
+      });
+    }
   };
+
   return (
     <AuthContext.Provider
       value={{
@@ -356,10 +303,7 @@ const AuthState = (props) => {
         ChangePasswordUser,
         ChangePhoto,
         resetPassword,
-        eliminarCuenta,
         UpdateUser,
-        // GetUser,
-        // UpdateProfileImage,
       }}
     >
       {props.children}
