@@ -1,7 +1,7 @@
 import { useReducer } from "react";
 import EventsContext from "./EventsContext";
 import EventsReducer from "./EventsReducer";
-import MethodGet from "../../config/Service";
+import MethodGet, { MethodPost } from "../../config/Service";
 import {
   GET_ALL_EVENTS,
   GET_EVENT_BY_ID,
@@ -46,14 +46,27 @@ const EventsState = ({ children }) => {
   };
   const getEventById = (id) => {
     let url = `/events/${id}`;
-    MethodGet(url).then((res) => {
-      dispatch({
-        type: GET_EVENT_BY_ID,
-        payload: res.data,
-      }).catch((error) => {
+    MethodGet(url)
+      .then((res) => {
+        dispatch({
+          type: GET_EVENT_BY_ID,
+          payload: res.data,
+        });
+      })
+      .catch((error) => {
         console.log(error);
       });
-    });
+  };
+
+  const buyTicket = (data) => {
+    let url = `/events/buy/ticket`;
+    MethodPost(url, data)
+      .then((res) => {
+        window.location.href = res.data.url;
+      })
+      .catch((error) => {
+        console.log(error, "ocurrio un error");
+      });
   };
   return (
     <EventsContext.Provider
@@ -63,6 +76,7 @@ const EventsState = ({ children }) => {
         getAllEvents,
         getEventById,
         getLatestEvents,
+        buyTicket,
       }}
     >
       {children}

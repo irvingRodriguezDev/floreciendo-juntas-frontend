@@ -20,6 +20,7 @@ import Home from "../containers/Home/Home";
 import DetailsCourse from "../containers/Courses/Details/DetailsCourse";
 import PinkSpinner from "../components/Loading/PinkSpinner";
 import BySystemId from "../containers/Courses/BySystem/BySystemId";
+import Success from "../Success";
 
 function AppRouter() {
   const { autenticado, usuarioAutenticado, cargando } = useContext(AuthContext);
@@ -43,6 +44,7 @@ function AppRouter() {
     { path: "/el-salon-de-tus-sueños", element: <Saloon /> },
     { path: "/detalle-curso/:id", element: <DetailsCourse /> },
     { path: "/cursos/bysystem/:id", element: <BySystemId /> },
+    { path: "/success", element: <Success /> },
   ];
 
   // Rutas públicas solo para no autenticados

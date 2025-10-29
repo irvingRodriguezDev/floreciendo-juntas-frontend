@@ -14,16 +14,18 @@ import {
 import Layout from "../../../components/Layout/Layout";
 import CardEvent from "../../../components/events/CardEvent";
 import EventsContext from "../../../context/Events/EventsContext";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import FormatDate from "../../../utils/FormatDate";
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import PlaceIcon from "@mui/icons-material/Place";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import MonetizationOnIcon from "@mui/icons-material/MonetizationOn";
 import { formatMexicanCurrency } from "../../../utils/FormatCurrency";
+import AuthContext from "../../../context/Auth/AuthContext";
 const DetailEvent = () => {
   const { id } = useParams();
-  const { event, getEventById } = useContext(EventsContext);
+  const { event, getEventById, buyTicket } = useContext(EventsContext);
+  const { usuario, autenticado } = useContext(AuthContext);
 
   useEffect(() => {
     getEventById(id);
@@ -47,6 +49,9 @@ const DetailEvent = () => {
       id: 2,
     },
   ];
+  const data = {};
+  data.eventId = id;
+  (data.buyerName = usuario.name), (data.buyerEmail = usuario.email);
 
   return (
     <Layout>
@@ -163,7 +168,6 @@ const DetailEvent = () => {
               </Grid>
 
               <Grid
-                item
                 size={{ xs: 12, md: 4 }}
                 sx={{
                   display: "flex",
@@ -222,25 +226,48 @@ const DetailEvent = () => {
                   Reserva tu lugar y sé parte de esta experiencia única donde
                   floreceremos juntas 💖
                 </Typography>
-
-                <Button
-                  variant='contained'
-                  sx={{
-                    bgcolor: "#E53888",
-                    color: "white",
-                    borderRadius: "50px",
-                    px: 4,
-                    py: 1.2,
-                    textTransform: "none",
-                    fontSize: "1rem",
-                    fontWeight: "bold",
-                    "&:hover": {
-                      bgcolor: "#d12a74",
-                    },
-                  }}
-                >
-                  Comprar boleto
-                </Button>
+                {autenticado ? (
+                  <Button
+                    variant='contained'
+                    onClick={() => buyTicket(data)}
+                    sx={{
+                      bgcolor: "#E53888",
+                      color: "white",
+                      borderRadius: "50px",
+                      px: 4,
+                      py: 1.2,
+                      textTransform: "none",
+                      fontSize: "1rem",
+                      fontWeight: "bold",
+                      "&:hover": {
+                        bgcolor: "#d12a74",
+                      },
+                    }}
+                  >
+                    Comprar boleto
+                  </Button>
+                ) : (
+                  <Link to='/iniciar-sesion'>
+                    <Button
+                      variant='contained'
+                      sx={{
+                        bgcolor: "#E53888",
+                        color: "white",
+                        borderRadius: "50px",
+                        px: 4,
+                        py: 1.2,
+                        textTransform: "none",
+                        fontSize: "1rem",
+                        fontWeight: "bold",
+                        "&:hover": {
+                          bgcolor: "#d12a74",
+                        },
+                      }}
+                    >
+                      Iniciar sesión para comprar
+                    </Button>
+                  </Link>
+                )}
               </Grid>
             </Grid>
             {/* Sección del mapa */}
@@ -272,7 +299,7 @@ const DetailEvent = () => {
 
               <Grid container spacing={3}>
                 {similarEvents.map((e) => (
-                  <Grid item xs={12} sm={6} key={e.id}>
+                  <Grid size={{ xs: 12, sm: 6 }} key={e.id}>
                     <CardEvent event={e} />
                   </Grid>
                 ))}
