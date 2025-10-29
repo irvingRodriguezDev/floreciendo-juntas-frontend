@@ -7,6 +7,7 @@ import {
   GET_EVENT_BY_ID,
   GET_LATEST_EVENTS,
 } from "../../types";
+import Swal from "sweetalert2";
 const EventsState = ({ children }) => {
   const initialState = {
     events: [],
@@ -66,6 +67,13 @@ const EventsState = ({ children }) => {
       })
       .catch((error) => {
         console.log(error, "ocurrio un error");
+        Swal.fire({
+          title: "Error",
+          text: error.response.data.message,
+          icon: "error",
+          timer: 2500,
+          showConfirmButton: false,
+        });
       });
   };
   return (

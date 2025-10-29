@@ -50,8 +50,11 @@ const DetailEvent = () => {
     },
   ];
   const data = {};
-  data.eventId = id;
-  (data.buyerName = usuario.name), (data.buyerEmail = usuario.email);
+  if (autenticado) {
+    data.eventId = id;
+    (data.buyerName = usuario.name ?? ""),
+      (data.buyerEmail = usuario.email ?? "");
+  }
 
   return (
     <Layout>

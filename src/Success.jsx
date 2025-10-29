@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import { Box, Typography, Button, CircularProgress } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { io } from "socket.io-client";
+import PinkSpinner from "./components/Loading/PinkSpinner";
 
 const Success = ({ buyerEmail, eventId }) => {
   const navigate = useNavigate();
@@ -50,7 +51,7 @@ const Success = ({ buyerEmail, eventId }) => {
       <Typography variant='body1' fontWeight='bold' sx={{ mb: 3 }}>
         {buyerEmail}
       </Typography>
-      <CircularProgress color='primary' />
+      <PinkSpinner />
       <Typography variant='body2' sx={{ mt: 2 }}>
         Serás redirigido a la página principal en breve...
       </Typography>

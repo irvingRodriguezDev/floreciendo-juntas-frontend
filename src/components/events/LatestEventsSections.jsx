@@ -24,7 +24,6 @@ const LatestEventsSection = () => {
   }, []);
   const primaryPink = "#e91e63";
   const lightYellow = "#ffecb3";
-  console.log(events);
 
   return (
     <Box
