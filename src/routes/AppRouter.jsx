@@ -21,6 +21,7 @@ import DetailsCourse from "../containers/Courses/Details/DetailsCourse";
 import PinkSpinner from "../components/Loading/PinkSpinner";
 import BySystemId from "../containers/Courses/BySystem/BySystemId";
 import Success from "../Success";
+import Error from "../Error";
 
 function AppRouter() {
   const { autenticado, usuarioAutenticado, cargando } = useContext(AuthContext);
@@ -45,6 +46,7 @@ function AppRouter() {
     { path: "/detalle-curso/:id", element: <DetailsCourse /> },
     { path: "/cursos/bysystem/:id", element: <BySystemId /> },
     { path: "/success", element: <Success /> },
+    { path: "/error", element: <Error /> },
   ];
 
   // Rutas públicas solo para no autenticados

@@ -1,4 +1,8 @@
-import { COURSES_COMPLETED, COURSES_COMPLETED_USER } from "../../types";
+import {
+  COURSES_COMPLETED,
+  COURSES_COMPLETED_USER,
+  GET_TICKETS_BY_USER,
+} from "../../types";
 
 export default (state, action) => {
   switch (action.type) {
@@ -13,6 +17,11 @@ export default (state, action) => {
         ...state,
         completed: action.payload,
         cargando: true,
+      };
+    case GET_TICKETS_BY_USER:
+      return {
+        ...state,
+        tickets: action.payload,
       };
 
     default:

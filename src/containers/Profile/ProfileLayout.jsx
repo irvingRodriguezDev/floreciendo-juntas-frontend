@@ -14,6 +14,7 @@ import CertificatesSection from "./CertificatesSection";
 import ProfileBanner from "../../components/Banner/ProfileBanner";
 import AuthContext from "../../context/Auth/AuthContext";
 import { useNavigate } from "react-router-dom";
+import UserTicketsTable from "./UserTicketsTable";
 // Colores primarios para mantener la identidad visual
 const PRIMARY_PINK = "#E53888";
 const LIGHT_PINK = "";
@@ -51,7 +52,7 @@ const ProfileLayout = () => {
         <BadgesSection />
         <Divider sx={{ my: 4, borderColor: PRIMARY_PINK, opacity: 0.8 }} />
         {/* 3. Sección "El Salón de Tus Sueños" */}
-        {/* <DreamSalonSection salonTitle={userData.salonTitle} /> */}
+        <UserTicketsTable />
         <Divider sx={{ my: 4, borderColor: PRIMARY_PINK, opacity: 0.8 }} />
         {/* 4. Sección de Diplomas y Certificados */}
         <CertificatesSection />

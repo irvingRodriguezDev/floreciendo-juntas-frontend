@@ -103,12 +103,21 @@ const DetailEvent = () => {
                   {event.title}
                 </Typography>
 
-                <Typography
-                  variant='body1'
-                  sx={{ color: "#444", mb: 3, lineHeight: 1.7 }}
-                >
-                  {event.description}
-                </Typography>
+                <Box
+                  sx={{
+                    position: "relative",
+                    width: "100%",
+                    height: { xs: 300, md: 450, overflowY: "scroll" },
+
+                    "& iframe": {
+                      border: 0,
+                      width: "100% !important",
+                      height: "100% !important",
+                      borderRadius: "12px",
+                    },
+                  }}
+                  dangerouslySetInnerHTML={{ __html: event.description }}
+                />
 
                 <Divider sx={{ my: 3 }} />
 
