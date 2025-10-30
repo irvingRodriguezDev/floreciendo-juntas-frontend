@@ -1,14 +1,16 @@
-// utils/FormatDate.js
 const FormatDate = (dateString) => {
   if (!dateString) return "Fecha no disponible";
 
-  const date = new Date(dateString);
+  // Quita la Z para que no se interprete como UTC
+  const localDateStr = dateString.replace("Z", "");
+  const date = new Date(localDateStr);
 
-  // Formato: 21 de Octubre de 2025
-  const options = { day: "numeric", month: "long", year: "numeric" };
-  const formatted = date.toLocaleDateString("es-MX", options);
+  const formatted = date.toLocaleDateString("es-MX", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
 
-  // Capitaliza la primera letra del mes
   return formatted.charAt(0).toUpperCase() + formatted.slice(1);
 };
 

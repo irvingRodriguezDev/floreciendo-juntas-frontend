@@ -23,6 +23,7 @@ import MonetizationOnIcon from "@mui/icons-material/MonetizationOn";
 import { formatMexicanCurrency } from "../../../utils/FormatCurrency";
 import AuthContext from "../../../context/Auth/AuthContext";
 import MethodGet from "../../../config/Service";
+import PinkSpinner from "../../../components/Loading/PinkSpinner";
 const DetailEvent = () => {
   const { id } = useParams();
   const { event, getEventById, buyTicket } = useContext(EventsContext);
@@ -51,7 +52,7 @@ const DetailEvent = () => {
 
   return (
     <Layout>
-      {event && (
+      {event ? (
         <>
           {/* HERO con degradado */}
           <Box
@@ -75,7 +76,7 @@ const DetailEvent = () => {
                 width: "100%",
                 maxWidth: "1200px",
                 height: { xs: 250, md: 400 },
-                objectFit: "cover",
+                // objectFit: "cover",
                 borderRadius: "20px",
                 boxShadow: "0 8px 24px rgba(229, 56, 136, 0.2)",
               }}
@@ -107,7 +108,7 @@ const DetailEvent = () => {
                   sx={{
                     position: "relative",
                     width: "100%",
-                    height: { xs: 300, md: 450, overflowY: "scroll" },
+                    height: { xs: 300, md: 650, overflowY: "scroll" },
 
                     "& iframe": {
                       border: 0,
@@ -332,6 +333,8 @@ const DetailEvent = () => {
             {/* Columna derecha */}
           </Grid>
         </>
+      ) : (
+        <PinkSpinner />
       )}
     </Layout>
   );

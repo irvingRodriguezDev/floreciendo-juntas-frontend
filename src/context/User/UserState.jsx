@@ -60,6 +60,10 @@ const UserState = ({ children }) => {
         console.log(error, "ocurrio un error");
       });
   };
+  const downloadTicket = (id) => {
+    let url = `/tickets/download?userId=${id}`;
+    // MethodGet(url).then(())
+  };
 
   return (
     <UserContext.Provider
