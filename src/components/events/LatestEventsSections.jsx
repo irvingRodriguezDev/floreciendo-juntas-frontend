@@ -93,22 +93,29 @@ const LatestEventsSection = () => {
           <Grid size={{ xs: 12, sm: 6, md: 4, lg: 3 }} key={event.id}>
             <Card
               sx={{
-                borderRadius: "16px",
-                boxShadow: theme.shadows[4],
+                borderRadius: "24px",
+                boxShadow: "0 4px 16px rgba(229, 56, 136, 0.15)",
                 overflow: "hidden",
-                minHeight: 450, // Altura para mantener uniformidad
+                minHeight: 460,
                 display: "flex",
                 flexDirection: "column",
+                transition: "transform 0.3s ease, box-shadow 0.3s ease",
+                "&:hover": {
+                  transform: "translateY(-6px)",
+                  boxShadow: "0 8px 24px rgba(229, 56, 136, 0.25)",
+                },
+                backgroundColor: "#fffdfd",
               }}
             >
-              {/* Media con el color de fondo de la imagen */}
+              {/* Imagen con fondo de color */}
               <Box
                 sx={{
-                  backgroundColor: event.bgColor,
-                  height: 250,
+                  background: `linear-gradient(180deg, ${event.bgColor}40 0%, #ffffff 100%)`,
+                  height: 240,
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
+                  position: "relative",
                 }}
               >
                 <CardMedia
@@ -116,66 +123,103 @@ const LatestEventsSection = () => {
                   image={event.image}
                   alt={event.title}
                   sx={{
-                    width: "100%",
-                    height: "100%",
+                    width: "auto",
+                    height: "240px",
                     objectFit: "cover",
+                    borderRadius: "0",
+                    transition: "transform 0.5s ease",
+                    "&:hover": {
+                      transform: "scale(1.05)",
+                    },
+                  }}
+                />
+
+                {/* Detalle floral sutil (pseudo fondo decorativo) */}
+                <Box
+                  sx={{
+                    position: "absolute",
+                    bottom: 0,
+                    right: 0,
+                    width: "100%",
+                    height: "60px",
+                    background:
+                      "linear-gradient(180deg, transparent 0%, rgba(255, 255, 255, 0.8) 100%)",
                   }}
                 />
               </Box>
 
+              {/* Contenido */}
               <CardContent
                 sx={{
                   p: 3,
                   flexGrow: 1,
                   display: "flex",
                   flexDirection: "column",
+                  justifyContent: "space-between",
                 }}
               >
-                {/* Metadatos (Fecha y Autor) */}
+                {/* Fecha y ubicación */}
                 <Box sx={{ mb: 2 }}>
                   <Typography
                     variant='caption'
-                    color='text.secondary'
-                    sx={{ mr: 2 }}
+                    sx={{
+                      color: "#A64D79",
+                      fontWeight: 500,
+                      display: "flex",
+                      alignItems: "center",
+                    }}
                   >
-                    {FormatDate(event.startDate)}
+                    🗓️ {FormatDate(event.startDate)}
                   </Typography>
-                  <br />
-                  <Typography variant='caption' sx={{ fontWeight: 100 }}>
-                    {event.location}
+                  <Typography
+                    variant='caption'
+                    sx={{
+                      color: "#666",
+                      display: "flex",
+                      alignItems: "center",
+                      mt: 0.5,
+                    }}
+                  >
+                    📍 {event.location}
                   </Typography>
                 </Box>
 
-                {/* Título del Evento */}
+                {/* Título del evento */}
                 <Typography
                   variant='h6'
                   sx={{
                     fontWeight: 700,
-                    mb: 1,
-                    lineHeight: 1.3,
-                    flexGrow: 1,
+                    mb: 2,
+                    lineHeight: 1.4,
+                    color: "#333",
+                    textAlign: "justify",
                   }}
                 >
                   {event.title}
                 </Typography>
 
-                {/* Botón de Leer / Ver Evento */}
-                <Link to={`/detalle-evento/${event.id}`}>
+                {/* Botón */}
+                <Link
+                  to={`/detalle-evento/${event.id}`}
+                  style={{ textDecoration: "none" }}
+                >
                   <Button
-                    variant='text'
+                    variant='contained'
+                    fullWidth
                     sx={{
-                      color: "#E53888", // Color amarillo para el texto del botón
+                      backgroundColor: "#E53888",
+                      color: "white",
+                      borderRadius: "30px",
                       fontWeight: 600,
-                      alignSelf: "flex-start",
-                      padding: 0,
                       textTransform: "none",
+                      boxShadow: "0 4px 10px rgba(229, 56, 136, 0.3)",
                       "&:hover": {
-                        backgroundColor: "transparent",
-                        textDecoration: "none",
+                        backgroundColor: "#d4307d",
+                        boxShadow: "0 6px 16px rgba(229, 56, 136, 0.4)",
                       },
                     }}
                   >
-                    Más detalles
+                    🌷 Más detalles del evento
                   </Button>
                 </Link>
               </CardContent>
@@ -193,13 +237,15 @@ const LatestEventsSection = () => {
             sx={{
               backgroundColor: "#E53888", // Rosa principal
               color: "white",
-              "&:hover": {
-                backgroundColor: "#E53888",
-              },
+              // boxShadow: "0 8px 24px rgba(229, 56, 136, 0.25)",
               fontWeight: 600,
               padding: "12px 30px",
               borderRadius: "8px",
               textTransform: "none",
+              "&:hover": {
+                transform: "translateY(-1px)",
+                boxShadow: "0 10px 24px rgba(229, 56, 136, 0.25)",
+              },
             }}
           >
             Ver Todos los Eventos

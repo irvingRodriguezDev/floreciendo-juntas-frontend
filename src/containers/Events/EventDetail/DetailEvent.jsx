@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import {
   Box,
   Button,
@@ -22,33 +22,26 @@ import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import MonetizationOnIcon from "@mui/icons-material/MonetizationOn";
 import { formatMexicanCurrency } from "../../../utils/FormatCurrency";
 import AuthContext from "../../../context/Auth/AuthContext";
+import MethodGet from "../../../config/Service";
 const DetailEvent = () => {
   const { id } = useParams();
   const { event, getEventById, buyTicket } = useContext(EventsContext);
   const { usuario, autenticado } = useContext(AuthContext);
-
+  const [similarEvents, setSimilarEvents] = useState(null);
   useEffect(() => {
     getEventById(id);
+    if (similarEvents == null) {
+      let url = `/events/similar/${id}`;
+      MethodGet(url)
+        .then((res) => {
+          setSimilarEvents(res.data.similarEvents);
+        })
+        .catch((error) => {
+          console.log("No se encontraron eventos similares", error);
+        });
+    }
   }, [id]);
 
-  const similarEvents = [
-    {
-      img: "https://histudy.pixcelsthemes.com/livepreview/histudy/assets/images/event/grid-type-01.jpg",
-      title: "International Education Fair 2024",
-      date: "11 Jan 2024",
-      time: "8:00 am - 5:00 pm",
-      location: "IAC Building",
-      id: 1,
-    },
-    {
-      img: "https://histudy.pixcelsthemes.com/livepreview/histudy/assets/images/event/grid-type-02.jpg",
-      title: "Global Technology Summit",
-      date: "15 Feb 2024",
-      time: "9:00 am - 6:00 pm",
-      location: "Tech Expo Center",
-      id: 2,
-    },
-  ];
   const data = {};
   if (autenticado) {
     data.eventId = id;
@@ -191,7 +184,7 @@ const DetailEvent = () => {
                   ¡Acompáñanos en este evento especial! 🌷
                 </Typography>
                 <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                  <CalendarTodayIcon sx={{ color: "#E53888" }} />
+                  📅
                   <Typography variant='body1' color='#555'>
                     {FormatDate(event.startDate)}{" "}
                     {event.endDate ? "- " + FormatDate(event.endDate) : ""}
@@ -199,21 +192,27 @@ const DetailEvent = () => {
                 </Box>
 
                 <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                  <AccessTimeIcon sx={{ color: "#E53888" }} />
+                  ⏰
                   <Typography variant='body1' color='#555'>
                     {event.time}
                   </Typography>
                 </Box>
 
                 <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                  <PlaceIcon sx={{ color: "#E53888" }} />
+                  📍
                   <Typography variant='body1' color='#555'>
                     {event.location}
                   </Typography>
                 </Box>
+                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                  🎟️
+                  <Typography variant='body1' color='#555'>
+                    {event.availableTickets} boletos disponibles
+                  </Typography>
+                </Box>
 
                 <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                  <MonetizationOnIcon sx={{ color: "#E53888" }} />
+                  💲
                   <Typography variant='body1' color='#555'>
                     {formatMexicanCurrency(event.price)} MXN
                   </Typography>
@@ -227,7 +226,7 @@ const DetailEvent = () => {
                   }}
                 >
                   Reserva tu lugar y sé parte de esta experiencia única donde
-                  floreceremos juntas 💖
+                  tod@s floreceremos juntas 💖🌸
                 </Typography>
                 {autenticado ? (
                   <Button
@@ -301,11 +300,23 @@ const DetailEvent = () => {
               </Divider>
 
               <Grid container spacing={3}>
-                {similarEvents.map((e) => (
-                  <Grid size={{ xs: 12, sm: 6 }} key={e.id}>
-                    <CardEvent event={e} />
+                {similarEvents && similarEvents.length > 0 ? (
+                  similarEvents.map((e) => (
+                    <Grid size={{ xs: 12, sm: 6, md: 4 }} key={e.id}>
+                      <CardEvent event={e} />
+                    </Grid>
+                  ))
+                ) : (
+                  <Grid size={12}>
+                    <Typography
+                      variant='body1'
+                      color='text.primary'
+                      textAlign='center'
+                    >
+                      No se encontraron eventos similares 🥺
+                    </Typography>
                   </Grid>
-                ))}
+                )}
               </Grid>
             </Grid>
 

@@ -9,7 +9,10 @@ export default (state, action) => {
     case GET_ALL_EVENTS:
       return {
         ...state,
-        events: action.payload,
+        events: action.payload.events,
+        totalItems: action.payload.totalItems,
+        totalPages: action.payload.totalPages,
+        currentPage: action.payload.currentPage,
         cargando: true,
       };
     case GET_EVENT_BY_ID:

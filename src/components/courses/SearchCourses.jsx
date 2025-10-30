@@ -8,7 +8,7 @@ import {
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 
-const SearchCourse = ({ setSearch }) => {
+const SearchCourse = ({ setSearch, title, placeholder }) => {
   return (
     <Box
       sx={{
@@ -28,7 +28,7 @@ const SearchCourse = ({ setSearch }) => {
           letterSpacing: "0.5px",
         }}
       >
-        🌸 Encuentra tu curso ideal
+        🌸 Encuentra tu {title} ideal
       </Typography>
 
       <Grid container justifyContent='center'>
@@ -36,7 +36,7 @@ const SearchCourse = ({ setSearch }) => {
           <TextField
             label=''
             onChange={(e) => setSearch(e.target.value)}
-            placeholder='Ej. Curso básico de acrílicos'
+            placeholder={placeholder}
             variant='outlined'
             fullWidth
             type='text'

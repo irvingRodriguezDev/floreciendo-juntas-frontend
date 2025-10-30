@@ -54,7 +54,11 @@ const Courses = () => {
           <CoursesBanner />
         </Grid>
         <Grid size={12}>
-          <SearchCourse setSearch={setSearch} />
+          <SearchCourse
+            setSearch={setSearch}
+            title={"Curso"}
+            placeholder={"Ej:Uñas acrilicas en 3D"}
+          />
         </Grid>
       </Grid>
 

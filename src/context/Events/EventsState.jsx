@@ -19,13 +19,23 @@ const EventsState = ({ children }) => {
   };
   const [state, dispatch] = useReducer(EventsReducer, initialState);
 
-  const getAllEvents = () => {
-    let url = `/events`;
+  const getAllEvents = (page, limit, search = "") => {
+    let url = `/events?page=${page}&limit=${limit}`;
+
+    if (search.trim() !== "") {
+      url += `&search=${encodeURIComponent(search)}`; // 👈 usar +=
+    }
+
     MethodGet(url)
       .then((res) => {
         dispatch({
           type: GET_ALL_EVENTS,
-          payload: res.data,
+          payload: {
+            events: res.data.events,
+            totalItems: res.data.total, // ⚠ ojo, tu backend devuelve 'total'
+            totalPages: res.data.totalPages,
+            currentPage: res.data.currentPage,
+          },
         });
       })
       .catch((error) => {
@@ -81,6 +91,9 @@ const EventsState = ({ children }) => {
       value={{
         events: state.events,
         event: state.event,
+        totalItems: state.totalItems,
+        totalPages: state.totalPages,
+        currentPage: state.currentPage,
         getAllEvents,
         getEventById,
         getLatestEvents,

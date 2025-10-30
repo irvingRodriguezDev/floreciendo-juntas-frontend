@@ -3,7 +3,7 @@ import { Box, Typography, Button } from "@mui/material";
 
 const EventsBanner = () => {
   // Texto del banner
-  const titleText = "¡Eventos que te hacen florecer! 🌸";
+  const titleText = "¡Eventos que te harán florecer! 🌸";
   const subtitleText =
     "Únete a nuestras actividades y descubre cómo seguir creciendo junto a otras mujeres increíbles.";
 

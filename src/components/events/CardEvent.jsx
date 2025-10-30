@@ -12,8 +12,8 @@ import {
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import { Link } from "react-router-dom";
-
-// Animación simple para los pétalos
+import FormatDate from "../../utils/FormatDate";
+// 🌸 Animación de pétalos flotando
 const floatPetal = keyframes`
   0% { transform: translateY(0) rotate(0deg); opacity: 0.8; }
   50% { transform: translateY(-10px) rotate(20deg); opacity: 1; }
@@ -25,15 +25,17 @@ const CardEvent = ({ event }) => {
     <Card
       sx={{
         position: "relative",
-        bgcolor: "#FDE6F0",
-        borderRadius: "16px",
-        border: "1px solid #E53888",
-        maxWidth: 360,
-        mx: "auto",
+        bgcolor: "#fbfbfbff",
+        borderRadius: "20px",
+        border: "1px solid #F4BBD3",
         overflow: "hidden",
-        boxShadow: "0 6px 18px rgba(0,0,0,0.1)",
+        width: "90%",
+        mx: "auto",
+        boxShadow: "0 6px 20px rgba(229, 56, 136, 0.15)",
+        transition: "transform 0.3s ease, box-shadow 0.3s ease",
         "&:hover": {
-          boxShadow: "0 12px 24px rgba(0,0,0,0.2)",
+          transform: "translateY(-6px)",
+          boxShadow: "0 10px 25px rgba(229, 56, 136, 0.25)",
         },
       }}
     >
@@ -44,77 +46,105 @@ const CardEvent = ({ event }) => {
           height='220'
           image={event.image}
           alt={event.title}
+          sx={{
+            objectFit: "cover",
+            transition: "transform 0.4s ease",
+            "&:hover": {
+              transform: "scale(1.05)",
+            },
+          }}
         />
+        {/* Fecha */}
         <Box
           sx={{
             position: "absolute",
             bottom: 12,
             right: 12,
-            bgcolor: "#E53888",
+            bgcolor: "rgba(229, 56, 136, 0.9)",
             color: "white",
             px: 1.5,
-            py: 0.6,
+            py: 0.5,
             borderRadius: "12px",
-            fontSize: "0.8rem",
-            fontWeight: "bold",
+            fontSize: "0.75rem",
+            fontWeight: 600,
+            letterSpacing: 0.4,
           }}
         >
-          {event.date}
+          {FormatDate(event.startDate)}
         </Box>
       </Box>
 
-      {/* Pétalos animados */}
-      {[...Array(5)].map((_, i) => (
+      {/* 🌸 Pétalos decorativos */}
+      {[...Array(4)].map((_, i) => (
         <Box
           key={i}
           sx={{
             position: "absolute",
-            top: `${10 + i * 15}%`,
-            left: `${5 + i * 15}%`,
-            width: 20,
-            height: 20,
-            bgcolor: "#F7A8C8",
+            top: `${10 + i * 20}%`,
+            left: `${8 + i * 18}%`,
+            width: 14 + i * 3,
+            height: 14 + i * 3,
+            bgcolor: "#F8B6C7",
             borderRadius: "50%",
+            opacity: 0.5,
             filter: "blur(2px)",
-            animation: `${floatPetal} ${3 + i}s ease-in-out infinite`,
-            opacity: 0.7,
+            animation: `${floatPetal} ${3 + i * 0.7}s ease-in-out infinite`,
           }}
         />
       ))}
 
       {/* Contenido */}
-      <CardContent>
-        <Stack direction='row' spacing={1.5} alignItems='center' mb={1}>
-          <LocationOnIcon sx={{ fontSize: 18, color: "#E53888" }} />
-          <Typography variant='body2' color='#E53888'>
-            {event.location}
-          </Typography>
-          <AccessTimeIcon sx={{ fontSize: 18, color: "#E53888", ml: 1 }} />
-          <Typography variant='body2' color='#E53888'>
-            {event.time}
+      <CardContent sx={{ p: 3 }}>
+        <Stack direction='row' spacing={1} alignItems='center' mb={1.5}>
+          <Typography variant='body2' color='text.primary'>
+            📍 {event.location}
           </Typography>
         </Stack>
 
-        <Typography variant='h6' fontWeight='bold' mb={2} color='#E53888'>
+        <Stack direction='row' spacing={1} alignItems='center' mb={2}>
+          <Typography variant='body2' color='text.primary'>
+            ⏰ {event.time}
+          </Typography>
+        </Stack>
+        <Stack direction='row' spacing={1} alignItems='center' mb={1.5}>
+          <Typography variant='body2' color='text.primary'>
+            🎟️ {event.availableTickets} boletos disponibles
+          </Typography>
+        </Stack>
+
+        <Typography
+          variant='h6'
+          fontWeight='bold'
+          mb={2}
+          sx={{
+            color: "#E53888",
+            textAlign: "justify",
+            fontFamily: "'Poppins', sans-serif",
+          }}
+        >
           {event.title}
         </Typography>
 
-        <Link to={`/detalle-evento/${event.id}`}>
+        <Link
+          to={`/detalle-evento/${event.id}`}
+          style={{ textDecoration: "none" }}
+        >
           <Button
             variant='contained'
-            size='large'
             fullWidth
             sx={{
+              background: "linear-gradient(90deg, #E53888, #F78FB3)",
               color: "white",
+              borderRadius: "30px",
               textTransform: "none",
-              borderRadius: 2,
-              bgcolor: "#E53888",
+              fontWeight: 600,
+              py: 1.2,
               "&:hover": {
-                bgcolor: "#D32F71",
+                background: "linear-gradient(90deg, #D12C76, #F272A5)",
               },
             }}
           >
-            Comprar Boletos
+            🌸 Ver detalles
           </Button>
         </Link>
       </CardContent>
