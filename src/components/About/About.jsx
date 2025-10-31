@@ -1,23 +1,27 @@
 import React from "react";
-import {
-  Box,
-  Typography,
-  Button,
-  Grid,
-  Stack,
-  useTheme,
-  Paper,
-} from "@mui/material";
-import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
+import { Box, Typography, Stack, useTheme, Paper, Grid } from "@mui/material";
+
 import SchoolIcon from "@mui/icons-material/School";
 import PeopleAltIcon from "@mui/icons-material/PeopleAlt";
 import PersonIcon from "@mui/icons-material/Person";
 import CameraAltIcon from "@mui/icons-material/CameraAlt";
 import WorkspacePremiumIcon from "@mui/icons-material/WorkspacePremium";
-import Graduados from "../../assets/images/graduados.jpg";
-// Componente para las tarjetas de estadísticas (KPIs)
+
+import foto1 from "../../assets/images/IMG_7049.JPG";
+import foto2 from "../../assets/images/IMG_7048.JPG";
+
+// Componente de estadísticas
 const StatisticCard = ({ icon: Icon, value, label, color }) => (
-  <Stack direction='row' spacing={2} alignItems='center' sx={{ mb: 2 }}>
+  <Stack
+    direction='row'
+    spacing={2}
+    alignItems='center'
+    sx={{
+      mb: 2,
+      width: "100%",
+      justifyContent: { xs: "center", sm: "flex-start" },
+    }}
+  >
     <Box
       sx={{
         width: 48,
@@ -27,6 +31,7 @@ const StatisticCard = ({ icon: Icon, value, label, color }) => (
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
+        flexShrink: 0,
       }}
     >
       <Icon sx={{ color: "white" }} />
@@ -48,155 +53,149 @@ const About = () => {
   return (
     <Box
       sx={{
-        padding: theme.spacing(8, 4),
+        py: { xs: 6, md: 10 },
+        px: { xs: 3, sm: 6, md: 10 },
         backgroundColor: "#fff",
-        // Fondo ligeramente gris si quieres replicar el fondo blanco/gris claro de la imagen
-        // backgroundColor: '#f8f9fa',
-        overflow: "hidden",
       }}
     >
-      <Grid container spacing={4} alignItems='center' justifyContent='center'>
+      <Grid container spacing={6} alignItems='center' justifyContent='center'>
         {/* Sección de Imágenes */}
         <Grid
-          size={{ xs: 12, sm: 6 }}
+          size={{ xs: 12, md: 6 }}
           sx={{
+            position: "relative",
             display: "flex",
             justifyContent: "center",
-            position: "relative",
-            order: { xs: 1, md: 0 },
+            alignItems: "center",
           }}
         >
           <Box
             sx={{
               position: "relative",
-              width: { xs: "80%", sm: "400px" },
-              height: { xs: "auto", sm: "450px" },
               display: "flex",
-              justifyContent: "center",
               alignItems: "center",
+              justifyContent: "center",
+              width: "100%",
+              maxWidth: 600,
+              gap: { xs: 2, md: 4 },
             }}
           >
-            {/* Imagen 1: Graduados (Para dar sentido de comunidad y logro)
+            {/* Imagen izquierda */}
             <Box
               component='img'
-              src='https://i.pinimg.com/1200x/61/42/87/614287f9496fcd823d0c2c53abd30750.jpg' // Reemplaza con la URL de la imagen de graduados/comunidad
-              alt='Comunidad Floreciendo Juntas'
+              src={foto1}
+              alt='Graduadas'
               sx={{
-                width: "100%",
-                height: "100%",
+                width: { xs: "65%", sm: "42%", md: "46%" },
+                height: "auto",
+                aspectRatio: "3/5",
                 objectFit: "cover",
-                borderRadius: "50%", // Forma ovalada en la imagen original
-                clipPath: "ellipse(45% 50% at 50% 50%)",
-                position: "absolute",
-                left: "-50%",
-                zIndex: 1,
-                display: { xs: "none", sm: "block" },
-              }}
-            /> */}
-            {/* Imagen 2: Estudiante/Modelo (La chica con gafas) */}
-            <Box
-              component='img'
-              src={Graduados} // Reemplaza con la URL de la imagen principal
-              alt='Estudiante de Uñas'
-              sx={{
-                width: { xs: 250, sm: 300, md: 350 },
-                height: { xs: 350, sm: 400, md: 550 },
-                objectFit: "cover",
-                borderRadius: "16px",
-                clipPath: "polygon(0 0, 100% 0, 100% 90%, 0 100%)", // Simula el corte de la imagen
-                position: "relative",
-                left: 10,
-                zIndex: 2,
+                borderRadius: "120px",
                 boxShadow: theme.shadows[4],
+                transform: { xs: "translateY(0)", md: "translateY(20px)" },
               }}
             />
-            {/* Caja de experiencia flotante (25+ Years Of Experience) */}
+
+            {/* Imagen derecha */}
+            <Box
+              component='img'
+              src={foto2}
+              alt='Estudiante'
+              sx={{
+                width: { xs: "65%", sm: "42%", md: "46%" },
+                height: "auto",
+                aspectRatio: "3/5",
+                objectFit: "cover",
+                borderRadius: "120px",
+                boxShadow: theme.shadows[4],
+                transform: { xs: "translateY(0)", md: "translateY(-20px)" },
+                position: "relative",
+                zIndex: 2,
+              }}
+            />
+
+            {/* Tarjeta flotante */}
             <Paper
-              elevation={8}
+              elevation={6}
               sx={{
                 position: "absolute",
-                bottom: { xs: "0", md: "50px" },
-                left: { xs: "50%", sm: "10%", md: "30%" },
-                transform: { xs: "translateX(-50%)", sm: "none" },
-                backgroundColor: "#D72E79", // Verde oscuro
+                bottom: { xs: "-50px", sm: "-60px", md: "-70px" },
+                left: { xs: "50%", md: "60%" },
+                transform: "translateX(-50%)",
+                backgroundColor: "#D72E79",
                 color: "white",
-                padding: theme.spacing(2, 3),
-                borderRadius: "12px",
+                px: { xs: 3, sm: 4 },
+                py: { xs: 2, sm: 3 },
+                borderRadius: "16px",
                 display: "flex",
                 alignItems: "center",
-                gap: theme.spacing(1),
-                zIndex: 3,
-                minWidth: "200px",
+                gap: theme.spacing(2),
+                minWidth: { xs: 280, sm: 280, md: 320 },
+                textAlign: "left",
               }}
             >
-              <WorkspacePremiumIcon fontSize='large' />
-              <Typography variant='h6' sx={{ fontWeight: 700 }}>
-                +10 Años
-                <Typography variant='body2' sx={{ lineHeight: 1 }}>
-                  De Experiencia Formando Éxito
+              <WorkspacePremiumIcon sx={{ fontSize: { xs: 36, sm: 48 } }} />
+              <Box>
+                <Typography variant='h6' sx={{ fontWeight: 700 }}>
+                  +10 Años
                 </Typography>
-              </Typography>
+                <Typography variant='body2' sx={{ lineHeight: 1.2 }}>
+                  De Experiencia Formando Manicuristas Éxitosas
+                </Typography>
+              </Box>
             </Paper>
           </Box>
         </Grid>
 
-        {/* Sección de Contenido de Texto y Estadísticas */}
-        <Grid size={{ xs: 12, sm: 6 }} sx={{ order: { xs: 0, md: 1 } }}>
-          {/* Etiqueta Superior */}
+        {/* Sección de Texto */}
+        <Grid size={{ xs: 12, md: 6 }}>
           <Typography
             variant='body2'
             color='text.secondary'
-            sx={{ mb: 1, fontWeight: 600 }}
+            sx={{
+              mb: 1,
+              fontWeight: 600,
+              textAlign: { xs: "center", md: "left" },
+              marginTop: { xs: 5, md: 0 },
+            }}
           >
             Sobre Floreciendo Juntas
           </Typography>
 
-          {/* Título Principal */}
           <Typography
             variant='h3'
             component='h2'
             sx={{
               fontWeight: 700,
               mb: 3,
+              textAlign: { xs: "center", md: "left" },
+              fontSize: { xs: "1.8rem", sm: "2.3rem", md: "2.8rem" },
               lineHeight: 1.2,
-              fontSize: { xs: "2rem", sm: "2.5rem", md: "3rem" },
             }}
           >
-            Una Nueva Forma de Impulsar
-            <br />
-            Tus{" "}
-            <span
-              style={{
-                position: "relative",
-                display: "inline-block",
-                textDecoration: "none",
-              }}
-            >
+            Una Nueva Forma de Impulsar tus{" "}
+            <Box component='span' sx={{ position: "relative" }}>
               Habilidades
               <Box
-                component='span'
                 sx={{
                   position: "absolute",
                   left: 0,
-                  bottom: 0,
+                  bottom: 3,
                   width: "100%",
-                  height: "8px",
-                  backgroundColor: theme.palette.warning.light, // Amarillo claro
-                  zIndex: -1,
-                  opacity: 0.7,
+                  height: "6px",
+                  backgroundColor: " #E36F9E",
+                  opacity: 0.6,
                   borderRadius: "4px",
                 }}
               />
-            </span>
+            </Box>
             .
           </Typography>
 
-          {/* Primer Párrafo */}
           <Typography
             variant='body1'
             color='text.secondary'
-            sx={{ mb: 2, maxWidth: 600 }}
-            textAlign='justify'
+            sx={{ mb: 2, textAlign: "justify" }}
           >
             El arte de las uñas es una de las habilidades más valiosas que una
             mujer puede poseer, transformando la pasión en un activo financiero.
@@ -204,12 +203,10 @@ const About = () => {
             moldear tu futuro en la industria de la belleza.
           </Typography>
 
-          {/* Segundo Párrafo */}
           <Typography
             variant='body1'
             color='text.secondary'
-            textAlign='justify'
-            sx={{ mb: 4, maxWidth: 600 }}
+            sx={{ mb: 4, textAlign: "justify" }}
           >
             Nuestro principal beneficio es darte la capacidad de emprender. A
             través de la formación especializada, adquirirás conocimientos y
@@ -217,60 +214,41 @@ const About = () => {
             complejidades del mercado.
           </Typography>
 
-          {/* Estadísticas (KPIs) */}
-          <Grid container spacing={3} sx={{ mb: 4 }}>
-            <Grid size={{ xs: 12, sm: 6 }}>
+          {/* Estadísticas */}
+          <Grid container spacing={2}>
+            <Grid size={{ xs: 6, sm: 6, md: 6 }}>
               <StatisticCard
                 icon={CameraAltIcon}
                 value='+500'
                 label='Clases Grabadas en HD'
-                color='#F3BBCE' // Amarillo
+                color='#F3BBCE'
               />
             </Grid>
-            <Grid size={{ xs: 12, sm: 6 }}>
+            <Grid size={{ xs: 6, sm: 6, md: 6 }}>
               <StatisticCard
                 icon={SchoolIcon}
                 value='+1.250'
                 label='Alumnas Certificadas'
-                color='#DC4485' // Verde
+                color='#DC4485'
               />
             </Grid>
-            <Grid size={{ xs: 12, sm: 6 }}>
+            <Grid size={{ xs: 6, sm: 6, md: 6 }}>
               <StatisticCard
                 icon={PeopleAltIcon}
                 value='25K'
                 label='Miembros de la Comunidad'
-                color='#F3BBCE' // Violeta
+                color='#F3BBCE'
               />
             </Grid>
-            <Grid size={{ xs: 12, sm: 6 }}>
+            <Grid size={{ xs: 6, sm: 6, md: 6 }}>
               <StatisticCard
                 icon={PersonIcon}
                 value='+250'
                 label='Educadoras de Soporte'
-                color='#DC4485' // Rosa
+                color='#DC4485'
               />
             </Grid>
           </Grid>
-
-          {/* Botón Inferior */}
-          {/* <Button
-            variant='contained'
-            endIcon={<ArrowForwardIcon />}
-            sx={{
-              backgroundColor: "#ffc107", // Amarillo
-              color: "#333",
-              "&:hover": {
-                backgroundColor: "#e0a800",
-              },
-              fontWeight: 600,
-              padding: "10px 30px",
-              borderRadius: "8px",
-              textTransform: "none",
-            }}
-          >
-            Saber Más Sobre Nosotras
-          </Button> */}
         </Grid>
       </Grid>
     </Box>

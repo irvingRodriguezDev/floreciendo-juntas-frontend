@@ -1,47 +1,43 @@
-import React, { useContext, useEffect, useRef } from "react"; // Necesitas useRef para la navegación personalizada si la usas
+import React, { useContext, useEffect, useRef } from "react";
 import {
   Box,
   Typography,
   Card,
   CardMedia,
-  Grid,
+  IconButton,
   Stack,
   useTheme,
-  IconButton,
 } from "@mui/material";
 import { Swiper, SwiperSlide } from "swiper/react";
+import { Navigation, Pagination } from "swiper/modules";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
-import { Navigation, Pagination } from "swiper/modules"; // Añadimos Loop explícitamente
 import { motion } from "framer-motion";
-
-// Importa los estilos de Swiper (Asegúrate de que sean accesibles)
-import "swiper/css";
-import "swiper/css/navigation";
-import "swiper/css/pagination";
 import { Link } from "react-router-dom";
 import CoursesContext from "../../../context/Courses/CoursesContext";
 import AuthContext from "../../../context/Auth/AuthContext";
 import Progress from "../../Progress/Progress";
-// NOTA: No necesitamos el archivo "./swipperCustom.css" si manejamos la navegación con useRef y estilos de MUI.
+
+import "swiper/css";
+import "swiper/css/navigation";
+import "swiper/css/pagination";
 
 const NewCourses = () => {
   const { courses, getLastestCourses } = useContext(CoursesContext);
   const { usuario, autenticado } = useContext(AuthContext);
-  useEffect(() => {
-    if (autenticado && usuario) {
-      getLastestCourses(usuario, autenticado);
-    } else if (!autenticado) {
-      getLastestCourses(null, false);
-    }
-  }, [usuario, autenticado]);
   const theme = useTheme();
 
-  // Referencias para los botones de navegación personalizados (Necesario para loop=true)
   const swiperPrevRef = useRef(null);
   const swiperNextRef = useRef(null);
 
-  // Definimos los estilos de color rosa que hemos estado usando (asumiendo que están en el tema)
+  useEffect(() => {
+    if (autenticado && usuario) {
+      getLastestCourses(usuario, autenticado);
+    } else {
+      getLastestCourses(null, false);
+    }
+  }, [usuario, autenticado]);
+
   const primaryPink = "#e91e63";
   const lightYellow = "#ffecb3";
 
@@ -50,12 +46,11 @@ const NewCourses = () => {
       sx={{
         backgroundColor: theme.palette.background.default || "#fffcf7",
         position: "relative",
+        py: { xs: 6, md: 10 },
       }}
     >
-      <Stack
-        alignItems='center'
-        sx={{ mb: 6, zIndex: 1, padding: theme.spacing(0, 4) }}
-      >
+      {/* --- Header --- */}
+      <Stack alignItems='center' sx={{ mb: 6, px: { xs: 2, md: 4 } }}>
         <motion.div
           initial={{ opacity: 0, y: 50 }}
           animate={{ opacity: 1, y: 0 }}
@@ -73,7 +68,6 @@ const NewCourses = () => {
             Tu Próximo Nivel en Manicura
           </Typography>
         </motion.div>
-
         <Typography
           variant='h3'
           component='h2'
@@ -81,16 +75,13 @@ const NewCourses = () => {
             fontWeight: 700,
             lineHeight: 1.2,
             textAlign: "center",
-            fontSize: { xs: "2.5rem", sm: "3rem", md: "3.5rem" },
+            fontSize: { xs: "2.2rem", sm: "2.8rem", md: "3.5rem" },
           }}
         >
           Descubre Nuestro{" "}
-          <span
-            style={{
-              position: "relative",
-              display: "inline-block",
-              textDecoration: "none",
-            }}
+          <Box
+            component='span'
+            sx={{ position: "relative", display: "inline-block" }}
           >
             Contenido Nuevo
             <Box
@@ -107,24 +98,27 @@ const NewCourses = () => {
                 borderRadius: "4px",
               }}
             />
-          </span>
+          </Box>
         </Typography>
       </Stack>
 
+      {/* --- Swiper --- */}
       <Box
-        sx={{
-          position: "relative",
-          maxWidth: "100%",
-          margin: 0,
-          zIndex: 1,
-          backgroundColor: "transparent",
-        }}
+        sx={{ position: "relative", maxWidth: "100%", px: { xs: 2, md: 4 } }}
       >
         <Swiper
           modules={[Navigation, Pagination]}
-          spaceBetween={20}
-          slidesPerView={1.5}
           loop={true}
+          grabCursor={true}
+          centeredSlides={true}
+          spaceBetween={20}
+          slidesPerView={1.15} // Card central pequeña en móviles
+          breakpoints={{
+            640: { slidesPerView: 1.3, spaceBetween: 20 },
+            768: { slidesPerView: 2.2, spaceBetween: 25 },
+            1024: { slidesPerView: 3, spaceBetween: 30 },
+            1440: { slidesPerView: 4, spaceBetween: 35 },
+          }}
           navigation={{
             prevEl: swiperPrevRef.current,
             nextEl: swiperNextRef.current,
@@ -136,13 +130,7 @@ const NewCourses = () => {
               swiper.navigation.update();
             }
           }}
-          breakpoints={{
-            640: { slidesPerView: 2.2, spaceBetween: 30 },
-            768: { slidesPerView: 3, spaceBetween: 30 },
-            1024: { slidesPerView: 3.5, spaceBetween: 40 },
-            1440: { slidesPerView: 4.5, spaceBetween: 40 },
-          }}
-          style={{ padding: theme.spacing(8, 4) }}
+          style={{ padding: theme.spacing(2, 0) }}
         >
           {courses.map((c, index) => (
             <SwiperSlide key={index}>
@@ -153,72 +141,74 @@ const NewCourses = () => {
                 <Card
                   component={motion.div}
                   whileHover={{
-                    scale: 1.04,
-                    boxShadow: "0 12px 28px rgba(0, 0, 0, 0.15)",
+                    scale: 1.03,
+                    boxShadow: "0 14px 28px rgba(255, 246, 248,0.15)",
                     transition: { duration: 0.3 },
                   }}
                   sx={{
+                    display: "flex",
+                    flexDirection: "column",
+                    height: "100%",
+                    // Ajuste minHeight: lo hemos reducido para que la Card sea más compacta
+                    minHeight: 280,
                     borderRadius: "18px",
-                    cursor: "pointer",
                     overflow: "hidden",
-                    backgroundColor: "#fff",
-                    boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
-                    border: "1px solid rgba(0,0,0,0.05)",
+                    cursor: "pointer",
+                    boxShadow: "0 6px 18px rgba(255, 246, 248,.08)",
                     transition: "transform 0.3s ease, box-shadow 0.3s ease",
                   }}
                 >
-                  {/* Imagen con efecto hover suave */}
-                  <Box sx={{ position: "relative", overflow: "hidden" }}>
+                  {/* 🖼️ Imagen uniforme (Altura Fija) */}
+                  <Box
+                    sx={{
+                      width: "100%",
+                      height: "500px", // Altura fija uniforme para todas las imágenes
+                      overflow: "hidden",
+                      position: "relative",
+                    }}
+                  >
                     <CardMedia
                       component='img'
-                      width='100%'
-                      height='260'
                       image={c.cover_image_url}
                       alt={c.title}
                       sx={{
-                        objectFit: "cover",
-                        transition: "transform 0.6s ease",
-                        "&:hover": { transform: "scale(1.05)" },
-                      }}
-                    />
-
-                    {/* Overlay degradado sutil para mejor legibilidad */}
-                    <Box
-                      sx={{
-                        position: "absolute",
-                        bottom: 0,
-                        left: 0,
                         width: "100%",
-                        height: "30%",
-                        background:
-                          "linear-gradient(to top, rgba(0,0,0,0.35), rgba(0,0,0,0))",
+                        height: "100%",
+                        objectFit: "cover", // Asegura que la imagen llene el espacio sin deformarse
+                        transition: "transform 0.5s ease",
+                        "&:hover": { transform: "scale(1.05)" },
                       }}
                     />
                   </Box>
 
-                  {/* Contenido */}
+                  {/* 📝 Contenido Compacto (Título y Progreso) */}
                   <Box
                     sx={{
-                      p: 2,
-                      background:
-                        "linear-gradient(180deg, #fff0f0 0%, #fff6f6 100%)",
+                      // 👇 Reducimos el padding vertical y eliminamos el margen automático inferior
+                      p: 1.5, // Reducido de 2 a 1.5 para un look más compacto
+                      // mt: 'auto', // Eliminado para quitar el espacio flexible al final
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      gap: 0.5, // Reducido para juntar el progreso y el título
                     }}
                   >
-                    {usuario !== null && usuario.isSubscribed && (
+                    {usuario?.isSubscribed && (
                       <Progress progress={c?.user_progress_percentage ?? 0} />
                     )}
-
                     <Typography
                       textAlign='center'
                       variant='body1'
                       sx={{
                         fontWeight: 600,
                         color: primaryPink,
-                        mt: 1,
                         fontSize: "1.05rem",
                         letterSpacing: 0.3,
                         transition: "color 0.3s ease",
                         "&:hover": { color: "#d81b60" },
+                        // Eliminamos cualquier margen adicional que pueda tener la tipografía
+                        lineHeight: 1.3,
                       }}
                     >
                       {c.title}
@@ -230,12 +220,12 @@ const NewCourses = () => {
           ))}
         </Swiper>
 
-        {/* Botones de navegación personalizados (Posicionados fuera del Swiper para mejor control) */}
+        {/* Botones de navegación */}
         <IconButton
           ref={swiperPrevRef}
           sx={{
             position: "absolute",
-            left: { xs: 5, sm: 20, lg: 0 },
+            left: { xs: 5, sm: 20 },
             top: "40%",
             transform: "translateY(-50%)",
             backgroundColor: "#F3BBCE",
@@ -245,7 +235,7 @@ const NewCourses = () => {
             width: 44,
             height: 44,
             boxShadow: theme.shadows[3],
-            display: { xs: "none", md: "flex" }, // Ocultar en móviles si interfiere con el scroll
+            display: { xs: "none", md: "flex" },
           }}
         >
           <ArrowBackIcon />
@@ -254,7 +244,7 @@ const NewCourses = () => {
           ref={swiperNextRef}
           sx={{
             position: "absolute",
-            right: { xs: 5, sm: 20, lg: 0 },
+            right: { xs: 5, sm: 20 },
             top: "40%",
             transform: "translateY(-50%)",
             backgroundColor: "#F3BBCE",
@@ -264,7 +254,7 @@ const NewCourses = () => {
             width: 44,
             height: 44,
             boxShadow: theme.shadows[3],
-            display: { xs: "none", md: "flex" }, // Ocultar en móviles si interfiere con el scroll
+            display: { xs: "none", md: "flex" },
           }}
         >
           <ArrowForwardIcon />

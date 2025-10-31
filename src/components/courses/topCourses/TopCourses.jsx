@@ -1,164 +1,195 @@
 import React, { useContext, useEffect } from "react";
 import {
   Box,
-  Card,
-  CardContent,
-  CardMedia,
   Grid,
   Typography,
-  Stack,
   useTheme,
+  Card,
+  CardMedia,
+  CardContent,
+  Stack,
+  CardActions,
 } from "@mui/material";
 import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
 import CoursesContext from "../../../context/Courses/CoursesContext";
 import AuthContext from "../../../context/Auth/AuthContext";
-import { Link } from "react-router-dom";
+import "./TopCourses.css";
+
 const TopCourses = () => {
   const { getTopTenCourses, topCourses } = useContext(CoursesContext);
   const { usuario } = useContext(AuthContext);
+  const theme = useTheme();
+
   useEffect(() => {
     getTopTenCourses();
   }, []);
-  const theme = useTheme();
-
-  const primaryPink = "#e91e63";
-  const lightYellow = "#ffecb3";
 
   return (
     <Box
       sx={{
-        backgroundColor: theme.palette.background.default || "#fffcf7",
-        padding: theme.spacing(8, 4),
+        py: { xs: 6, md: 10 },
+        px: { xs: 2, md: 4 },
+        background: "linear-gradient(180deg, #fff 0%, #FFF6F8 100%)",
+        borderRadius: "20px",
       }}
     >
-      {/* --- Encabezado de la Sección (Estilo Floreciendo Juntas) --- */}
-      <Stack alignItems='center' sx={{ mb: 6, zIndex: 1 }}>
-        {/* Etiqueta Superior */}
-        <motion.div
-          initial={{ opacity: 0, y: 50 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-        >
-          <Typography
-            variant='overline'
-            sx={{
-              color: theme.palette.text.secondary,
-              fontWeight: 600,
-              textTransform: "uppercase",
-              mb: 1,
-            }}
-          >
-            Lo Más Visto en Nuestra Academia
-          </Typography>
-        </motion.div>
-
-        {/* Título Principal con Resaltado */}
+      {/* --- Encabezado --- */}
+      <motion.div
+        initial={{ opacity: 0, y: 40 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.8 }}
+        style={{ textAlign: "center", marginBottom: "70px" }}
+      >
         <Typography
-          variant='h3'
+          variant='overline'
+          sx={{
+            color: theme.palette.text.secondary,
+            letterSpacing: "3px",
+            fontWeight: 600,
+            textTransform: "uppercase",
+            mb: 1,
+            fontSize: { xs: "16px", md: "20px" },
+          }}
+        >
+          Lo más visto en nuestra academia
+        </Typography>
+
+        <Typography
+          variant='h2'
           component='h2'
           sx={{
-            fontWeight: 700,
-            lineHeight: 1.2,
-            textAlign: "center",
-            fontSize: { xs: "2.5rem", sm: "3rem", md: "3.5rem" },
+            fontWeight: 800,
+            lineHeight: 1.1,
+            fontSize: { xs: "2.8rem", sm: "3.5rem", md: "5rem", lg: "6rem" },
+            color: theme.palette.text.primary,
           }}
         >
           Nuestros{" "}
-          <span
-            style={{
+          <Box
+            component='span'
+            sx={{
               position: "relative",
               display: "inline-block",
-              textDecoration: "none",
+              "&::after": {
+                content: '""',
+                position: "absolute",
+                bottom: 4,
+                left: 0,
+                width: "100%",
+                height: "10px",
+                background: "#e36f9e",
+                opacity: 0.7,
+                borderRadius: "6px",
+                transform: "scaleX(0)",
+                transformOrigin: "left",
+                transition: "transform 0.4s ease",
+              },
+              "&:hover::after": {
+                transform: "scaleX(1)",
+              },
             }}
           >
             Cursos Top
-            <Box
-              component='span'
-              sx={{
-                position: "absolute",
-                left: 0,
-                bottom: 0,
-                width: "100%",
-                height: "8px",
-                backgroundColor: lightYellow, // Resaltado amarillo suave
-                zIndex: -1,
-                opacity: 0.7,
-                borderRadius: "4px",
-              }}
-            />
-          </span>{" "}
+          </Box>{" "}
           10
         </Typography>
-      </Stack>
+      </motion.div>
 
-      {/* --- Lista de Cursos --- */}
+      {/* --- Grid de cursos --- */}
       <Grid
         container
-        spacing={4}
+        spacing={{ xs: 3, sm: 4, md: 5 }}
         justifyContent='center'
-        sx={{ maxWidth: "100%", margin: "0 auto" }}
+        sx={{ maxWidth: "1500px", margin: "0 auto" }}
       >
         {topCourses.map((course, index) => (
-          <Grid size={{ xs: 12, sm: 6, md: 4, lg: 3 }} key={index}>
+          <Grid size={{ xs: 12, sm: 6, md: 6, lg: 4, xl: 3 }} key={index}>
             <motion.div
-              initial={{ opacity: 0, y: 50 }}
+              initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.2 }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: index * 0.08 }}
             >
               <Link
-                style={{ textDecoration: "none" }}
                 to={`/detalle-curso/${course.courseId}`}
+                style={{ textDecoration: "none" }}
               >
                 <Card
                   sx={{
-                    borderRadius: "16px",
-                    boxShadow: theme.shadows[6], // Sombra más prominente
+                    display: "flex",
+                    flexDirection: "column",
+                    height: "100%",
+                    borderRadius: "24px",
                     overflow: "hidden",
-                    position: "relative",
+                    boxShadow:
+                      "0 4px 12px rgba(0, 0, 0, 0.08), 0 8px 24px rgba(0, 0, 0, 0.05)",
+                    transition: "transform 0.4s ease, box-shadow 0.4s ease",
+                    backgroundColor: "#fff",
                     "&:hover": {
-                      transform: "scale(1.03)",
-                      transition: "transform 0.3s",
+                      transform: "translateY(-6px)",
+                      boxShadow:
+                        "0 8px 24px rgba(0, 0, 0, 0.12), 0 12px 36px rgba(0, 0, 0, 0.08)",
                     },
                   }}
                 >
-                  {/* Clasificación (rank) - Integrada al diseño */}
+                  {/* Contenedor de imagen con aspect-ratio */}
                   <Box
                     sx={{
-                      position: "absolute",
-                      top: 0,
-                      left: 0,
-                      backgroundColor: primaryPink,
-                      color: "white",
-                      padding: theme.spacing(0.5, 2),
-                      borderBottomRightRadius: "16px",
-                      zIndex: 2,
-                      fontSize: "1.5rem",
-                      fontWeight: "bold",
-                      lineHeight: 1.2,
+                      position: "relative",
+                      width: "100%",
+                      aspectRatio: "16/9",
                     }}
                   >
-                    #{index + 1}
+                    <CardMedia
+                      component='img'
+                      image={course.cover_image_url}
+                      alt={course.title}
+                      sx={{
+                        width: "100%",
+                        height: "100%",
+                        objectFit: "cover", // mantiene proporción y rellena sin distorsión
+                      }}
+                    />
+
+                    {/* Insignia de ranking */}
+                    <Box
+                      sx={{
+                        position: "absolute",
+                        top: 12,
+                        left: 12,
+                        background: "rgba(227,111,158,0.95)",
+                        color: "white",
+                        fontSize: "1rem",
+                        fontWeight: 700,
+                        px: 2,
+                        py: 0.5,
+                        borderRadius: "12px",
+                        boxShadow: "0 2px 6px rgba(0,0,0,0.25)",
+                      }}
+                    >
+                      #{index + 1}
+                    </Box>
                   </Box>
 
-                  <CardMedia
-                    component='img'
-                    image={course.cover_image_url}
-                    alt={course.title}
+                  {/* Título debajo de la imagen */}
+                  <CardContent
                     sx={{
-                      width: "100%",
-                      height: 350, // Altura fija
-                      objectFit: "cover",
+                      textAlign: "center",
+                      py: 3,
+                      px: 2,
+                      mt: "auto",
                     }}
-                  />
-
-                  <CardContent sx={{ p: 2 }}>
+                  >
                     <Typography
-                      variant='h6' // Usamos h6 para un título más adecuado
+                      variant='h6'
                       sx={{
+                        fontWeight: 600,
                         color: theme.palette.text.primary,
-                        fontWeight: 700,
-                        textAlign: "center",
+                        fontSize: { xs: "1.15rem", md: "1.25rem" },
+                        transition: "color 0.3s ease",
+                        "&:hover": { color: "#e36f9e" },
                       }}
                     >
                       {course.title}
