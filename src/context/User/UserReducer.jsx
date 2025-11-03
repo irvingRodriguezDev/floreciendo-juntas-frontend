@@ -1,6 +1,8 @@
 import {
+  CALENDAR_ERROR,
   COURSES_COMPLETED,
   COURSES_COMPLETED_USER,
+  GET_CALENDAR_LINKS,
   GET_TICKETS_BY_USER,
 } from "../../types";
 
@@ -22,6 +24,19 @@ export default (state, action) => {
       return {
         ...state,
         tickets: action.payload,
+      };
+    case GET_CALENDAR_LINKS:
+      return {
+        ...state,
+        calendarLinks: action.payload,
+        calendarLoading: false,
+      };
+
+    case CALENDAR_ERROR:
+      return {
+        ...state,
+        calendarError: action.payload,
+        calendarLoading: false,
       };
 
     default:

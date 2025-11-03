@@ -68,7 +68,6 @@ const EventsState = ({ children }) => {
         console.log(error);
       });
   };
-
   const buyTicket = (data) => {
     let url = `/events/buy/ticket`;
     MethodPost(url, data)

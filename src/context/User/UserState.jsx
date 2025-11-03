@@ -3,8 +3,11 @@ import MethodGet, { MethodPost, MethodPut } from "../../config/Service";
 import UserContext from "./UserContext";
 import UserReducer from "./UserReducer";
 import {
+  CALENDAR_ERROR,
+  CALENDAR_LOADING,
   COURSES_COMPLETED,
   COURSES_COMPLETED_USER,
+  GET_CALENDAR_LINKS,
   GET_TICKETS_BY_USER,
 } from "../../types";
 /**Importar componente token headers */
@@ -14,6 +17,9 @@ const UserState = ({ children }) => {
     coursesCompleted: 0,
     completed: [],
     tickets: 0,
+    calendarLinks: null,
+    calendarLoading: false,
+    calendarError: null,
   };
 
   const [state, dispatch] = useReducer(UserReducer, initialState);
@@ -64,6 +70,31 @@ const UserState = ({ children }) => {
     let url = `/tickets/download?userId=${id}`;
     // MethodGet(url).then(())
   };
+  const getCalendarLinks = async (ticketId) => {
+    try {
+      dispatch({
+        type: CALENDAR_LOADING,
+      });
+
+      const response = await MethodGet(`/tickets/${ticketId}/calendar-links`);
+
+      dispatch({
+        type: GET_CALENDAR_LINKS,
+        payload: response.data,
+      });
+
+      return response.data; // Retornar para uso inmediato
+    } catch (error) {
+      console.error("Error obteniendo links de calendario:", error);
+
+      dispatch({
+        type: CALENDAR_ERROR,
+        payload: error.response?.data?.message || "Error al obtener calendario",
+      });
+
+      throw error;
+    }
+  };
 
   return (
     <UserContext.Provider
@@ -74,6 +105,7 @@ const UserState = ({ children }) => {
         getCoursesCompletedByUser,
         getCoursesCompleted,
         getTicketsByUser,
+        getCalendarLinks,
       }}
     >
       {children}
