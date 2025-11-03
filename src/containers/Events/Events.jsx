@@ -36,6 +36,7 @@ const Events = () => {
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
   };
+
   return (
     <Layout>
       {/* Banner y Buscador */}
@@ -61,7 +62,11 @@ const Events = () => {
             container
             spacing={3}
             justifyContent='center'
-            sx={{ maxWidth: "1400", margin: "0 auto", padding: "20px" }}
+            sx={{
+              maxWidth: "1200px",
+              margin: "0 auto",
+              paddingY: 4,
+            }}
           >
             {events.length > 0 ? (
               events.map((c) => (

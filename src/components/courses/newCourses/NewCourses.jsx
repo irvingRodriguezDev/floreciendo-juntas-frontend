@@ -7,6 +7,7 @@ import {
   IconButton,
   Stack,
   useTheme,
+  useMediaQuery, // 👈 Nuevo: para manejar breakpoints
 } from "@mui/material";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination } from "swiper/modules";
@@ -17,7 +18,7 @@ import { Link } from "react-router-dom";
 import CoursesContext from "../../../context/Courses/CoursesContext";
 import AuthContext from "../../../context/Auth/AuthContext";
 import Progress from "../../Progress/Progress";
-
+import { getImageUrl } from "../../../utils/Image"; // 👈 Tu función utilitaria
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
@@ -26,6 +27,10 @@ const NewCourses = () => {
   const { courses, getLastestCourses } = useContext(CoursesContext);
   const { usuario, autenticado } = useContext(AuthContext);
   const theme = useTheme();
+
+  // 💡 Nuevo: Hook para detectar el tamaño de la pantalla
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const isTablet = useMediaQuery(theme.breakpoints.down("md"));
 
   const swiperPrevRef = useRef(null);
   const swiperNextRef = useRef(null);
@@ -40,6 +45,18 @@ const NewCourses = () => {
 
   const primaryPink = "#e91e63";
   const lightYellow = "#ffecb3";
+
+  // Función para determinar el ancho óptimo de la imagen basado en el viewport
+  const getOptimalWidth = () => {
+    if (isMobile) return 300; // Móviles (300px)
+    if (isTablet) return 400; // Tablets (400px)
+    return 350; // Desktop (350px)
+  };
+
+  // 📌 El ancho de la imagen que se solicitará a CloudFront
+  const optimalWidth = getOptimalWidth();
+  // 📌 Calidad de la imagen (ajustable)
+  const imageQuality = 85;
 
   return (
     <Box
@@ -106,119 +123,130 @@ const NewCourses = () => {
       <Box
         sx={{ position: "relative", maxWidth: "100%", px: { xs: 2, md: 4 } }}
       >
-        <Swiper
-          modules={[Navigation, Pagination]}
-          loop={true}
-          grabCursor={true}
-          centeredSlides={true}
-          spaceBetween={20}
-          slidesPerView={1.15} // Card central pequeña en móviles
-          breakpoints={{
-            640: { slidesPerView: 1.3, spaceBetween: 20 },
-            768: { slidesPerView: 2.2, spaceBetween: 25 },
-            1024: { slidesPerView: 3, spaceBetween: 30 },
-            1440: { slidesPerView: 4, spaceBetween: 35 },
-          }}
-          navigation={{
-            prevEl: swiperPrevRef.current,
-            nextEl: swiperNextRef.current,
-          }}
-          onBeforeInit={(swiper) => {
-            if (swiper.params.navigation) {
-              swiper.params.navigation.prevEl = swiperPrevRef.current;
-              swiper.params.navigation.nextEl = swiperNextRef.current;
-              swiper.navigation.update();
-            }
-          }}
-          style={{ padding: theme.spacing(2, 0) }}
-        >
-          {courses.map((c, index) => (
-            <SwiperSlide key={index}>
-              <Link
-                to={`/detalle-curso/${c.id}`}
-                style={{ textDecoration: "none" }}
-              >
-                <Card
-                  component={motion.div}
-                  whileHover={{
-                    scale: 1.03,
-                    boxShadow: "0 14px 28px rgba(255, 246, 248,0.15)",
-                    transition: { duration: 0.3 },
-                  }}
-                  sx={{
-                    display: "flex",
-                    flexDirection: "column",
-                    height: "100%",
-                    // Ajuste minHeight: lo hemos reducido para que la Card sea más compacta
-                    minHeight: 280,
-                    borderRadius: "18px",
-                    overflow: "hidden",
-                    cursor: "pointer",
-                    boxShadow: "0 6px 18px rgba(255, 246, 248,.08)",
-                    transition: "transform 0.3s ease, box-shadow 0.3s ease",
-                  }}
+        {!courses.length ? (
+          <Progress />
+        ) : (
+          <Swiper
+            modules={[Navigation, Pagination]}
+            loop={true}
+            grabCursor={true}
+            centeredSlides={true}
+            spaceBetween={20}
+            slidesPerView={1.15} // Card central pequeña en móviles
+            breakpoints={{
+              640: { slidesPerView: 1.3, spaceBetween: 20 },
+              768: { slidesPerView: 2.2, spaceBetween: 25 },
+              1024: { slidesPerView: 3, spaceBetween: 30 },
+              1440: { slidesPerView: 4, spaceBetween: 35 },
+            }}
+            navigation={{
+              prevEl: swiperPrevRef.current,
+              nextEl: swiperNextRef.current,
+            }}
+            onBeforeInit={(swiper) => {
+              if (swiper.params.navigation) {
+                swiper.params.navigation.prevEl = swiperPrevRef.current;
+                swiper.params.navigation.nextEl = swiperNextRef.current;
+                swiper.navigation.update();
+              }
+            }}
+            style={{ padding: theme.spacing(2, 0) }}
+          >
+            {courses.map((c) => (
+              <SwiperSlide key={c.id}>
+                <Link
+                  to={`/detalle-curso/${c.id}`}
+                  style={{ textDecoration: "none" }}
                 >
-                  {/* 🖼️ Imagen uniforme (Altura Fija) */}
-                  <Box
-                    sx={{
-                      width: "100%",
-                      height: "500px", // Altura fija uniforme para todas las imágenes
-                      overflow: "hidden",
-                      position: "relative",
+                  <Card
+                    component={motion.div}
+                    whileHover={{
+                      scale: 1.03,
+                      boxShadow: "0 14px 28px rgba(255, 246, 248,0.15)",
+                      transition: { duration: 0.3 },
                     }}
-                  >
-                    <CardMedia
-                      component='img'
-                      image={c.cover_image_url}
-                      alt={c.title}
-                      sx={{
-                        width: "100%",
-                        height: "100%",
-                        objectFit: "cover", // Asegura que la imagen llene el espacio sin deformarse
-                        transition: "transform 0.5s ease",
-                        "&:hover": { transform: "scale(1.05)" },
-                      }}
-                    />
-                  </Box>
-
-                  {/* 📝 Contenido Compacto (Título y Progreso) */}
-                  <Box
                     sx={{
-                      // 👇 Reducimos el padding vertical y eliminamos el margen automático inferior
-                      p: 1.5, // Reducido de 2 a 1.5 para un look más compacto
-                      // mt: 'auto', // Eliminado para quitar el espacio flexible al final
                       display: "flex",
                       flexDirection: "column",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      gap: 0.5, // Reducido para juntar el progreso y el título
+                      height: "100%",
+                      minHeight: 280,
+                      borderRadius: "18px",
+                      overflow: "hidden",
+                      cursor: "pointer",
+                      boxShadow: "0 6px 18px rgba(255, 246, 248,.08)",
+                      transition: "transform 0.3s ease, box-shadow 0.3s ease",
                     }}
                   >
-                    {usuario?.isSubscribed && (
-                      <Progress progress={c?.user_progress_percentage ?? 0} />
-                    )}
-                    <Typography
-                      textAlign='center'
-                      variant='body1'
+                    {/* 🖼️ Imagen Responsiva y Optimizada */}
+                    <Box
                       sx={{
-                        fontWeight: 600,
-                        color: primaryPink,
-                        fontSize: "1.05rem",
-                        letterSpacing: 0.3,
-                        transition: "color 0.3s ease",
-                        "&:hover": { color: "#d81b60" },
-                        // Eliminamos cualquier margen adicional que pueda tener la tipografía
-                        lineHeight: 1.3,
+                        width: "100%",
+                        // 💡 CLAVE: Altura más realista y responsiva (ej: relación de aspecto 4:3)
+                        // Usamos padding-top para mantener la proporción sin depender de una altura fija
+                        paddingTop: { xs: "75%", sm: "66.67%" }, // 4:3 en móvil, 3:2 en tablet/desktop
+                        overflow: "hidden",
+                        position: "relative",
                       }}
                     >
-                      {c.title}
-                    </Typography>
-                  </Box>
-                </Card>
-              </Link>
-            </SwiperSlide>
-          ))}
-        </Swiper>
+                      <CardMedia
+                        component='img'
+                        // 💡 CLAVE: Llamada a la función con el ancho y calidad óptimos
+                        image={getImageUrl(
+                          c.cover_image_url,
+                          optimalWidth,
+                          imageQuality
+                        )}
+                        alt={c.title}
+                        sx={{
+                          position: "absolute", // Necesario para la técnica de padding-top
+                          top: 0,
+                          left: 0,
+                          width: "100%",
+                          height: "100%",
+                          objectFit: "cover",
+                          transition: "transform 0.5s ease",
+                          "&:hover": { transform: "scale(1.05)" },
+                        }}
+                      />
+                    </Box>
+
+                    {/* 📝 Contenido Compacto (Título y Progreso) */}
+                    <Box
+                      sx={{
+                        p: 1.5,
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        gap: 0.5,
+                        flexGrow: 1, // Permite que el contenido ocupe el espacio restante
+                      }}
+                    >
+                      {usuario?.isSubscribed && (
+                        <Progress progress={c?.user_progress_percentage ?? 0} />
+                      )}
+                      <Typography
+                        textAlign='center'
+                        variant='body1'
+                        sx={{
+                          fontWeight: 600,
+                          color: primaryPink,
+                          fontSize: "1.05rem",
+                          letterSpacing: 0.3,
+                          transition: "color 0.3s ease",
+                          "&:hover": { color: "#d81b60" },
+                          lineHeight: 1.3,
+                        }}
+                      >
+                        {c.title}
+                      </Typography>
+                    </Box>
+                  </Card>
+                </Link>
+              </SwiperSlide>
+            ))}
+          </Swiper>
+        )}
 
         {/* Botones de navegación */}
         <IconButton
@@ -230,7 +258,7 @@ const NewCourses = () => {
             transform: "translateY(-50%)",
             backgroundColor: "#F3BBCE",
             color: "white",
-            "&:hover": { backgroundColor: "#F3BBCE" },
+            "&:hover": { backgroundColor: "#d81b60" }, // Color más oscuro al pasar el ratón
             zIndex: 10,
             width: 44,
             height: 44,
@@ -249,7 +277,7 @@ const NewCourses = () => {
             transform: "translateY(-50%)",
             backgroundColor: "#F3BBCE",
             color: "white",
-            "&:hover": { backgroundColor: "#F3BBCE" },
+            "&:hover": { backgroundColor: "#d81b60" }, // Color más oscuro al pasar el ratón
             zIndex: 10,
             width: 44,
             height: 44,

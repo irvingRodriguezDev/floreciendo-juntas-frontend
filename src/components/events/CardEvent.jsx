@@ -2,18 +2,19 @@ import React from "react";
 import {
   Card,
   CardContent,
-  CardMedia,
   Typography,
   Box,
   Stack,
   Button,
   keyframes,
-  Chip,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
-import LocationOnIcon from "@mui/icons-material/LocationOn";
-import AccessTimeIcon from "@mui/icons-material/AccessTime";
+
 import { Link } from "react-router-dom";
 import FormatDate from "../../utils/FormatDate";
+import { getImageUrl } from "../../utils/Image";
+
 // 🌸 Animación de pétalos flotando
 const floatPetal = keyframes`
   0% { transform: translateY(0) rotate(0deg); opacity: 0.8; }
@@ -22,6 +23,23 @@ const floatPetal = keyframes`
 `;
 
 const CardEvent = ({ event }) => {
+  const theme = useTheme();
+
+  // 💡 Hook para detectar el tamaño de la pantalla
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const isTablet = useMediaQuery(theme.breakpoints.down("md"));
+
+  // Función de ancho responsivo
+  const getOptimalWidth = () => {
+    if (isMobile) return 400;
+    if (isTablet) return 500;
+    return 600;
+  };
+
+  // 📌 El ancho y la calidad que se solicitarán a CloudFront
+  const optimalWidth = getOptimalWidth();
+  const imageQuality = 85;
+
   return (
     <Card
       sx={{
@@ -38,25 +56,38 @@ const CardEvent = ({ event }) => {
           transform: "translateY(-6px)",
           boxShadow: "0 12px 30px rgba(229, 56, 136, 0.25)",
         },
+        height: "100%", // Asegura que la tarjeta siempre ocupe el espacio de la fila
+        display: "flex",
+        flexDirection: "column",
       }}
     >
-      {/* Imagen del evento */}
+      {/* 🖼️ Imagen del evento - Contenedor con Proporción */}
       <Box
         sx={{
           position: "relative",
           width: "100%",
-          height: { xs: 240, sm: 280, md: 320 }, // más grande y responsiva
+
+          paddingTop: "100%",
           overflow: "hidden",
         }}
       >
         <Box
           component='img'
-          src={event.image}
+          src={
+            event.image
+              ? getImageUrl(event.image, optimalWidth, imageQuality)
+              : null // Manejar src vacío para evitar la advertencia
+          }
           alt={event.title}
+          loading='lazy'
+          decoding='async'
           sx={{
+            position: "absolute", // Necesario para la técnica de padding-top
+            top: 0,
+            left: 0,
             width: "100%",
-            height: "100%",
-            objectFit: "cover",
+            height: "100%", // Llena el 100% del área proporcional
+            objectFit: "cover", // Recorta si es necesario, pero llena el espacio
             borderRadius: 0,
             transition: "transform 0.5s ease",
             "&:hover": {
@@ -80,6 +111,7 @@ const CardEvent = ({ event }) => {
             fontWeight: 600,
             letterSpacing: 0.3,
             boxShadow: "0 3px 8px rgba(229, 56, 136, 0.35)",
+            zIndex: 10, // Asegurar que la fecha esté por encima de la imagen
           }}
         >
           {FormatDate(event.startDate)}
@@ -106,7 +138,15 @@ const CardEvent = ({ event }) => {
       ))}
 
       {/* Contenido del evento */}
-      <CardContent sx={{ p: 3 }}>
+      <CardContent
+        sx={{
+          p: 3,
+          flexGrow: 1,
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "space-between",
+        }}
+      >
         <Typography
           variant='h6'
           fontWeight='bold'

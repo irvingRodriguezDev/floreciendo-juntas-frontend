@@ -9,22 +9,34 @@ import {
   CardContent,
   Stack,
   CardActions,
+  useMediaQuery,
 } from "@mui/material";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import CoursesContext from "../../../context/Courses/CoursesContext";
 import AuthContext from "../../../context/Auth/AuthContext";
 import "./TopCourses.css";
+import { getImageUrl } from "../../../utils/Image";
 
 const TopCourses = () => {
   const { getTopTenCourses, topCourses } = useContext(CoursesContext);
   const { usuario } = useContext(AuthContext);
   const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const isTablet = useMediaQuery(theme.breakpoints.down("md"));
 
   useEffect(() => {
     getTopTenCourses();
   }, []);
-
+  const getOptimalWidth = () => {
+    if (isMobile) return 300; // Móviles (300px)
+    if (isTablet) return 400; // Tablets (400px)
+    return 350; // Desktop (350px)
+  };
+  // 📌 El ancho de la imagen que se solicitará a CloudFront
+  const optimalWidth = getOptimalWidth();
+  // 📌 Calidad de la imagen (ajustable)
+  const imageQuality = 85;
   return (
     <Box
       sx={{
@@ -144,7 +156,11 @@ const TopCourses = () => {
                   >
                     <CardMedia
                       component='img'
-                      image={course.cover_image_url}
+                      image={getImageUrl(
+                        course.cover_image_url,
+                        optimalWidth,
+                        imageQuality
+                      )}
                       alt={course.title}
                       sx={{
                         width: "100%",

@@ -9,30 +9,49 @@ import {
   Button,
   Stack,
   useTheme,
+  useMediaQuery,
 } from "@mui/material";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import EventsContext from "../../context/Events/EventsContext";
 import FormatDate from "../../utils/FormatDate";
 import { Link } from "react-router-dom";
-// Datos de ejemplo para los eventos
+import { getImageUrl } from "../../utils/Image";
 
 const LatestEventsSection = () => {
   const { events, getLatestEvents } = useContext(EventsContext);
   const theme = useTheme();
+
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const isTablet = useMediaQuery(theme.breakpoints.down("md"));
+  const isDesktop = useMediaQuery(theme.breakpoints.up("lg")); // Usar 'up' para desktop
+
   useEffect(() => {
     getLatestEvents();
-  }, []);
+  }, [getLatestEvents]); // Asegúrate de incluir getLatestEvents en las dependencias
+
   const primaryPink = "#e91e63";
   const lightYellow = "#ffecb3";
+
+  // Función para determinar el ancho óptimo de la imagen basado en el viewport
+  const getOptimalWidth = () => {
+    // Pedir un ancho que sea apropiado para una de las 3-4 columnas de la cuadrícula
+    if (isMobile) return 400;
+    if (isTablet) return 500;
+    if (isDesktop) return 350; // Al tener 4 columnas, el ancho de cada una es menor
+    return 450;
+  };
+
+  const optimalWidth = getOptimalWidth();
+  const imageQuality = 85;
 
   return (
     <Box
       sx={{
-        backgroundColor: theme.palette.background.paper || "#ffffff", // Fondo blanco de la imagen
+        backgroundColor: theme.palette.background.paper || "#ffffff",
         padding: theme.spacing(8, 4),
       }}
     >
-      {/* --- Encabezado de la Sección (Centrado y con Resaltado) --- */}
+      {/* --- Encabezado de la Sección --- */}
       <Stack alignItems='center' sx={{ mb: 6 }}>
         <Typography
           variant='overline'
@@ -55,7 +74,7 @@ const LatestEventsSection = () => {
             fontSize: { xs: "2.5rem", sm: "3rem", md: "3.5rem" },
           }}
         >
-          Proximos{" "}
+          Próximos{" "}
           <span
             style={{
               position: "relative",
@@ -72,7 +91,7 @@ const LatestEventsSection = () => {
                 bottom: 0,
                 width: "100%",
                 height: "8px",
-                backgroundColor: lightYellow, // Resaltado amarillo
+                backgroundColor: lightYellow,
                 zIndex: -1,
                 opacity: 0.7,
                 borderRadius: "4px",
@@ -89,15 +108,57 @@ const LatestEventsSection = () => {
         justifyContent='center'
         sx={{ maxWidth: 1200, margin: "0 auto" }}
       >
-        {events.length > 0 ? (
+        {!events.length ? (
+          <Box sx={{ p: 4 }}>
+            {/* Mostrar un spinner o el mensaje si no hay eventos */}
+            {/* 💡 Sugerencia: Usar un componente de PinkSpinner aquí */}
+            <Typography
+              variant='h3'
+              component='h2'
+              sx={{
+                fontWeight: 700,
+                lineHeight: 1.2,
+                textAlign: "center",
+                fontSize: { xs: "2.5rem", sm: "3rem", md: "3.5rem" },
+              }}
+            >
+              😔No tenemos eventos{" "}
+              <span
+                style={{
+                  position: "relative",
+                  display: "inline-block",
+                  textDecoration: "none",
+                }}
+              >
+                disponibles😔
+                <Box
+                  component='span'
+                  sx={{
+                    position: "absolute",
+                    left: 0,
+                    bottom: 0,
+                    width: "100%",
+                    height: "8px",
+                    backgroundColor: lightYellow,
+                    zIndex: -1,
+                    opacity: 0.7,
+                    borderRadius: "4px",
+                  }}
+                />
+              </span>
+            </Typography>
+          </Box>
+        ) : (
           events.map((event) => (
-            <Grid size={{ xs: 12, sm: 6, md: 4, lg: 3 }} key={event.id}>
+            <Grid item xs={12} sm={6} md={4} lg={3} key={event.id}>
+              {" "}
+              {/* 💡 CLAVE: Usar 'item' y breakpoints */}
               <Card
                 sx={{
                   borderRadius: "24px",
                   boxShadow: "0 4px 16px rgba(229, 56, 136, 0.15)",
                   overflow: "hidden",
-                  minHeight: 460,
+                  // ❌ ELIMINAR minHeight: 460 para dejar que el contenido defina la altura
                   display: "flex",
                   flexDirection: "column",
                   transition: "transform 0.3s ease, box-shadow 0.3s ease",
@@ -106,27 +167,31 @@ const LatestEventsSection = () => {
                     boxShadow: "0 8px 24px rgba(229, 56, 136, 0.25)",
                   },
                   backgroundColor: "#fffdfd",
+                  height: "100%", // Asegura que las tarjetas se alineen en la altura de la fila
                 }}
               >
-                {/* Imagen con fondo de color */}
+                {/* 🖼️ Contenedor de Imagen (Ahora con Proporción) */}
                 <Box
                   sx={{
-                    background: `linear-gradient(180deg, ${event.bgColor}40 0%, #ffffff 100%)`,
-                    height: 240,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
                     position: "relative",
+                    width: "100%",
+                    // 💡 CLAVE: Usar padding-top para forzar una proporción 2:3 (vertical)
+                    // 150% = Altura es 1.5 veces el ancho (Típico para imágenes de retrato)
+                    paddingTop: "100%",
+                    overflow: "hidden",
                   }}
                 >
                   <CardMedia
                     component='img'
-                    image={event.image}
+                    image={getImageUrl(event.image, optimalWidth, imageQuality)}
                     alt={event.title}
                     sx={{
-                      width: "auto",
-                      height: "240px",
-                      objectFit: "cover",
+                      position: "absolute", // Necesario para la técnica de padding-top
+                      top: 0,
+                      left: 0,
+                      width: "100%",
+                      height: "100%", // Ahora 100% de la altura de 'paddingTop' (la proporción 2:3)
+                      objectFit: "cover", // Esto recorta si la imagen no es 2:3, pero garantiza llenar el espacio
                       borderRadius: "0",
                       transition: "transform 0.5s ease",
                       "&:hover": {
@@ -135,7 +200,7 @@ const LatestEventsSection = () => {
                     }}
                   />
 
-                  {/* Detalle floral sutil (pseudo fondo decorativo) */}
+                  {/* Detalle floral sutil (mantenido) */}
                   <Box
                     sx={{
                       position: "absolute",
@@ -145,6 +210,7 @@ const LatestEventsSection = () => {
                       height: "60px",
                       background:
                         "linear-gradient(180deg, transparent 0%, rgba(255, 255, 255, 0.8) 100%)",
+                      zIndex: 2, // Asegura que esté por encima de la imagen
                     }}
                   />
                 </Box>
@@ -227,42 +293,6 @@ const LatestEventsSection = () => {
               </Card>
             </Grid>
           ))
-        ) : (
-          <Typography
-            variant='h3'
-            component='h2'
-            sx={{
-              fontWeight: 700,
-              lineHeight: 1.2,
-              textAlign: "center",
-              fontSize: { xs: "2.5rem", sm: "3rem", md: "3.5rem" },
-            }}
-          >
-            😔No tenemos eventos{" "}
-            <span
-              style={{
-                position: "relative",
-                display: "inline-block",
-                textDecoration: "none",
-              }}
-            >
-              disponibles😔
-              <Box
-                component='span'
-                sx={{
-                  position: "absolute",
-                  left: 0,
-                  bottom: 0,
-                  width: "100%",
-                  height: "8px",
-                  backgroundColor: lightYellow, // Resaltado amarillo
-                  zIndex: -1,
-                  opacity: 0.7,
-                  borderRadius: "4px",
-                }}
-              />
-            </span>
-          </Typography>
         )}
       </Grid>
 
@@ -274,9 +304,8 @@ const LatestEventsSection = () => {
               variant='contained'
               endIcon={<ArrowForwardIcon />}
               sx={{
-                backgroundColor: "#E53888", // Rosa principal
+                backgroundColor: "#E53888",
                 color: "white",
-                // boxShadow: "0 8px 24px rgba(229, 56, 136, 0.25)",
                 fontWeight: 600,
                 padding: "12px 30px",
                 borderRadius: "8px",
