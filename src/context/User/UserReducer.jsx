@@ -23,7 +23,10 @@ export default (state, action) => {
     case GET_TICKETS_BY_USER:
       return {
         ...state,
-        tickets: action.payload,
+        tickets: action.payload.tickets,
+        totalItems: action.payload.totalItems,
+        totalPages: action.payload.totalPages,
+        currentPage: action.payload.currentPage,
       };
     case GET_CALENDAR_LINKS:
       return {

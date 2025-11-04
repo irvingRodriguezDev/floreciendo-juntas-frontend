@@ -30,12 +30,21 @@ import AppleIcon from "@mui/icons-material/Apple";
 import EmailIcon from "@mui/icons-material/Email";
 import EventAvailableIcon from "@mui/icons-material/EventAvailable";
 import DownloadIcon from "@mui/icons-material/Download";
+import Pagination from "../../components/Pagination/Pagination";
 
 const UserTicketsTable = () => {
   const { usuario } = useContext(AuthContext);
-  const { tickets, getTicketsByUser, getCalendarLinks, calendarLoading } =
-    useContext(UserContext);
-
+  const {
+    tickets,
+    getTicketsByUser,
+    getCalendarLinks,
+    calendarLoading,
+    totalPages,
+    currentPage,
+    downloadTicket,
+  } = useContext(UserContext);
+  const [page, setPage] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(12);
   const [anchorEl, setAnchorEl] = useState(null);
   const [selectedTicket, setSelectedTicket] = useState(null);
   const [loadingCalendar, setLoadingCalendar] = useState(false);
@@ -47,9 +56,9 @@ const UserTicketsTable = () => {
 
   useEffect(() => {
     if (usuario?.id) {
-      getTicketsByUser(usuario.id);
+      getTicketsByUser(usuario.id, page, rowsPerPage);
     }
-  }, [usuario]);
+  }, [usuario, page, rowsPerPage]);
 
   const handleCalendarMenuOpen = (event, ticket) => {
     setAnchorEl(event.currentTarget);
@@ -145,6 +154,12 @@ const UserTicketsTable = () => {
   const handleCloseSnackbar = () => {
     setSnackbar({ ...snackbar, open: false });
   };
+  const handlePageChange = (newPage) => {
+    if (newPage >= 1 && newPage <= totalPages && newPage !== page) {
+      setPage(newPage);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  };
 
   if (tickets.length === 0) {
     return (
@@ -159,7 +174,20 @@ const UserTicketsTable = () => {
   }
 
   return (
-    <>
+    <Paper
+      elevation={12}
+      boxShadow='12px'
+      sx={{ padding: "20px", borderRadius: "16px" }}
+    >
+      <Typography
+        variant='h5'
+        color={"#E53888"}
+        sx={{ mb: 3, fontWeight: 600 }}
+      >
+        Cada acceso🎟️ es una semilla de aprendizaje y crecimiento para que sigas
+        floreciendo🌸 en el mundo del nail art 💅🏻
+      </Typography>
+
       <TableContainer
         component={Paper}
         sx={{
@@ -170,141 +198,152 @@ const UserTicketsTable = () => {
         }}
       >
         {tickets ? (
-          <Table>
-            <TableHead sx={{ bgcolor: "#FDE6F0" }}>
-              <TableRow>
-                <TableCell
-                  sx={{
-                    fontWeight: "bold",
-                    color: "#E53888",
-                    textAlign: "center",
-                  }}
-                >
-                  Evento
-                </TableCell>
-                <TableCell
-                  sx={{
-                    fontWeight: "bold",
-                    color: "#E53888",
-                    textAlign: "center",
-                  }}
-                >
-                  Fecha
-                </TableCell>
-                <TableCell
-                  sx={{
-                    fontWeight: "bold",
-                    color: "#E53888",
-                    textAlign: "center",
-                  }}
-                >
-                  Ubicación
-                </TableCell>
-                <TableCell
-                  sx={{
-                    fontWeight: "bold",
-                    color: "#E53888",
-                    textAlign: "center",
-                  }}
-                >
-                  Precio
-                </TableCell>
-                <TableCell
-                  sx={{
-                    fontWeight: "bold",
-                    color: "#E53888",
-                    textAlign: "center",
-                  }}
-                >
-                  Código
-                </TableCell>
-                <TableCell
-                  sx={{
-                    fontWeight: "bold",
-                    color: "#E53888",
-                    textAlign: "center",
-                  }}
-                >
-                  Acciones
-                </TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {tickets.map((ticket) => (
-                <TableRow key={ticket.id} hover>
-                  <TableCell sx={{ textAlign: "center" }}>
-                    {ticket.Event.title}
-                  </TableCell>
-                  <TableCell sx={{ textAlign: "center" }}>
-                    {FormatDate(ticket.Event.startDate)}
-                  </TableCell>
-                  <TableCell sx={{ textAlign: "center" }}>
-                    {ticket.Event.location}
-                  </TableCell>
-                  <TableCell sx={{ textAlign: "center" }}>
-                    {formatMexicanCurrency(Number(ticket.Event.price))}
+          <>
+            <Table>
+              <TableHead sx={{ bgcolor: "#FDE6F0" }}>
+                <TableRow>
+                  <TableCell
+                    sx={{
+                      fontWeight: "bold",
+                      color: "#E53888",
+                      textAlign: "center",
+                    }}
+                  >
+                    Evento
                   </TableCell>
                   <TableCell
-                    sx={{ fontFamily: "monospace", textAlign: "center" }}
+                    sx={{
+                      fontWeight: "bold",
+                      color: "#E53888",
+                      textAlign: "center",
+                    }}
                   >
-                    {ticket.code}
+                    Fecha
                   </TableCell>
-                  <TableCell sx={{ textAlign: "center" }}>
-                    <Box
-                      sx={{ display: "flex", gap: 1, justifyContent: "center" }}
-                    >
-                      {/* Botón Descargar PDF */}
-                      <Button
-                        variant='contained'
-                        size='small'
-                        sx={{
-                          bgcolor: "#E53888",
-                          "&:hover": { bgcolor: "#D32F71" },
-                          textTransform: "none",
-                        }}
-                        startIcon={<ConfirmationNumberIcon />}
-                        onClick={() =>
-                          window.open(ticket.downloadUrl, "_blank")
-                        }
-                      >
-                        Descargar
-                      </Button>
-
-                      {/* Botón Calendario */}
-                      <Button
-                        variant='outlined'
-                        size='small'
-                        sx={{
-                          borderColor: "#E53888",
-                          color: "#E53888",
-                          "&:hover": {
-                            borderColor: "#D32F71",
-                            bgcolor: "rgba(229, 56, 136, 0.04)",
-                          },
-                          textTransform: "none",
-                        }}
-                        startIcon={
-                          loadingCalendar &&
-                          selectedTicket?.id === ticket.id ? (
-                            <CircularProgress
-                              size={16}
-                              sx={{ color: "#E53888" }}
-                            />
-                          ) : (
-                            <CalendarMonthIcon />
-                          )
-                        }
-                        onClick={(e) => handleCalendarMenuOpen(e, ticket)}
-                        disabled={loadingCalendar}
-                      >
-                        Calendario
-                      </Button>
-                    </Box>
+                  <TableCell
+                    sx={{
+                      fontWeight: "bold",
+                      color: "#E53888",
+                      textAlign: "center",
+                    }}
+                  >
+                    Ubicación
+                  </TableCell>
+                  <TableCell
+                    sx={{
+                      fontWeight: "bold",
+                      color: "#E53888",
+                      textAlign: "center",
+                    }}
+                  >
+                    Precio
+                  </TableCell>
+                  <TableCell
+                    sx={{
+                      fontWeight: "bold",
+                      color: "#E53888",
+                      textAlign: "center",
+                    }}
+                  >
+                    Código
+                  </TableCell>
+                  <TableCell
+                    sx={{
+                      fontWeight: "bold",
+                      color: "#E53888",
+                      textAlign: "center",
+                    }}
+                  >
+                    Acciones
                   </TableCell>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHead>
+              <TableBody>
+                {tickets.map((ticket) => (
+                  <TableRow key={ticket.id} hover>
+                    <TableCell sx={{ textAlign: "center" }}>
+                      {ticket.Event.title}
+                    </TableCell>
+                    <TableCell sx={{ textAlign: "center" }}>
+                      {FormatDate(ticket.Event.startDate)}
+                    </TableCell>
+                    <TableCell sx={{ textAlign: "center" }}>
+                      {ticket.Event.location}
+                    </TableCell>
+                    <TableCell sx={{ textAlign: "center" }}>
+                      {formatMexicanCurrency(Number(ticket.Event.price))}
+                    </TableCell>
+                    <TableCell
+                      sx={{ fontFamily: "monospace", textAlign: "center" }}
+                    >
+                      {ticket.code}
+                    </TableCell>
+                    <TableCell sx={{ textAlign: "center" }}>
+                      <Box
+                        sx={{
+                          display: "flex",
+                          gap: 1,
+                          justifyContent: "center",
+                        }}
+                      >
+                        {/* Botón Descargar PDF */}
+                        <Button
+                          variant='contained'
+                          size='small'
+                          sx={{
+                            bgcolor: "#E53888",
+                            "&:hover": { bgcolor: "#D32F71" },
+                            textTransform: "none",
+                          }}
+                          startIcon={<ConfirmationNumberIcon />}
+                          onClick={() => downloadTicket(ticket, usuario)}
+                        >
+                          Descargar
+                        </Button>
+
+                        {/* Botón Calendario */}
+                        <Button
+                          variant='outlined'
+                          size='small'
+                          sx={{
+                            borderColor: "#E53888",
+                            color: "#E53888",
+                            "&:hover": {
+                              borderColor: "#D32F71",
+                              bgcolor: "rgba(229, 56, 136, 0.04)",
+                            },
+                            textTransform: "none",
+                          }}
+                          startIcon={
+                            loadingCalendar &&
+                            selectedTicket?.id === ticket.id ? (
+                              <CircularProgress
+                                size={16}
+                                sx={{ color: "#E53888" }}
+                              />
+                            ) : (
+                              <CalendarMonthIcon />
+                            )
+                          }
+                          onClick={(e) => handleCalendarMenuOpen(e, ticket)}
+                          disabled={loadingCalendar}
+                        >
+                          Calendario
+                        </Button>
+                      </Box>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+            <Box sx={{ padding: "20px" }}>
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={handlePageChange}
+              />
+            </Box>
+          </>
         ) : (
           <PinkSpinner />
         )}
@@ -383,7 +422,7 @@ const UserTicketsTable = () => {
           {snackbar.message}
         </Alert>
       </Snackbar>
-    </>
+    </Paper>
   );
 };
 

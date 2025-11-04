@@ -10,6 +10,8 @@ import {
   GET_CALENDAR_LINKS,
   GET_TICKETS_BY_USER,
 } from "../../types";
+import fileDownload from "js-file-download";
+import clienteAxios from "../../config/Axios";
 /**Importar componente token headers */
 
 const UserState = ({ children }) => {
@@ -20,6 +22,9 @@ const UserState = ({ children }) => {
     calendarLinks: null,
     calendarLoading: false,
     calendarError: null,
+    totalItems: 0,
+    totalPages: 0,
+    currentPage: 0,
   };
 
   const [state, dispatch] = useReducer(UserReducer, initialState);
@@ -52,23 +57,35 @@ const UserState = ({ children }) => {
       });
   };
 
-  const getTicketsByUser = (userId) => {
-    let url = `/tickets/byUser/${userId}`;
+  const getTicketsByUser = (userId, page, limit) => {
+    let url = `/tickets/byUser/${userId}?page=${page}&limit=${limit}`;
 
     MethodGet(url)
       .then((res) => {
         dispatch({
           type: GET_TICKETS_BY_USER,
-          payload: res.data.tickets,
+          payload: {
+            tickets: res.data.tickets,
+            totalItems: res.data.totalItems,
+            totalPages: res.data.totalPages,
+            currentPage: res.data.currentPage,
+          },
         });
       })
       .catch((error) => {
         console.log(error, "ocurrio un error");
       });
   };
-  const downloadTicket = (id) => {
-    let url = `/tickets/download?userId=${id}`;
-    // MethodGet(url).then(())
+  const downloadTicket = (ticket, usuarioId) => {
+    let url = `/tickets/download?ticketId=${ticket.id}&userId=${usuarioId}`;
+    clienteAxios
+      .get(url)
+      .then((res) => {
+        fileDownload(res.data, `Acceso-${ticket.event.title}.pdf`);
+      })
+      .catch((error) => {
+        console.log(error, "ocurrio un error al descargar el boleto");
+      });
   };
   const getCalendarLinks = async (ticketId) => {
     try {
@@ -102,10 +119,14 @@ const UserState = ({ children }) => {
         coursesCompleted: state.coursesCompleted,
         completed: state.completed,
         tickets: state.tickets,
+        totalItems: state.totalItems,
+        totalPages: state.totalPages,
+        currentPage: state.currentPage,
         getCoursesCompletedByUser,
         getCoursesCompleted,
         getTicketsByUser,
         getCalendarLinks,
+        downloadTicket,
       }}
     >
       {children}

@@ -27,7 +27,7 @@ const LatestEventsSection = () => {
 
   useEffect(() => {
     getLatestEvents();
-  }, [getLatestEvents]); // Asegúrate de incluir getLatestEvents en las dependencias
+  }, []); // Asegúrate de incluir getLatestEvents en las dependencias
 
   const primaryPink = "#e91e63";
   const lightYellow = "#ffecb3";

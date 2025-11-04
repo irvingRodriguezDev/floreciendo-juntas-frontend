@@ -20,6 +20,9 @@ const AuthState = (props) => {
     ErrorsApi: [],
     all_users: [],
     cargando: true,
+    totalItems: 0,
+    totalPages: 0,
+    currentPage: 0,
   };
 
   const [state, dispatch] = useReducer(AuthReducer, initialState);
@@ -296,6 +299,9 @@ const AuthState = (props) => {
         ErrorsApi: state.ErrorsApi,
         all_users: state.all_users,
         cargando: state.cargando,
+        totalItems: state.totalItems,
+        totalPages: state.totalPages,
+        currentPage: state.currentPage,
         iniciarSesion,
         usuarioAutenticado,
         cerrarSesion,
