@@ -17,16 +17,20 @@ export default (state, action) => {
     case COURSES_COMPLETED:
       return {
         ...state,
-        completed: action.payload,
-        cargando: true,
+        completed: action.payload.completed,
+        completedPagination: {
+          ...action.payload.pagination,
+        },
+        cargando: false,
       };
+
     case GET_TICKETS_BY_USER:
       return {
         ...state,
         tickets: action.payload.tickets,
-        totalItems: action.payload.totalItems,
-        totalPages: action.payload.totalPages,
-        currentPage: action.payload.currentPage,
+        ticketsPagination: {
+          ...action.payload.pagination,
+        },
       };
     case GET_CALENDAR_LINKS:
       return {

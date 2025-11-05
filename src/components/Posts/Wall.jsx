@@ -40,88 +40,75 @@ const Wall = ({ courseId }) => {
         pb: 6,
       }}
     >
-      <Paper
-        elevation={2}
-        sx={{
-          p: { xs: 2, sm: 3 },
-          borderRadius: "16px",
-          backgroundColor: "#fff",
-        }}
-      >
-        <Stack spacing={3} alignItems='center'>
-          {/* 🔹 Botón de crear publicación */}
-          <Button
-            variant='contained'
-            sx={{
-              bgcolor: "#D82E7A",
-              borderRadius: "10px",
-              textTransform: "none",
-              fontWeight: 600,
-              px: 4,
-              py: 1,
-              "&:hover": { bgcolor: "#c4276e" },
-            }}
-            onClick={() => setOpenModal(true)}
-          >
-            Crear publicación
-          </Button>
+      <Stack spacing={3} alignItems='center'>
+        {/* 🔹 Botón de crear publicación */}
+        <Button
+          variant='contained'
+          sx={{
+            bgcolor: "#D82E7A",
+            borderRadius: "10px",
+            textTransform: "none",
+            fontWeight: 600,
+            px: 4,
+            py: 1,
+            "&:hover": { bgcolor: "#c4276e" },
+          }}
+          onClick={() => setOpenModal(true)}
+        >
+          Crear publicación
+        </Button>
 
-          <CreatePostModal
-            open={openModal}
-            onClose={() => setOpenModal(false)}
-            courseId={courseId}
-            onSubmit={handleCreatePost}
-          />
+        <CreatePostModal
+          open={openModal}
+          onClose={() => setOpenModal(false)}
+          courseId={courseId}
+          onSubmit={handleCreatePost}
+        />
 
-          {/* 🔹 Estado de carga */}
-          {loading ? (
-            <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
-              <PinkSpinner />
-            </Box>
-          ) : (
-            <>
-              {/* 🔹 Estado vacío */}
-              {posts.length === 0 ? (
-                <Box textAlign='center' sx={{ mt: 4 }}>
-                  <Typography variant='body1' color='text.secondary'>
-                    No hay publicaciones todavía.
-                  </Typography>
-                  <Box sx={{ mt: 1 }}>
-                    <IceIcon width={60} />
-                  </Box>
-                  <Typography
-                    variant='subtitle2'
-                    sx={{ color: "#D82E7A", mt: 1, fontWeight: 500 }}
-                  >
-                    ¡Rompe el hielo y crea la primera publicación!
-                  </Typography>
+        {/* 🔹 Estado de carga */}
+        {loading ? (
+          <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
+            <PinkSpinner />
+          </Box>
+        ) : (
+          <>
+            {/* 🔹 Estado vacío */}
+            {posts.length === 0 ? (
+              <Box textAlign='center' sx={{ mt: 4 }}>
+                <Typography variant='body1' color='text.secondary'>
+                  No hay publicaciones todavía.
+                </Typography>
+                <Box sx={{ mt: 1 }}>
+                  <IceIcon width={60} />
                 </Box>
-              ) : (
-                <>
-                  {/* 🔹 Lista de posts */}
-                  <Grid size={12}>
-                    <PostCard posts={posts} />
+                <Typography
+                  variant='subtitle2'
+                  sx={{ color: "#D82E7A", mt: 1, fontWeight: 500 }}
+                >
+                  ¡Rompe el hielo y crea la primera publicación!
+                </Typography>
+              </Box>
+            ) : (
+              <>
+                {/* 🔹 Lista de posts */}
+                <Grid size={12}>
+                  <PostCard posts={posts} />
+                </Grid>
+                {/* 🔹 Paginación */}
+                {totalPages > 1 && (
+                  <Grid container justifyContent='center' sx={{ mt: 3, pb: 2 }}>
+                    <Pagination
+                      totalPages={totalPages}
+                      currentPage={page}
+                      onPageChange={handlePageChange}
+                    />
                   </Grid>
-                  {/* 🔹 Paginación */}
-                  {totalPages > 1 && (
-                    <Grid
-                      container
-                      justifyContent='center'
-                      sx={{ mt: 3, pb: 2 }}
-                    >
-                      <Pagination
-                        totalPages={totalPages}
-                        currentPage={page}
-                        onPageChange={handlePageChange}
-                      />
-                    </Grid>
-                  )}
-                </>
-              )}
-            </>
-          )}
-        </Stack>
-      </Paper>
+                )}
+              </>
+            )}
+          </>
+        )}
+      </Stack>
     </Box>
   );
 };

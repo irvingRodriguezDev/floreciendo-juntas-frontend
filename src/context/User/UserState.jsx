@@ -22,9 +22,16 @@ const UserState = ({ children }) => {
     calendarLinks: null,
     calendarLoading: false,
     calendarError: null,
-    totalItems: 0,
-    totalPages: 0,
-    currentPage: 0,
+    completedPagination: {
+      totalPages: 1,
+      currentPage: 1,
+      totalItems: 0,
+    },
+    ticketsPagination: {
+      totalPages: 1,
+      currentPage: 1,
+      totalItems: 0,
+    },
   };
 
   const [state, dispatch] = useReducer(UserReducer, initialState);
@@ -43,38 +50,42 @@ const UserState = ({ children }) => {
       });
   };
 
-  const getCoursesCompleted = (userId) => {
-    let url = `/user/completedByUser?userId=${userId}`;
+  const getCoursesCompleted = (userId, page, limit) => {
+    const url = `/user/completedByUser?userId=${userId}&page=${page}&limit=${limit}`;
     MethodGet(url)
       .then((res) => {
         dispatch({
           type: COURSES_COMPLETED,
-          payload: res.data.courses,
+          payload: {
+            completed: res.data.courses,
+            pagination: {
+              totalPages: res.data.totalPages,
+              currentPage: res.data.page,
+              totalItems: res.data.total,
+            },
+          },
         });
       })
-      .catch((error) => {
-        console.log(error);
-      });
+      .catch((error) => console.error(error));
   };
 
   const getTicketsByUser = (userId, page, limit) => {
-    let url = `/tickets/byUser/${userId}?page=${page}&limit=${limit}`;
-
+    const url = `/tickets/byUser/${userId}?page=${page}&limit=${limit}`;
     MethodGet(url)
       .then((res) => {
         dispatch({
           type: GET_TICKETS_BY_USER,
           payload: {
             tickets: res.data.tickets,
-            totalItems: res.data.totalItems,
-            totalPages: res.data.totalPages,
-            currentPage: res.data.currentPage,
+            pagination: {
+              totalPages: res.data.totalPages,
+              currentPage: res.data.currentPage,
+              totalItems: res.data.totalItems,
+            },
           },
         });
       })
-      .catch((error) => {
-        console.log(error, "ocurrio un error");
-      });
+      .catch((error) => console.error(error));
   };
   const downloadTicket = (ticket, usuarioId) => {
     let url = `/tickets/download?ticketId=${ticket.id}&userId=${usuarioId}`;
@@ -119,9 +130,8 @@ const UserState = ({ children }) => {
         coursesCompleted: state.coursesCompleted,
         completed: state.completed,
         tickets: state.tickets,
-        totalItems: state.totalItems,
-        totalPages: state.totalPages,
-        currentPage: state.currentPage,
+        ticketsPagination: state.ticketsPagination,
+        completedPagination: state.completedPagination,
         getCoursesCompletedByUser,
         getCoursesCompleted,
         getTicketsByUser,

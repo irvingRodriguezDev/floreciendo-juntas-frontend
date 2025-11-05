@@ -1,5 +1,6 @@
 import React, { useContext, useEffect } from "react";
-import { Box, Typography, Grid, Button, Stack } from "@mui/material";
+import { Box, Typography, Grid, Stack, Paper, Divider } from "@mui/material";
+import { motion } from "framer-motion";
 import Layout from "../../../components/Layout/Layout";
 import CourseTitle from "./CouseTitle";
 import CoursesContext from "../../../context/Courses/CoursesContext";
@@ -10,6 +11,7 @@ import AuthContext from "../../../context/Auth/AuthContext";
 import VideoBlocker from "../VideoBlocker/VideoBlocker";
 import CustomTabs from "../../../components/Custom/CustomTabs";
 import Wall from "../../../components/Posts/Wall";
+
 const CourseDetailScreen = () => {
   const params = useParams();
   const { id } = params;
@@ -34,15 +36,16 @@ const CourseDetailScreen = () => {
 
   const isSubscribed = usuario && usuario.isSubscribed;
   const userId = usuario?.id;
+
   const tabsData = [
     {
-      label: "Descripcion del curso",
+      label: "Descripción del curso",
       content: (
         <Box>
           <Typography
             variant='body1'
             color='text.secondary'
-            sx={{ mb: 3 }}
+            sx={{ mb: 3, lineHeight: 1.8 }}
             component='div'
             dangerouslySetInnerHTML={{
               __html: course ? course.description : "",
@@ -64,52 +67,82 @@ const CourseDetailScreen = () => {
   return (
     <Layout>
       {course ? (
-        <Box sx={{ minHeight: "100vh" }}>
-          {/* Banner Superior */}
+        <Box sx={{ bgcolor: "#fafafa", minHeight: "100vh" }}>
           <CourseTitle title={course.title} />
-          {/* Contenido Principal */}
+
+          {/* Contenido principal */}
           <Grid
             container
-            spacing={{ xs: 2, md: 4 }} // Menos espacio en móviles
+            spacing={{ xs: 2, md: 4 }}
             sx={{
-              maxWidth: 1440,
+              maxWidth: 1280,
               margin: "0 auto",
-              p: { xs: 2, md: 4 }, // Menos padding en móviles
+              p: { xs: 2, md: 4 },
             }}
           >
-            {/* Columna Izquierda: Video y Contenido Principal (8/12 en desktop) */}
-            <Grid size={{ xs: 12, md: 12 }} order={{ xs: 1, md: 1 }}>
+            <Grid size={12}>
               <Stack spacing={{ xs: 3, md: 4 }}>
-                {/* Bloque del Video/Bloqueador */}
-                <Box
-                  sx={{
-                    margin: "0 auto",
-                    padding: { xs: 0, sm: "10px", md: "20px" }, // Padding condicional
-                    width: "100%",
-                  }}
+                {/* Video Section */}
+                <motion.div
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6 }}
                 >
-                  {isSubscribed ? (
-                    // 1. Mostrar Video si está Suscrito
-                    <VideoPlayer
-                      src={
-                        course?.video_url &&
-                        typeof course.video_url === "string"
-                          ? course.video_url.trim()
-                          : ""
-                      }
-                      poster={course.cover_image_url}
-                      courseId={id}
-                      userId={userId}
-                      usuario={usuario}
-                    />
-                  ) : (
-                    // 2. Mostrar Bloqueador y Formulario de Pago
-                    <VideoBlocker userId={userId} title={course.title} />
-                  )}
-                </Box>
+                  <Paper
+                    elevation={3}
+                    sx={{
+                      borderRadius: 4,
+                      overflow: "hidden",
+                      backgroundColor: "#fff",
+                      boxShadow: "0 4px 20px rgba(0,0,0,0.08)",
+                      p: { xs: 0, md: 2 },
+                    }}
+                  >
+                    {isSubscribed ? (
+                      <VideoPlayer
+                        src={
+                          course?.video_url &&
+                          typeof course.video_url === "string"
+                            ? course.video_url.trim()
+                            : ""
+                        }
+                        poster={course.cover_image_url}
+                        courseId={id}
+                        userId={userId}
+                        usuario={usuario}
+                      />
+                    ) : (
+                      <VideoBlocker userId={userId} title={course.title} />
+                    )}
+                  </Paper>
+                </motion.div>
 
-                {/* Descripción del Curso */}
-                <CustomTabs tabs={tabsData} />
+                {/* Divider decorativo */}
+                <Divider
+                  sx={{
+                    borderColor: "rgba(0,0,0,0.1)",
+                    mt: { xs: 1, md: 3 },
+                  }}
+                />
+
+                {/* Tabs Section */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: 0.2 }}
+                >
+                  <Paper
+                    elevation={2}
+                    sx={{
+                      borderRadius: 3,
+                      p: { xs: 2, md: 4 },
+                      backgroundColor: "#fff",
+                      boxShadow: "0 2px 12px rgba(0,0,0,0.05)",
+                    }}
+                  >
+                    <CustomTabs tabs={tabsData} />
+                  </Paper>
+                </motion.div>
               </Stack>
             </Grid>
           </Grid>

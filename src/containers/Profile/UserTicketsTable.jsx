@@ -39,12 +39,11 @@ const UserTicketsTable = () => {
     getTicketsByUser,
     getCalendarLinks,
     calendarLoading,
-    totalPages,
-    currentPage,
+    ticketsPagination,
     downloadTicket,
   } = useContext(UserContext);
   const [page, setPage] = useState(1);
-  const [rowsPerPage, setRowsPerPage] = useState(12);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
   const [anchorEl, setAnchorEl] = useState(null);
   const [selectedTicket, setSelectedTicket] = useState(null);
   const [loadingCalendar, setLoadingCalendar] = useState(false);
@@ -53,6 +52,7 @@ const UserTicketsTable = () => {
     message: "",
     severity: "success",
   });
+  console.log(ticketsPagination, "la paginacion de tickets");
 
   useEffect(() => {
     if (usuario?.id) {
@@ -155,9 +155,13 @@ const UserTicketsTable = () => {
     setSnackbar({ ...snackbar, open: false });
   };
   const handlePageChange = (newPage) => {
-    if (newPage >= 1 && newPage <= totalPages && newPage !== page) {
+    if (
+      newPage >= 1 &&
+      newPage <= ticketsPagination.totalPages &&
+      newPage !== page
+    ) {
       setPage(newPage);
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      window.scrollTo({ top: 1000, behavior: "smooth" });
     }
   };
 
@@ -338,8 +342,8 @@ const UserTicketsTable = () => {
             </Table>
             <Box sx={{ padding: "20px" }}>
               <Pagination
-                currentPage={currentPage}
-                totalPages={totalPages}
+                currentPage={ticketsPagination.currentPage}
+                totalPages={ticketsPagination.totalPages}
                 onPageChange={handlePageChange}
               />
             </Box>
