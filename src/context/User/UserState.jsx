@@ -88,7 +88,10 @@ const UserState = ({ children }) => {
       .catch((error) => console.error(error));
   };
   const downloadTicket = (ticket, usuarioId) => {
-    let url = `/tickets/download?ticketId=${ticket.id}&userId=${usuarioId}`;
+    console.log(usuarioId);
+
+    let url = `/tickets/download?ticketId=${ticket.id}&userId=${usuarioId.id}`;
+
     clienteAxios
       .get(url)
       .then((res) => {

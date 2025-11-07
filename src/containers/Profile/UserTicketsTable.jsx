@@ -52,7 +52,6 @@ const UserTicketsTable = () => {
     message: "",
     severity: "success",
   });
-  console.log(ticketsPagination, "la paginacion de tickets");
 
   useEffect(() => {
     if (usuario?.id) {
