@@ -28,7 +28,7 @@ const SearchCourse = ({ setSearch, title, placeholder }) => {
           letterSpacing: "0.5px",
         }}
       >
-        🌸 Encuentra tu {title} ideal
+        {title}
       </Typography>
 
       <Grid container justifyContent='center'>

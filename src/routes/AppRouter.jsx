@@ -22,6 +22,7 @@ import PinkSpinner from "../components/Loading/PinkSpinner";
 import BySystemId from "../containers/Courses/BySystem/BySystemId";
 import Success from "../Success";
 import Error from "../Error";
+import ProductDetailPage from "../components/Products/ProductDetailPage";
 
 function AppRouter() {
   const { autenticado, usuarioAutenticado, cargando } = useContext(AuthContext);
@@ -47,6 +48,7 @@ function AppRouter() {
     { path: "/cursos/bysystem/:id", element: <BySystemId /> },
     { path: "/success", element: <Success /> },
     { path: "/error", element: <Error /> },
+    { path: "/detalle-producto/:id", element: <ProductDetailPage /> },
   ];
 
   // Rutas públicas solo para no autenticados

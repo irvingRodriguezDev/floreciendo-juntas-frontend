@@ -47,7 +47,7 @@ const Events = () => {
         <Grid size={12}>
           <SearchCourse
             setSearch={setSearch}
-            title={"Evento"}
+            title={"Tu próximo evento para florecer juntas comienza aquí 💫🌸"}
             placeholder={"Ej: Chistmas Nails"}
           />
         </Grid>

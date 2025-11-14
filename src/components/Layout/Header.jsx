@@ -12,42 +12,59 @@ import {
   ListItemButton,
   ListItemText,
   useMediaQuery,
+  Badge,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import { Link } from "react-router-dom";
 import AuthContext from "../../context/Auth/AuthContext";
+import CartContext from "../../context/Cart/CartContext"; // ⭐ NUEVO
 import Logo from "../../assets/images/logo_carolina_tavera.png";
+import CartIcon from "../icons/CartIcon";
+import { styled } from "@mui/material/styles";
+import CartButton from "./CartButton";
+import CartSidebar from "./CartSidebar";
+
 const menuItems = [
   { name: "Cursos", path: "/cursos", auth: "both" },
-  // { name: "Certificaciones", path: "/certificaciones", auth: "both" },
-  // {
-  //   name: "Salon",
-  //   path: "/el-salon-de-tus-sueños",
-  //   auth: "both",
-  // },
-  // {
-  //   name: "10 secretos",
-  //   path: "/10-secretos",
-  //   auth: "both",
-  // },
-  // { name: "Tienda", path: "/tienda", auth: "both" },
+  { name: "Salon", path: "/el-salon-de-tus-sueños", auth: "both" },
   { name: "Eventos", path: "/eventos", auth: "both" },
 ];
 
+// ⭐ Badge Rosa elegante
+const StyledBadge = styled(Badge)(({ theme }) => ({
+  "& .MuiBadge-badge": {
+    right: -3,
+    top: 13,
+    border: `2px solid #d82e7a`,
+    padding: "0px 4px",
+    fontSize: "12px",
+    backgroundColor: "#E53888",
+    color: "#fff",
+  },
+}));
+
 const Header = () => {
   const [open, setOpen] = useState(false);
+  const [openCart, setOpenCart] = useState(false); // ⭐ NUEVO sidebar
   const { autenticado } = useContext(AuthContext);
+  const { cart, guestCart } = useContext(CartContext); // ⭐ NUEVO
+
   const isMobile = useMediaQuery("(max-width:1100px)");
   const [scrolled, setScrolled] = useState(false);
 
-  // 🔹 Detectar scroll
+  // ⭐ Contador del carrito
+  const cartCount = autenticado
+    ? cart?.items?.reduce((acc, item) => acc + item.quantity, 0) || 0
+    : guestCart?.reduce((acc, item) => acc + item.quantity, 0) || 0;
+
+  // Detectar scroll
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 40);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // 🔹 Filtrar menú según auth
+  // Filtrar menú por auth
   const filteredMenu = menuItems.filter((item) => {
     if (item.auth === "both") return true;
     if (item.auth === true && autenticado) return true;
@@ -84,11 +101,12 @@ const Header = () => {
         <Toolbar
           sx={{ display: "flex", justifyContent: "space-between", px: 2 }}
         >
+          {/* LOGO */}
           <Link style={{ textDecoration: "none" }} to='/'>
             <img src={Logo} width='100%' height='90px' />
           </Link>
 
-          {/* MENÚ DESKTOP */}
+          {/* MENU DESKTOP */}
           {!isMobile && (
             <Box
               sx={{
@@ -128,31 +146,34 @@ const Header = () => {
             </Box>
           )}
 
-          {/* BOTONES ACCIÓN */}
+          {/* BOTONES DE ACCIÓN */}
           {!isMobile && (
             <Box sx={{ display: "flex", gap: 2 }}>
+              {/* ⭐ CART DESKTOP */}
+
+              <CartButton onOpen={() => setOpenCart(true)} />
+
+              {/* Auth logic */}
               {!autenticado ? (
-                <>
-                  <Button
-                    component={Link}
-                    to={"/iniciar-sesion"}
-                    variant='outlined'
-                    size='large'
-                    sx={{
-                      color: scrolled ? "#E53888" : "#fff",
-                      borderColor: scrolled ? "#E53888" : "#fff",
-                      borderRadius: "10px",
-                      "&:hover": {
-                        backgroundColor: scrolled
-                          ? "rgba(229, 56, 136, 0.1)"
-                          : "rgba(255,255,255,0.15)",
-                      },
-                      transition: "all 0.3s ease",
-                    }}
-                  >
-                    Iniciar
-                  </Button>
-                </>
+                <Button
+                  component={Link}
+                  to={"/iniciar-sesion"}
+                  variant='outlined'
+                  size='large'
+                  sx={{
+                    color: scrolled ? "#E53888" : "#fff",
+                    borderColor: scrolled ? "#E53888" : "#fff",
+                    borderRadius: "10px",
+                    "&:hover": {
+                      backgroundColor: scrolled
+                        ? "rgba(229, 56, 136, 0.1)"
+                        : "rgba(255,255,255,0.15)",
+                    },
+                    transition: "all 0.3s ease",
+                  }}
+                >
+                  Iniciar
+                </Button>
               ) : (
                 <Button
                   component={Link}
@@ -172,52 +193,45 @@ const Header = () => {
             </Box>
           )}
 
-          {/* MENÚ MOBILE */}
+          {/* MOBILE MENU */}
           {isMobile && (
-            <>
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+              {/* ⭐ CART MOBILE */}
+
+              <CartButton onOpen={() => setOpenCart(true)} />
+
+              {/* HAMBURGER */}
               <IconButton
                 edge='start'
                 sx={{
                   color: scrolled ? "#E53888" : "#fff",
-                  "&:hover": {
-                    backgroundColor: "rgba(229, 56, 136, 0.1)",
-                  },
+                  "&:hover": { backgroundColor: "rgba(229, 56, 136, 0.1)" },
                   transition: "color 0.3s ease",
                 }}
                 onClick={() => setOpen(true)}
               >
                 <MenuIcon />
               </IconButton>
+
+              {/* DRAWER MOBILE */}
               <Drawer anchor='left' open={open} onClose={() => setOpen(false)}>
                 <Box
                   sx={{
                     width: 250,
-                    p: 2, // Shorthand for padding in MUI; overrides the full 'padding' below if needed
+                    p: 2,
                     height: "100vh",
                     display: "flex",
                     flexDirection: "column",
                     justifyContent: "space-between",
-                    boxShadow: scrolled
-                      ? "0 8px 25px rgba(243, 187, 206, 0.33)"
-                      : "0 4px 30px rgba(243, 187, 206, 0.33)",
-                    background: scrolled
-                      ? "rgba(243, 187, 206, 0.33)"
-                      : "rgba(243, 187, 206, 0.33)",
+                    background: "rgba(243, 187, 206, 0.33)",
                     backdropFilter: "blur(14px)",
                     border: "1px solid rgba(243, 187, 206, 0.33)",
-                    transition: "all 0.4s ease",
-                    color: scrolled ? "#E53888" : "#FFFFFF",
-                    textShadow: scrolled ? "none" : "0 1px 6px rgba(0,0,0,0.4)",
                   }}
                 >
                   <Box>
                     <Typography
                       variant='h6'
-                      sx={{
-                        color: "#E53888",
-                        fontWeight: "bold",
-                        mb: 2,
-                      }}
+                      sx={{ color: "#E53888", fontWeight: "bold", mb: 2 }}
                     >
                       Menú
                     </Typography>
@@ -248,25 +262,22 @@ const Header = () => {
                     </List>
                   </Box>
 
-                  {/* Botones dentro del drawer */}
                   <Box
                     sx={{ display: "flex", flexDirection: "column", gap: 1 }}
                   >
                     {!autenticado ? (
-                      <>
-                        <Button
-                          component={Link}
-                          to='/iniciar-sesion'
-                          variant='outlined'
-                          sx={{
-                            color: "#E53888",
-                            borderColor: "#E53888",
-                            borderRadius: "10px",
-                          }}
-                        >
-                          Iniciar
-                        </Button>
-                      </>
+                      <Button
+                        component={Link}
+                        to='/iniciar-sesion'
+                        variant='outlined'
+                        sx={{
+                          color: "#E53888",
+                          borderColor: "#E53888",
+                          borderRadius: "10px",
+                        }}
+                      >
+                        Iniciar
+                      </Button>
                     ) : (
                       <Button
                         component={Link}
@@ -285,10 +296,14 @@ const Header = () => {
                   </Box>
                 </Box>
               </Drawer>
-            </>
+            </Box>
           )}
         </Toolbar>
       </AppBar>
+
+      {/* ⭐ AQUÍ SE MONTARÁ EL SIDEBAR DEL CARRITO (te lo entrego después) */}
+
+      <CartSidebar open={openCart} onClose={() => setOpenCart(false)} />
     </Box>
   );
 };

@@ -56,7 +56,9 @@ const Courses = () => {
         <Grid size={12}>
           <SearchCourse
             setSearch={setSearch}
-            title={"Curso"}
+            title={
+              "Busca cursos que te inspiren a seguir creciendo y floreciendo 💖🌿"
+            }
             placeholder={"Ej:Uñas acrilicas en 3D"}
           />
         </Grid>

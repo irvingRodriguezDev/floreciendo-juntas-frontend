@@ -57,7 +57,6 @@ const NewCourses = () => {
   const optimalWidth = getOptimalWidth();
   // 📌 Calidad de la imagen (ajustable)
   const imageQuality = 85;
-
   return (
     <Box
       sx={{
@@ -124,7 +123,52 @@ const NewCourses = () => {
         sx={{ position: "relative", maxWidth: "100%", px: { xs: 2, md: 4 } }}
       >
         {!courses.length ? (
-          <Progress />
+          <Typography
+            variant='h3'
+            component='h2'
+            sx={{
+              fontWeight: 400,
+              lineHeight: 1.3,
+              textAlign: "center",
+              fontSize: { xs: "2.2rem", sm: "2.8rem", md: "2.5rem" },
+            }}
+          >
+            🌷 ¡Por ahora no tenemos nuevos cursos{" "}
+            <Box
+              component='span'
+              sx={{ position: "relative", display: "inline-block" }}
+            >
+              disponibles
+              <Box
+                component='span'
+                sx={{
+                  position: "absolute",
+                  left: 0,
+                  bottom: 0,
+                  width: "100%",
+                  height: "8px",
+                  backgroundColor: lightYellow,
+                  zIndex: -1,
+                  opacity: 0.7,
+                  borderRadius: "4px",
+                }}
+              />
+            </Box>
+            ! 🌷
+            <br />
+            <Typography
+              component='span'
+              sx={{
+                fontSize: { xs: "1.1rem", sm: "1.3rem" },
+                color: "text.secondary",
+                display: "block",
+                mt: 1,
+              }}
+            >
+              Pero mantente atenta 💖, ¡muy pronto llegarán nuevas oportunidades
+              para seguir aprendiendo y creciendo juntas!
+            </Typography>
+          </Typography>
         ) : (
           <Swiper
             modules={[Navigation, Pagination]}
@@ -222,7 +266,7 @@ const NewCourses = () => {
                         flexGrow: 1, // Permite que el contenido ocupe el espacio restante
                       }}
                     >
-                      {usuario?.isSubscribed && (
+                      {c && autenticado && usuario.isSubscribed && (
                         <Progress progress={c?.user_progress_percentage ?? 0} />
                       )}
                       <Typography
@@ -249,44 +293,48 @@ const NewCourses = () => {
         )}
 
         {/* Botones de navegación */}
-        <IconButton
-          ref={swiperPrevRef}
-          sx={{
-            position: "absolute",
-            left: { xs: 5, sm: 20 },
-            top: "40%",
-            transform: "translateY(-50%)",
-            backgroundColor: "#F3BBCE",
-            color: "white",
-            "&:hover": { backgroundColor: "#d81b60" }, // Color más oscuro al pasar el ratón
-            zIndex: 10,
-            width: 44,
-            height: 44,
-            boxShadow: theme.shadows[3],
-            display: { xs: "none", md: "flex" },
-          }}
-        >
-          <ArrowBackIcon />
-        </IconButton>
-        <IconButton
-          ref={swiperNextRef}
-          sx={{
-            position: "absolute",
-            right: { xs: 5, sm: 20 },
-            top: "40%",
-            transform: "translateY(-50%)",
-            backgroundColor: "#F3BBCE",
-            color: "white",
-            "&:hover": { backgroundColor: "#d81b60" }, // Color más oscuro al pasar el ratón
-            zIndex: 10,
-            width: 44,
-            height: 44,
-            boxShadow: theme.shadows[3],
-            display: { xs: "none", md: "flex" },
-          }}
-        >
-          <ArrowForwardIcon />
-        </IconButton>
+        {courses.length > 0 && (
+          <>
+            <IconButton
+              ref={swiperPrevRef}
+              sx={{
+                position: "absolute",
+                left: { xs: 5, sm: 20 },
+                top: "40%",
+                transform: "translateY(-50%)",
+                backgroundColor: "#F3BBCE",
+                color: "white",
+                "&:hover": { backgroundColor: "#d81b60" }, // Color más oscuro al pasar el ratón
+                zIndex: 10,
+                width: 44,
+                height: 44,
+                boxShadow: theme.shadows[3],
+                display: { xs: "none", md: "flex" },
+              }}
+            >
+              <ArrowBackIcon />
+            </IconButton>
+            <IconButton
+              ref={swiperNextRef}
+              sx={{
+                position: "absolute",
+                right: { xs: 5, sm: 20 },
+                top: "40%",
+                transform: "translateY(-50%)",
+                backgroundColor: "#F3BBCE",
+                color: "white",
+                "&:hover": { backgroundColor: "#d81b60" }, // Color más oscuro al pasar el ratón
+                zIndex: 10,
+                width: 44,
+                height: 44,
+                boxShadow: theme.shadows[3],
+                display: { xs: "none", md: "flex" },
+              }}
+            >
+              <ArrowForwardIcon />
+            </IconButton>
+          </>
+        )}
       </Box>
     </Box>
   );

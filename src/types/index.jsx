@@ -50,3 +50,15 @@ export const CALENDAR_LOADING = "CALENDAR_LOADING";
 export const GET_ALL_EVENTS = "GET_ALL_EVENTS";
 export const GET_EVENT_BY_ID = "GET_EVENT_BY_ID";
 export const GET_LATEST_EVENTS = "GET_LATEST_EVENTS";
+
+//PRODUCTS
+export const GET_ALL_PRODUCTS = "GET_ALL_PRODUCTS";
+export const GET_ONE_PRODUCT = "GET_ONE_PRODUCT";
+
+//CART
+export const ADD_TO_CART = "ADD_TO_CART";
+export const UPDATE_CART_ITEM = "UPDATE_CART_ITEM";
+export const DELETE_CART_ITEM = "DELETE_CART_ITEM";
+export const GET_USER_CART = "GET_USER_CART";
+export const CLEAR_CART = "CLEAR_CART";
+export const SET_GUEST_CART = "SET_GUEST_CART";

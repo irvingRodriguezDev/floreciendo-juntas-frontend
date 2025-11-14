@@ -15,7 +15,7 @@ import svg from "../../assets/svg/undraw_secure-login_m11a.svg";
 import AuthContext from "../../context/Auth/AuthContext";
 import { useContext } from "react";
 import { Formik, Form } from "formik";
-
+import CartContext from "../../context/Cart/CartContext";
 const LoginSchema = Yup.object().shape({
   email: Yup.string()
     .email("Correo inválido")
@@ -64,7 +64,18 @@ const inputStyles = {
 
 const Login = () => {
   const { iniciarSesion } = useContext(AuthContext);
-
+  const { syncGuestToServer, getUserCart } = useContext(CartContext);
+  const handleLogin = async (credentials) => {
+    await iniciarSesion(credentials); // espera a que el token esté listo
+    // Ahora sincronizamos guest cart (si existe)
+    try {
+      await syncGuestToServer();
+    } catch (e) {
+      console.error("No se pudo sincronizar el carrito", e);
+    }
+    // Finalmente, recargamos carrito desde servidor para asegurar consistencia
+    await getUserCart();
+  };
   return (
     <Layout>
       <Box
@@ -204,7 +215,7 @@ const Login = () => {
               <Formik
                 initialValues={{ email: "", password: "" }}
                 validationSchema={LoginSchema}
-                onSubmit={(values) => iniciarSesion(values)}
+                onSubmit={handleLogin} // 🔥 AQUÍ VA TU LÓGICA COMPLETA
               >
                 {({ values, errors, touched, handleChange, handleBlur }) => (
                   <Form>

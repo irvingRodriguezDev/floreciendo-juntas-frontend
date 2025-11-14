@@ -122,7 +122,7 @@ const LatestEventsSection = () => {
                 fontSize: { xs: "2.5rem", sm: "3rem", md: "3.5rem" },
               }}
             >
-              😔No tenemos eventos{" "}
+              🌷 Por ahora no tenemos{" "}
               <span
                 style={{
                   position: "relative",
@@ -130,7 +130,7 @@ const LatestEventsSection = () => {
                   textDecoration: "none",
                 }}
               >
-                disponibles😔
+                eventos disponibles
                 <Box
                   component='span'
                   sx={{
@@ -146,6 +146,21 @@ const LatestEventsSection = () => {
                   }}
                 />
               </span>
+              🌷
+              <br />
+              <Typography
+                component='span'
+                sx={{
+                  fontSize: { xs: "1.1rem", sm: "1.3rem" },
+                  color: "text.secondary",
+                  display: "block",
+                  mt: 1,
+                  fontWeight: 400,
+                }}
+              >
+                Pero mantente atenta 💖, pronto llegarán nuevas experiencias
+                para compartir, aprender y florecer juntas.
+              </Typography>
             </Typography>
           </Box>
         ) : (
