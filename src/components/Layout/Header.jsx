@@ -23,6 +23,7 @@ import CartIcon from "../icons/CartIcon";
 import { styled } from "@mui/material/styles";
 import CartButton from "./CartButton";
 import CartSidebar from "./CartSidebar";
+import BadgeBox from "../ui/BadgeBox";
 
 const menuItems = [
   { name: "Cursos", path: "/cursos", auth: "both" },
@@ -47,15 +48,19 @@ const Header = () => {
   const [open, setOpen] = useState(false);
   const [openCart, setOpenCart] = useState(false); // ⭐ NUEVO sidebar
   const { autenticado } = useContext(AuthContext);
-  const { cart, guestCart } = useContext(CartContext); // ⭐ NUEVO
+  const { cart, guest_cart, getUserCart } = useContext(CartContext); // ⭐ NUEVO
 
   const isMobile = useMediaQuery("(max-width:1100px)");
   const [scrolled, setScrolled] = useState(false);
-
+  useEffect(() => {
+    if (autenticado) {
+      getUserCart();
+    }
+  }, []);
   // ⭐ Contador del carrito
   const cartCount = autenticado
     ? cart?.items?.reduce((acc, item) => acc + item.quantity, 0) || 0
-    : guestCart?.reduce((acc, item) => acc + item.quantity, 0) || 0;
+    : guest_cart?.items?.reduce((acc, item) => acc + item.quantity, 0) || 0;
 
   // Detectar scroll
   useEffect(() => {
@@ -151,7 +156,18 @@ const Header = () => {
             <Box sx={{ display: "flex", gap: 2 }}>
               {/* ⭐ CART DESKTOP */}
 
-              <CartButton onOpen={() => setOpenCart(true)} />
+              <BadgeBox
+                count={cartCount}
+                anchor
+                top='6px'
+                right='6px'
+                size='md'
+              >
+                <CartButton
+                  sx={{ fontSize: "50px" }}
+                  onOpen={() => setOpenCart(true)}
+                />
+              </BadgeBox>
 
               {/* Auth logic */}
               {!autenticado ? (
@@ -197,8 +213,15 @@ const Header = () => {
           {isMobile && (
             <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
               {/* ⭐ CART MOBILE */}
-
-              <CartButton onOpen={() => setOpenCart(true)} />
+              <BadgeBox
+                count={cartCount}
+                anchor
+                top='6px'
+                right='6px'
+                size='md'
+              >
+                <CartButton onOpen={() => setOpenCart(true)} />
+              </BadgeBox>
 
               {/* HAMBURGER */}
               <IconButton

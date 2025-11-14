@@ -27,8 +27,8 @@ import {
 
 const CartState = ({ children }) => {
   const initialState = {
-    cart: [],
-    guest_cart: [],
+    cart: null,
+    guest_cart: null,
   };
 
   const [state, dispatch] = useReducer(CartReducer, initialState);
@@ -36,38 +36,79 @@ const CartState = ({ children }) => {
   // On mount load guest cart into context for preview (if any)
   useEffect(() => {
     const guest = readGuestCart();
-    if (guest.length) {
-      dispatch({ type: SET_GUEST_CART, payload: guest });
-    }
-    // If user is authenticated, load server cart
-    // NOTE: you can call getUserCart() from your auth flow after login
+    dispatch({ type: SET_GUEST_CART, payload: guest });
   }, []);
 
   // ------------- Guest (local) operations -------------
-  const addItemGuest = (item) => {
-    const current = readGuestCart();
-    const next = addOrIncreaseGuestItem(current, item);
+  const addItemGuest = (product) => {
+    const cart = readGuestCart();
+    const next = addOrIncreaseGuestItem(cart, product);
     writeGuestCart(next);
     dispatch({ type: SET_GUEST_CART, payload: next });
   };
 
-  const updateItemGuest = (product_id, quantity) => {
-    const current = readGuestCart();
-    const next = updateGuestItem(current, product_id, quantity);
+  const updateItemGuest = (productId, qty) => {
+    const cart = readGuestCart();
+    const next = updateGuestItem(cart, productId, qty);
     writeGuestCart(next);
     dispatch({ type: SET_GUEST_CART, payload: next });
   };
 
-  const deleteItemGuest = (product_id) => {
-    const current = readGuestCart();
-    const next = deleteGuestItem(current, product_id);
+  const deleteItemGuest = (productId) => {
+    const cart = readGuestCart();
+    const next = deleteGuestItem(cart, productId);
     writeGuestCart(next);
     dispatch({ type: SET_GUEST_CART, payload: next });
   };
 
   const clearGuest = () => {
     clearGuestCart();
-    dispatch({ type: SET_GUEST_CART, payload: [] });
+    dispatch({
+      type: SET_GUEST_CART,
+      payload: { cartId: null, total: 0, items: [] },
+    });
+  };
+  // ----------- Public API para CartItem (UI) -----------
+
+  const increase = (itemId, autenticado) => {
+    if (autenticado) {
+      // aumentar en 1
+      return updateItemCart({
+        product_id: itemId,
+        quantity: 1, // siempre 1
+      });
+    } else {
+      // guest
+      const cart = readGuestCart();
+      const item = cart.items.find((i) => i.product.id === itemId);
+
+      const newQty = (item?.quantity || 0) + 1;
+      updateItemGuest(itemId, newQty);
+    }
+  };
+
+  const decrease = (itemId, autenticado) => {
+    if (autenticado) {
+      return updateItemCart({
+        product_id: itemId,
+        quantity: -1, // quitar 1
+      });
+    } else {
+      const cart = readGuestCart();
+      const item = cart.items.find((i) => i.product.id === itemId);
+      if (!item) return;
+
+      const newQty = Math.max(1, item.quantity - 1);
+      updateItemGuest(itemId, newQty);
+    }
+  };
+
+  const removeItem = (itemId, autenticado) => {
+    if (autenticado) {
+      return deleteItemCart(itemId);
+    } else {
+      deleteItemGuest(itemId);
+    }
   };
 
   // ------------- Server operations (authenticated) -------------
@@ -182,6 +223,9 @@ const CartState = ({ children }) => {
 
         // sync
         syncGuestToServer,
+        increase,
+        decrease,
+        removeItem,
       }}
     >
       {children}

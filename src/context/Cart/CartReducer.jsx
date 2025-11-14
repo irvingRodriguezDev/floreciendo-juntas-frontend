@@ -9,75 +9,103 @@ import {
 
 export default (state, action) => {
   switch (action.type) {
-    // 👉 Agregar producto al carrito
-    case ADD_TO_CART: {
-      const item = action.payload;
-
-      // Verificar si ya existe en el carrito
-      const existingItem = state.cart.find(
-        (p) => p.product_id === item.product_id
-      );
-
-      if (existingItem) {
-        // Si ya existe, sumar la cantidad
-        const updatedCart = state.cart.map((p) =>
-          p.product_id === item.product_id
-            ? { ...p, quantity: p.quantity + item.quantity }
-            : p
-        );
-
-        return {
-          ...state,
-          cart: updatedCart,
-        };
-      }
-
-      // Si no existe, agregarlo
-      return {
-        ...state,
-        cart: [...state.cart, item],
-      };
-    }
-
-    // 👉 Actualizar cantidad de un producto
-    case UPDATE_CART_ITEM: {
-      const { product_id, quantity } = action.payload;
-
-      const updatedCart = state.cart.map((item) =>
-        item.product_id === product_id ? { ...item, quantity } : item
-      );
-
-      return {
-        ...state,
-        cart: updatedCart,
-      };
-    }
-
-    // 👉 Cargar carrito desde API
+    // 🟢 Set cart completo del backend
     case GET_USER_CART:
       return {
         ...state,
-        cart: action.payload,
+        cart: action.payload, // { cartId, total, items[] }
       };
 
-    // 👉 Eliminar un producto del carrito
-    case DELETE_CART_ITEM:
+    // 🟢 Agregar item (solo backend)
+    case ADD_TO_CART: {
+      const newItem = action.payload;
+
+      // Si no existe carrito aún:
+      if (!state.cart) {
+        return {
+          ...state,
+          cart: {
+            cartId: newItem.cartId,
+            items: [newItem],
+          },
+        };
+      }
+
+      const exists = state.cart.items.find(
+        (i) => i.productId === newItem.productId
+      );
+
+      let updatedItems;
+
+      if (exists) {
+        updatedItems = state.cart.items.map((i) =>
+          i.productId === newItem.productId
+            ? { ...i, quantity: i.quantity + newItem.quantity }
+            : i
+        );
+      } else {
+        updatedItems = [...state.cart.items, newItem];
+      }
+
       return {
         ...state,
-        cart: state.cart.filter((item) => item.product_id !== action.payload),
+        cart: {
+          ...state.cart,
+          items: updatedItems,
+        },
+      };
+    }
+
+    // 🟢 Actualizar cantidad
+    case UPDATE_CART_ITEM: {
+      const { productId, quantity } = action.payload;
+
+      if (!state.cart) return state;
+
+      const updatedItems = state.cart.items.map((i) =>
+        i.productId === productId ? { ...i, quantity } : i
+      );
+
+      return {
+        ...state,
+        cart: {
+          ...state.cart,
+          items: updatedItems,
+        },
+      };
+    }
+
+    // 🟢 Eliminar item
+    case DELETE_CART_ITEM:
+      if (!state.cart) return state;
+
+      return {
+        ...state,
+        cart: {
+          ...state.cart,
+          items: state.cart.items.filter((i) => i.productId !== action.payload),
+        },
       };
 
-    // 👉 Limpiar carrito completo
+    // 🟢 Limpiar carrito completo
     case CLEAR_CART:
       return {
         ...state,
-        cart: [],
+        cart: {
+          cartId: null,
+          items: [],
+        },
       };
-    // payload: guest cart array (only kept in context for preview before login)
+
+    // 🟢 Guest cart debe ser OBJETO con misma estructura
     case SET_GUEST_CART:
       return {
         ...state,
-        guest_cart: Array.isArray(action.payload) ? action.payload : [],
+        guest_cart: action.payload || {
+          cartId: "guest",
+          items: [],
+          total: 0,
+        },
       };
 
     default:

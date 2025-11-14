@@ -4,6 +4,7 @@ import RemoveIcon from "@mui/icons-material/Remove";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { useContext } from "react";
 import CartContext from "../../context/Cart/CartContext";
+import { formatMexicanCurrency } from "../../utils/FormatCurrency";
 
 export default function CartItem({ item }) {
   const { increase, decrease, removeItem } = useContext(CartContext);
@@ -21,8 +22,8 @@ export default function CartItem({ item }) {
       {/* Imagen del producto */}
       <Box
         component='img'
-        src={item.image || "/placeholder.png"}
-        alt={item.name}
+        src={item.product?.image?.url || "/placeholder.png"}
+        alt={item.product?.name || "Producto"}
         sx={{
           width: 70,
           height: 70,
@@ -32,12 +33,14 @@ export default function CartItem({ item }) {
         }}
       />
 
-      {/* Info */}
+      {/* Información del producto */}
       <Box flex={1}>
-        <Typography fontWeight={600}>{item.name}</Typography>
+        <Typography fontWeight={600}>
+          {item.product?.name || "Producto sin nombre"}
+        </Typography>
 
         <Typography fontSize='14px' sx={{ opacity: 0.7, mt: 0.3 }}>
-          ${item.price}
+          {formatMexicanCurrency(Number(item.product?.price || 0))}
         </Typography>
 
         {/* Controles */}

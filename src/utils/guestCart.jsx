@@ -1,48 +1,77 @@
 // src/utils/guestCart.js
-const GUEST_CART_KEY = "guest_cart_v1";
 
-export const readGuestCart = () => {
-  try {
-    const raw = localStorage.getItem(GUEST_CART_KEY);
-    if (!raw) return [];
-    return JSON.parse(raw);
-  } catch (e) {
-    console.error("Error leyendo guest cart", e);
-    return [];
+// Leer guest cart desde localStorage
+export function readGuestCart() {
+  const data = localStorage.getItem("guest_cart");
+  let cart = data ? JSON.parse(data) : null;
+
+  // Si no existe, crear estructura base
+  if (!cart) {
+    cart = { cartId: null, total: 0, items: [] };
+    writeGuestCart(cart);
   }
-};
 
-export const writeGuestCart = (items) => {
-  try {
-    localStorage.setItem(GUEST_CART_KEY, JSON.stringify(items));
-  } catch (e) {
-    console.error("Error escribiendo guest cart", e);
+  return cart;
+}
+
+// Guardar guest cart
+export function writeGuestCart(cart) {
+  localStorage.setItem("guest_cart", JSON.stringify(cart));
+}
+
+// Vaciar guest cart
+export function clearGuestCart() {
+  localStorage.removeItem("guest_cart");
+}
+
+// Agregar o incrementar item
+export function addOrIncreaseGuestItem(cart, product) {
+  const { id, price } = product;
+
+  // buscar si existe
+  const existing = cart.items.find((i) => i.productId === id);
+
+  if (existing) {
+    existing.quantity += 1;
+    existing.subtotal = existing.quantity * Number(existing.unitPrice);
+  } else {
+    cart.items.push({
+      id: null, // aún no existe en BD
+      cartId: null, // guest
+      productId: id,
+      quantity: 1,
+      unitPrice: Number(price),
+      subtotal: Number(price),
+      product,
+    });
   }
-};
 
-export const clearGuestCart = () => {
-  try {
-    localStorage.removeItem(GUEST_CART_KEY);
-  } catch (e) {
-    console.error("Error limpiando guest cart", e);
-  }
-};
+  cart.total = calculateGuestTotal(cart.items);
 
-// Helpers
-export const addOrIncreaseGuestItem = (items, newItem) => {
-  const found = items.find((i) => i.product_id === newItem.product_id);
-  if (found) {
-    return items.map((i) =>
-      i.product_id === newItem.product_id
-        ? { ...i, quantity: i.quantity + newItem.quantity }
-        : i
-    );
-  }
-  return [...items, newItem];
-};
+  return cart;
+}
 
-export const updateGuestItem = (items, product_id, quantity) =>
-  items.map((i) => (i.product_id === product_id ? { ...i, quantity } : i));
+// Actualizar cantidad
+export function updateGuestItem(cart, productId, qty) {
+  const item = cart.items.find((i) => i.productId === productId);
+  if (!item) return cart;
 
-export const deleteGuestItem = (items, product_id) =>
-  items.filter((i) => i.product_id !== product_id);
+  item.quantity = qty;
+  item.subtotal = item.quantity * Number(item.unitPrice);
+
+  cart.total = calculateGuestTotal(cart.items);
+
+  return cart;
+}
+
+// Eliminar item
+export function deleteGuestItem(cart, productId) {
+  cart.items = cart.items.filter((i) => i.productId !== productId);
+  cart.total = calculateGuestTotal(cart.items);
+  return cart;
+}
+
+// Calcular total
+function calculateGuestTotal(items) {
+  return items.reduce((sum, i) => sum + Number(i.subtotal), 0);
+}

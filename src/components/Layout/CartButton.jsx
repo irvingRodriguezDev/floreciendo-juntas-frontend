@@ -1,16 +1,11 @@
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
-import { Badge, IconButton } from "@mui/material";
-import CartContext from "../../context/Cart/CartContext";
-import { useContext } from "react";
+import { IconButton } from "@mui/material";
+import CartIcon from "../icons/CartIcon";
 
 export default function CartButton({ onOpen }) {
-  const { cartCount } = useContext(CartContext);
-
   return (
     <IconButton onClick={onOpen}>
-      <Badge badgeContent={cartCount} color='primary'>
-        <ShoppingCartIcon sx={{ color: "#111" }} />
-      </Badge>
+      <CartIcon width={45} />
     </IconButton>
   );
 }

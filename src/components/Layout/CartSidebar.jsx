@@ -1,24 +1,33 @@
 import { Box, IconButton, Typography, Divider } from "@mui/material";
 import { motion } from "framer-motion";
 import CloseIcon from "@mui/icons-material/Close";
-import { useContext, useMemo } from "react";
+import { useContext, useEffect, useMemo } from "react";
 
 import CartContext from "../../context/Cart/CartContext";
 import AuthContext from "../../context/Auth/AuthContext";
 
 import CartItem from "./CartItem";
+import { formatMexicanCurrency } from "../../utils/FormatCurrency";
 
 export default function CartSidebar({ open, onClose }) {
-  const { cart, guest_cart } = useContext(CartContext);
+  const { cart, guest_cart, getUserCart } = useContext(CartContext);
   const { autenticado } = useContext(AuthContext);
+
+  useEffect(() => {
+    if (autenticado) {
+      getUserCart();
+    }
+  }, [autenticado]);
 
   // Seleccionar carrito correcto
   const activeCart = autenticado ? cart : guest_cart;
 
-  // Calcular total SOLO del carrito activo
+  // Calcular total
   const total = useMemo(() => {
-    return activeCart.reduce((sum, item) => {
-      const price = Number(item.price || item.product?.price || 0);
+    if (!activeCart || !Array.isArray(activeCart.items)) return 0;
+
+    return activeCart.items.reduce((sum, item) => {
+      const price = Number(item.unitPrice || item.product?.price || 0);
       return sum + price * item.quantity;
     }, 0);
   }, [activeCart]);
@@ -55,7 +64,7 @@ export default function CartSidebar({ open, onClose }) {
           right: 0,
           height: "100vh",
           width: { xs: "90%", sm: 380 },
-          bgcolor: "rgba(255, 240, 247, 0.9)", // tono rosa suave elegante
+          bgcolor: "rgba(255, 240, 247, 0.9)",
           backdropFilter: "blur(12px)",
           zIndex: 1300,
           boxShadow: "-4px 0 20px rgba(229, 56, 136, 0.25)",
@@ -84,7 +93,7 @@ export default function CartSidebar({ open, onClose }) {
 
         {/* Lista de productos */}
         <Box sx={{ flex: 1, overflowY: "auto", pr: 1 }}>
-          {activeCart.length === 0 ? (
+          {activeCart?.items?.length === 0 ? (
             <Typography
               sx={{
                 mt: 5,
@@ -96,8 +105,9 @@ export default function CartSidebar({ open, onClose }) {
               Tu carrito está vacío 💗
             </Typography>
           ) : (
-            activeCart.map((item) => (
-              <CartItem key={item.id || item.product_id} item={item} />
+            activeCart &&
+            activeCart.items.map((item) => (
+              <CartItem key={item.id || item.productId} item={item} />
             ))
           )}
         </Box>
@@ -111,7 +121,7 @@ export default function CartSidebar({ open, onClose }) {
               Total:
             </Typography>
             <Typography fontWeight={700} sx={{ color: "#E53888" }}>
-              ${total.toFixed(2)}
+              {formatMexicanCurrency(Number(total))}
             </Typography>
           </Box>
 

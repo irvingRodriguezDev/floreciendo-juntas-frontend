@@ -11,12 +11,10 @@ import ToastProvider from "./components/Toast/ToastProvider.jsx";
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <BrowserRouter>
-      <ThemeProvider theme={theme}>
-        <CssBaseline />
-        <ToastProvider>
-          <App />
-        </ToastProvider>
-      </ThemeProvider>
+      <CssBaseline />
+      <ToastProvider>
+        <App />
+      </ToastProvider>
     </BrowserRouter>
   </React.StrictMode>
 );

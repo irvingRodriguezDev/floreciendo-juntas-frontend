@@ -16,6 +16,7 @@ import { Formik, Form } from "formik";
 import * as Yup from "yup";
 import AuthContext from "../../context/Auth/AuthContext";
 import svg from "../../assets/svg/undraw_access-account_aydp.svg";
+import CartContext from "../../context/Cart/CartContext";
 
 const RegisterSchema = Yup.object().shape({
   name: Yup.string().required("El nombre es requerido"),
@@ -46,6 +47,18 @@ const inputStyles = {
 
 const Register = () => {
   const { registerUser } = useContext(AuthContext);
+  const { syncGuestToServer, getUserCart } = useContext(CartContext);
+  const handleRegister = async (credentials) => {
+    await registerUser(credentials); // espera a que el token esté listo
+    // Ahora sincronizamos guest cart (si existe)
+    try {
+      await syncGuestToServer();
+    } catch (e) {
+      console.error("No se pudo sincronizar el carrito", e);
+    }
+    // Finalmente, recargamos carrito desde servidor para asegurar consistencia
+    await getUserCart();
+  };
 
   return (
     <Layout>
@@ -174,9 +187,7 @@ const Register = () => {
                   phone: "",
                 }}
                 validationSchema={RegisterSchema}
-                onSubmit={(values) => {
-                  registerUser(values);
-                }}
+                onSubmit={(values) => handleRegister(values)}
               >
                 {({ values, errors, touched, handleChange, handleBlur }) => (
                   <Form>

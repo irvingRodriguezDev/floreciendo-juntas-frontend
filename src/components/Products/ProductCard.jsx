@@ -51,8 +51,8 @@ const ProductCard = ({ product }) => {
 
   // Detectar si está en carrito (elige la fuente según autenticado)
   const itemInCart = autenticado
-    ? cart.find((i) => i.product_id === product.id)
-    : guest_cart.find((i) => i.product_id === product.id);
+    ? cart.items.find((i) => i.product_id === product.id)
+    : guest_cart.items.find((i) => i.product_id === product.id);
 
   // Helper para agregar al guest: mandamos objeto completo para localStorage/preview
   const handleAddGuest = (qty = 1) => {
@@ -126,10 +126,10 @@ const ProductCard = ({ product }) => {
 
     if (autenticado) {
       updateItemCart({ product_id: product.id, quantity: newQty });
-      enqueueSnackbar("Cantidad aumentada", { variant: "success" });
+      enqueueSnackbar("Cantidad Actualizada", { variant: "success" });
     } else {
       updateItemGuest(product.id, newQty);
-      enqueueSnackbar("Cantidad aumentada", { variant: "success" });
+      enqueueSnackbar("Cantidad Actualizada", { variant: "success" });
     }
   };
 
