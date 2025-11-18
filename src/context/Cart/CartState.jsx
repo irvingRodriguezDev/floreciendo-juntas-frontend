@@ -70,32 +70,41 @@ const CartState = ({ children }) => {
   };
   // ----------- Public API para CartItem (UI) -----------
 
-  const increase = (itemId, autenticado) => {
+  const increase = async (cartId, itemId, autenticado) => {
     if (autenticado) {
       // aumentar en 1
+      const cart = await getUserCart();
+
+      const item = await cart?.data.items.find((i) => i.product.id === itemId);
       return updateItemCart({
+        cart_id: cartId,
         product_id: itemId,
-        quantity: 1, // siempre 1
+        quantity: (item?.quantity || 0) + 1, // siempre 1
       });
     } else {
       // guest
       const cart = readGuestCart();
-      const item = cart.items.find((i) => i.product.id === itemId);
+
+      const item = cart.items.find((i) => i.product.product_id === itemId);
 
       const newQty = (item?.quantity || 0) + 1;
       updateItemGuest(itemId, newQty);
     }
   };
 
-  const decrease = (itemId, autenticado) => {
+  const decrease = async (cartId, itemId, autenticado) => {
     if (autenticado) {
+      const cart = await getUserCart();
+      const item = await cart?.data.items.find((i) => i.product.id === itemId);
+
       return updateItemCart({
+        cart_id: cartId,
         product_id: itemId,
-        quantity: -1, // quitar 1
+        quantity: (item.quantity || 0) - 1, // quitar 1
       });
     } else {
       const cart = readGuestCart();
-      const item = cart.items.find((i) => i.product.id === itemId);
+      const item = cart.items.find((i) => i.product.product_id === itemId);
       if (!item) return;
 
       const newQty = Math.max(1, item.quantity - 1);
@@ -103,11 +112,11 @@ const CartState = ({ children }) => {
     }
   };
 
-  const removeItem = (itemId, autenticado) => {
+  const removeItem = (itemId, productId, autenticado) => {
     if (autenticado) {
-      return deleteItemCart(itemId);
+      return deleteItemCart(itemId, productId, autenticado);
     } else {
-      deleteItemGuest(itemId);
+      deleteItemGuest(productId);
     }
   };
 
@@ -140,11 +149,11 @@ const CartState = ({ children }) => {
   };
 
   const updateItemCart = (data) => {
-    const url = `/cart/update/${data.product_id}`;
+    const url = `/cart/update/${data.cart_id}`;
     return MethodPut(url, data)
       .then((res) => {
         // API may return updated item or whole cart
-        dispatch({ type: UPDATE_CART_ITEM, payload: res.data });
+        dispatch({ type: UPDATE_CART_ITEM, payload: res.data.item });
         return res;
       })
       .catch((error) => {
@@ -153,11 +162,11 @@ const CartState = ({ children }) => {
       });
   };
 
-  const deleteItemCart = (product_id) => {
-    const url = `/cart/delete/${product_id}`;
+  const deleteItemCart = (cartId, productId, autenticado) => {
+    const url = `/cart/remove/${cartId}/${productId}`;
     return MethodDelete(url)
       .then((res) => {
-        dispatch({ type: DELETE_CART_ITEM, payload: product_id });
+        dispatch({ type: DELETE_CART_ITEM, payload: productId });
         return res;
       })
       .catch((error) => {

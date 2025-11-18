@@ -1,4 +1,4 @@
-import { Box, IconButton, Typography, Divider } from "@mui/material";
+import { Box, IconButton, Typography, Divider, Button } from "@mui/material";
 import { motion } from "framer-motion";
 import CloseIcon from "@mui/icons-material/Close";
 import { useContext, useEffect, useMemo } from "react";
@@ -8,9 +8,10 @@ import AuthContext from "../../context/Auth/AuthContext";
 
 import CartItem from "./CartItem";
 import { formatMexicanCurrency } from "../../utils/FormatCurrency";
+import { Link } from "react-router-dom";
 
 export default function CartSidebar({ open, onClose }) {
-  const { cart, guest_cart, getUserCart } = useContext(CartContext);
+  const { cart, guest_cart, getUserCart, clearCart } = useContext(CartContext);
   const { autenticado } = useContext(AuthContext);
 
   useEffect(() => {
@@ -88,6 +89,28 @@ export default function CartSidebar({ open, onClose }) {
             <CloseIcon />
           </IconButton>
         </Box>
+        {autenticado && activeCart?.items?.length > 0 && (
+          <Box sx={{ display: "flex", justifyContent: "end", mt: 1 }}>
+            <Button
+              onClick={() => clearCart()}
+              sx={{
+                width: "50%",
+                padding: "2px 0",
+                background: "#E53888",
+                color: "#fff",
+                borderRadius: 12,
+                fontWeight: 600,
+                cursor: "pointer",
+                border: "none",
+                fontSize: "14px",
+                transition: "0.3s",
+              }}
+              variant='contained'
+            >
+              Vaciar Carrito
+            </Button>
+          </Box>
+        )}
 
         <Divider sx={{ my: 2, borderColor: "rgba(229, 56, 136, 0.25)" }} />
 
@@ -124,25 +147,45 @@ export default function CartSidebar({ open, onClose }) {
               {formatMexicanCurrency(Number(total))}
             </Typography>
           </Box>
-
-          <Box
-            component='button'
-            onClick={() => alert("Ir a pagar")}
-            style={{
-              width: "100%",
-              padding: "14px 0",
-              background: "#E53888",
-              color: "#fff",
-              borderRadius: 12,
-              fontWeight: 600,
-              cursor: "pointer",
-              border: "none",
-              fontSize: "16px",
-              transition: "0.3s",
-            }}
-          >
-            Proceder al pago
-          </Box>
+          {autenticado ? (
+            <Box
+              component='button'
+              style={{
+                width: "100%",
+                padding: "14px 0",
+                background: "#E53888",
+                color: "#fff",
+                borderRadius: 12,
+                fontWeight: 600,
+                cursor: "pointer",
+                border: "none",
+                fontSize: "16px",
+                transition: "0.3s",
+              }}
+            >
+              Proceder al pago
+            </Box>
+          ) : (
+            <Link to={"/iniciar-sesion"}>
+              <Box
+                component='button'
+                style={{
+                  width: "100%",
+                  padding: "14px 0",
+                  background: "#E53888",
+                  color: "#fff",
+                  borderRadius: 12,
+                  fontWeight: 600,
+                  cursor: "pointer",
+                  border: "none",
+                  fontSize: "16px",
+                  transition: "0.3s",
+                }}
+              >
+                Inicia sesión para guardar
+              </Box>
+            </Link>
+          )}
         </Box>
       </Box>
     </>

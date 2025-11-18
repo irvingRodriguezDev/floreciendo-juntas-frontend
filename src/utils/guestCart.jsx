@@ -29,7 +29,7 @@ export function addOrIncreaseGuestItem(cart, product) {
   const { id, price } = product;
 
   // buscar si existe
-  const existing = cart.items.find((i) => i.productId === id);
+  const existing = cart.items.find((i) => i.product.product_id === id);
 
   if (existing) {
     existing.quantity += 1;
@@ -53,7 +53,7 @@ export function addOrIncreaseGuestItem(cart, product) {
 
 // Actualizar cantidad
 export function updateGuestItem(cart, productId, qty) {
-  const item = cart.items.find((i) => i.productId === productId);
+  const item = cart.items.find((i) => i.product.product_id === productId);
   if (!item) return cart;
 
   item.quantity = qty;
@@ -66,7 +66,7 @@ export function updateGuestItem(cart, productId, qty) {
 
 // Eliminar item
 export function deleteGuestItem(cart, productId) {
-  cart.items = cart.items.filter((i) => i.productId !== productId);
+  cart.items = cart.items.filter((i) => i.product.product_id !== productId);
   cart.total = calculateGuestTotal(cart.items);
   return cart;
 }

@@ -5,9 +5,10 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import { useContext } from "react";
 import CartContext from "../../context/Cart/CartContext";
 import { formatMexicanCurrency } from "../../utils/FormatCurrency";
-
+import AuthContext from "../../context/Auth/AuthContext";
 export default function CartItem({ item }) {
   const { increase, decrease, removeItem } = useContext(CartContext);
+  const { autenticado } = useContext(AuthContext);
 
   return (
     <Box
@@ -22,7 +23,7 @@ export default function CartItem({ item }) {
       {/* Imagen del producto */}
       <Box
         component='img'
-        src={item.product?.image?.url || "/placeholder.png"}
+        src={item.product?.image?.url || item.product.image}
         alt={item.product?.name || "Producto"}
         sx={{
           width: 70,
@@ -40,14 +41,26 @@ export default function CartItem({ item }) {
         </Typography>
 
         <Typography fontSize='14px' sx={{ opacity: 0.7, mt: 0.3 }}>
+          Precio Unitario:{" "}
           {formatMexicanCurrency(Number(item.product?.price || 0))}
         </Typography>
-
+        <Typography fontSize='14px' sx={{ opacity: 0.7, mt: 0.3 }}>
+          Subtotal:{" "}
+          {formatMexicanCurrency(
+            Number(item.product?.price * item.quantity || 0)
+          )}
+        </Typography>
         {/* Controles */}
         <Box display='flex' alignItems='center' gap={1} mt={1}>
           {/* Disminuir */}
           <IconButton
-            onClick={() => decrease(item.id)}
+            onClick={() =>
+              decrease(
+                item.id,
+                autenticado ? item.productId : item.product.product_id,
+                autenticado
+              )
+            }
             size='small'
             disabled={item.quantity <= 1}
           >
@@ -58,13 +71,28 @@ export default function CartItem({ item }) {
           <Typography fontWeight={600}>{item.quantity}</Typography>
 
           {/* Aumentar */}
-          <IconButton onClick={() => increase(item.id)} size='small'>
+          <IconButton
+            onClick={() =>
+              increase(
+                item.id,
+                autenticado ? item.productId : item.product.product_id,
+                autenticado
+              )
+            }
+            size='small'
+          >
             <AddIcon fontSize='small' />
           </IconButton>
 
           {/* Eliminar */}
           <IconButton
-            onClick={() => removeItem(item.id)}
+            onClick={() =>
+              removeItem(
+                item.id,
+                autenticado ? item.productId : item.product.product_id,
+                autenticado
+              )
+            }
             color='error'
             size='small'
             sx={{ marginLeft: "auto" }}

@@ -34,7 +34,6 @@ const ProductCard = ({ product }) => {
     updateItemGuest,
     deleteItemGuest,
   } = useContext(CartContext);
-
   const [open, setOpen] = useState(false);
   const [prod, setProd] = useState(null);
 
@@ -52,13 +51,13 @@ const ProductCard = ({ product }) => {
   // Detectar si está en carrito (elige la fuente según autenticado)
   const itemInCart = autenticado
     ? cart.items.find((i) => i.product_id === product.id)
-    : guest_cart.items.find((i) => i.product_id === product.id);
+    : guest_cart.items.find((i) => i.product.product_id === product.id);
 
   // Helper para agregar al guest: mandamos objeto completo para localStorage/preview
-  const handleAddGuest = (qty = 1) => {
+  const handleAddGuest = (product) => {
     const guestItem = {
       product_id: product.id,
-      quantity: qty,
+      quantity: 1,
       name: product.name,
       image: product.image?.url || product.image || null,
       price: Number(product.price),
@@ -72,14 +71,14 @@ const ProductCard = ({ product }) => {
   };
 
   // Handler para click en "Agregar"
-  const handleClickAddCart = (qty = 1) => {
+  const handleClickAddCart = (product) => {
     if (autenticado) {
-      handleAddAuth(qty);
+      handleAddAuth(product);
       enqueueSnackbar("Producto agregado al carrito 💗", {
         variant: "success",
       });
     } else {
-      handleAddGuest(qty);
+      handleAddGuest(product);
       enqueueSnackbar("Producto guardado para después 💗", {
         variant: "info",
       });
@@ -115,9 +114,9 @@ const ProductCard = ({ product }) => {
     }
   };
 
-  const handleIncrease = () => {
+  const handleIncrease = (product) => {
     if (!itemInCart) {
-      handleClickAddCart(1);
+      handleClickAddCart(product);
       enqueueSnackbar("Producto agregado al carrito", { variant: "success" });
       return;
     }
@@ -133,8 +132,6 @@ const ProductCard = ({ product }) => {
     }
   };
 
-  // Ensure CardContent has bottom padding enough for buttons (avoid cut)
-  // and show buttons always on xs; on md+ only on hover
   return (
     <>
       <Card
@@ -277,7 +274,7 @@ const ProductCard = ({ product }) => {
                   </Button>
 
                   <Button
-                    onClick={handleIncrease}
+                    onClick={() => handleIncrease(product)}
                     sx={{
                       minWidth: 48,
                       color: "#d82e7a",
@@ -295,7 +292,7 @@ const ProductCard = ({ product }) => {
                 <Button
                   fullWidth
                   variant='contained'
-                  onClick={() => handleClickAddCart(1)}
+                  onClick={() => handleClickAddCart(product)}
                   sx={{
                     borderRadius: 2,
                     py: 1.1,
