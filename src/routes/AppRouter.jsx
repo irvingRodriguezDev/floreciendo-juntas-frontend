@@ -23,6 +23,8 @@ import BySystemId from "../containers/Courses/BySystem/BySystemId";
 import Success from "../Success";
 import Error from "../Error";
 import ProductDetailPage from "../components/Products/ProductDetailPage";
+import SuccessSalonPayment from "../SuccessPartialPayment";
+import SuccessSubscription from "../SuccessSubscription";
 
 function AppRouter() {
   const { autenticado, usuarioAutenticado, cargando } = useContext(AuthContext);
@@ -46,7 +48,9 @@ function AppRouter() {
     { path: "/el-salon-de-tus-sueños", element: <Saloon /> },
     { path: "/detalle-curso/:id", element: <DetailsCourse /> },
     { path: "/cursos/bysystem/:id", element: <BySystemId /> },
-    { path: "/success", element: <Success /> },
+    { path: "/success-payment-tickets", element: <Success /> },
+    { path: "/success-payment-partial", element: <SuccessSalonPayment /> },
+    { path: "/success-payment-subscription", element: <SuccessSubscription /> },
     { path: "/error", element: <Error /> },
     { path: "/detalle-producto/:id", element: <ProductDetailPage /> },
   ];

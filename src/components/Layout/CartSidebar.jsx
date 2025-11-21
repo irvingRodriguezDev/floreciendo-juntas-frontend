@@ -9,10 +9,11 @@ import AuthContext from "../../context/Auth/AuthContext";
 import CartItem from "./CartItem";
 import { formatMexicanCurrency } from "../../utils/FormatCurrency";
 import { Link } from "react-router-dom";
-
+import OrdersContext from "../../context/Orders/OrdersContext";
 export default function CartSidebar({ open, onClose }) {
   const { cart, guest_cart, getUserCart, clearCart } = useContext(CartContext);
   const { autenticado } = useContext(AuthContext);
+  const { createOrder } = useContext(OrdersContext);
 
   useEffect(() => {
     if (autenticado) {
@@ -150,6 +151,10 @@ export default function CartSidebar({ open, onClose }) {
           {autenticado ? (
             <Box
               component='button'
+              onClick={async () => {
+                const ok = await createOrder(); // espera a que termine
+                if (ok) onClose(); // solo cerramos si salió bien
+              }}
               style={{
                 width: "100%",
                 padding: "14px 0",

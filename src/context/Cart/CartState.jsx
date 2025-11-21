@@ -122,8 +122,11 @@ const CartState = ({ children }) => {
 
   // ------------- Server operations (authenticated) -------------
   const addItemCart = (data) => {
+    const formData = new FormData();
+    formData.append("productId", data.product_id);
+    formData.append("quantity", data.quantity);
     const url = `/cart/add`;
-    return MethodPost(url, data)
+    return MethodPost(url, formData)
       .then((res) => {
         // API returns the item added or the updated cart item
         dispatch({ type: ADD_TO_CART, payload: res.data });

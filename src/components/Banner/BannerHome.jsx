@@ -13,7 +13,7 @@ import {
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import VideoModal from "./VideoModal";
-import image from "../../assets/images/FB_IMG_1760128916351.jpg";
+import image from "../../assets/images/caro.jpg";
 const BannerHome = () => {
   const theme = useTheme();
   const videoSource =
@@ -27,14 +27,16 @@ const BannerHome = () => {
         alignItems: "center",
         justifyContent: "center",
         minHeight: "80vh",
-        background: "#FFF0F0",
+        background: "#fff0f0",
         padding: 4,
         position: "relative",
-        overflow: "hidden", // Para contener los elementos decorativos
+        overflow: "hidden",
         borderRadius: "16px",
       }}
     >
-      {/* Elementos decorativos de fondo */}
+      {/* --- ELEMENTOS DECORATIVOS --- */}
+
+      {/* Aros grandes derechos */}
       <Box
         sx={{
           position: "absolute",
@@ -43,7 +45,7 @@ const BannerHome = () => {
           width: 650,
           height: 650,
           borderRadius: "50%",
-          border: "3px solid #D72E79", // Amarillo
+          border: "3px solid #F971AF",
           opacity: 0.9,
           zIndex: 1,
           display: { xs: "none", md: "block" },
@@ -57,12 +59,132 @@ const BannerHome = () => {
           width: 500,
           height: 500,
           borderRadius: "50%",
-          border: "3px solid #D72E79",
+          border: "3px solid #F971AF",
           opacity: 0.3,
           zIndex: 0,
           display: { xs: "none", md: "block" },
         }}
       />
+
+      {/* Líneas curvas inferiores */}
+      <Box
+        sx={{
+          position: "absolute",
+          bottom: "15%",
+          left: "-5%",
+          width: 300,
+          height: 300,
+          borderRadius: "50%",
+          border: "1px solid #F971AF",
+          opacity: 0.9,
+          filter: "blur(1px)",
+          transform: "rotate(15deg)",
+          display: { xs: "none", md: "block" },
+        }}
+      />
+      <Box
+        sx={{
+          position: "absolute",
+          bottom: "12%",
+          left: "0%",
+          width: 350,
+          height: 350,
+          borderRadius: "50%",
+          border: "1px solid #F971AF",
+          opacity: 0.8,
+          filter: "blur(1px)",
+          transform: "rotate(25deg)",
+          display: { xs: "none", md: "block" },
+        }}
+      />
+
+      {/* Flor minimalista */}
+      <Box
+        sx={{
+          position: "absolute",
+          top: "12%",
+          left: "6%",
+          width: 18,
+          height: 18,
+          borderRadius: "50%",
+          backgroundColor: "#F971AF",
+          opacity: 0.6,
+          display: { xs: "none", md: "block" },
+        }}
+      />
+
+      {[0, 1, 2, 3].map((i) => (
+        <Box
+          key={i}
+          sx={{
+            position: "absolute",
+            top: "12%",
+            left: "6%",
+            width: 12,
+            height: 12,
+            borderRadius: "50%",
+            backgroundColor: "#F971AF",
+            opacity: 0.4,
+            transform: `translate(
+          ${Math.cos(i * 90 * (Math.PI / 180)) * 18}px,
+          ${Math.sin(i * 90 * (Math.PI / 180)) * 18}px
+        )`,
+            display: { xs: "none", md: "block" },
+          }}
+        />
+      ))}
+
+      {/* Sparkles distribuidos vertical derecha */}
+      {Array.from({ length: 8 }).map((_, i) => (
+        <Box
+          key={i}
+          sx={{
+            position: "absolute",
+            top: `${20 + i * 5}%`,
+            right: `${5 + (i % 3) * 3}%`,
+            width: 6,
+            height: 6,
+            borderRadius: "50%",
+            backgroundColor: "#F971AF",
+            opacity: 0.3,
+            display: { xs: "none", md: "block" },
+          }}
+        />
+      ))}
+
+      {/* Glow vertical suave */}
+      <Box
+        sx={{
+          position: "absolute",
+          top: 0,
+          left: "50%",
+          width: "250px",
+          height: "100%",
+          background:
+            "linear-gradient(90deg, transparent, rgba(249,113,175,0.10), transparent)",
+          filter: "blur(10px)",
+          display: { xs: "none", md: "block" },
+          pointerEvents: "none",
+        }}
+      />
+
+      {/* Oval aura */}
+      <Box
+        sx={{
+          position: "absolute",
+          top: "60%",
+          right: "20%",
+          width: 260,
+          height: 120,
+          borderRadius: "50%",
+          border: "2px solid #F971AF",
+          opacity: 0.12,
+          transform: "rotate(-20deg)",
+          display: { xs: "none", md: "block" },
+        }}
+      />
+
+      {/* Aro pequeño extra */}
       <Box
         sx={{
           position: "absolute",
@@ -71,12 +193,13 @@ const BannerHome = () => {
           width: 150,
           height: 150,
           borderRadius: "50%",
-          border: "3px solid #D72E79",
+          border: "3px solid #F971AF",
           opacity: 0.3,
-          zIndex: 0,
           display: { xs: "none", md: "block" },
         }}
       />
+
+      {/* Diamante rotado */}
       <Box
         sx={{
           position: "absolute",
@@ -84,12 +207,14 @@ const BannerHome = () => {
           right: "5%",
           width: 30,
           height: 30,
-          backgroundColor: "#D72E79",
+          backgroundColor: "#F971AF",
           transform: "rotate(45deg)",
-          opacity: 0.5,
+          opacity: 0.8,
           display: { xs: "none", md: "block" },
         }}
       />
+
+      {/* Cuadro rosado flotante */}
       <Box
         sx={{
           position: "absolute",
@@ -98,63 +223,46 @@ const BannerHome = () => {
           transform: "translate(-50%, -50%) rotate(15deg)",
           width: "50px",
           height: "50px",
-          backgroundColor: "#D72E79",
-          opacity: 0.2,
-          display: { xs: "none", md: "block" },
-        }}
-      />
-      <Box
-        sx={{
-          position: "absolute",
-          top: "40%",
-          left: "10%",
-          width: "10px",
-          height: "10px",
-          borderRadius: "50%",
-          backgroundColor: "#D72E79",
-          opacity: 0.4,
-          display: { xs: "none", md: "block" },
-        }}
-      />
-      <Box
-        sx={{
-          position: "absolute",
-          top: "42%",
-          left: "11%",
-          width: "10px",
-          height: "10px",
-          borderRadius: "50%",
-          backgroundColor: "#D72E79",
-          opacity: 0.4,
-          display: { xs: "none", md: "block" },
-        }}
-      />
-      <Box
-        sx={{
-          position: "absolute",
-          top: "40%",
-          left: "12%",
-          width: "10px",
-          height: "10px",
-          borderRadius: "50%",
-          backgroundColor: "#D72E79",
-          opacity: 0.4,
+          backgroundColor: "#F971AF",
+          opacity: 0.9,
           display: { xs: "none", md: "block" },
         }}
       />
 
-      {/* Sección Izquierda - Contenido de texto y botones */}
+      {/* 3 puntos rosados */}
+      {[
+        { top: "40%", left: "10%" },
+        { top: "42%", left: "11%" },
+        { top: "40%", left: "12%" },
+      ].map((pos, idx) => (
+        <Box
+          key={idx}
+          sx={{
+            position: "absolute",
+            width: 10,
+            height: 10,
+            borderRadius: "50%",
+            backgroundColor: "#F971AF",
+            opacity: 0.4,
+            display: { xs: "none", md: "block" },
+            ...pos,
+          }}
+        />
+      ))}
+
+      {/* ---- CONTENIDO IZQUIERDO ---- */}
       <Box
         sx={{
           flex: 1,
           textAlign: { xs: "center", md: "left" },
           marginRight: { md: theme.spacing(4) },
-          zIndex: 1, // Asegura que el contenido esté por encima de los decorativos
+          zIndex: 1,
         }}
       >
         <Typography variant='body2' color='text.secondary' sx={{ mb: 1 }}>
           Tu Camino al Éxito en Uñas
         </Typography>
+
         <Typography
           variant='h3'
           component='h1'
@@ -166,13 +274,7 @@ const BannerHome = () => {
           }}
         >
           Conviértete en una artista de uñas y adquiere <br />
-          <span
-            style={{
-              position: "relative",
-              display: "inline-block",
-              textDecoration: "none",
-            }}
-          >
+          <span style={{ position: "relative", display: "inline-block" }}>
             Nuevos conocimientos
             <Box
               component='span'
@@ -182,22 +284,16 @@ const BannerHome = () => {
                 bottom: 0,
                 width: "100%",
                 height: "8px",
-                backgroundColor: "#D72E79", // Amarillo
+                backgroundColor: "#F971AF",
                 zIndex: -1,
                 opacity: 0.7,
                 borderRadius: "4px",
               }}
             />
-          </span>{" "}
+          </span>
           <br />y{" "}
-          <span
-            style={{
-              position: "relative",
-              display: "inline-block",
-              textDecoration: "none",
-            }}
-          >
-            Habilidades
+          <span style={{ position: "relative", display: "inline-block" }}>
+            Habilidades 💞
             <Box
               component='span'
               sx={{
@@ -206,7 +302,7 @@ const BannerHome = () => {
                 bottom: 0,
                 width: "100%",
                 height: "8px",
-                backgroundColor: "#D72E79", // Amarillo
+                backgroundColor: "#F971AF",
                 zIndex: -1,
                 opacity: 0.7,
                 borderRadius: "4px",
@@ -214,6 +310,7 @@ const BannerHome = () => {
             />
           </span>
         </Typography>
+
         <Typography
           variant='body1'
           color='text.secondary'
@@ -224,6 +321,7 @@ const BannerHome = () => {
           transformar tu pasión en un negocio exitoso. ¡Únete a nosotras y haz
           tus sueños realidad!
         </Typography>
+
         <Stack
           direction={{ xs: "column", md: "row" }}
           spacing={2}
@@ -232,11 +330,9 @@ const BannerHome = () => {
           <Chip
             variant='contained'
             sx={{
-              backgroundColor: "#D72E79", // Amarillo
+              backgroundColor: "#F971AF",
               color: "#fff",
-              "&:hover": {
-                backgroundColor: "#D72E79", // Un tono más oscuro de amarillo
-              },
+              "&:hover": { backgroundColor: "#F971AF" },
               fontWeight: "bold",
               padding: "20px 25px",
               borderRadius: "12px",
@@ -247,15 +343,16 @@ const BannerHome = () => {
 
           <VideoModal buttonText='Ver nuestro video' videoUrl={videoSource} />
         </Stack>
+
         <Box
           component='img'
-          src='https://floreciendo.wapizima.com.mx/static/media/firma_caro_negra.2d934595178c23de9acb.png' // Reemplaza con la URL de tu imagen
+          src='https://floreciendo.wapizima.com.mx/static/media/firma_caro_negra.2d934595178c23de9acb.png'
           alt='caro'
           sx={{
             width: "100%",
             maxWidth: { xs: 300, sm: 400, md: 500 },
             height: "auto",
-            borderRadius: "50%", // Si la imagen tiene bordes redondeados
+            borderRadius: "50%",
             objectFit: "cover",
             position: "relative",
             zIndex: 1,
@@ -263,7 +360,7 @@ const BannerHome = () => {
         />
       </Box>
 
-      {/* Sección Derecha - Imagen y estadísticas */}
+      {/* ---- CONTENIDO DERECHO ---- */}
       <Box
         sx={{
           flex: 1,
@@ -277,20 +374,20 @@ const BannerHome = () => {
       >
         <Box
           component='img'
-          src={image} // Reemplaza con la URL de tu imagen
+          src={image}
           alt='caro'
           sx={{
             width: "100%",
             maxWidth: { xs: 300, sm: 400, md: 500 },
             height: "auto",
-            borderRadius: "50%", // Si la imagen tiene bordes redondeados
+            borderRadius: "50%",
             objectFit: "cover",
             position: "relative",
             zIndex: 1,
           }}
         />
 
-        {/* Floating Card: Total Active Students */}
+        {/* Floating Card */}
         <Box
           sx={{
             position: "absolute",
@@ -300,14 +397,14 @@ const BannerHome = () => {
             borderRadius: "12px",
             padding: theme.spacing(1.5, 2),
             boxShadow: theme.shadows[3],
-            display: "flex",
+            display: { md: "none", lg: "flex" },
             alignItems: "center",
             gap: theme.spacing(1),
             zIndex: 2,
             border: "1px solid #e0e0e0",
           }}
         >
-          <Avatar sx={{ bgcolor: "#F1D5E1", width: 32, height: 32 }}>
+          <Avatar sx={{ bgcolor: "#F971AF", width: 32, height: 32 }}>
             <CheckCircleOutlineIcon sx={{ fontSize: 18 }} />
           </Avatar>
           <Box>

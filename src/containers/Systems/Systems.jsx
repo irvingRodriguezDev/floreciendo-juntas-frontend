@@ -16,6 +16,7 @@ import "swiper/css/navigation";
 import SystemContext from "../../context/System/SystemContext";
 import { Link } from "react-router-dom";
 import PinkSpinner from "../../components/Loading/PinkSpinner";
+
 const Systems = () => {
   const { getAllSystems, systems } = useContext(SystemContext);
   const theme = useTheme();
@@ -38,9 +39,127 @@ const Systems = () => {
         justifyContent: "center",
         borderRadius: "16px",
         overflow: "hidden",
+
+        // ---------- ANIMACIONES KEYFRAMES ----------
+        "@keyframes floatUp": {
+          "0%": { transform: "translateY(0)" },
+          "100%": { transform: "translateY(-40px)" },
+        },
+        "@keyframes pulse": {
+          "0%": { transform: "scale(1)", opacity: 0.5 },
+          "50%": { transform: "scale(1.15)", opacity: 0.9 },
+          "100%": { transform: "scale(1)", opacity: 0.5 },
+        },
+        "@keyframes rotateSoft": {
+          "0%": { transform: "rotate(0deg)" },
+          "100%": { transform: "rotate(360deg)" },
+        },
+        "@keyframes sparkle": {
+          "0%, 100%": { opacity: 0 },
+          "50%": { opacity: 0.8 },
+        },
+        "@keyframes wave": {
+          "0%": { transform: "translateX(0)" },
+          "100%": { transform: "translateX(40px)" },
+        },
       }}
     >
-      {/* --- Elementos decorativos --- */}
+      {/* ---- DECORACIONES NUEVAS ---- */}
+
+      {/* 🫧 Burbujas flotando */}
+      {[1, 2, 3, 4].map((b, i) => (
+        <Box
+          key={i}
+          sx={{
+            position: "absolute",
+            width: 20 + i * 6,
+            height: 20 + i * 6,
+            borderRadius: "50%",
+            backgroundColor: "#F8C8D8",
+            opacity: 0.28,
+            filter: "blur(1px)",
+            left: `${10 + i * 15}%`,
+            bottom: `${5 + i * 12}%`,
+            animation: `floatUp ${6 + i * 2}s ease-in-out infinite alternate`,
+            zIndex: 0,
+            display: { xs: "none", md: "block" },
+          }}
+        />
+      ))}
+
+      {/* ✨ Sparkles (brillitos) */}
+      {[1, 2, 3, 4, 5, 6].map((s, i) => (
+        <Box
+          key={i}
+          sx={{
+            position: "absolute",
+            width: 6,
+            height: 6,
+            borderRadius: "50%",
+            backgroundColor: "#DC4485",
+            opacity: 0.7,
+            left: `${20 + i * 10}%`,
+            top: `${15 + i * 8}%`,
+            animation: `sparkle ${2 + i}s ease-in-out infinite`,
+            zIndex: 0,
+            display: { xs: "none", md: "block" },
+          }}
+        />
+      ))}
+
+      {/* 🔄 Círculo girando */}
+      <Box
+        sx={{
+          position: "absolute",
+          width: 140,
+          height: 140,
+          border: "4px solid #F3BBCE",
+          borderRadius: "50%",
+          top: "20%",
+          right: "10%",
+          opacity: 0.25,
+          animation: "rotateSoft 22s linear infinite",
+          zIndex: 0,
+          display: { xs: "none", md: "block" },
+        }}
+      />
+
+      {/* 🌿 Línea ondulada */}
+      <Box
+        sx={{
+          position: "absolute",
+          width: 120,
+          height: 4,
+          background:
+            "linear-gradient(90deg, transparent, #DC4485, transparent)",
+          top: "60%",
+          left: "10%",
+          borderRadius: 2,
+          opacity: 0.4,
+          animation: "wave 6s ease-in-out infinite alternate",
+          zIndex: 0,
+          display: { xs: "none", md: "block" },
+        }}
+      />
+
+      {/* 🌸 Círculo pulsante */}
+      <Box
+        sx={{
+          position: "absolute",
+          bottom: "18%",
+          right: "18%",
+          width: 65,
+          height: 65,
+          borderRadius: "50%",
+          backgroundColor: "#DC4485",
+          opacity: 0.25,
+          animation: "pulse 5s infinite ease-in-out",
+          zIndex: 0,
+          display: { xs: "none", md: "block" },
+        }}
+      />
+
+      {/* DECORACIONES ORIGINALES */}
       <Box
         sx={{
           position: "absolute",
@@ -52,6 +171,7 @@ const Systems = () => {
           borderBottom: "3px double #F3BBCE",
           transform: "rotate(15deg)",
           display: { xs: "none", md: "block" },
+          zIndex: 0,
         }}
       />
       <Box
@@ -65,6 +185,7 @@ const Systems = () => {
           backgroundColor: "#DC4485",
           opacity: 0.5,
           display: { xs: "none", md: "block" },
+          zIndex: 0,
         }}
       />
       <Box
@@ -78,11 +199,12 @@ const Systems = () => {
           border: "3px solid #D72E79",
           opacity: 0.4,
           display: { xs: "none", md: "block" },
+          zIndex: 0,
         }}
       />
 
       {/* --- Cabecera --- */}
-      <Stack alignItems='center' sx={{ mb: 6, zIndex: 1 }}>
+      <Stack alignItems='center' sx={{ mb: 6, zIndex: 2 }}>
         <Typography
           variant='overline'
           sx={{
@@ -106,9 +228,9 @@ const Systems = () => {
         >
           Nuestros Cursos
         </Typography>
+
         <Typography
           variant='h3'
-          component='h2'
           sx={{
             fontWeight: 700,
             lineHeight: 1.2,
@@ -117,10 +239,7 @@ const Systems = () => {
           }}
         >
           Explora{" "}
-          <Box
-            component='span'
-            sx={{ position: "relative", display: "inline-block" }}
-          >
+          <Box component='span' sx={{ position: "relative" }}>
             Sistemas
             <Box
               component='span'
@@ -148,7 +267,7 @@ const Systems = () => {
           width: "100%",
           maxWidth: "1300px",
           mx: "auto",
-          zIndex: 1,
+          zIndex: 3,
           borderRadius: "12px",
         }}
       >
@@ -184,11 +303,7 @@ const Systems = () => {
                       p: { xs: 3, sm: 4 },
                       textAlign: "center",
                       borderRadius: "16px",
-                      height: "100%",
                       minHeight: 280,
-                      display: "flex",
-                      flexDirection: "column",
-                      justifyContent: "space-between",
                       boxShadow: "0px 6px 16px rgba(0, 0, 0, 0.08)",
                       transition: "transform 0.3s ease, box-shadow 0.3s ease",
                       "&:hover": {
@@ -237,8 +352,6 @@ const Systems = () => {
                         WebkitBoxOrient: "vertical",
                         overflow: "hidden",
                         textOverflow: "ellipsis",
-                        lineHeight: 1.5,
-                        px: 1,
                       }}
                     >
                       {system.description}
@@ -252,7 +365,7 @@ const Systems = () => {
           )}
         </Swiper>
 
-        {/* --- Botones de navegación --- */}
+        {/* NAVIGATION BUTTONS */}
         <IconButton
           ref={swiperPrevRef}
           sx={{

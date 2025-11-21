@@ -6,39 +6,39 @@ import SchoolIcon from "@mui/icons-material/School";
 import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
 import PlayCircleFilledIcon from "@mui/icons-material/PlayCircleFilled";
 
-// Datos de las características (Mantenidos igual)
+// Datos de las características
 const features = [
   {
     icon: StarIcon,
     title: "Mentoras Expertas",
     description:
       "Contamos con profesionales de élite en el sector de uñas para darte el mejor soporte y guía.",
-    iconColor: "#E46F9F", // Amarillo
+    iconColor: "#E46F9F",
   },
   {
     icon: HeadsetMicIcon,
     title: "Soporte Dedicado",
     description:
       "Siempre estamos listas para ayudarte a resolver dudas y problemas 24/7. ¡No estás sola!",
-    iconColor: "#E46F9F", // Verde
+    iconColor: "#E46F9F",
   },
   {
     icon: SchoolIcon,
     title: "Aprendizaje Digital",
     description:
       "Accede a tus cursos desde cualquier dispositivo, a tu ritmo, con lecciones claras y concisas.",
-    iconColor: "#E46F9F", // Violeta
+    iconColor: "#E46F9F",
   },
   {
     icon: EmojiEventsIcon,
     title: "Certificado de Éxito",
     description:
       "Obtén tu certificación que avala tus conocimientos y te impulsa a emprender con credibilidad.",
-    iconColor: "#E46F9F", // Rosa principal
+    iconColor: "#E46F9F",
   },
 ];
 
-// Componente individual para cada característica (Mantenido igual)
+// Componente individual
 const FeatureItem = ({ icon: Icon, title, description, iconColor }) => (
   <Stack spacing={1} sx={{ maxWidth: { xs: "100%", md: "300px" } }}>
     <Box
@@ -68,61 +68,116 @@ const FeatureItem = ({ icon: Icon, title, description, iconColor }) => (
 const WhyChooseUsSection = () => {
   const theme = useTheme();
 
-  const lightYellow = "#D82E7A";
-  const pinkDecorColor = "#F727A3"; // Usaremos el amarillo/rosa pálido para los adornos
-
-  // Fondo de color (Un crema pálido similar al de la imagen)
-  const softBgColor = "#FFF0F0";
+  const pinkMain = "#D82E7A";
+  const pinkDecor = "#F727A3";
+  const softBg = "#FFF0F0";
 
   return (
     <Box
       sx={{
-        backgroundColor: softBgColor, // Fondo de color suave
+        backgroundColor: softBg,
         padding: theme.spacing(8, 4),
         overflow: "hidden",
-        position: "relative", // Para posicionar los adornos
+        position: "relative",
         minHeight: "80vh",
         display: "flex",
         alignItems: "center",
         borderRadius: "16px",
       }}
     >
-      {/* --- Elementos Decorativos de Fondo --- */}
+      {/* ----------- ELEMENTOS DECORATIVOS CON ANIMACIONES ----------- */}
 
-      {/* Adorno de puntos/círculos en la esquina superior izquierda (simulando los puntos rosas) */}
+      {/* Esfera rosada grande */}
       <Box
         sx={{
           position: "absolute",
-          top: "5%",
-          left: "5%",
-          width: "50px",
-          height: "50px",
-          backgroundImage:
-            "radial-gradient(circle, #f06292 20%, transparent 20%)",
-          backgroundSize: "10px 10px",
-          opacity: 0.5,
-          transform: "rotate(15deg)",
+          top: "-40px",
+          right: "-40px",
+          width: "160px",
+          height: "160px",
+          backgroundColor: "#F8B6D0",
+          borderRadius: "50%",
+          opacity: 0.4,
+          filter: "blur(8px)",
+          animation: "float1 6s ease-in-out infinite",
+          "@keyframes float1": {
+            "0%": { transform: "translateY(0px)" },
+            "50%": { transform: "translateY(15px)" },
+            "100%": { transform: "translateY(0px)" },
+          },
           display: { xs: "none", md: "block" },
         }}
       />
 
-      {/* Adorno de líneas/figura abstracta en la parte inferior derecha */}
+      {/* Círculos pequeños tipo sparkle */}
+      {[...Array(6)].map((_, i) => (
+        <Box
+          key={i}
+          sx={{
+            position: "absolute",
+            top: `${10 + i * 12}%`,
+            left: `${5 + (i % 3) * 8}%`,
+            width: "10px",
+            height: "10px",
+            backgroundColor: "#FF8AC0",
+            borderRadius: "50%",
+            opacity: 0.7,
+            animation: `sparkle 2.2s ease-in-out ${(i * 0.4).toFixed(
+              1
+            )}s infinite`,
+            "@keyframes sparkle": {
+              "0%": { transform: "scale(0.6)", opacity: 0.4 },
+              "50%": { transform: "scale(1)", opacity: 1 },
+              "100%": { transform: "scale(0.6)", opacity: 0.4 },
+            },
+            display: { xs: "none", md: "block" },
+          }}
+        />
+      ))}
+
+      {/* Líneas curvas decorativas */}
       <Box
         sx={{
           position: "absolute",
-          bottom: "5%",
-          right: "5%",
-          width: "50px",
-          height: "50px",
-          borderTop: `5px solid ${pinkDecorColor}`,
-          borderLeft: `5px solid ${pinkDecorColor}`,
-          transform: "rotate(45deg)",
-          opacity: 0.6,
-          borderRadius: "5px",
+          bottom: "8%",
+          left: "6%",
+          width: "120px",
+          height: "120px",
+          border: "3px solid #F8A1C4",
+          borderRadius: "40% 60% 60% 40%",
+          transform: "rotate(25deg)",
+          opacity: 0.35,
+          animation: "float2 7s ease-in-out infinite",
+          "@keyframes float2": {
+            "0%": { transform: "rotate(25deg) translateY(0)" },
+            "50%": { transform: "rotate(25deg) translateY(12px)" },
+            "100%": { transform: "rotate(25deg) translateY(0)" },
+          },
           display: { xs: "none", md: "block" },
         }}
       />
-      {/* --- Fin Elementos Decorativos --- */}
+
+      {/* Figura abstracta rotando */}
+      <Box
+        sx={{
+          position: "absolute",
+          top: "35%",
+          right: "8%",
+          width: "70px",
+          height: "70px",
+          border: "4px solid #F06292",
+          borderRadius: "20% 40% 60% 30%",
+          animation: "rotate 12s linear infinite",
+          opacity: 0.4,
+          "@keyframes rotate": {
+            "0%": { transform: "rotate(0deg)" },
+            "100%": { transform: "rotate(360deg)" },
+          },
+          display: { xs: "none", md: "block" },
+        }}
+      />
+
+      {/* ------------------------------------------------------------- */}
 
       <Grid
         container
@@ -131,10 +186,9 @@ const WhyChooseUsSection = () => {
         justifyContent='center'
         sx={{ maxWidth: 1440, margin: "0 auto", zIndex: 1 }}
       >
-        {/* Sección Izquierda: Título y Características */}
+        {/* IZQUIERDA */}
         <Grid size={{ xs: 12, sm: 6 }}>
           <Stack spacing={5}>
-            {/* Cabecera de la Sección (Estilo Floreciendo Juntas) */}
             <Stack>
               <Typography
                 variant='overline'
@@ -158,13 +212,7 @@ const WhyChooseUsSection = () => {
                 }}
               >
                 Lo Que Nos Hace{" "}
-                <span
-                  style={{
-                    position: "relative",
-                    display: "inline-block",
-                    textDecoration: "none",
-                  }}
-                >
+                <span style={{ position: "relative", display: "inline-block" }}>
                   Diferentes
                   <Box
                     component='span'
@@ -174,7 +222,7 @@ const WhyChooseUsSection = () => {
                       bottom: 0,
                       width: "100%",
                       height: "8px",
-                      backgroundColor: lightYellow, // Resaltado amarillo suave
+                      backgroundColor: pinkMain,
                       zIndex: -1,
                       opacity: 0.7,
                       borderRadius: "4px",
@@ -184,7 +232,6 @@ const WhyChooseUsSection = () => {
               </Typography>
             </Stack>
 
-            {/* Listado de Características */}
             <Grid container spacing={4}>
               {features.map((feature, index) => (
                 <Grid size={{ xs: 12, md: 6 }} key={index}>
@@ -195,7 +242,7 @@ const WhyChooseUsSection = () => {
           </Stack>
         </Grid>
 
-        {/* Sección Derecha: Imagen/Video y Círculo de Play (La Caja Grande) */}
+        {/* DERECHA */}
         <Grid
           size={{ xs: 12, sm: 6 }}
           sx={{ display: "flex", justifyContent: "center" }}
@@ -205,30 +252,25 @@ const WhyChooseUsSection = () => {
               position: "relative",
               width: "100%",
               maxWidth: 500,
-              height: { xs: 350, sm: 450, md: 500 }, // Altura para mantener la proporción
+              height: { xs: 350, sm: 450, md: 500 },
               borderRadius: "16px",
               overflow: "hidden",
               boxShadow: theme.shadows[10],
-              border: `10px solid ${theme.palette.background.paper || "white"}`, // Borde blanco visible
+              border: `10px solid white`,
             }}
           >
-            {/* Imagen de Fondo del Video */}
             <Box
               component='img'
-              // Usa la URL de la imagen de la chica con el chico
               src='https://i.pinimg.com/1200x/ee/79/a9/ee79a90d29fad35a96c8e6cffde03602.jpg'
               alt='Estudiantes aprendiendo'
               sx={{
                 width: "100%",
                 height: "100%",
                 objectFit: "cover",
-                position: "relative",
-                top: 0,
-                left: 0,
               }}
             />
 
-            {/* Icono de Play Central (simulando un video) */}
+            {/* Icono de Play */}
             <Box
               sx={{
                 position: "absolute",
@@ -242,30 +284,18 @@ const WhyChooseUsSection = () => {
                   width: "100px",
                   height: "100px",
                   borderRadius: "50%",
-                  backgroundColor: "rgba(255, 255, 255, 0.3)",
+                  backgroundColor: "rgba(255,255,255,0.3)",
                   animation: "pulse 2s infinite",
-                  opacity: 0.8,
                 },
                 "@keyframes pulse": {
-                  "0%": { transform: "scale(1)", opacity: 0.8 },
-                  "50%": { transform: "scale(1.1)", opacity: 0.4 },
-                  "100%": { transform: "scale(1)", opacity: 0.8 },
+                  "0%": { transform: "scale(1)" },
+                  "50%": { transform: "scale(1.2)" },
+                  "100%": { transform: "scale(1)" },
                 },
               }}
             >
               <PlayCircleFilledIcon
-                sx={{
-                  fontSize: 85,
-                  color: "white",
-                  transition: "color 0.2s",
-                  zIndex: 3,
-                  position: "relative",
-                  ml: 1,
-                  mt: 1,
-                  "&:hover": {
-                    color: "#fff",
-                  },
-                }}
+                sx={{ fontSize: 85, color: "white", position: "relative" }}
               />
             </Box>
           </Box>

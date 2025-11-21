@@ -50,7 +50,7 @@ const ProductCard = ({ product }) => {
 
   // Detectar si está en carrito (elige la fuente según autenticado)
   const itemInCart = autenticado
-    ? cart.items.find((i) => i.product_id === product.id)
+    ? cart.items.find((i) => i.productId === product.id)
     : guest_cart.items.find((i) => i.product.product_id === product.id);
 
   // Helper para agregar al guest: mandamos objeto completo para localStorage/preview
@@ -66,8 +66,8 @@ const ProductCard = ({ product }) => {
   };
 
   // Helper para agregar cuando autenticado (API)
-  const handleAddAuth = (qty = 1) => {
-    return addItemCart({ product_id: product.id, quantity: qty });
+  const handleAddAuth = () => {
+    return addItemCart({ product_id: product.id, quantity: 1 });
   };
 
   // Handler para click en "Agregar"
@@ -98,7 +98,11 @@ const ProductCard = ({ product }) => {
           variant: "warning",
         });
       } else {
-        updateItemCart({ product_id: product.id, quantity: newQty });
+        updateItemCart({
+          cart_id: itemInCart.id,
+          product_id: product.id,
+          quantity: newQty,
+        });
         enqueueSnackbar("Cantidad actualizada", { variant: "info" });
       }
     } else {
@@ -114,7 +118,7 @@ const ProductCard = ({ product }) => {
     }
   };
 
-  const handleIncrease = (product) => {
+  const handleIncrease = (item, product) => {
     if (!itemInCart) {
       handleClickAddCart(product);
       enqueueSnackbar("Producto agregado al carrito", { variant: "success" });
@@ -124,7 +128,11 @@ const ProductCard = ({ product }) => {
     const newQty = itemInCart.quantity + 1;
 
     if (autenticado) {
-      updateItemCart({ product_id: product.id, quantity: newQty });
+      updateItemCart({
+        cart_id: item.id,
+        product_id: product.id,
+        quantity: newQty,
+      });
       enqueueSnackbar("Cantidad Actualizada", { variant: "success" });
     } else {
       updateItemGuest(product.id, newQty);
@@ -274,7 +282,7 @@ const ProductCard = ({ product }) => {
                   </Button>
 
                   <Button
-                    onClick={() => handleIncrease(product)}
+                    onClick={() => handleIncrease(itemInCart, product)}
                     sx={{
                       minWidth: 48,
                       color: "#d82e7a",

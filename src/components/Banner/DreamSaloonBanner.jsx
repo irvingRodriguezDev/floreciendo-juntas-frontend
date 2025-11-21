@@ -46,7 +46,7 @@ export default function SalonDreamSlider() {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        background: "linear-gradient(135deg, #fde5ef 0%, #fff 100%)",
+        background: "linear-gradient(135deg, #F971AF 0%, #fff 100%)",
         boxShadow: "0 20px 40px rgba(0,0,0,0.08)",
         p: { xs: 2, sm: 3, md: 6 },
       }}
@@ -68,8 +68,8 @@ export default function SalonDreamSlider() {
             top: { xs: "8%", md: "8%" },
             left: { xs: "50%", md: "5%" },
             transform: { xs: "translateX(-50%)", md: "none" },
-            color: "#D82E7A",
-            opacity: 0.15,
+            color: "#D53A84",
+            opacity: 0.75,
             userSelect: "none",
             pointerEvents: "none",
 

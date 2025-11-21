@@ -6,7 +6,7 @@ import PostsContext from "../../context/Posts/PostsContext";
 import IceIcon from "../icons/IceIcon";
 import PinkSpinner from "../Loading/PinkSpinner";
 import Pagination from "../Pagination/Pagination";
-const Wall = ({ courseId }) => {
+const Wall = ({ courseId, isAuthenticating, isSubscribed }) => {
   const { getPosts, posts, totalPages } = useContext(PostsContext);
 
   const [page, setPage] = useState(1);
@@ -42,22 +42,23 @@ const Wall = ({ courseId }) => {
     >
       <Stack spacing={3} alignItems='center'>
         {/* 🔹 Botón de crear publicación */}
-        <Button
-          variant='contained'
-          sx={{
-            bgcolor: "#D82E7A",
-            borderRadius: "10px",
-            textTransform: "none",
-            fontWeight: 600,
-            px: 4,
-            py: 1,
-            "&:hover": { bgcolor: "#c4276e" },
-          }}
-          onClick={() => setOpenModal(true)}
-        >
-          Crear publicación
-        </Button>
-
+        {isAuthenticating && isSubscribed && (
+          <Button
+            variant='contained'
+            sx={{
+              bgcolor: "#D82E7A",
+              borderRadius: "10px",
+              textTransform: "none",
+              fontWeight: 600,
+              px: 4,
+              py: 1,
+              "&:hover": { bgcolor: "#c4276e" },
+            }}
+            onClick={() => setOpenModal(true)}
+          >
+            Crear publicación
+          </Button>
+        )}
         <CreatePostModal
           open={openModal}
           onClose={() => setOpenModal(false)}

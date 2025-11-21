@@ -10,7 +10,7 @@ const VideoBlocker = ({ userId, title }) => {
     <Box
       sx={{
         width: "100%",
-        height: { xs: 250, md: 550 }, // Mantener la altura del video
+        height: { xs: 750, md: 600 }, // Mantener la altura del video
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
@@ -23,10 +23,10 @@ const VideoBlocker = ({ userId, title }) => {
         position: "relative",
       }}
     >
-      <LockIcon sx={{ fontSize: 60, color: PRIMARY_PINK, mb: 2, mt: 2 }} />
+      <LockIcon sx={{ fontSize: 40, color: PRIMARY_PINK, mb: 2, mt: 2 }} />
       <Typography
         variant='h5'
-        sx={{ fontWeight: 600, color: PRIMARY_PINK, mb: 1 }}
+        sx={{ fontWeight: 600, color: PRIMARY_PINK, mb: 1, mt: -2 }}
       >
         Desbloquea "{title}"
       </Typography>

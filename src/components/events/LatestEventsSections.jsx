@@ -165,7 +165,7 @@ const LatestEventsSection = () => {
           </Box>
         ) : (
           events.map((event) => (
-            <Grid item xs={12} sm={6} md={4} lg={3} key={event.id}>
+            <Grid xs={12} sm={6} md={4} lg={3} key={event.id}>
               {" "}
               {/* 💡 CLAVE: Usar 'item' y breakpoints */}
               <Card

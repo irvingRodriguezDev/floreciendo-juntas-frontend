@@ -122,7 +122,7 @@ const About = () => {
                 bottom: { xs: "-50px", sm: "-60px", md: "-70px" },
                 left: { xs: "50%", md: "60%" },
                 transform: "translateX(-50%)",
-                backgroundColor: "#D72E79",
+                backgroundColor: "#F971AF",
                 color: "white",
                 px: { xs: 3, sm: 4 },
                 py: { xs: 2, sm: 3 },
@@ -183,7 +183,7 @@ const About = () => {
                   bottom: 3,
                   width: "100%",
                   height: "6px",
-                  backgroundColor: " #E36F9E",
+                  backgroundColor: "#F971AF",
                   opacity: 0.6,
                   borderRadius: "4px",
                 }}
@@ -229,7 +229,7 @@ const About = () => {
                 icon={SchoolIcon}
                 value='+1.250'
                 label='Alumnas Certificadas'
-                color='#DC4485'
+                color='#F971AF'
               />
             </Grid>
             <Grid size={{ xs: 6, sm: 6, md: 6 }}>
@@ -245,7 +245,7 @@ const About = () => {
                 icon={PersonIcon}
                 value='+250'
                 label='Educadoras de Soporte'
-                color='#DC4485'
+                color='#F971AF'
               />
             </Grid>
           </Grid>

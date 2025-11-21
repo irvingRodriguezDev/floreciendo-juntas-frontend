@@ -177,11 +177,7 @@ const UserTicketsTable = () => {
   }
 
   return (
-    <Paper
-      elevation={12}
-      boxShadow='12px'
-      sx={{ padding: "20px", borderRadius: "16px" }}
-    >
+    <Paper elevation={12} sx={{ padding: "20px", borderRadius: "16px" }}>
       <Typography
         variant='h5'
         color={"#E53888"}
@@ -261,6 +257,7 @@ const UserTicketsTable = () => {
                   </TableCell>
                 </TableRow>
               </TableHead>
+
               <TableBody>
                 {tickets.map((ticket) => (
                   <TableRow key={ticket.id} hover>

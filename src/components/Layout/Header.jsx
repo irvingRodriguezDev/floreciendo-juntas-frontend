@@ -13,63 +13,51 @@ import {
   ListItemText,
   useMediaQuery,
   Badge,
+  GlobalStyles,
+  useTheme,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import { Link } from "react-router-dom";
 import AuthContext from "../../context/Auth/AuthContext";
-import CartContext from "../../context/Cart/CartContext"; // ⭐ NUEVO
+import CartContext from "../../context/Cart/CartContext";
 import Logo from "../../assets/images/logo_carolina_tavera.png";
-import CartIcon from "../icons/CartIcon";
-import { styled } from "@mui/material/styles";
 import CartButton from "./CartButton";
 import CartSidebar from "./CartSidebar";
 import BadgeBox from "../ui/BadgeBox";
 
+/* Menu items (igual que antes) */
 const menuItems = [
   { name: "Cursos", path: "/cursos", auth: "both" },
   { name: "Salon", path: "/el-salon-de-tus-sueños", auth: "both" },
   { name: "Eventos", path: "/eventos", auth: "both" },
 ];
 
-// ⭐ Badge Rosa elegante
-const StyledBadge = styled(Badge)(({ theme }) => ({
-  "& .MuiBadge-badge": {
-    right: -3,
-    top: 13,
-    border: `2px solid #d82e7a`,
-    padding: "0px 4px",
-    fontSize: "12px",
-    backgroundColor: "#E53888",
-    color: "#fff",
-  },
-}));
-
 const Header = () => {
+  const theme = useTheme();
   const [open, setOpen] = useState(false);
-  const [openCart, setOpenCart] = useState(false); // ⭐ NUEVO sidebar
+  const [openCart, setOpenCart] = useState(false);
   const { autenticado } = useContext(AuthContext);
-  const { cart, guest_cart, getUserCart } = useContext(CartContext); // ⭐ NUEVO
+  const { cart, guest_cart, getUserCart } = useContext(CartContext);
 
   const isMobile = useMediaQuery("(max-width:1100px)");
   const [scrolled, setScrolled] = useState(false);
+
   useEffect(() => {
-    if (autenticado) {
-      getUserCart();
-    }
-  }, []);
-  // ⭐ Contador del carrito
+    if (autenticado) getUserCart();
+  }, [autenticado]);
+
+  // contador carrito
   const cartCount = autenticado
     ? cart?.items?.reduce((acc, item) => acc + item.quantity, 0) || 0
     : guest_cart?.items?.reduce((acc, item) => acc + item.quantity, 0) || 0;
 
-  // Detectar scroll
+  // detect scroll
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 40);
-    window.addEventListener("scroll", handleScroll);
+    window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Filtrar menú por auth
   const filteredMenu = menuItems.filter((item) => {
     if (item.auth === "both") return true;
     if (item.auth === true && autenticado) return true;
@@ -79,36 +67,155 @@ const Header = () => {
 
   return (
     <Box sx={{ flexGrow: 1 }}>
+      {/* Global keyframes + clases para animaciones del header */}
+      <GlobalStyles
+        styles={{
+          "@keyframes headerFloat": {
+            "0%": { transform: "translateY(0px)" },
+            "50%": { transform: "translateY(-6px)" },
+            "100%": { transform: "translateY(0px)" },
+          },
+          "@keyframes sparkle": {
+            "0%": { opacity: 0 },
+            "40%": { opacity: 0.9 },
+            "60%": { opacity: 0.6 },
+            "100%": { opacity: 0 },
+          },
+          ".hj-float": {
+            animation: "headerFloat 6s ease-in-out infinite",
+            willChange: "transform",
+          },
+          ".hj-sparkle": {
+            animation: "sparkle 3.2s ease-in-out infinite",
+            willChange: "opacity, transform",
+          },
+          ".hj-deco": {
+            pointerEvents: "none",
+            userSelect: "none",
+            backfaceVisibility: "hidden",
+          },
+        }}
+      />
+
       <AppBar
         position='fixed'
-        elevation={scrolled ? 4 : 0}
+        elevation={scrolled ? 6 : 0}
         sx={{
           width: "100%",
-          mt: 0,
-          left: "50%",
-          transform: "translateX(-50%)",
+          // transform: "translateX(-50%)",
           borderBottomLeftRadius: "16px",
           borderBottomRightRadius: "16px",
-          boxShadow: scrolled
-            ? "0 8px 25px rgba(229, 56, 136, 0.15)"
-            : "0 4px 30px rgba(0,0,0,0.25)",
+          // Glassmorphism rosado consistente en todo momento
           background: scrolled
-            ? "rgba(255, 255, 255, 0.25)"
-            : "rgba(0, 0, 0, 0.25)",
-          backdropFilter: "blur(14px)",
-          border: "1px solid rgba(255, 255, 255, 0.25)",
-          transition: "all 0.4s ease",
+            ? "linear-gradient(180deg, rgba(229,83,140,0.06), rgba(255,255,255,0.12))"
+            : "linear-gradient(180deg, rgba(229,83,140,0.05), rgba(0,0,0,0.06))",
+          boxShadow: scrolled
+            ? "0 8px 30px rgba(229, 56, 136, 0.12)"
+            : "0 6px 20px rgba(0,0,0,0.12)",
+          backdropFilter: "blur(14px) saturate(1.05)",
+          border: scrolled
+            ? "1px solid rgba(229,83,140,0.12)"
+            : "1px solid rgba(255,255,255,0.08)",
+          transition: "all 0.45s cubic-bezier(0.2,0.8,0.2,1)",
           color: scrolled ? "#E53888" : "#FFFFFF",
-          textShadow: scrolled ? "none" : "0 1px 6px rgba(0,0,0,0.4)",
+          textShadow: scrolled ? "none" : "0 1px 6px rgba(0,0,0,0.35)",
           zIndex: 1000,
         }}
       >
+        {/* DECORACIONES SUAVES (detrás del header) */}
+        {/* Se usan zIndex bajo, opacidad baja y display none en xs */}
+        <Box
+          className='hj-deco hj-float'
+          sx={{
+            position: "absolute",
+            left: { xs: "auto", md: 24 },
+            right: { xs: "auto", md: "60%" },
+            top: -8,
+            width: 140,
+            height: 140,
+            borderRadius: "50%",
+            background:
+              "radial-gradient(circle at 30% 30%, rgba(229,83,140,0.12), transparent 40%)",
+            opacity: 1,
+            zIndex: 0,
+            display: { xs: "none", md: "block" },
+          }}
+        />
+
+        <Box
+          className='hj-deco'
+          sx={{
+            position: "absolute",
+            right: 28,
+            top: 6,
+            width: 90,
+            height: 90,
+            borderRadius: "50%",
+            border: "3px solid rgba(229,83,140,0.12)",
+            opacity: 0.9,
+            zIndex: 0,
+            display: { xs: "none", md: "block" },
+            transform: "translateY(-6px)",
+          }}
+        />
+
+        {/* Sparkles sutiles */}
+        <Box
+          className='hj-deco hj-sparkle'
+          sx={{
+            position: "absolute",
+            right: { xs: "6%", md: "12%" },
+            top: 12,
+            width: 8,
+            height: 8,
+            borderRadius: "50%",
+            backgroundColor: "rgba(229,83,140,0.86)",
+            opacity: 0.18,
+            zIndex: 0,
+            display: { xs: "none", md: "block" },
+          }}
+        />
+        <Box
+          className='hj-deco hj-sparkle'
+          sx={{
+            position: "absolute",
+            right: { xs: "10%", md: "18%" },
+            top: 28,
+            width: 6,
+            height: 6,
+            borderRadius: "50%",
+            backgroundColor: "rgba(215,46,121,0.9)",
+            opacity: 0.14,
+            animationDelay: "0.6s",
+            zIndex: 0,
+            display: { xs: "none", md: "block" },
+          }}
+        />
+
         <Toolbar
           sx={{ display: "flex", justifyContent: "space-between", px: 2 }}
         >
-          {/* LOGO */}
-          <Link style={{ textDecoration: "none" }} to='/'>
-            <img src={Logo} width='100%' height='90px' />
+          {/* LOGO - micro hover y pulso muy suave */}
+          <Link
+            style={{ textDecoration: "none", display: "block", width: 180 }}
+            to='/'
+          >
+            <Box
+              component='img'
+              src={Logo}
+              alt='Logo Floreciendo Juntas'
+              sx={{
+                width: { xs: 220, md: 280 },
+                height: "auto",
+                transition: "transform 0.35s ease, box-shadow 0.35s ease",
+                transformOrigin: "left center",
+                "&:hover": { transform: "translateY(-4px) scale(1.01)" },
+                filter: scrolled
+                  ? "none"
+                  : "drop-shadow(0 6px 18px rgba(0,0,0,0.25))",
+                borderRadius: 1,
+              }}
+            />
           </Link>
 
           {/* MENU DESKTOP */}
@@ -131,16 +238,35 @@ const Header = () => {
                     variant='subtitle1'
                     sx={{
                       cursor: "pointer",
-                      color: scrolled ? "#E53888" : "#fff",
+                      color: scrolled ? "#E53888" : "#E53888",
                       px: 2,
                       py: 1,
                       borderRadius: "10px",
                       fontWeight: 500,
-                      transition: "all 0.3s ease",
+                      transition: "all 0.25s ease",
+                      position: "relative",
+                      display: "inline-block",
+                      "&::after": {
+                        content: '""',
+                        position: "absolute",
+                        left: "50%",
+                        bottom: 6,
+                        transform: "translateX(-50%)",
+                        width: 0,
+                        height: 4,
+                        background:
+                          "linear-gradient(90deg, rgba(229,83,140,0.85), rgba(215,46,121,0.85))",
+                        borderRadius: 2,
+                        transition: "width .28s cubic-bezier(.2,.8,.2,1)",
+                      },
+                      "&:hover::after": {
+                        width: "60%",
+                      },
                       "&:hover": {
                         backgroundColor: scrolled
-                          ? "rgba(229, 56, 136, 0.1)"
-                          : "rgba(255,255,255,0.15)",
+                          ? "rgba(229,56,136,0.08)"
+                          : "rgba(255,255,255,0.06)",
+                        transform: "translateY(-3px)",
                       },
                     }}
                   >
@@ -153,9 +279,8 @@ const Header = () => {
 
           {/* BOTONES DE ACCIÓN */}
           {!isMobile && (
-            <Box sx={{ display: "flex", gap: 2 }}>
-              {/* ⭐ CART DESKTOP */}
-
+            <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
+              {/* CART */}
               <BadgeBox
                 count={cartCount}
                 anchor
@@ -163,13 +288,10 @@ const Header = () => {
                 right='6px'
                 size='md'
               >
-                <CartButton
-                  sx={{ fontSize: "50px" }}
-                  onOpen={() => setOpenCart(true)}
-                />
+                <CartButton onOpen={() => setOpenCart(true)} />
               </BadgeBox>
 
-              {/* Auth logic */}
+              {/* Auth */}
               {!autenticado ? (
                 <Button
                   component={Link}
@@ -177,15 +299,17 @@ const Header = () => {
                   variant='outlined'
                   size='large'
                   sx={{
-                    color: scrolled ? "#E53888" : "#fff",
-                    borderColor: scrolled ? "#E53888" : "#fff",
+                    color: scrolled ? "#E53888" : "#E53888",
+                    borderColor: scrolled ? "#E53888" : "#E53888",
                     borderRadius: "10px",
+                    px: 2.2,
+                    py: 1,
+                    transition: "all 0.25s ease",
                     "&:hover": {
                       backgroundColor: scrolled
-                        ? "rgba(229, 56, 136, 0.1)"
-                        : "rgba(255,255,255,0.15)",
+                        ? "rgba(229,56,136,0.09)"
+                        : "rgba(255,255,255,0.06)",
                     },
-                    transition: "all 0.3s ease",
                   }}
                 >
                   Iniciar
@@ -200,6 +324,11 @@ const Header = () => {
                     color: "#fff",
                     backgroundColor: "#E53888",
                     borderRadius: "10px",
+                    px: 2.2,
+                    py: 1,
+                    boxShadow: scrolled
+                      ? "0 8px 20px rgba(229,83,140,0.12)"
+                      : "0 6px 14px rgba(229,83,140,0.10)",
                     "&:hover": { backgroundColor: "#d82e7a" },
                   }}
                 >
@@ -209,10 +338,9 @@ const Header = () => {
             </Box>
           )}
 
-          {/* MOBILE MENU */}
+          {/* MOBILE */}
           {isMobile && (
             <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-              {/* ⭐ CART MOBILE */}
               <BadgeBox
                 count={cartCount}
                 anchor
@@ -223,32 +351,31 @@ const Header = () => {
                 <CartButton onOpen={() => setOpenCart(true)} />
               </BadgeBox>
 
-              {/* HAMBURGER */}
               <IconButton
                 edge='start'
                 sx={{
-                  color: scrolled ? "#E53888" : "#fff",
-                  "&:hover": { backgroundColor: "rgba(229, 56, 136, 0.1)" },
-                  transition: "color 0.3s ease",
+                  color: scrolled ? "#E53888" : "#E53888",
+                  "&:hover": { backgroundColor: "rgba(229, 56, 136, 0.08)" },
                 }}
                 onClick={() => setOpen(true)}
               >
                 <MenuIcon />
               </IconButton>
 
-              {/* DRAWER MOBILE */}
               <Drawer anchor='left' open={open} onClose={() => setOpen(false)}>
                 <Box
                   sx={{
                     width: 250,
                     p: 2,
+                    zIndex: 2600,
                     height: "100vh",
                     display: "flex",
                     flexDirection: "column",
                     justifyContent: "space-between",
-                    background: "rgba(243, 187, 206, 0.33)",
-                    backdropFilter: "blur(14px)",
-                    border: "1px solid rgba(243, 187, 206, 0.33)",
+                    background:
+                      "linear-gradient(180deg, rgba(243,187,206,0.18), rgba(255,255,255,0.06))",
+                    backdropFilter: "blur(12px)",
+                    border: "1px solid rgba(243,187,206,0.16)",
                   }}
                 >
                   <Box>
@@ -263,16 +390,11 @@ const Header = () => {
                         <ListItem key={item.path} disablePadding>
                           <Link
                             to={item.path}
-                            style={{ textDecoration: "none" }}
+                            style={{ textDecoration: "none", width: "100%" }}
                           >
                             <ListItemButton
                               onClick={() => setOpen(false)}
-                              sx={{
-                                borderRadius: "12px",
-                                "&:hover": {
-                                  backgroundColor: "rgba(238, 158, 234, 0.15)",
-                                },
-                              }}
+                              sx={{ borderRadius: "12px" }}
                             >
                               <ListItemText
                                 primary={item.name}
@@ -324,8 +446,7 @@ const Header = () => {
         </Toolbar>
       </AppBar>
 
-      {/* ⭐ AQUÍ SE MONTARÁ EL SIDEBAR DEL CARRITO (te lo entrego después) */}
-
+      {/* Sidebar carrito */}
       <CartSidebar open={openCart} onClose={() => setOpenCart(false)} />
     </Box>
   );

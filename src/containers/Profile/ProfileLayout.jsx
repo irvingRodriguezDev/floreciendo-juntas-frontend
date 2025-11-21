@@ -52,6 +52,8 @@ const ProfileLayout = () => {
         <BadgesSection />
         <Divider sx={{ my: 4, borderColor: PRIMARY_PINK, opacity: 0.8 }} />
         {/* 3. Sección "El Salón de Tus Sueños" */}
+        <DreamSalonSection />
+        <Divider sx={{ my: 4, borderColor: PRIMARY_PINK, opacity: 0.8 }} />
         <UserTicketsTable />
         <Divider sx={{ my: 4, borderColor: PRIMARY_PINK, opacity: 0.8 }} />
         {/* 4. Sección de Diplomas y Certificados */}

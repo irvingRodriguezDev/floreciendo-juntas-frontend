@@ -23,7 +23,7 @@ export default function CartItem({ item }) {
       {/* Imagen del producto */}
       <Box
         component='img'
-        src={item.product?.image?.url || item.product.image}
+        src={item.product?.image?.url || item.product.image || null}
         alt={item.product?.name || "Producto"}
         sx={{
           width: 70,

@@ -10,6 +10,7 @@ import UserState from "./context/User/UserState";
 import EventsState from "./context/Events/EventsState";
 import ProductsState from "./context/Products/ProductsState";
 import CartState from "./context/Cart/CartState";
+import OrdersState from "./context/Orders/OrdersState";
 // Carga asíncrona de la clave pública
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_KEY);
 
@@ -24,7 +25,9 @@ function App() {
                 <EventsState>
                   <ProductsState>
                     <CartState>
-                      <AppRouter />
+                      <OrdersState>
+                        <AppRouter />
+                      </OrdersState>
                     </CartState>
                   </ProductsState>
                 </EventsState>

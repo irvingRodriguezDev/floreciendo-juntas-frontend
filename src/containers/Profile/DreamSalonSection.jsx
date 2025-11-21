@@ -1,11 +1,17 @@
-import React from "react";
-import { Box, Typography, Button } from "@mui/material";
-import StorefrontIcon from "@mui/icons-material/Storefront";
-
+import { Box, Typography } from "@mui/material";
+import OrdersContext from "../../context/Orders/OrdersContext";
+import { useContext, useEffect } from "react";
+import AuthContext from "../../context/Auth/AuthContext";
+import OrdersTable from "../../components/Orders/OrdersTable";
 const PRIMARY_PINK = "#E53888";
 const LIGHT_ACCENT = "#FFF8FB"; // Rosa muy claro para el fondo
 
-const DreamSalonSection = ({ salonTitle }) => {
+const DreamSalonSection = () => {
+  const { usuario } = useContext(AuthContext);
+  const { getOrdersUser, orders } = useContext(OrdersContext);
+  useEffect(() => {
+    getOrdersUser(usuario);
+  }, []);
   return (
     <Box
       sx={{
@@ -16,7 +22,6 @@ const DreamSalonSection = ({ salonTitle }) => {
         textAlign: "center",
       }}
     >
-      <StorefrontIcon sx={{ color: PRIMARY_PINK, fontSize: 45, mb: 1.5 }} />
       <Typography
         variant='h5'
         color={PRIMARY_PINK}
@@ -24,27 +29,12 @@ const DreamSalonSection = ({ salonTitle }) => {
       >
         El Salón de Tus Sueños
       </Typography>
-      <Typography
-        variant='h4'
-        color='text.primary'
-        sx={{ mb: 2, fontWeight: 700 }}
-      >
-        "{salonTitle}"
-      </Typography>
+
       <Typography variant='body1' color='text.secondary' sx={{ mb: 3 }}>
         ¡Este espacio refleja tu visión! El éxito de tu negocio es nuestro mayor
         orgullo. Sigue creciendo y transformando vidas con tu arte.
       </Typography>
-      <Button
-        variant='contained'
-        sx={{
-          bgcolor: PRIMARY_PINK,
-          "&:hover": { bgcolor: "#D1789C" },
-          color: "white",
-        }}
-      >
-        Ver Galería del Salón
-      </Button>
+      <OrdersTable orders={orders} />
     </Box>
   );
 };

@@ -58,7 +58,11 @@ const CourseDetailScreen = () => {
       label: "Preguntas y respuestas del curso",
       content: (
         <Box sx={{ position: "relative", zIndex: 1, mt: 2 }}>
-          <Wall courseId={id} />
+          <Wall
+            courseId={id}
+            isAuthenticating={isAuthenticating}
+            isSubscribed={isSubscribed}
+          />
         </Box>
       ),
     },
