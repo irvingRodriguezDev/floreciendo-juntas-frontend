@@ -3,24 +3,28 @@ import { Box, Button, Typography, Card, Stack, Grid } from "@mui/material";
 import FacebookIcon from "../icons/FacebookIcon";
 import InstagramIcon from "../icons/InstagramIcon";
 import TiktokIcon from "../icons/TiktokIcon";
+import { Link } from "react-router-dom";
 const socialData = [
   {
     id: 1,
     name: "Facebook",
     followers: "3.5K Seguidores",
     icon: <FacebookIcon width={50} />,
+    link: "https://www.facebook.com/caarolinataveera",
   },
   {
     id: 2,
     name: "Instagram",
     followers: "3.9K Seguidores",
     icon: <InstagramIcon width={50} />,
+    link: "https://www.instagram.com/carolina_tavera1997/",
   },
   {
     id: 3,
     name: "Tiktok",
     followers: "95.9K Seguidores",
     icon: <TiktokIcon width={42} />,
+    link: "https://www.tiktok.com/@carolina_tavera",
   },
 ];
 
@@ -144,24 +148,30 @@ const SocialCards = () => {
                 </Stack>
 
                 {/* Botón */}
-                <Button
-                  variant='contained'
-                  sx={{
-                    backgroundColor: "#FF0080",
-                    textTransform: "none",
-                    borderRadius: "8px",
-                    px: 2.5,
-                    py: 0.6,
-                    fontWeight: 600,
-                    boxShadow: "0 2px 4px rgba(255, 0, 128, 0.3)",
-                    "&:hover": {
-                      backgroundColor: "#d6006b",
-                      boxShadow: "0 3px 6px rgba(255, 0, 128, 0.4)",
-                    },
-                  }}
+                <Link
+                  to={item.link}
+                  style={{ textDecoration: "none" }}
+                  target='__blank'
                 >
-                  SEGUIR
-                </Button>
+                  <Button
+                    variant='contained'
+                    sx={{
+                      backgroundColor: "#FF0080",
+                      textTransform: "none",
+                      borderRadius: "8px",
+                      px: 2.5,
+                      py: 0.6,
+                      fontWeight: 600,
+                      boxShadow: "0 2px 4px rgba(255, 0, 128, 0.3)",
+                      "&:hover": {
+                        backgroundColor: "#d6006b",
+                        boxShadow: "0 3px 6px rgba(255, 0, 128, 0.4)",
+                      },
+                    }}
+                  >
+                    SEGUIR
+                  </Button>
+                </Link>
               </Card>
             </Grid>
           ))}
