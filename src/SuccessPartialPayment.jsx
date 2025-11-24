@@ -7,7 +7,7 @@ export default function SuccessSalonPayment() {
   // REDIRECCIÓN AUTOMÁTICA
   useEffect(() => {
     const timer = setTimeout(() => {
-      window.location.href = "/"; // 👉 cambia esta ruta si lo necesitas
+      window.location.href = "/mi-perfil"; // 👉 cambia esta ruta si lo necesitas
     }, 3500);
 
     return () => clearTimeout(timer);

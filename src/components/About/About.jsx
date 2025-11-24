@@ -219,7 +219,7 @@ const About = () => {
             <Grid size={{ xs: 6, sm: 6, md: 6 }}>
               <StatisticCard
                 icon={CameraAltIcon}
-                value='+500'
+                value='+150'
                 label='Clases Grabadas en HD'
                 color='#F3BBCE'
               />
@@ -235,7 +235,7 @@ const About = () => {
             <Grid size={{ xs: 6, sm: 6, md: 6 }}>
               <StatisticCard
                 icon={PeopleAltIcon}
-                value='25K'
+                value='+10K'
                 label='Miembros de la Comunidad'
                 color='#F3BBCE'
               />
@@ -243,7 +243,7 @@ const About = () => {
             <Grid size={{ xs: 6, sm: 6, md: 6 }}>
               <StatisticCard
                 icon={PersonIcon}
-                value='+250'
+                value='+50'
                 label='Educadoras de Soporte'
                 color='#F971AF'
               />

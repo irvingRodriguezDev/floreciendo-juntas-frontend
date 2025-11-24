@@ -43,6 +43,22 @@ const LatestEventsSection = () => {
 
   const optimalWidth = getOptimalWidth();
   const imageQuality = 85;
+  const Underline = ({ color }) => (
+    <Box
+      component='span'
+      sx={{
+        position: "absolute",
+        left: 0,
+        bottom: 0,
+        width: "100%",
+        height: "8px",
+        backgroundColor: color,
+        zIndex: -1,
+        opacity: 0.7,
+        borderRadius: "4px",
+      }}
+    />
+  );
 
   return (
     <Box
@@ -51,7 +67,7 @@ const LatestEventsSection = () => {
         padding: theme.spacing(8, 4),
       }}
     >
-      {/* --- Encabezado de la Sección --- */}
+      {/* === Encabezado === */}
       <Stack alignItems='center' sx={{ mb: 6 }}>
         <Typography
           variant='overline'
@@ -75,33 +91,17 @@ const LatestEventsSection = () => {
           }}
         >
           Próximos{" "}
-          <span
-            style={{
-              position: "relative",
-              display: "inline-block",
-              textDecoration: "none",
-            }}
+          <Box
+            component='span'
+            sx={{ position: "relative", display: "inline-block" }}
           >
             Eventos
-            <Box
-              component='span'
-              sx={{
-                position: "absolute",
-                left: 0,
-                bottom: 0,
-                width: "100%",
-                height: "8px",
-                backgroundColor: lightYellow,
-                zIndex: -1,
-                opacity: 0.7,
-                borderRadius: "4px",
-              }}
-            />
-          </span>
+            <Underline color={lightYellow} />
+          </Box>
         </Typography>
       </Stack>
 
-      {/* --- Listado de Eventos --- */}
+      {/* === Listado === */}
       <Grid
         container
         spacing={4}
@@ -110,88 +110,65 @@ const LatestEventsSection = () => {
       >
         {!events.length ? (
           <Box sx={{ p: 4 }}>
-            {/* Mostrar un spinner o el mensaje si no hay eventos */}
-            {/* 💡 Sugerencia: Usar un componente de PinkSpinner aquí */}
             <Typography
               variant='h3'
               component='h2'
               sx={{
                 fontWeight: 700,
-                lineHeight: 1.2,
                 textAlign: "center",
-                fontSize: { xs: "2.5rem", sm: "3rem", md: "3.5rem" },
+                fontSize: { xs: "2.2rem", sm: "2.6rem", md: "3rem" },
               }}
             >
               🌷 Por ahora no tenemos{" "}
-              <span
-                style={{
-                  position: "relative",
-                  display: "inline-block",
-                  textDecoration: "none",
-                }}
+              <Box
+                component='span'
+                sx={{ position: "relative", display: "inline-block" }}
               >
                 eventos disponibles
-                <Box
-                  component='span'
-                  sx={{
-                    position: "absolute",
-                    left: 0,
-                    bottom: 0,
-                    width: "100%",
-                    height: "8px",
-                    backgroundColor: lightYellow,
-                    zIndex: -1,
-                    opacity: 0.7,
-                    borderRadius: "4px",
-                  }}
-                />
-              </span>
+                <Underline color={lightYellow} />
+              </Box>
               🌷
-              <br />
-              <Typography
-                component='span'
-                sx={{
-                  fontSize: { xs: "1.1rem", sm: "1.3rem" },
-                  color: "text.secondary",
-                  display: "block",
-                  mt: 1,
-                  fontWeight: 400,
-                }}
-              >
-                Pero mantente atenta 💖, pronto llegarán nuevas experiencias
-                para compartir, aprender y florecer juntas.
-              </Typography>
+            </Typography>
+
+            <Typography
+              sx={{
+                fontSize: { xs: "1.1rem", sm: "1.3rem" },
+                color: "text.secondary",
+                textAlign: "center",
+                mt: 2,
+                maxWidth: 600,
+                margin: "0 auto",
+              }}
+            >
+              Pero mantente atenta 💖, pronto llegarán nuevas experiencias para
+              compartir, aprender y florecer juntas.
             </Typography>
           </Box>
         ) : (
           events.map((event) => (
             <Grid xs={12} sm={6} md={4} lg={3} key={event.id}>
-              {" "}
-              {/* 💡 CLAVE: Usar 'item' y breakpoints */}
               <Card
                 sx={{
                   borderRadius: "24px",
                   boxShadow: "0 4px 16px rgba(229, 56, 136, 0.15)",
                   overflow: "hidden",
-                  // ❌ ELIMINAR minHeight: 460 para dejar que el contenido defina la altura
                   display: "flex",
                   flexDirection: "column",
                   transition: "transform 0.3s ease, box-shadow 0.3s ease",
+                  willChange: "transform",
                   "&:hover": {
                     transform: "translateY(-6px)",
                     boxShadow: "0 8px 24px rgba(229, 56, 136, 0.25)",
                   },
                   backgroundColor: "#fffdfd",
-                  height: "100%", // Asegura que las tarjetas se alineen en la altura de la fila
+                  height: "100%",
                 }}
               >
-                {/* 🖼️ Contenedor de Imagen (Ahora con Proporción) */}
+                {/* Imagen */}
                 <Box
                   sx={{
                     position: "relative",
                     width: "100%",
-                    // 💡 CLAVE: Usar padding-top para forzar una proporción 2:3 (vertical)
-                    // 150% = Altura es 1.5 veces el ancho (Típico para imágenes de retrato)
                     paddingTop: "100%",
                     overflow: "hidden",
                   }}
@@ -201,21 +178,17 @@ const LatestEventsSection = () => {
                     image={getImageUrl(event.image, optimalWidth, imageQuality)}
                     alt={event.title}
                     sx={{
-                      position: "absolute", // Necesario para la técnica de padding-top
+                      position: "absolute",
                       top: 0,
                       left: 0,
                       width: "100%",
-                      height: "100%", // Ahora 100% de la altura de 'paddingTop' (la proporción 2:3)
-                      objectFit: "cover", // Esto recorta si la imagen no es 2:3, pero garantiza llenar el espacio
-                      borderRadius: "0",
+                      height: "100%",
+                      objectFit: "cover",
                       transition: "transform 0.5s ease",
-                      "&:hover": {
-                        transform: "scale(1.05)",
-                      },
+                      "&:hover": { transform: "scale(1.06)" },
                     }}
                   />
 
-                  {/* Detalle floral sutil (mantenido) */}
                   <Box
                     sx={{
                       position: "absolute",
@@ -224,8 +197,8 @@ const LatestEventsSection = () => {
                       width: "100%",
                       height: "60px",
                       background:
-                        "linear-gradient(180deg, transparent 0%, rgba(255, 255, 255, 0.8) 100%)",
-                      zIndex: 2, // Asegura que esté por encima de la imagen
+                        "linear-gradient(180deg, transparent 0%, rgba(255,255,255,0.8) 100%)",
+                      zIndex: 2,
                     }}
                   />
                 </Box>
@@ -240,7 +213,7 @@ const LatestEventsSection = () => {
                     justifyContent: "space-between",
                   }}
                 >
-                  {/* Fecha y ubicación */}
+                  {/* Fecha + ubicación */}
                   <Box sx={{ mb: 2 }}>
                     <Typography
                       variant='caption'
@@ -253,6 +226,7 @@ const LatestEventsSection = () => {
                     >
                       🗓️ {FormatDate(event.startDate)}
                     </Typography>
+
                     <Typography
                       variant='caption'
                       sx={{
@@ -266,7 +240,7 @@ const LatestEventsSection = () => {
                     </Typography>
                   </Box>
 
-                  {/* Título del evento */}
+                  {/* Título */}
                   <Typography
                     variant='h6'
                     sx={{
@@ -311,7 +285,7 @@ const LatestEventsSection = () => {
         )}
       </Grid>
 
-      {/* --- Botón de Ver Todos los Eventos --- */}
+      {/* Botón Ver Todos */}
       {events.length > 0 && (
         <Box sx={{ textAlign: "center", mt: 6 }}>
           <Link to='/eventos'>

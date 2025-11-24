@@ -7,7 +7,7 @@ export default function SuccessSubscription() {
   // REDIRECCIÓN AUTOMÁTICA
   useEffect(() => {
     const timer = setTimeout(() => {
-      window.location.href = "/"; // 👉 Cambia aquí la ruta de destino
+      window.location.href = "/cursos"; // 👉 Cambia aquí la ruta de destino
     }, 3500);
 
     return () => clearTimeout(timer);

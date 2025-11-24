@@ -10,7 +10,7 @@ const Success = ({ buyerEmail, eventId }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const timer = setTimeout(() => navigate("/"), 5000);
+    const timer = setTimeout(() => navigate("/mi-perfil"), 5000);
 
     const socket = io(import.meta.env.VITE_SOCKET_URL);
 

@@ -391,13 +391,13 @@ const BannerHome = () => {
         <Box
           sx={{
             position: "absolute",
-            top: { xs: "-30px", md: "10px" },
+            top: { xs: "-60px", md: "10px" },
             right: { xs: "30px", md: "20px" },
             backgroundColor: "white",
             borderRadius: "12px",
             padding: theme.spacing(1.5, 2),
             boxShadow: theme.shadows[3],
-            display: { md: "none", lg: "flex" },
+            display: { xs: "none", md: "none", lg: "flex" },
             alignItems: "center",
             gap: theme.spacing(1),
             zIndex: 2,

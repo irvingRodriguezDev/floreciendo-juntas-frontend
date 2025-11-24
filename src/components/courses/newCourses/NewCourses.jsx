@@ -7,7 +7,8 @@ import {
   IconButton,
   Stack,
   useTheme,
-  useMediaQuery, // 👈 Nuevo: para manejar breakpoints
+  useMediaQuery,
+  Chip, // 👈 Nuevo: para manejar breakpoints
 } from "@mui/material";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination } from "swiper/modules";
@@ -57,6 +58,7 @@ const NewCourses = () => {
   const optimalWidth = getOptimalWidth();
   // 📌 Calidad de la imagen (ajustable)
   const imageQuality = 85;
+
   return (
     <Box
       sx={{
@@ -66,17 +68,33 @@ const NewCourses = () => {
       }}
     >
       {/* --- Header --- */}
-      <Stack alignItems='center' sx={{ mb: 6, px: { xs: 2, md: 4 } }}>
+      <Stack
+        alignItems='center'
+        sx={{ mb: 8, px: { xs: 2, md: 4 } }}
+        component={motion.div}
+        initial='hidden'
+        animate='visible'
+        variants={{
+          hidden: { opacity: 0, y: 40 },
+          visible: {
+            opacity: 1,
+            y: 0,
+            transition: { duration: 0.6, ease: "easeOut" },
+          },
+        }}
+      >
+        {/* Subtítulo */}
         <motion.div
-          initial={{ opacity: 0, y: 50 }}
+          initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
+          transition={{ delay: 0.2, duration: 0.6 }}
         >
           <Typography
             variant='overline'
             sx={{
               color: theme.palette.text.secondary,
-              fontWeight: 600,
+              fontWeight: 700,
+              letterSpacing: "1.5px",
               textTransform: "uppercase",
               mb: 1,
             }}
@@ -84,38 +102,57 @@ const NewCourses = () => {
             Tu Próximo Nivel en Manicura
           </Typography>
         </motion.div>
-        <Typography
-          variant='h3'
-          component='h2'
-          sx={{
-            fontWeight: 700,
-            lineHeight: 1.2,
-            textAlign: "center",
-            fontSize: { xs: "2.2rem", sm: "2.8rem", md: "3.5rem" },
-          }}
+
+        {/* Título principal */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.94 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 0.35, duration: 0.6 }}
         >
-          Descubre Nuestro{" "}
-          <Box
-            component='span'
-            sx={{ position: "relative", display: "inline-block" }}
+          <Typography
+            variant='h3'
+            component='h2'
+            sx={{
+              fontWeight: 800,
+              lineHeight: 1.2,
+              textAlign: "center",
+              fontSize: { xs: "2.2rem", sm: "2.8rem", md: "3.4rem" },
+            }}
           >
-            Contenido Nuevo
+            Descubre Nuestro{" "}
             <Box
-              component='span'
-              sx={{
-                position: "absolute",
-                left: 0,
-                bottom: 0,
-                width: "100%",
-                height: "8px",
-                backgroundColor: lightYellow,
-                zIndex: -1,
-                opacity: 0.7,
-                borderRadius: "4px",
-              }}
-            />
-          </Box>
-        </Typography>
+              component={motion.span}
+              sx={{ position: "relative", display: "inline-block" }}
+              whileHover={{ scale: 1.02 }}
+              transition={{ type: "spring", stiffness: 250 }}
+            >
+              Contenido Nuevo
+              {/* Subrayado animado */}
+              <Box
+                component={motion.span}
+                initial={{ scaleX: 0 }}
+                animate={{ scaleX: 1 }}
+                transition={{
+                  duration: 0.6,
+                  ease: "easeOut",
+                  delay: 0.5,
+                }}
+                sx={{
+                  position: "absolute",
+                  left: 0,
+                  bottom: -2,
+                  width: "100%",
+                  height: "10px",
+                  background: `linear-gradient(90deg, #F971AF, #FFABD1)`,
+                  borderRadius: "6px",
+                  transformOrigin: "left",
+                  zIndex: -1,
+                  opacity: 0.8,
+                }}
+              />
+            </Box>
+          </Typography>
+        </motion.div>
       </Stack>
 
       {/* --- Swiper --- */}
@@ -204,81 +241,53 @@ const NewCourses = () => {
                 >
                   <Card
                     component={motion.div}
-                    whileHover={{
-                      scale: 1.03,
-                      boxShadow: "0 14px 28px rgba(255, 246, 248,0.15)",
-                      transition: { duration: 0.3 },
-                    }}
+                    whileHover={{ scale: 1.03, transition: { duration: 0.3 } }}
                     sx={{
-                      display: "flex",
-                      flexDirection: "column",
-                      height: "100%",
-                      minHeight: 280,
-                      borderRadius: "18px",
-                      overflow: "hidden",
+                      borderRadius: "20px",
+                      width: "100%",
+                      boxShadow: "12px 12px 20px rgba(0,0,0,0.08)",
                       cursor: "pointer",
-                      boxShadow: "0 6px 18px rgba(255, 246, 248,.08)",
-                      transition: "transform 0.3s ease, box-shadow 0.3s ease",
+                      border: "1px solid #f3f3f3",
+                      overflow: "hidden",
+                      backgroundColor: "#fff",
+                      transition: "all 0.3s ease-in-out",
                     }}
                   >
-                    {/* 🖼️ Imagen Responsiva y Optimizada */}
-                    <Box
-                      sx={{
-                        width: "100%",
-                        // 💡 CLAVE: Altura más realista y responsiva (ej: relación de aspecto 4:3)
-                        // Usamos padding-top para mantener la proporción sin depender de una altura fija
-                        paddingTop: { xs: "75%", sm: "66.67%" }, // 4:3 en móvil, 3:2 en tablet/desktop
-                        overflow: "hidden",
-                        position: "relative",
-                      }}
-                    >
+                    {/* Imagen con aspectRatio responsivo */}
+                    <Box sx={{ position: "relative", padding: "10px" }}>
                       <CardMedia
                         component='img'
-                        // 💡 CLAVE: Llamada a la función con el ancho y calidad óptimos
-                        image={getImageUrl(
-                          c.cover_image_url,
-                          optimalWidth,
-                          imageQuality
-                        )}
-                        alt={c.title}
+                        image={c.cover_image_url}
+                        alt={c.name}
                         sx={{
-                          position: "absolute", // Necesario para la técnica de padding-top
-                          top: 0,
-                          left: 0,
-                          width: "100%",
-                          height: "100%",
                           objectFit: "cover",
-                          transition: "transform 0.5s ease",
-                          "&:hover": { transform: "scale(1.05)" },
+                          width: "100%",
+                          borderRadius: "16px",
                         }}
                       />
                     </Box>
 
-                    {/* 📝 Contenido Compacto (Título y Progreso) */}
+                    {/* Contenido */}
                     <Box
                       sx={{
-                        p: 1.5,
+                        p: 2,
                         display: "flex",
                         flexDirection: "column",
                         alignItems: "center",
-                        justifyContent: "center",
-                        gap: 0.5,
-                        flexGrow: 1, // Permite que el contenido ocupe el espacio restante
+                        textAlign: "center",
+                        gap: 1,
+                        flexGrow: 1,
                       }}
                     >
                       {c && autenticado && usuario.isSubscribed && (
                         <Progress progress={c?.user_progress_percentage ?? 0} />
                       )}
+
                       <Typography
-                        textAlign='center'
-                        variant='body1'
+                        variant='subtitle1'
                         sx={{
-                          fontWeight: 600,
-                          color: primaryPink,
-                          fontSize: "1.05rem",
-                          letterSpacing: 0.3,
-                          transition: "color 0.3s ease",
-                          "&:hover": { color: "#d81b60" },
+                          fontWeight: 700,
+                          marginTop: 1.5,
                           lineHeight: 1.3,
                         }}
                       >

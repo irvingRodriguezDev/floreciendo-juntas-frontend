@@ -42,11 +42,14 @@ const TopCourses = () => {
       sx={{
         py: { xs: 6, md: 10 },
         px: { xs: 2, md: 4 },
-        background: "linear-gradient(180deg, #fff 0%, #FFF6F8 100%)",
-        borderRadius: "20px",
+        background: `
+      linear-gradient(180deg, #fff 0%, #FFF6F8 100%),
+      radial-gradient(circle at top left, rgba(255,200,220,0.25), transparent 60%)
+    `,
+        borderRadius: "24px",
       }}
     >
-      {/* --- Encabezado --- */}
+      {/* Encabezado */}
       <motion.div
         initial={{ opacity: 0, y: 40 }}
         whileInView={{ opacity: 1, y: 0 }}
@@ -62,7 +65,7 @@ const TopCourses = () => {
             fontWeight: 600,
             textTransform: "uppercase",
             mb: 1,
-            fontSize: { xs: "16px", md: "20px" },
+            fontSize: { xs: "15px", md: "18px" },
           }}
         >
           Lo más visto en nuestra academia
@@ -70,17 +73,22 @@ const TopCourses = () => {
 
         <Typography
           variant='h2'
-          component='h2'
           sx={{
             fontWeight: 800,
             lineHeight: 1.1,
-            fontSize: { xs: "2.8rem", sm: "3.5rem", md: "5rem", lg: "6rem" },
-            color: theme.palette.text.primary,
+            fontSize: { xs: "2.6rem", sm: "3.3rem", md: "4.2rem" },
+            maxWidth: "900px",
+            margin: "0 auto",
+            position: "relative",
           }}
         >
           Nuestros{" "}
           <Box
-            component='span'
+            component={motion.span}
+            initial={{ "--w": "0%" }}
+            whileInView={{ "--w": "100%" }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
             sx={{
               position: "relative",
               display: "inline-block",
@@ -89,17 +97,13 @@ const TopCourses = () => {
                 position: "absolute",
                 bottom: 4,
                 left: 0,
-                width: "100%",
+                width: "var(--w)",
                 height: "10px",
                 background: "#e36f9e",
                 opacity: 0.7,
                 borderRadius: "6px",
-                transform: "scaleX(0)",
-                transformOrigin: "left",
-                transition: "transform 0.4s ease",
-              },
-              "&:hover::after": {
-                transform: "scaleX(1)",
+                transition: "width 0.6s ease",
+                zIndex: -1,
               },
             }}
           >
@@ -109,7 +113,7 @@ const TopCourses = () => {
         </Typography>
       </motion.div>
 
-      {/* --- Grid de cursos --- */}
+      {/* Grid */}
       <Grid
         container
         spacing={{ xs: 3, sm: 4, md: 5 }}
@@ -119,10 +123,11 @@ const TopCourses = () => {
         {topCourses.map((course, index) => (
           <Grid size={{ xs: 12, sm: 6, md: 6, lg: 4, xl: 3 }} key={index}>
             <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
+              initial={{ opacity: 0, scale: 0.92, y: 20 }}
+              whileInView={{ opacity: 1, scale: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: index * 0.08 }}
+              style={{ height: "100%" }}
             >
               <Link
                 to={`/detalle-curso/${course.courseId}`}
@@ -133,25 +138,23 @@ const TopCourses = () => {
                     display: "flex",
                     flexDirection: "column",
                     height: "100%",
-                    borderRadius: "24px",
+                    borderRadius: "26px",
                     overflow: "hidden",
-                    boxShadow:
-                      "0 4px 12px rgba(0, 0, 0, 0.08), 0 8px 24px rgba(0, 0, 0, 0.05)",
-                    transition: "transform 0.4s ease, box-shadow 0.4s ease",
+                    boxShadow: "0 4px 12px rgba(0,0,0,0.06)",
+                    transition: "all 0.35s cubic-bezier(0.22, 1, 0.36, 1)",
                     backgroundColor: "#fff",
                     "&:hover": {
-                      transform: "translateY(-6px)",
-                      boxShadow:
-                        "0 8px 24px rgba(0, 0, 0, 0.12), 0 12px 36px rgba(0, 0, 0, 0.08)",
+                      transform: "translateY(-6px) scale(1.02)",
+                      boxShadow: "0 12px 28px rgba(0,0,0,0.12)",
                     },
                   }}
                 >
-                  {/* Contenedor de imagen con aspect-ratio */}
+                  {/* Imagen */}
                   <Box
                     sx={{
-                      position: "relative",
                       width: "100%",
                       aspectRatio: "16/9",
+                      position: "relative",
                     }}
                   >
                     <CardMedia
@@ -165,23 +168,23 @@ const TopCourses = () => {
                       sx={{
                         width: "100%",
                         height: "100%",
-                        objectFit: "cover", // mantiene proporción y rellena sin distorsión
+                        objectFit: "cover",
                       }}
                     />
 
-                    {/* Insignia de ranking */}
+                    {/* Medalla */}
                     <Box
                       sx={{
                         position: "absolute",
-                        top: 12,
-                        left: 12,
-                        background: "rgba(227,111,158,0.95)",
+                        top: 10,
+                        left: 10,
+                        background: "linear-gradient(135deg, #e36f9e, #f399c7)",
                         color: "white",
-                        fontSize: "1rem",
+                        fontSize: "0.95rem",
                         fontWeight: 700,
                         px: 2,
-                        py: 0.5,
-                        borderRadius: "12px",
+                        py: 0.6,
+                        borderRadius: "50px",
                         boxShadow: "0 2px 6px rgba(0,0,0,0.25)",
                       }}
                     >
@@ -189,21 +192,19 @@ const TopCourses = () => {
                     </Box>
                   </Box>
 
-                  {/* Título debajo de la imagen */}
                   <CardContent
                     sx={{
                       textAlign: "center",
                       py: 3,
                       px: 2,
-                      mt: "auto",
                     }}
                   >
                     <Typography
                       variant='h6'
                       sx={{
                         fontWeight: 600,
+                        fontSize: { xs: "1.1rem", md: "1.25rem" },
                         color: theme.palette.text.primary,
-                        fontSize: { xs: "1.15rem", md: "1.25rem" },
                         transition: "color 0.3s ease",
                         "&:hover": { color: "#e36f9e" },
                       }}
