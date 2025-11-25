@@ -1,0 +1,65 @@
+/* ✨ Sparkles flotando en el card */
+.sparkle-container {
+  position: relative;
+}
+
+.sparkle {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  background: #ff8ac4;
+  border-radius: 50%;
+  opacity: 0.6;
+  filter: blur(2px);
+  animation: sparkleMove 6s infinite ease-in-out;
+}
+
+.sparkle-1 {
+  top: 10%;
+  left: 80%;
+  animation-delay: 0s;
+}
+
+.sparkle-2 {
+  top: 60%;
+  left: 10%;
+  animation-delay: 1.8s;
+}
+
+.sparkle-3 {
+  top: 30%;
+  left: 50%;
+  animation-delay: 3s;
+}
+
+@keyframes sparkleMove {
+  0% {
+    transform: scale(0.6) translateY(0);
+    opacity: 0.4;
+  }
+  50% {
+    transform: scale(1) translateY(-20px);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(0.6) translateY(0);
+    opacity: 0.4;
+  }
+}
+
+/* Avatar glow animado */
+.avatar-glow {
+  animation: softPulse 3.5s infinite ease-in-out;
+}
+
+@keyframes softPulse {
+  0% {
+    filter: drop-shadow(0 0 10px rgba(229, 56, 136, 0.4));
+  }
+  50% {
+    filter: drop-shadow(0 0 22px rgba(229, 56, 136, 0.7));
+  }
+  100% {
+    filter: drop-shadow(0 0 10px rgba(229, 56, 136, 0.4));
+  }
+}

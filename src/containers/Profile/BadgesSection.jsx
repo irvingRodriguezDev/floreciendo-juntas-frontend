@@ -1,77 +1,119 @@
 import React, { useContext, useEffect } from "react";
-import { Box, Typography, Grid } from "@mui/material";
-import DiamondIcon from "@mui/icons-material/Diamond";
+import { Box, Typography, Grid, Paper } from "@mui/material";
+import { motion } from "framer-motion";
 import UserContext from "../../context/User/UserContext";
 import AuthContext from "../../context/Auth/AuthContext";
 import CourseCompletedIcon from "../../components/icons/CourseCompletedIcon";
+
 const PRIMARY_PINK = "#E53888";
-const BADGE_COLOR = "#F7CDD9"; // Rosa de fondo de las insignias
+const BADGE_BG = "#FFE6F1";
 
 const BadgesSection = () => {
   const { usuario } = useContext(AuthContext);
   const { getCoursesCompletedByUser, coursesCompleted } =
     useContext(UserContext);
+
   useEffect(() => {
-    getCoursesCompletedByUser(usuario.id);
+    if (usuario?.id) {
+      getCoursesCompletedByUser(usuario.id);
+    }
   }, []);
-  // const badges = Array.from({ length: badgeCount }, (_, i) => ({
-  //   id: i + 1,
-  //   name: `Experta en Nivel ${i + 1}`,
-  //   description: `Completado el módulo avanzado de Técnicas de Uñas ${i + 1}.`,
-  // }));
 
   return (
-    <Box
+    <Paper
+      elevation={0}
+      component={motion.div}
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4 }}
       sx={{
         p: 3,
-        bgcolor: "white",
-        borderRadius: "16px",
-        boxShadow: "0 4px 10px rgba(0,0,0,0.25)",
+        borderRadius: "20px",
+        background: "linear-gradient(135deg,#FFF4F9 0%, #FFEAF1 100%)",
+        border: "1px solid rgba(229,56,136,0.15)",
+        boxShadow:
+          "0 6px 16px rgba(229,56,136,0.12), inset 0 0 20px rgba(255,255,255,0.6)",
+        position: "relative",
+        overflow: "hidden",
       }}
     >
+      {/* DECORACIÓN */}
+      <Box
+        sx={{
+          position: "absolute",
+          top: -20,
+          left: -20,
+          width: 120,
+          height: 120,
+          background: "rgba(229,56,136,0.12)",
+          borderRadius: "50%",
+          filter: "blur(35px)",
+        }}
+      />
+
       <Typography
         variant='h5'
-        color={PRIMARY_PINK}
-        sx={{ mb: 3, fontWeight: 600 }}
+        sx={{
+          mb: 3,
+          fontWeight: 700,
+          color: PRIMARY_PINK,
+          textAlign: "center",
+        }}
       >
-        Insignias & Logros
+        Insignias & Logros 🌸
       </Typography>
 
-      <Grid container spacing={3} justifyContent='center'>
-        <Grid size={{ xs: 6, sm: 4, md: 2.4 }}>
-          <Typography textAlign='center'>Cursos completados</Typography>
-          <Box
-            sx={{
-              textAlign: "center",
-              p: 2,
-              borderRadius: "50%",
-              bgcolor: BADGE_COLOR,
-              border: `2px solid ${PRIMARY_PINK}`,
-              width: 80,
-              height: 80,
-              mx: "auto",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              transition: "transform 0.3s",
-              "&:hover": {
-                transform: "scale(1.05)",
-              },
-            }}
+      <Grid container spacing={4} justifyContent='center'>
+        {/* BADGE - Cursos completados */}
+        <Grid item xs={6} sm={4} md={3} textAlign='center'>
+          <motion.div
+            whileHover={{ scale: 1.05 }}
+            transition={{ type: "spring", stiffness: 200 }}
           >
-            <CourseCompletedIcon width={50} />
-          </Box>
-          <Typography
-            variant='caption'
-            display='block'
-            textAlign='center'
-            sx={{ mt: 1, fontWeight: 600 }}
-          >
-            x {coursesCompleted.coursesCompleted}
-          </Typography>
+            <Box
+              sx={{
+                mx: "auto",
+                width: 100,
+                height: 100,
+                borderRadius: "50%",
+                bgcolor: BADGE_BG,
+                border: `3px solid ${PRIMARY_PINK}`,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                position: "relative",
+                boxShadow:
+                  "0 4px 14px rgba(229,56,136,0.25), inset 0 0 20px rgba(255,255,255,0.6)",
+              }}
+            >
+              {/* Icono */}
+              <CourseCompletedIcon width={58} height={58} />
+            </Box>
+
+            {/* Título */}
+            <Typography
+              variant='subtitle2'
+              sx={{ mt: 1, fontWeight: 600, color: PRIMARY_PINK }}
+            >
+              Cursos completados
+            </Typography>
+
+            {/* Contador */}
+            <Typography
+              variant='body1'
+              sx={{
+                mt: 0.5,
+                fontWeight: 700,
+                color: "#4A4A4A",
+                fontSize: "1.1rem",
+              }}
+            >
+              ✨ x {coursesCompleted?.coursesCompleted || 0}
+            </Typography>
+          </motion.div>
         </Grid>
       </Grid>
-    </Box>
+    </Paper>
   );
 };
 

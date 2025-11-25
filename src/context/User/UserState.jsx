@@ -88,14 +88,12 @@ const UserState = ({ children }) => {
       .catch((error) => console.error(error));
   };
   const downloadTicket = (ticket, usuarioId) => {
-    console.log(usuarioId);
-
     let url = `/tickets/download?ticketId=${ticket.id}&userId=${usuarioId.id}`;
 
     clienteAxios
       .get(url)
       .then((res) => {
-        fileDownload(res.data, `Acceso-${ticket.event.title}.pdf`);
+        window.open(res.data.downloadUrl, "_blank");
       })
       .catch((error) => {
         console.log(error, "ocurrio un error al descargar el boleto");

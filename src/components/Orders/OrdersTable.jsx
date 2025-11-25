@@ -14,16 +14,16 @@ import {
 import PaymentIcon from "@mui/icons-material/Payment";
 import CloudDownloadIcon from "@mui/icons-material/CloudDownload";
 import OrdersContext from "../../context/Orders/OrdersContext";
-// Simulación de funciones de manejo de acciones
 
-const formatCurrency = (amount) => {
-  return new Intl.NumberFormat("es-MX", {
+const formatCurrency = (amount) =>
+  new Intl.NumberFormat("es-MX", {
     style: "currency",
     currency: "MXN",
   }).format(amount);
-};
+
 const OrdersTable = ({ orders }) => {
   const { addCustomPayment, downloadEdoCtaDream } = useContext(OrdersContext);
+
   if (!orders || orders.length === 0) {
     return (
       <Typography
@@ -37,45 +37,86 @@ const OrdersTable = ({ orders }) => {
   }
 
   return (
-    <TableContainer component={Paper} sx={{ boxShadow: 3, borderRadius: 2 }}>
-      <Table sx={{ minWidth: 700 }} aria-label='tabla de pedidos'>
-        {/* Encabezados de la Tabla */}
+    <TableContainer
+      component={Paper}
+      sx={{
+        boxShadow: "0px 6px 20px rgba(0,0,0,0.06)",
+        borderRadius: 3,
+        overflowX: "auto",
+        "&::-webkit-scrollbar": {
+          height: "8px",
+        },
+        "&::-webkit-scrollbar-thumb": {
+          background: "#E53888",
+          borderRadius: 8,
+        },
+      }}
+    >
+      <Table sx={{ minWidth: 800 }}>
         <TableHead>
-          <TableRow sx={{ bgcolor: "#f5f5f5" }}>
-            <TableCell>ID Pedido</TableCell>
-            <TableCell>Monto Total</TableCell>
-            <TableCell>Pagado</TableCell>
-            <TableCell>Pendiente</TableCell>
-            <TableCell>Fecha Inicio</TableCell>
-            <TableCell>Vencimiento</TableCell>
-            <TableCell>Estado</TableCell>
-            <TableCell align='center'>Acciones</TableCell>
+          <TableRow sx={{ bgcolor: "#FFF0F6" }}>
+            {[
+              "ID Pedido",
+              "Monto Total",
+              "Pagado",
+              "Pendiente",
+              "Fecha Inicio",
+              "Vencimiento",
+              "Estado",
+              "Acciones",
+            ].map((header) => (
+              <TableCell
+                key={header}
+                sx={{
+                  fontWeight: "bold",
+                  color: "#D82F7A",
+                  fontSize: "0.9rem",
+                }}
+              >
+                {header}
+              </TableCell>
+            ))}
           </TableRow>
         </TableHead>
 
-        {/* Cuerpo de la Tabla */}
         <TableBody>
           {orders.map((order) => (
             <TableRow
               key={order.id}
-              sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+              sx={{
+                "&:hover": {
+                  bgcolor: "#FFF7FB",
+                  boxShadow: "0px 4px 12px rgba(0,0,0,0.05)",
+                },
+                transition: "0.2s ease",
+              }}
             >
-              <TableCell component='th' scope='row' sx={{ fontWeight: "bold" }}>
+              <TableCell sx={{ fontWeight: "bold", color: "#333" }}>
                 #{order.id}
               </TableCell>
+
               <TableCell>{formatCurrency(order.totalAmount)}</TableCell>
-              <TableCell sx={{ color: "success.main" }}>
+
+              <TableCell sx={{ color: "success.main", fontWeight: 600 }}>
                 {formatCurrency(order.paidAmount)}
               </TableCell>
-              <TableCell sx={{ color: "error.main", fontWeight: "bold" }}>
+
+              <TableCell sx={{ color: "error.main", fontWeight: 600 }}>
                 {formatCurrency(order.remainingAmount)}
               </TableCell>
+
               <TableCell>{order.startDate}</TableCell>
               <TableCell>{order.dueDate}</TableCell>
+
               <TableCell>
                 <Typography
-                  variant='caption'
                   sx={{
+                    display: "inline-block",
+                    px: 1,
+                    py: 0.5,
+                    borderRadius: "10px",
+                    fontSize: "0.75rem",
+                    fontWeight: 700,
                     bgcolor:
                       order.status === "pendiente"
                         ? "warning.light"
@@ -84,16 +125,12 @@ const OrdersTable = ({ orders }) => {
                       order.status === "pendiente"
                         ? "warning.dark"
                         : "success.dark",
-                    borderRadius: 1,
-                    p: 0.5,
-                    fontWeight: "bold",
                   }}
                 >
                   {order.status.toUpperCase()}
                 </Typography>
               </TableCell>
 
-              {/* Columna de Acciones */}
               <TableCell align='center'>
                 <Box sx={{ display: "flex", gap: 1, justifyContent: "center" }}>
                   <Button
@@ -108,10 +145,15 @@ const OrdersTable = ({ orders }) => {
                         order.remainingAmount
                       )
                     }
-                    sx={{ textTransform: "none", bgcolor: "#D82F7A" }}
+                    sx={{
+                      textTransform: "none",
+                      bgcolor: "#E53888",
+                      "&:hover": { bgcolor: "#D62B78" },
+                    }}
                   >
                     Abonar
                   </Button>
+
                   <Button
                     variant='outlined'
                     size='small'
@@ -119,9 +161,14 @@ const OrdersTable = ({ orders }) => {
                     onClick={() => downloadEdoCtaDream(order.id)}
                     sx={{
                       textTransform: "none",
-                      borderColor: "#D82F7A",
-                      bgcolor: "#FDE6F0",
-                      color: "#D82F7A",
+                      borderColor: "#E53888",
+                      color: "#E53888",
+                      bgcolor: "#FFF0F8",
+                      "&:hover": {
+                        borderColor: "#D62B78",
+                        color: "#D62B78",
+                        bgcolor: "#FFE4F1",
+                      },
                     }}
                   >
                     Edo. Cuenta

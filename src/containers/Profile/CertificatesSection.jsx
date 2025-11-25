@@ -2,16 +2,13 @@ import React, { useContext, useEffect, useState } from "react";
 import {
   Box,
   Typography,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
+  Card,
+  CardContent,
+  CardActions,
   Button,
-  Avatar,
+  Grid,
   Tooltip,
+  Divider,
 } from "@mui/material";
 import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
@@ -21,12 +18,12 @@ import CoursesContext from "../../context/Courses/CoursesContext";
 import Pagination from "../../components/Pagination/Pagination";
 
 const PRIMARY_PINK = "#E53888";
-const SECONDARY_PINK = "#F7CDD9";
+const CARD_BG = "#FFF4FA";
+const BORDER_PINK = "#F7CDD9";
 
 const CertificatesSection = () => {
   const [page, setPage] = useState(1);
   const [rowsPerPage] = useState(10);
-  const [loading, setLoading] = useState(true);
 
   const { completed, getCoursesCompleted, completedPagination } =
     useContext(UserContext);
@@ -34,7 +31,11 @@ const CertificatesSection = () => {
   const { downloadCertificate } = useContext(CoursesContext);
 
   const handlePageChange = (newPage) => {
-    if (newPage >= 1 && newPage <= totalPages && newPage !== page) {
+    if (
+      newPage >= 1 &&
+      newPage <= completedPagination.totalPages &&
+      newPage !== page
+    ) {
       setPage(newPage);
     }
   };
@@ -51,7 +52,6 @@ const CertificatesSection = () => {
         p: { xs: 2, md: 4 },
         borderRadius: "20px",
         bgcolor: "#fff",
-        boxShadow: "0 8px 24px rgba(229,56,136,0.15)",
       }}
     >
       <Typography
@@ -71,76 +71,57 @@ const CertificatesSection = () => {
           Aún no tienes cursos completados 😔
         </Typography>
       ) : (
-        <TableContainer
-          component={Paper}
-          sx={{
-            borderRadius: "16px",
-            overflow: "hidden",
-            boxShadow: "0 4px 16px rgba(229,56,136,0.1)",
-          }}
-        >
-          <Table>
-            <TableHead sx={{ bgcolor: PRIMARY_PINK }}>
-              <TableRow>
-                <TableCell
-                  sx={{ color: "#fff", fontWeight: 700, textAlign: "center" }}
-                >
-                  Curso
-                </TableCell>
-                <TableCell
-                  sx={{ color: "#fff", fontWeight: 700, textAlign: "center" }}
-                >
-                  Estado
-                </TableCell>
-                <TableCell
-                  sx={{ color: "#fff", fontWeight: 700, textAlign: "center" }}
-                >
-                  Certificado
-                </TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {completed.map((cert) => (
-                <TableRow
-                  key={cert.id}
-                  hover
+        <>
+          <Grid container spacing={3}>
+            {completed.map((cert) => (
+              <Grid item xs={12} sm={6} md={4} key={cert.id}>
+                <Card
                   sx={{
+                    borderRadius: "18px",
+                    p: 2,
+                    border: `2px solid ${BORDER_PINK}`,
+                    background: CARD_BG,
+                    boxShadow: "0 6px 16px rgba(229,56,136,0.1)",
+                    transition: "transform 0.25s ease",
                     "&:hover": {
-                      backgroundColor: SECONDARY_PINK,
+                      transform: "scale(1.03)",
                     },
-                    transition: "background-color 0.3s ease",
                   }}
                 >
-                  <TableCell>
+                  <CardContent>
+                    {/* Título del curso */}
                     <Typography
-                      variant='subtitle1'
+                      variant='h6'
                       sx={{
-                        fontWeight: 600,
+                        fontWeight: 700,
                         color: PRIMARY_PINK,
                         textAlign: "center",
+                        mb: 2,
                       }}
                     >
                       {cert.title}
                     </Typography>
-                  </TableCell>
 
-                  <TableCell>
+                    <Divider sx={{ mb: 2 }} />
+
+                    {/* Estado */}
                     <Box
                       sx={{
                         display: "flex",
                         justifyContent: "center",
                         alignItems: "center",
                         gap: 1,
+                        mb: 2,
                       }}
                     >
-                      <CheckCircleIcon sx={{ color: "green", fontSize: 20 }} />
+                      <CheckCircleIcon sx={{ color: "green", fontSize: 22 }} />
                       <Typography variant='body2' color='text.secondary'>
                         Completado
                       </Typography>
                     </Box>
-                  </TableCell>
+                  </CardContent>
 
-                  <TableCell sx={{ display: "flex", justifyContent: "center" }}>
+                  <CardActions sx={{ justifyContent: "center", mt: 1 }}>
                     <Tooltip title='Descargar certificado'>
                       <Button
                         variant='contained'
@@ -148,9 +129,10 @@ const CertificatesSection = () => {
                         sx={{
                           bgcolor: PRIMARY_PINK,
                           "&:hover": { bgcolor: "#c52c77" },
-                          borderRadius: "10px",
                           textTransform: "none",
+                          borderRadius: "10px",
                           fontWeight: 600,
+                          px: 3,
                         }}
                         onClick={() =>
                           downloadCertificate(cert.id, usuario.name)
@@ -159,13 +141,15 @@ const CertificatesSection = () => {
                         Descargar
                       </Button>
                     </Tooltip>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+                  </CardActions>
+                </Card>
+              </Grid>
+            ))}
+          </Grid>
+
+          {/* PAGINACIÓN */}
           {completedPagination.totalPages > 1 && (
-            <Box sx={{ padding: "20px" }}>
+            <Box sx={{ padding: "25px 0" }}>
               <Pagination
                 currentPage={completedPagination.currentPage}
                 totalPages={completedPagination.totalPages}
@@ -173,7 +157,7 @@ const CertificatesSection = () => {
               />
             </Box>
           )}
-        </TableContainer>
+        </>
       )}
     </Box>
   );

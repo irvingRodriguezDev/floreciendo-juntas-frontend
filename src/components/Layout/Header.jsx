@@ -28,7 +28,7 @@ import BadgeBox from "../ui/BadgeBox";
 /* Menu items (igual que antes) */
 const menuItems = [
   { name: "Cursos", path: "/cursos", auth: "both" },
-  { name: "Salon", path: "/el-salon-de-tus-sueños", auth: "both" },
+  { name: "Salón", path: "/el-salon-de-tus-sueños", auth: "both" },
   { name: "Eventos", path: "/eventos", auth: "both" },
 ];
 

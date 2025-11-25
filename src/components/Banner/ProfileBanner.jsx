@@ -2,120 +2,115 @@ import React from "react";
 import { Box, Typography } from "@mui/material";
 
 const ProfileBanner = () => {
-  // ----------------------------------------------------
-  // --- 1. Contenido del Banner
-  // ----------------------------------------------------
   const titleText = "Mi Perfil 🌸";
-  const subtitleText = "¡Qué alegría verte floreciendo juntas!";
+  const subtitleText = "Qué alegría verte floreciendo juntas ✨";
 
   // ----------------------------------------------------
-  // --- 2. Estilos Base del Banner
+  // Banner
   // ----------------------------------------------------
   const bannerSx = {
-    // Fondo Rosa pálido
-    bgcolor: "#FFF0F4", // Un rosa pálido ligeramente más fuerte que el ejemplo anterior
-    padding: { xs: "60px 20px", md: "80px 40px" },
+    background: "linear-gradient(135deg, #FFE5EE 0%, #FFF7FA 100%)",
+    padding: { xs: "70px 25px", md: "100px 60px" },
     textAlign: "center",
     position: "relative",
     overflow: "hidden",
-    borderBottom: "1px solid #F7C0C7",
-    borderRadius: "20px", // Bordes más redondeados
-    boxShadow: "0 4px 12px rgba(229, 56, 136, 0.1)", // Sombra sutil con el color primario
+    borderRadius: "30px",
+    boxShadow: "0 8px 24px rgba(229, 56, 136, 0.12)",
   };
 
-  // ----------------------------------------------------
-  // --- 3. Estilos para los Adornos (Simulando el look)
-  // ----------------------------------------------------
-
-  // Función helper para los estilos de adorno base
-  const getAdornmentBaseSx = (position) => ({
+  // Helper estilos base
+  const getAdornment = (extra) => ({
     position: "absolute",
-    opacity: 0.7,
-    zIndex: 0, // Asegura que el texto esté encima
-    userSelect: "none", // No se puede seleccionar el texto de adorno
-    ...position, // Combina las propiedades de posición
+    opacity: 0.55,
+    zIndex: 0,
+    filter: "blur(0.5px)",
+    userSelect: "none",
+    ...extra,
   });
 
-  // 1. Adorno de ondas (arriba-izquierda) - Color rosa fuerte
-  const adornmentPinkWavesSx = getAdornmentBaseSx({
-    top: "30px",
-    left: { xs: "5%", md: "15%" },
-    color: "#E53888", // Color primario de acento
-    fontSize: { xs: "24px", md: "36px" },
-    transform: "rotate(-10deg)",
-  });
+  // ----------------------------------------------------
+  // Adornos
+  // ----------------------------------------------------
 
-  // 2. Adorno de puntos/círculos (abajo-izquierda) - Color rosa suave
-  const adornmentLightCirclesSx = getAdornmentBaseSx({
-    bottom: "20px",
-    left: "5%",
-    color: "#F7CDD9", // Color suave de decoración
-    fontSize: { xs: "36px", md: "50px" },
-    lineHeight: "0.8",
-  });
-
-  // 3. Adorno de forma angular/triangular (abajo-derecha)
-  const adornmentTriangleSx = getAdornmentBaseSx({
-    bottom: "30px",
-    right: "10%",
-    width: "40px",
-    height: "40px",
-    // Creación del triángulo con bordes transparentes
-    borderLeft: "20px solid transparent",
-    borderRight: "20px solid transparent",
-    borderBottom: "40px solid #E36F9E", // Rosa intermedio
-    transform: "rotate(135deg)",
-  });
-
-  // 4. Adorno circular/anillo (arriba-derecha)
-  const adornmentRingSx = getAdornmentBaseSx({
-    top: "15px",
-    right: "5%",
-    width: "70px",
-    height: "70px",
+  // 🌸 Flor grande en difuminado (arriba izquierda)
+  const flowerBlurPink = getAdornment({
+    top: "-40px",
+    left: "-20px",
+    width: "180px",
+    height: "180px",
+    background: "radial-gradient(circle, #FFB6D5 0%, transparent 70%)",
     borderRadius: "50%",
-    border: "5px solid #E53888", // Rosa fuerte
-    opacity: 0.5,
   });
+
+  // 🌼 Flor dorada suave (abajo derecha)
+  const flowerSoftGold = getAdornment({
+    bottom: "-30px",
+    right: "-10px",
+    width: "150px",
+    height: "150px",
+    background: "radial-gradient(circle, #FFD9A8 0%, transparent 70%)",
+    borderRadius: "50%",
+  });
+
+  // 🌸 Pétalos flotando (varios)
+  const petalSx = (pos) =>
+    getAdornment({
+      fontSize: { xs: "26px", md: "32px" },
+      color: "#E56A9F",
+      animation: "floatPetal 6s ease-in-out infinite",
+      ...pos,
+    });
+
+  // Animación
+  const floatAnimation = `
+    @keyframes floatPetal {
+      0% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-15px) rotate(8deg); }
+      100% { transform: translateY(0px) rotate(0deg); }
+    }
+  `;
 
   return (
     <Box sx={bannerSx}>
-      {/* --- Adornos Geométricos --- */}
-      {/* 1. Ondas/Patrón de repetición */}
-      <Box sx={adornmentPinkWavesSx}>&lt; &gt; &lt; &gt; &lt; &gt;</Box>
-      {/* 2. Puntos/Círculos */}
-      <Box sx={adornmentLightCirclesSx}>
-        &#x25CF; &#x25CF; <br />
-        &#x25CF; &#x25CF; &#x25CF; <br />
-        &#x25CF; &#x25CF;
-      </Box>
-      {/* 3. Triángulo (sin contenido) */}
-      <Box sx={adornmentTriangleSx} /> {/* 4. Anillo (sin contenido) */}
-      <Box sx={adornmentRingSx} />{" "}
-      {/* --- Contenido del Banner (Z-index 1 para que estén encima) --- */}
+      <style>{floatAnimation}</style>
+
+      {/* --- Adornos --- */}
+      <Box sx={flowerBlurPink} />
+      <Box sx={flowerSoftGold} />
+
+      {/* pétalos */}
+      <Box sx={petalSx({ top: "20px", left: "15%" })}>🌸</Box>
+      <Box sx={petalSx({ top: "60px", right: "18%" })}>🌸</Box>
+      <Box sx={petalSx({ bottom: "40px", left: "25%" })}>🌸</Box>
+      <Box sx={petalSx({ bottom: "30px", right: "10%" })}>🌸</Box>
+
+      {/* --- Contenido --- */}
       <Typography
         variant='h3'
         component='h1'
         sx={{
-          fontWeight: 700,
-          color: "#333",
-          mb: 1.5,
+          fontWeight: 800,
+          color: "#C73578",
+          mb: 2,
           zIndex: 1,
           position: "relative",
-          fontSize: { xs: "2rem", md: "3rem" },
+          fontFamily: "'Poppins', sans-serif",
+          fontSize: { xs: "2.2rem", md: "3.2rem" },
         }}
       >
         {titleText}
       </Typography>
+
       <Typography
         variant='h6'
         component='p'
         sx={{
-          color: "#707070",
+          color: "#6A6A6A",
           zIndex: 1,
           position: "relative",
-          fontSize: { xs: "1.1rem", md: "1.4rem" },
           fontWeight: 400,
+          fontSize: { xs: "1.2rem", md: "1.5rem" },
+          fontFamily: "'Poppins', sans-serif",
         }}
       >
         {subtitleText}

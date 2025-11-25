@@ -1,22 +1,11 @@
-import React, { useContext } from "react";
-import {
-  Box,
-  Container,
-  Typography,
-  Divider,
-  Button,
-  Grid,
-} from "@mui/material";
-import ProfileHeader from "./ProfileHeader";
-import BadgesSection from "./BadgesSection";
-import DreamSalonSection from "./DreamSalonSection";
-import CertificatesSection from "./CertificatesSection";
+import { useContext } from "react";
+import { Box, Container, Button, Grid } from "@mui/material";
 import ProfileBanner from "../../components/Banner/ProfileBanner";
 import AuthContext from "../../context/Auth/AuthContext";
 import { useNavigate } from "react-router-dom";
-import UserTicketsTable from "./UserTicketsTable";
+import ProfileTabs from "./ProfileTabs";
+
 // Colores primarios para mantener la identidad visual
-const PRIMARY_PINK = "#E53888";
 const LIGHT_PINK = "";
 
 const ProfileLayout = () => {
@@ -33,6 +22,7 @@ const ProfileLayout = () => {
               display: "flex",
               justifyContent: "end",
               mt: 2,
+              mb: 2,
             }}
           >
             <Button
@@ -45,19 +35,7 @@ const ProfileLayout = () => {
             </Button>
           </Grid>
         </Grid>
-        {/* 1. Cabecera (Nombre y Rol) */}
-        <ProfileHeader usuario={usuario} />
-        <Divider sx={{ my: 4, borderColor: PRIMARY_PINK, opacity: 0.8 }} />
-        {/* 2. Sección de Insignias */}
-        <BadgesSection />
-        <Divider sx={{ my: 4, borderColor: PRIMARY_PINK, opacity: 0.8 }} />
-        {/* 3. Sección "El Salón de Tus Sueños" */}
-        <DreamSalonSection />
-        <Divider sx={{ my: 4, borderColor: PRIMARY_PINK, opacity: 0.8 }} />
-        <UserTicketsTable />
-        <Divider sx={{ my: 4, borderColor: PRIMARY_PINK, opacity: 0.8 }} />
-        {/* 4. Sección de Diplomas y Certificados */}
-        <CertificatesSection />
+        <ProfileTabs />
       </Container>
     </Box>
   );
