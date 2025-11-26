@@ -340,8 +340,6 @@ const BannerHome = () => {
             }}
             label='¡Quiero empezar a florecer!'
           />
-
-          <VideoModal buttonText='Ver nuestro video' videoUrl={videoSource} />
         </Stack>
 
         <Box
@@ -386,7 +384,9 @@ const BannerHome = () => {
             zIndex: 1,
           }}
         />
-
+        <Box position='absolute' sx={{ zIndex: 10 }}>
+          <VideoModal buttonText='Ver nuestro video' videoUrl={videoSource} />
+        </Box>
         {/* Floating Card */}
         <Box
           sx={{

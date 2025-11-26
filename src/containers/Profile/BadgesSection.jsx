@@ -65,7 +65,7 @@ const BadgesSection = () => {
 
       <Grid container spacing={4} justifyContent='center'>
         {/* BADGE - Cursos completados */}
-        <Grid item xs={6} sm={4} md={3} textAlign='center'>
+        <Grid size={{ xs: 6, sm: 4, md: 3 }} textAlign='center'>
           <motion.div
             whileHover={{ scale: 1.05 }}
             transition={{ type: "spring", stiffness: 200 }}

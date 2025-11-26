@@ -74,7 +74,7 @@ const CertificatesSection = () => {
         <>
           <Grid container spacing={3}>
             {completed.map((cert) => (
-              <Grid item xs={12} sm={6} md={4} key={cert.id}>
+              <Grid size={{ xs: 12, sm: 6, md: 4 }} key={cert.id}>
                 <Card
                   sx={{
                     borderRadius: "18px",

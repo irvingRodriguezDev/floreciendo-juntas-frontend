@@ -1,162 +1,140 @@
-/* --- Sección general --- */
-.topcourses-container {
-  background: linear-gradient(180deg, #fff 100%);
-  padding: 6rem 2rem;
-  min-height: 100vh;
+.top-movies-container {
+  padding: 20px;
+  color: white;
+  background: transparent; /* O rgba(0, 0, 0, 0) si prefieres */
+  overflow-x: hidden; /* Previene scroll horizontal */
+  max-width: 100%; /* Asegura que no exceda el viewport */
+  box-sizing: border-box; /* Incluye padding en el ancho total */
+  overflow-y: hidden;
+}
+
+.movies-list {
+  display: flex;
+  gap: 20px; /* Reducido de 40px para menos espacio horizontal */
+  flex-wrap: wrap;
+  justify-content: center; /* Centra las tarjetas si hay espacio */
+  width: 100%; /* Asegura que ocupe todo el ancho disponible */
+}
+
+.movie-card {
+  position: relative; /* Para posicionar el rank relativo a esta card */
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  border-radius: 16px;
+  align-items: center;
+  background-color: transparent;
+  border-radius: 12px; /* Reducido de 100px para esquinas suaves sin exagerar */
+  flex: 0 1 200px; /* Flex-grow: 0, flex-shrink: 1, flex-basis: 200px → ancho controlado y adaptable */
+  max-width: 100%; /* Límite máximo para evitar desborde */
+  padding: 10px; /* Padding interno moderado */
+  box-sizing: border-box;
 }
 
-/* --- Encabezado --- */
-.topcourses-header {
+.movie-rank {
+  position: absolute;
+  font-size: 22rem; /* Reducido drásticamente de 18rem; ajusta según necesites (ej. 3rem para más pequeño) */
+  font-weight: 800;
+  left: "1px"; /* Cambiado de -50px para que no se salga a la izquierda */
+  top: 41%;
+  transform: translate(
+    -65%,
+    -50%
+  ); /* Centra horizontal y verticalmente respecto a su posición */
+  z-index: 3;
+  color: #f971af;
+  /* Glass effect SOLO en el número: Ajustado para que funcione mejor sin padding extra */
+  background: rgba(249, 113, 175, 0.8);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  /* Contorno para visibilidad */
+  -webkit-text-stroke: 1px rgba(255, 255, 255, 0.5); /* Reducido de 2px para sutileza */
+  /* Eliminé padding: 15px 25px porque no se aplica bien con background-clip: text.
+     Si necesitas espacio alrededor, envuelve el rank en un <div> con padding. */
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3); /* Sombra sutil para profundidad */
+}
+
+.movie-img {
+  width: "100%"; /* Cambiado de 'auto' para que se ajuste al contenedor */
+  height: 450px; /* Reducido ligeramente de 300px para mejor proporción */
+  border-radius: 8px;
+  object-fit: cover;
+  z-index: 2;
+  /* Desplazamos la imagen ligeramente a la derecha para "superponer" con el rank */
+}
+
+.movie-title {
+  margin-top: 10px;
+  font-size: 1.5rem; /* Reducido de 2rem para mejor proporción */
   text-align: center;
-  margin-bottom: 4rem;
-}
-
-.subtitle {
-  color: #b76e79;
-  font-weight: 600;
-  text-transform: uppercase;
-  font-size: 4rem;
-  letter-spacing: 1.2px;
+  z-index: 2;
+  margin-left: 0; /* Eliminado el 100px problemático */
+  font-weight: bold;
+  color: #e53888;
+  /* Aseguramos que no desborde */
+  word-wrap: break-word;
+  max-width: 100%;
 }
 
 .title {
-  font-weight: 700;
-  color: #3c2a2a;
-  font-size: 9rem;
-  margin-top: 0.8rem;
-  line-height: 1.2;
-}
-
-.highlight {
-  color: #e91e63;
-  position: relative;
-}
-
-.highlight::after {
-  content: "";
-  position: absolute;
-  bottom: 5px;
-  left: 0;
-  width: 100%;
-  height: 8px;
-  background: rgba(255, 236, 179, 0.7);
-  border-radius: 4px;
-  z-index: -1;
-}
-
-/* --- Tarjetas tipo Netflix --- */
-.course-card {
-  position: relative;
-  border-radius: 18px;
-  overflow: hidden;
-  height: 380px;
-  box-shadow: 0 8px 24px rgba(233, 30, 99, 0.15);
-  transition: all 0.4s ease;
-  cursor: pointer;
-  background-color: #fff;
-}
-
-.course-card:hover {
-  transform: scale(1.04);
-  box-shadow: 0 12px 28px rgba(233, 30, 99, 0.25);
-}
-
-/* Imagen del curso */
-.course-image {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: all 0.4s ease;
-}
-
-.course-card:hover .course-image {
-  filter: brightness(0.7);
-  transform: scale(1.05);
-}
-
-/* Capa de color al hacer hover */
-.overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(
-    to top,
-    rgba(233, 30, 99, 0.45),
-    rgba(255, 255, 255, 0)
-  );
-  opacity: 0;
-  transition: opacity 0.4s ease;
-}
-
-.course-card:hover .overlay {
-  opacity: 1;
-}
-
-/* Número ranking */
-.rank-badge {
-  position: absolute;
-  top: 0;
-  left: 0;
-  background-color: #e91e63;
-  color: white;
+  text-align: left; /* O 'center' si prefieres para el heading principal */
   font-weight: bold;
-  padding: 0.5rem 1.2rem;
-  font-size: 1.3rem;
-  border-bottom-right-radius: 16px;
-  z-index: 2;
+  font-size: 2.5rem; /* Ajustado de xx-large para consistencia (xx-large es ~3rem) */
+  color: #e53888;
+  margin-bottom: 20px; /* Espacio debajo para separar del lista */
+  /* Si este es un heading fuera de las cards, asegúrate de que esté en el contenedor */
 }
 
-/* Contenido del curso */
-.course-content {
-  position: absolute;
-  bottom: 0;
-  width: 100%;
-  background: rgba(255, 255, 255, 0.9);
-  padding: 1rem;
-  text-align: center;
-  transition: all 0.4s ease;
-}
+/* Media queries para responsive (evita overflow en móviles) */
+@media (max-width: 768px) {
+  .top-movies-container {
+    padding: 10px;
+  }
 
-.course-title {
-  font-weight: 600;
-  font-size: 1.1rem;
-  color: #3c2a2a;
-  margin: 0;
-}
+  .movies-list {
+    gap: 10px; /* Aún más pequeño en móviles */
+    justify-content: flex-start; /* O center si quieres */
+  }
 
-/* --- Responsive --- */
-@media (max-width: 1200px) {
+  .movie-card {
+    flex: 0 1 150px; /* Más estrechas en móviles */
+    max-width: 150px;
+    padding: 8px;
+  }
+
+  .movie-rank {
+    font-size: 8rem; /* Más pequeño en móviles */
+  }
+
+  .movie-img {
+    height: 200px;
+  }
+
+  .movie-title {
+    font-size: 1.2rem;
+  }
+
   .title {
-    font-size: 2.5rem;
+    font-size: 2rem;
+    text-align: center; /* Centra en móviles para mejor UX */
   }
 }
 
-@media (max-width: 900px) {
-  .title {
-    font-size: 2.2rem;
+@media (max-width: 480px) {
+  .movies-list {
+    flex-direction: column; /* Stack vertical en pantallas muy pequeñas para eliminar cualquier riesgo de horizontal */
+    align-items: center;
   }
 
-  .course-card {
-    height: 340px;
-  }
-}
-
-@media (max-width: 600px) {
-  .title {
-    font-size: 1.8rem;
+  .movie-card {
+    max-width: 100%;
+    width: 100%;
   }
 
-  .course-card {
-    height: 300px;
-  }
-
-  .course-title {
-    font-size: 1rem;
+  .movie-rank {
+    position: static; /* En móviles, coloca el rank arriba o abajo para simplicidad */
+    transform: none;
+    margin-bottom: 10px;
+    text-align: center;
+    width: 100%;
   }
 }

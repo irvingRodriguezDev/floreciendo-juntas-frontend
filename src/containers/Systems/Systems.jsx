@@ -226,7 +226,7 @@ const Systems = () => {
             },
           }}
         >
-          Nuestros Cursos
+          {/* Nuestros Cursos */}
         </Typography>
 
         <Typography
@@ -238,9 +238,9 @@ const Systems = () => {
             fontSize: { xs: "2rem", sm: "2.5rem", md: "3.5rem" },
           }}
         >
-          Explora{" "}
+          Explora Nuestras {""}
           <Box component='span' sx={{ position: "relative" }}>
-            Sistemas
+            Academias
             <Box
               component='span'
               sx={{
@@ -256,7 +256,6 @@ const Systems = () => {
               }}
             />
           </Box>{" "}
-          de Uñas
         </Typography>
       </Stack>
 

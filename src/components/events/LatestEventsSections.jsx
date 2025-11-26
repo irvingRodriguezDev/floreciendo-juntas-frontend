@@ -146,7 +146,7 @@ const LatestEventsSection = () => {
           </Box>
         ) : (
           events.map((event) => (
-            <Grid xs={12} sm={6} md={4} lg={3} key={event.id}>
+            <Grid size={{ xs: 12, sm: 6, md: 6, lg: 4, xl: 4 }} key={event.id}>
               <Card
                 sx={{
                   borderRadius: "24px",

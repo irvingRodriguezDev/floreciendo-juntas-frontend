@@ -70,11 +70,11 @@ const AuthState = (props) => {
       dispatch({ type: types.LOGIN_ERROR });
       return false;
     }
-
     tokenAuth(token);
 
     try {
       const { data } = await MethodGet("/auth/me");
+
       dispatch({
         type: types.OBTENER_USUARIO,
         payload: {
@@ -82,12 +82,13 @@ const AuthState = (props) => {
           profileImage: getProfileImageUrl(data.user.profileImage),
         },
       });
+
       return true;
     } catch (error) {
       dispatch({ type: types.LOGIN_ERROR });
       return false;
     } finally {
-      dispatch({ type: types.FIN_AUTENTICACION });
+      dispatch({ type: types.FIN_AUTENTICACION }); // 🔥 NECESITA que FIN ponga isAuthenticating=false
     }
   };
 

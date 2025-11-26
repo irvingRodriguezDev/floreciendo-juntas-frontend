@@ -62,56 +62,29 @@ const NewCourses = () => {
   return (
     <Box
       sx={{
-        backgroundColor: theme.palette.background.default || "#fffcf7",
+        background: `linear-gradient(180deg, #fff5f7 100%, #fff 0%)`,
         position: "relative",
         py: { xs: 6, md: 10 },
+        overflow: "hidden",
+        borderRadius: "16px",
       }}
     >
-      {/* --- Header --- */}
+      {/* ————— Header mejorado ————— */}
       <Stack
         alignItems='center'
         sx={{ mb: 8, px: { xs: 2, md: 4 } }}
         component={motion.div}
-        initial='hidden'
-        animate='visible'
-        variants={{
-          hidden: { opacity: 0, y: 40 },
-          visible: {
-            opacity: 1,
-            y: 0,
-            transition: { duration: 0.6, ease: "easeOut" },
-          },
-        }}
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
       >
-        {/* Subtítulo */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2, duration: 0.6 }}
-        >
-          <Typography
-            variant='overline'
-            sx={{
-              color: theme.palette.text.secondary,
-              fontWeight: 700,
-              letterSpacing: "1.5px",
-              textTransform: "uppercase",
-              mb: 1,
-            }}
-          >
-            Tu Próximo Nivel en Manicura
-          </Typography>
-        </motion.div>
-
-        {/* Título principal */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.94 }}
+          initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.35, duration: 0.6 }}
+          transition={{ delay: 0.3, duration: 0.6 }}
         >
           <Typography
             variant='h3'
-            component='h2'
             sx={{
               fontWeight: 800,
               lineHeight: 1.2,
@@ -122,9 +95,7 @@ const NewCourses = () => {
             Descubre Nuestro{" "}
             <Box
               component={motion.span}
-              sx={{ position: "relative", display: "inline-block" }}
-              whileHover={{ scale: 1.02 }}
-              transition={{ type: "spring", stiffness: 250 }}
+              sx={{ display: "inline-block", position: "relative" }}
             >
               Contenido Nuevo
               {/* Subrayado animado */}
@@ -132,11 +103,7 @@ const NewCourses = () => {
                 component={motion.span}
                 initial={{ scaleX: 0 }}
                 animate={{ scaleX: 1 }}
-                transition={{
-                  duration: 0.6,
-                  ease: "easeOut",
-                  delay: 0.5,
-                }}
+                transition={{ duration: 0.6, delay: 0.5 }}
                 sx={{
                   position: "absolute",
                   left: 0,
@@ -146,8 +113,8 @@ const NewCourses = () => {
                   background: `linear-gradient(90deg, #F971AF, #FFABD1)`,
                   borderRadius: "6px",
                   transformOrigin: "left",
-                  zIndex: -1,
                   opacity: 0.8,
+                  zIndex: -1,
                 }}
               />
             </Box>
@@ -155,27 +122,28 @@ const NewCourses = () => {
         </motion.div>
       </Stack>
 
-      {/* --- Swiper --- */}
+      {/* ————— Swiper o mensaje vacío ————— */}
       <Box
         sx={{ position: "relative", maxWidth: "100%", px: { xs: 2, md: 4 } }}
       >
         {!courses.length ? (
           <Typography
             variant='h3'
-            component='h2'
             sx={{
-              fontWeight: 400,
-              lineHeight: 1.3,
               textAlign: "center",
-              fontSize: { xs: "2.2rem", sm: "2.8rem", md: "2.5rem" },
+              fontWeight: 400,
+              fontSize: { xs: "1.8rem", sm: "2.2rem", md: "2.5rem" },
             }}
           >
-            🌷 ¡Por ahora no tenemos nuevos cursos{" "}
+            🌷 ¡Por ahora no tenemos nuevos{" "}
             <Box
               component='span'
-              sx={{ position: "relative", display: "inline-block" }}
+              sx={{
+                position: "relative",
+                display: "inline-block",
+              }}
             >
-              disponibles
+              cursos disponibles
               <Box
                 component='span'
                 sx={{
@@ -185,98 +153,115 @@ const NewCourses = () => {
                   width: "100%",
                   height: "8px",
                   backgroundColor: lightYellow,
-                  zIndex: -1,
-                  opacity: 0.7,
                   borderRadius: "4px",
+                  opacity: 0.7,
+                  zIndex: -1,
                 }}
               />
             </Box>
             ! 🌷
-            <br />
             <Typography
               component='span'
               sx={{
-                fontSize: { xs: "1.1rem", sm: "1.3rem" },
-                color: "text.secondary",
                 display: "block",
                 mt: 1,
+                fontSize: { xs: "1.1rem", sm: "1.3rem" },
+                color: "text.secondary",
               }}
             >
-              Pero mantente atenta 💖, ¡muy pronto llegarán nuevas oportunidades
-              para seguir aprendiendo y creciendo juntas!
+              Muy pronto llegarán nuevas oportunidades para seguir aprendiendo
+              💖
             </Typography>
           </Typography>
         ) : (
           <Swiper
             modules={[Navigation, Pagination]}
-            loop={true}
+            loop={courses.length > 4}
             grabCursor={true}
             centeredSlides={true}
+            centerInsufficientSlides={true}
             spaceBetween={20}
-            slidesPerView={1.15} // Card central pequeña en móviles
+            slidesPerView={1.15}
             breakpoints={{
-              640: { slidesPerView: 1.3, spaceBetween: 20 },
-              768: { slidesPerView: 2.2, spaceBetween: 25 },
-              1024: { slidesPerView: 3, spaceBetween: 30 },
-              1440: { slidesPerView: 4, spaceBetween: 35 },
+              640: { slidesPerView: 1.4, spaceBetween: 20 },
+              768: { slidesPerView: 2, spaceBetween: 25 },
+              1024: { slidesPerView: 2.8, spaceBetween: 30 },
+              1440: { slidesPerView: 3.5, spaceBetween: 35 },
             }}
             navigation={{
               prevEl: swiperPrevRef.current,
               nextEl: swiperNextRef.current,
             }}
             onBeforeInit={(swiper) => {
-              if (swiper.params.navigation) {
-                swiper.params.navigation.prevEl = swiperPrevRef.current;
-                swiper.params.navigation.nextEl = swiperNextRef.current;
-                swiper.navigation.update();
-              }
+              swiper.params.navigation.prevEl = swiperPrevRef.current;
+              swiper.params.navigation.nextEl = swiperNextRef.current;
             }}
-            style={{ padding: theme.spacing(2, 0) }}
+            style={{
+              padding: theme.spacing(2, 0),
+              maxWidth: "1500px",
+              margin: "0 auto",
+            }}
           >
             {courses.map((c) => (
-              <SwiperSlide key={c.id}>
+              <SwiperSlide
+                key={c.id}
+                component={motion.div}
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.5 }}
+                whileHover={{ scale: 1.02 }}
+                style={{
+                  display: "flex",
+                  justifyContent: "center",
+                }}
+              >
                 <Link
                   to={`/detalle-curso/${c.id}`}
-                  style={{ textDecoration: "none" }}
+                  style={{
+                    textDecoration: "none",
+                    width: "100%",
+                    maxWidth: "350px",
+                  }}
                 >
                   <Card
                     component={motion.div}
-                    whileHover={{ scale: 1.03, transition: { duration: 0.3 } }}
+                    whileHover={{
+                      boxShadow: "0px 12px 30px rgba(249,113,175,0.8)",
+                    }}
+                    transition={{ duration: 0.3 }}
                     sx={{
                       borderRadius: "20px",
-                      width: "100%",
-                      boxShadow: "12px 12px 20px rgba(0,0,0,0.08)",
-                      cursor: "pointer",
-                      border: "1px solid #f3f3f3",
                       overflow: "hidden",
                       backgroundColor: "#fff",
-                      transition: "all 0.3s ease-in-out",
+                      border: "1px solid #f3f3f3",
+                      cursor: "pointer",
+                      display: "flex",
+                      flexDirection: "column",
+                      boxShadow: "6px 6px 15px rgba(0,0,0,0.08)",
                     }}
                   >
-                    {/* Imagen con aspectRatio responsivo */}
-                    <Box sx={{ position: "relative", padding: "10px" }}>
-                      <CardMedia
-                        component='img'
-                        image={c.cover_image_url}
-                        alt={c.name}
-                        sx={{
-                          objectFit: "cover",
-                          width: "100%",
-                          borderRadius: "16px",
-                        }}
-                      />
-                    </Box>
+                    {/* Imagen */}
+                    <CardMedia
+                      component='img'
+                      image={c.cover_image_url}
+                      alt={c.name}
+                      sx={{
+                        width: "100%",
+                        height: "100%",
+
+                        objectFit: "contain",
+                      }}
+                    />
 
                     {/* Contenido */}
                     <Box
                       sx={{
                         p: 2,
+                        textAlign: "center",
                         display: "flex",
                         flexDirection: "column",
                         alignItems: "center",
-                        textAlign: "center",
                         gap: 1,
-                        flexGrow: 1,
                       }}
                     >
                       {c && autenticado && usuario.isSubscribed && (
@@ -287,8 +272,8 @@ const NewCourses = () => {
                         variant='subtitle1'
                         sx={{
                           fontWeight: 700,
-                          marginTop: 1.5,
                           lineHeight: 1.3,
+                          mt: 1.2,
                         }}
                       >
                         {c.title}
@@ -301,9 +286,9 @@ const NewCourses = () => {
           </Swiper>
         )}
 
-        {/* Botones de navegación */}
+        {/* ————— Controles Swiper ————— */}
         {courses.length > 0 && (
-          <>
+          <Box>
             <IconButton
               ref={swiperPrevRef}
               sx={{
@@ -313,16 +298,16 @@ const NewCourses = () => {
                 transform: "translateY(-50%)",
                 backgroundColor: "#F3BBCE",
                 color: "white",
-                "&:hover": { backgroundColor: "#d81b60" }, // Color más oscuro al pasar el ratón
+                "&:hover": { backgroundColor: "#d81b60" },
                 zIndex: 10,
                 width: 44,
                 height: 44,
-                boxShadow: theme.shadows[3],
                 display: { xs: "none", md: "flex" },
               }}
             >
               <ArrowBackIcon />
             </IconButton>
+
             <IconButton
               ref={swiperNextRef}
               sx={{
@@ -332,17 +317,16 @@ const NewCourses = () => {
                 transform: "translateY(-50%)",
                 backgroundColor: "#F3BBCE",
                 color: "white",
-                "&:hover": { backgroundColor: "#d81b60" }, // Color más oscuro al pasar el ratón
+                "&:hover": { backgroundColor: "#d81b60" },
                 zIndex: 10,
                 width: 44,
                 height: 44,
-                boxShadow: theme.shadows[3],
                 display: { xs: "none", md: "flex" },
               }}
             >
               <ArrowForwardIcon />
             </IconButton>
-          </>
+          </Box>
         )}
       </Box>
     </Box>

@@ -58,11 +58,18 @@ const CourseDetailScreen = () => {
       label: "Preguntas y respuestas del curso",
       content: (
         <Box sx={{ position: "relative", zIndex: 1, mt: 2 }}>
-          <Wall
-            courseId={id}
-            isAuthenticating={isAuthenticating}
-            isSubscribed={isSubscribed}
-          />
+          {isAuthenticating && isSubscribed ? (
+            <Wall
+              courseId={id}
+              isAuthenticating={isAuthenticating}
+              isSubscribed={isSubscribed}
+            />
+          ) : (
+            <Typography textAlign='center' fontSize='20px' color='#EC4899'>
+              Debes iniciar sesión y contar con una suscripcion activa para
+              acceder a los comentarios
+            </Typography>
+          )}
         </Box>
       ),
     },

@@ -138,43 +138,45 @@ const CreatePostModal = ({ open, onClose, courseId }) => {
         </Stack>
 
         {image && (
-          <Box sx={{ mt: 3 }}>
+          <>
             <Typography
               variant='subtitle2'
               sx={{ mb: 1, color: "#d82e7a", fontWeight: 600 }}
             >
               Vista previa
             </Typography>
-            <ImageListItem
-              sx={{
-                position: "relative",
-                borderRadius: "12px",
-                overflow: "hidden",
-                boxShadow: "0 2px 8px rgba(216,46,122,0.15)",
-                width: "100%",
-                height: 250,
-              }}
-            >
-              <img
-                src={image.urlPhoto}
-                alt='preview'
-                style={{ width: "100%", height: "100%", objectFit: "cover" }}
-              />
-              <IconButton
-                onClick={handleDeleteImage}
+            <Box sx={{ mt: 3, display: "flex", justifyContent: "center" }}>
+              <ImageListItem
                 sx={{
-                  position: "absolute",
-                  top: 8,
-                  right: 8,
-                  bgcolor: "rgba(255,255,255,0.7)",
-                  "&:hover": { bgcolor: "white" },
-                  color: "#d82e7a",
+                  position: "relative",
+                  borderRadius: "12px",
+                  overflow: "hidden",
+                  boxShadow: "0 2px 8px rgba(216,46,122,0.15)",
+                  width: "50%",
+                  height: 250,
                 }}
               >
-                <DeleteIcon />
-              </IconButton>
-            </ImageListItem>
-          </Box>
+                <img
+                  src={image.urlPhoto}
+                  alt='preview'
+                  style={{ width: "420px", height: "400px" }}
+                />
+                <IconButton
+                  onClick={handleDeleteImage}
+                  sx={{
+                    position: "absolute",
+                    top: 8,
+                    right: 8,
+                    bgcolor: "rgba(255,255,255,0.7)",
+                    "&:hover": { bgcolor: "white" },
+                    color: "#d82e7a",
+                  }}
+                >
+                  <DeleteIcon />
+                </IconButton>
+              </ImageListItem>
+            </Box>
+          </>
         )}
       </DialogContent>
 

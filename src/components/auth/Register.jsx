@@ -20,6 +20,9 @@ import CartContext from "../../context/Cart/CartContext";
 
 const RegisterSchema = Yup.object().shape({
   name: Yup.string().required("El nombre es requerido"),
+  username: Yup.string().required(
+    "El nombre para tus reconocimientos es requerido"
+  ),
   phone: Yup.string().required("El teléfono es requerido"),
   email: Yup.string()
     .email("Correo inválido")
@@ -222,6 +225,23 @@ const Register = () => {
                             onBlur={handleBlur}
                             error={touched.name && Boolean(errors.name)}
                             helperText={touched.name && errors.name}
+                            variant='outlined'
+                            sx={inputStyles}
+                          />
+                        </FormControl>
+                      </Grid>
+                      <Grid size={12}>
+                        <FormControl fullWidth>
+                          <TextField
+                            label='Nombre de usuario'
+                            name='username'
+                            placeholder='Captura tu nombre para tus reconocimientos'
+                            autoComplete='off'
+                            value={values.username}
+                            onChange={handleChange}
+                            onBlur={handleBlur}
+                            error={touched.username && Boolean(errors.username)}
+                            helperText={touched.username && errors.username}
                             variant='outlined'
                             sx={inputStyles}
                           />

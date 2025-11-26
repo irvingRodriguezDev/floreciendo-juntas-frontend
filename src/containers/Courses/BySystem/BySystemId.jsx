@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import Layout from "../../../components/Layout/Layout";
-import { Grid, Pagination } from "@mui/material";
+import { Grid } from "@mui/material";
 import SystemBanner from "../../../components/Banner/SystemBanner";
 import { useParams } from "react-router-dom";
 import MethodGet from "../../../config/Service";
@@ -9,9 +9,10 @@ import SearchCourse from "../../../components/courses/SearchCourses";
 import { useDebounce } from "use-debounce";
 import PinkSpinner from "../../../components/Loading/PinkSpinner";
 import AllCourses from "../../../components/courses/AllCourses/AllCourses";
+import Pagination from "../../../components/Pagination/Pagination";
 const BySystemId = () => {
   const params = useParams();
-  const { getCoursesBySystemId, courses, currentPage, totalPages } =
+  const { getCoursesBySystemId, courses, currentPage, totalPages, totalItems } =
     useContext(CoursesContext);
   const { id } = params;
   const [system, setSystem] = useState(null);

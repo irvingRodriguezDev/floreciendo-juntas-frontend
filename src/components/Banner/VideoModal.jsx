@@ -9,6 +9,7 @@ import {
   IconButton,
   useMediaQuery,
 } from "@mui/material";
+import { motion } from "framer-motion";
 import CloseIcon from "@mui/icons-material/Close";
 import VideoPlayer from "../FullScreenVideo"; // Asegúrate de la ruta correcta
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
@@ -26,46 +27,65 @@ const VideoModal = ({ buttonText = "Ver Nuestro Video", videoUrl }) => {
 
   return (
     <>
-      {/* Botón para Abrir el Modal */}
-      <Button
-        variant='outlined'
-        startIcon={<PlayArrowIcon />}
+      {/* PLAY ANIMADO */}
+      <motion.div
         onClick={handleOpen}
-        sx={{
-          color: primaryPink,
-          borderColor: primaryPink,
-          fontWeight: 600,
-          padding: "8px 20px",
-          borderRadius: "8px",
-          textTransform: "none",
-          "&:hover": {
-            backgroundColor: primaryPink,
-            color: "white",
-            borderColor: primaryPink,
-          },
+        style={{
+          width: 80,
+          height: 80,
+          borderRadius: "50%",
+          background: "transparent",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          cursor: "pointer",
+          position: "relative",
+          boxShadow: "0 0 20px rgba(255, 77, 141, 0.6)",
         }}
+        whileHover={{ scale: 1.12 }}
+        whileTap={{ scale: 0.95 }}
       >
-        {buttonText}
-      </Button>
+        {/* Burbuja animada detrás */}
+        <motion.div
+          style={{
+            position: "absolute",
+            width: "100%",
+            height: "100%",
+            borderRadius: "50%",
+            backgroundColor: primaryPink,
+            opacity: 0.4,
+            zIndex: -1,
+          }}
+          animate={{
+            scale: [1, 1.4, 1],
+            opacity: [0.4, 0, 0.4],
+          }}
+          transition={{
+            duration: 1.8,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
+        />
 
-      {/* MUI Dialog (Modal) */}
+        <PlayArrowIcon sx={{ fontSize: 58, color: "#F971AF" }} />
+      </motion.div>
+
+      {/* MODAL DE VIDEO */}
       <Dialog
         open={open}
         onClose={handleClose}
         fullWidth
-        maxWidth='md' // Tamaño máximo del modal
-        fullScreen={fullScreen} // Full screen en dispositivos pequeños
+        maxWidth='md'
+        fullScreen={fullScreen}
         PaperProps={{
-          // Estilo del contenedor del modal
           sx: {
             borderRadius: fullScreen ? 0 : "16px",
-            backgroundColor: "black", // Fondo negro para mejor visualización del video
-            m: fullScreen ? 0 : 2, // Margen en desktop
+            backgroundColor: "black",
+            m: fullScreen ? 0 : 2,
           },
         }}
       >
         <DialogContent sx={{ p: 0, position: "relative" }}>
-          {/* Botón de Cerrar */}
           <IconButton
             onClick={handleClose}
             sx={{
@@ -83,8 +103,6 @@ const VideoModal = ({ buttonText = "Ver Nuestro Video", videoUrl }) => {
             <CloseIcon />
           </IconButton>
 
-          {/* Reproductor de Video */}
-          {/* Importante: Solo renderizamos el video si está abierto para asegurar que autoPlay funcione */}
           {open && <VideoPlayer videoSrc={videoUrl} />}
         </DialogContent>
       </Dialog>

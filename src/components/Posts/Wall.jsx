@@ -1,11 +1,12 @@
 import React, { useContext, useEffect, useState } from "react";
-import { Box, Typography, Button, Stack, Grid, Paper } from "@mui/material";
+import { Box, Typography, Button, Stack, Grid } from "@mui/material";
 import PostCard from "./PostCard";
 import CreatePostModal from "./CreatePostModal";
 import PostsContext from "../../context/Posts/PostsContext";
 import IceIcon from "../icons/IceIcon";
 import PinkSpinner from "../Loading/PinkSpinner";
 import Pagination from "../Pagination/Pagination";
+
 const Wall = ({ courseId, isAuthenticating, isSubscribed }) => {
   const { getPosts, posts, totalPages } = useContext(PostsContext);
 
@@ -14,35 +15,32 @@ const Wall = ({ courseId, isAuthenticating, isSubscribed }) => {
   const [loading, setLoading] = useState(false);
   const [openModal, setOpenModal] = useState(false);
 
-  // 🔹 Cargar posts al montar o cuando cambia el curso o página
+  // 🔹 Cargar posts solo si el usuario está suscrito
   useEffect(() => {
+    if (!courseId || !isSubscribed) return;
+
     const fetchPosts = async () => {
       setLoading(true);
       await getPosts(courseId, page, rowsPerPage);
       setLoading(false);
     };
-    if (courseId) fetchPosts();
-  }, [courseId, page, rowsPerPage]);
+
+    fetchPosts();
+  }, [courseId, page, rowsPerPage, isSubscribed]);
 
   const handlePageChange = (newPage) => {
     if (newPage >= 1 && newPage <= totalPages && newPage !== page) {
       setPage(newPage);
     }
   };
+
   const handleCreatePost = () => setOpenModal(false);
 
   return (
-    <Box
-      sx={{
-        maxWidth: "900px",
-        mx: "auto",
-        pt: 4,
-        pb: 6,
-      }}
-    >
+    <Box sx={{ maxWidth: "900px", mx: "auto", pt: 4, pb: 6 }}>
       <Stack spacing={3} alignItems='center'>
-        {/* 🔹 Botón de crear publicación */}
-        {isAuthenticating && isSubscribed && (
+        {/* 🔹 Botón crear publicación SOLO si está suscrito */}
+        {isSubscribed && (
           <Button
             variant='contained'
             sx={{
@@ -59,6 +57,7 @@ const Wall = ({ courseId, isAuthenticating, isSubscribed }) => {
             Crear publicación
           </Button>
         )}
+
         <CreatePostModal
           open={openModal}
           onClose={() => setOpenModal(false)}
@@ -66,7 +65,7 @@ const Wall = ({ courseId, isAuthenticating, isSubscribed }) => {
           onSubmit={handleCreatePost}
         />
 
-        {/* 🔹 Estado de carga */}
+        {/* 🔹 Loading */}
         {loading ? (
           <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
             <PinkSpinner />
@@ -95,6 +94,7 @@ const Wall = ({ courseId, isAuthenticating, isSubscribed }) => {
                 <Grid size={12}>
                   <PostCard posts={posts} />
                 </Grid>
+
                 {/* 🔹 Paginación */}
                 {totalPages > 1 && (
                   <Grid container justifyContent='center' sx={{ mt: 3, pb: 2 }}>

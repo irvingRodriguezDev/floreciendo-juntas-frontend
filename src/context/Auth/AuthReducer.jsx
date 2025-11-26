@@ -5,8 +5,10 @@ export default (state, action) => {
     case types.INICIO_AUTENTICACION:
       return {
         ...state,
+        isAuthenticating: true,
         cargando: true,
       };
+
     case types.REGISTRO_EXITOSO:
       localStorage.setItem("token", action.payload.token);
       return {
@@ -33,9 +35,11 @@ export default (state, action) => {
         ...state,
         autenticado: true,
         usuario: action.payload,
-        cargando: false, // ✅ Crucial para el éxito
+        isAuthenticating: false,
+        cargando: false,
         success: true,
       };
+
     case types.USER_CHANGEPASSWORD:
       return {
         ...state,
@@ -53,15 +57,15 @@ export default (state, action) => {
     case types.LOGIN_ERROR:
       return {
         ...state,
-        token: null,
         autenticado: false,
         usuario: null,
-        cargando: false, // ✅ Crucial para el fallo
+        isAuthenticating: false, // 🔥 ESTO ES MUY IMPORTANTE
+        cargando: false,
       };
     case types.FIN_AUTENTICACION:
       return {
         ...state,
-        isAuthenticating: false, // ¡El spinner se apaga aquí!
+        isAuthenticating: false,
         cargando: false,
       };
 
