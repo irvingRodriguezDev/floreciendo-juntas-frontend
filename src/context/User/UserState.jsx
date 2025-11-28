@@ -3,15 +3,19 @@ import MethodGet, { MethodPost, MethodPut } from "../../config/Service";
 import UserContext from "./UserContext";
 import UserReducer from "./UserReducer";
 import {
+  ADD_SHIPPING_ADDRESS,
   CALENDAR_ERROR,
   CALENDAR_LOADING,
   COURSES_COMPLETED,
   COURSES_COMPLETED_USER,
+  GET_ADDRESS,
   GET_CALENDAR_LINKS,
   GET_TICKETS_BY_USER,
 } from "../../types";
 import fileDownload from "js-file-download";
 import clienteAxios from "../../config/Axios";
+import Swal from "sweetalert2";
+import { Zoom } from "@mui/material";
 /**Importar componente token headers */
 
 const UserState = ({ children }) => {
@@ -32,6 +36,7 @@ const UserState = ({ children }) => {
       currentPage: 1,
       totalItems: 0,
     },
+    address: [],
   };
 
   const [state, dispatch] = useReducer(UserReducer, initialState);
@@ -125,6 +130,72 @@ const UserState = ({ children }) => {
     }
   };
 
+  const getAddresses = async () => {
+    try {
+      let url = "/address";
+      const res = await MethodGet(url);
+      dispatch({
+        type: GET_ADDRESS,
+        payload: res.data,
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  const AddNewAddress = async (datos) => {
+    // Validación mínima antes de enviar
+    if (!datos || Object.keys(datos).length === 0) {
+      Swal.fire({
+        icon: "warning",
+        title: "Datos incompletos",
+        text: "Por favor completa los campos obligatorios.",
+      });
+      return;
+    }
+
+    // Spinner de carga
+    Swal.fire({
+      title: "Guardando dirección...",
+      text: "Por favor espera",
+      allowOutsideClick: false,
+      didOpen: () => {
+        Swal.showLoading();
+      },
+    });
+
+    try {
+      const url = `/address`;
+      const res = await MethodPost(url, datos);
+
+      // Actualiza el estado
+      dispatch({
+        type: ADD_SHIPPING_ADDRESS,
+        payload: res.data,
+      });
+
+      // Cierra el spinner y muestra confirmación
+      Swal.fire({
+        icon: "success",
+        title: "Dirección guardada",
+        text: "La dirección se guardó correctamente.",
+        timer: 1800,
+        showConfirmButton: false,
+      });
+
+      return res.data;
+    } catch (error) {
+      console.error("Ocurrió un error al guardar la dirección:", error);
+
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text:
+          error?.response?.data?.message ||
+          "Ocurrió un error al guardar la dirección.",
+      });
+    }
+  };
+
   return (
     <UserContext.Provider
       value={{
@@ -133,11 +204,14 @@ const UserState = ({ children }) => {
         tickets: state.tickets,
         ticketsPagination: state.ticketsPagination,
         completedPagination: state.completedPagination,
+        address: state.address,
         getCoursesCompletedByUser,
         getCoursesCompleted,
         getTicketsByUser,
         getCalendarLinks,
         downloadTicket,
+        AddNewAddress,
+        getAddresses,
       }}
     >
       {children}

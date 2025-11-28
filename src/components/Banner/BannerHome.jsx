@@ -14,6 +14,11 @@ import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import VideoModal from "./VideoModal";
 import image from "../../assets/images/caro.jpg";
+import GerberaImg from "../../assets/images/Gerbera Daisy -7.png";
+import GerberaImg2 from "../../assets/images/FLOR ROSA 2.png";
+import GerberaImg3 from "../../assets/images/GERBERA MAGENTA.png";
+import GerberaImg4 from "../../assets/images/GERBERA MAGENTA desenfoque.png";
+import GerberaImg5 from "../../assets/images/FLOR ROSA CONVEN.png";
 const BannerHome = () => {
   const theme = useTheme();
   const videoSource =
@@ -205,9 +210,12 @@ const BannerHome = () => {
           position: "absolute",
           bottom: "10%",
           right: "5%",
-          width: 30,
-          height: 30,
-          backgroundColor: "#F971AF",
+          width: 200,
+          height: 200,
+          backgroundImage: `url(${GerberaImg})`,
+          backgroundSize: "cover",
+          backgroundRepeat: "no-repeat",
+          // backgroundColor: "#F971AF",
           transform: "rotate(45deg)",
           opacity: 0.8,
           display: { xs: "none", md: "block" },
@@ -218,17 +226,67 @@ const BannerHome = () => {
       <Box
         sx={{
           position: "absolute",
-          top: "50%",
-          left: "30%",
-          transform: "translate(-50%, -50%) rotate(15deg)",
-          width: "50px",
-          height: "50px",
-          backgroundColor: "#F971AF",
+          top: "1%",
+          left: "95%",
+          transform: "translate(-50%, -50%) rotate(35deg)",
+          width: "350px",
+          height: "350px",
+          backgroundImage: `url(${GerberaImg5})`,
+          backgroundSize: "cover",
+          backgroundRepeat: "no-repeat",
+          // backgroundColor: "#F971AF",
           opacity: 0.9,
           display: { xs: "none", md: "block" },
         }}
       />
-
+      <Box
+        sx={{
+          position: "absolute",
+          top: "50%",
+          left: "30%",
+          transform: "translate(-50%, -50%) rotate(15deg)",
+          width: "350px",
+          height: "350px",
+          backgroundImage: `url(${GerberaImg2})`,
+          backgroundSize: "cover",
+          backgroundRepeat: "no-repeat",
+          // backgroundColor: "#F971AF",
+          opacity: 0.9,
+          display: { xs: "none", md: "block" },
+        }}
+      />
+      <Box
+        sx={{
+          position: "absolute",
+          top: "10%",
+          left: "55%",
+          transform: "translate(-50%, -50%) rotate(15deg)",
+          width: "350px",
+          height: "350px",
+          backgroundImage: `url(${GerberaImg3})`,
+          backgroundSize: "cover",
+          backgroundRepeat: "no-repeat",
+          // backgroundColor: "#F971AF",
+          opacity: 0.9,
+          display: { xs: "none", md: "block" },
+        }}
+      />
+      <Box
+        sx={{
+          position: "absolute",
+          top: "90%",
+          left: "5%",
+          transform: "translate(-50%, -50%) rotate(15deg)",
+          width: "350px",
+          height: "350px",
+          backgroundImage: `url(${GerberaImg4})`,
+          backgroundSize: "cover",
+          backgroundRepeat: "no-repeat",
+          // backgroundColor: "#F971AF",
+          opacity: 0.9,
+          display: { xs: "none", md: "block" },
+        }}
+      />
       {/* 3 puntos rosados */}
       {[
         { top: "40%", left: "10%" },
@@ -293,7 +351,7 @@ const BannerHome = () => {
           </span>
           <br />y{" "}
           <span style={{ position: "relative", display: "inline-block" }}>
-            Habilidades 💞
+            Habilidades
             <Box
               component='span'
               sx={{

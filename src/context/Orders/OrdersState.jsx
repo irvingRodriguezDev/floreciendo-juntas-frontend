@@ -16,8 +16,19 @@ const OrdersState = ({ children }) => {
   };
   const [state, dispatch] = useReducer(OrdersReducer, initialState);
 
-  const createOrder = async () => {
+  const createOrder = async (address) => {
     try {
+      if (address === null) {
+        Swal.fire({
+          title: "Atención",
+          text: "Debes seleccionar una direccion de envio",
+          icon: "warning",
+          showConfirmButton: false,
+          timer: 2500,
+        });
+        return;
+      }
+
       Swal.fire({
         title: "Procesando...",
         text: "Estamos creando tu orden",
@@ -26,7 +37,9 @@ const OrdersState = ({ children }) => {
       });
 
       console.log("➡ Creando orden...");
-      const resOrder = await MethodPost("/orders/create");
+      const resOrder = await MethodPost("/orders/create", {
+        body: { AddressId: address },
+      });
 
       console.log("✔ Orden creada", resOrder);
 
@@ -53,7 +66,7 @@ const OrdersState = ({ children }) => {
       Swal.fire({
         icon: "error",
         title: "Ocurrió un error",
-        text: error.message || "Por favor intenta más tarde.",
+        text: error.response.data.message || "Por favor intenta más tarde.",
       });
     }
   };
@@ -100,12 +113,14 @@ const OrdersState = ({ children }) => {
     const { value: amount } = await Swal.fire({
       title: "Ingresa la cantidad",
       input: "number",
-      inputLabel: "Cantidad que desear abonar, al salon de tus sueños",
+      inputLabel: "Cantidad que deseas abonar al salón de tus sueños",
       inputPlaceholder: "Ej. 150",
       inputAttributes: {
         min: 50,
         step: "0.01",
       },
+      allowOutsideClick: false, // ❌ No cerrar al hacer click afuera
+      allowEscapeKey: false, // ❌ No cerrar con ESC
       showCancelButton: true,
       confirmButtonText: "Continuar",
       cancelButtonText: "Cancelar",
@@ -116,17 +131,90 @@ const OrdersState = ({ children }) => {
         return null;
       },
     });
+
+    if (!amount) return; // Si cancelan, salir
+
+    // Mostrar loader mientras se procesa la petición
+    Swal.fire({
+      title: "Procesando tu solicitud de pago...",
+      text: "Un momento por favor 💖",
+      allowOutsideClick: false,
+      allowEscapeKey: false,
+      didOpen: () => {
+        Swal.showLoading(); // 🔄 Loader activo
+      },
+    });
+
     let url = `/order-payments/${id}/pay-partial`;
-    let datos = { amount: amount };
+    let datos = { amount: amount, type: "partial" };
+
     MethodPost(url, datos)
       .then((res) => {
+        Swal.close(); // Cerrar loader
         window.location.href = res.data.url;
       })
       .catch((error) => {
-        console.log(error, "Ocurrio un error al intentar realizar el pago");
+        Swal.fire({
+          title: "Error",
+          text: error?.response?.data?.error || "Ocurrió un error inesperado",
+          icon: "error",
+          confirmButtonText: "Aceptar",
+          allowOutsideClick: false,
+        });
       });
   };
 
+  const payShippingCost = async (id, shippingCost) => {
+    // Mostrar confirmación al usuario
+
+    const { isConfirmed } = await Swal.fire({
+      title: "Pagar costo de envío",
+      html: `
+      <p>Vas a realizar el pago del costo de envío.</p>
+      <p style="font-size: 20px; font-weight: bold; margin-top: 10px;">
+        Total a pagar: $${shippingCost}
+      </p>
+    `,
+      icon: "info",
+      showCancelButton: true,
+      confirmButtonText: "Pagar ahora",
+      cancelButtonText: "Cancelar",
+      allowOutsideClick: false,
+      allowEscapeKey: false,
+    });
+
+    if (!isConfirmed) return;
+
+    // Loader mientras procesa
+    Swal.fire({
+      title: "Procesando pago...",
+      text: "Un momento por favor 💖",
+      allowOutsideClick: false,
+      allowEscapeKey: false,
+      didOpen: () => {
+        Swal.showLoading();
+      },
+    });
+
+    // Enviar el monto fijo del envío
+    let url = `/order-payments/${id}/pay-partial`;
+    let datos = { amount: shippingCost, type: "shipping" }; // ← monto fijo del envío
+
+    MethodPost(url, datos)
+      .then((res) => {
+        Swal.close();
+        window.location.href = res.data.url; // Stripe redirect
+      })
+      .catch((error) => {
+        Swal.fire({
+          title: "Error",
+          text: error?.response?.data?.error || "Ocurrió un error inesperado",
+          icon: "error",
+          confirmButtonText: "Aceptar",
+          allowOutsideClick: false,
+        });
+      });
+  };
   const downloadEdoCtaDream = async (id) => {
     try {
       const confirm = await Swal.fire({
@@ -150,8 +238,6 @@ const OrdersState = ({ children }) => {
 
       // 1️⃣ Ya no pedimos blob
       const res = await clienteAxios.get(`/orders/${id}/account-statement`);
-
-      console.log(res.data, "respuesta del backend");
 
       const { url } = res.data;
 
@@ -191,6 +277,7 @@ const OrdersState = ({ children }) => {
         addCustomPayment,
         downloadEdoCtaDream,
         createOrder,
+        payShippingCost,
       }}
     >
       {children}

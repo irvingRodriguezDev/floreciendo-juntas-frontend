@@ -25,13 +25,16 @@ import Error from "../Error";
 import ProductDetailPage from "../components/Products/ProductDetailPage";
 import SuccessSalonPayment from "../SuccessPartialPayment";
 import SuccessSubscription from "../SuccessSubscription";
+import DetailOrders from "../components/Orders/DetailOrders";
+import useLastPath from "../hooks/useLastPath";
+import Checkout from "../containers/Checkout/Checkout";
 
 function AppRouter() {
   const { autenticado, usuarioAutenticado, cargando } = useContext(AuthContext);
   useEffect(() => {
     usuarioAutenticado();
   }, []);
-
+  useLastPath();
   if (cargando) {
     return <PinkSpinner label='Cargando' />;
   }
@@ -53,6 +56,8 @@ function AppRouter() {
     { path: "/success-payment-subscription", element: <SuccessSubscription /> },
     { path: "/error", element: <Error /> },
     { path: "/detalle-producto/:id", element: <ProductDetailPage /> },
+    { path: "/detalle-orden/:id", element: <DetailOrders /> },
+    { path: "/checkout", element: <Checkout /> },
   ];
 
   // Rutas públicas solo para no autenticados

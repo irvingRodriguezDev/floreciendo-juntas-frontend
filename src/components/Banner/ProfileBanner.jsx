@@ -1,8 +1,11 @@
 import React from "react";
 import { Box, Typography } from "@mui/material";
-
+import gerbera1 from "../../assets/images/Gerbera Daisy -7.png";
+import gerbera2 from "../../assets/images/Gerbera Daisy floreciendo juntas.png";
+import gerbera3 from "../../assets/images/GERBERA MAGENTA desenfoque.png";
+import gerbera4 from "../../assets/images/GERBERA MAGENTA.png";
 const ProfileBanner = () => {
-  const titleText = "Mi Perfil 🌸";
+  const titleText = "Mi Perfil";
   const subtitleText = "Qué alegría verte floreciendo juntas ✨";
 
   // ----------------------------------------------------
@@ -79,10 +82,18 @@ const ProfileBanner = () => {
       <Box sx={flowerSoftGold} />
 
       {/* pétalos */}
-      <Box sx={petalSx({ top: "20px", left: "15%" })}>🌸</Box>
-      <Box sx={petalSx({ top: "60px", right: "18%" })}>🌸</Box>
-      <Box sx={petalSx({ bottom: "40px", left: "25%" })}>🌸</Box>
-      <Box sx={petalSx({ bottom: "30px", right: "10%" })}>🌸</Box>
+      <Box sx={petalSx({ top: "20px", left: "5%" })}>
+        <img width={150} height={150} src={gerbera1} />
+      </Box>
+      <Box sx={petalSx({ top: "60px", right: "18%" })}>
+        <img width={150} height={150} src={gerbera2} />
+      </Box>
+      <Box sx={petalSx({ bottom: "40px", left: "25%" })}>
+        <img width={150} height={150} src={gerbera3} />
+      </Box>
+      <Box sx={petalSx({ bottom: "30px", right: "10%" })}>
+        <img width={150} height={150} src={gerbera4} />
+      </Box>
 
       {/* --- Contenido --- */}
       <Typography

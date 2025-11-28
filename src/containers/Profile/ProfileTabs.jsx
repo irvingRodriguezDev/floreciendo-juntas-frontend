@@ -6,6 +6,7 @@ import BadgesSection from "./BadgesSection";
 import UserTicketsTable from "./UserTicketsTable";
 import CertificatesSection from "./CertificatesSection";
 import DreamSalonSection from "./DreamSalonSection";
+import AddressSection from "./AddressSection";
 
 // Paleta Floreciendo Juntas 🌸
 const colors = {
@@ -78,8 +79,9 @@ export default function ProfileTabs() {
           <Tab label='Información' />
           <Tab label='Insignias' />
           <Tab label='Mis Tickets' />
-          <Tab label='Mis Salon' />
+          <Tab label='Mis Salón' />
           <Tab label='Certificados' />
+          <Tab label='Mis Direcciones' />
         </Tabs>
       </Paper>
 
@@ -122,6 +124,11 @@ export default function ProfileTabs() {
           {value === 4 && (
             <motion.div key='t4' {...animation}>
               <CertificatesSection />
+            </motion.div>
+          )}
+          {value === 5 && (
+            <motion.div key='t4' {...animation}>
+              <AddressSection />
             </motion.div>
           )}
         </AnimatePresence>

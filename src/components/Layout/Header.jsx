@@ -20,7 +20,7 @@ import MenuIcon from "@mui/icons-material/Menu";
 import { Link } from "react-router-dom";
 import AuthContext from "../../context/Auth/AuthContext";
 import CartContext from "../../context/Cart/CartContext";
-import Logo from "../../assets/images/logo_carolina_tavera.png";
+import Logo from "../../assets/images/LOGOTIPO FLORECIENDO JUNTAS negro.png";
 import CartButton from "./CartButton";
 import CartSidebar from "./CartSidebar";
 import BadgeBox from "../ui/BadgeBox";
@@ -205,7 +205,7 @@ const Header = () => {
               src={Logo}
               alt='Logo Floreciendo Juntas'
               sx={{
-                width: { xs: 220, md: 280 },
+                width: { xs: 220, md: 220 },
                 height: "auto",
                 transition: "transform 0.35s ease, box-shadow 0.35s ease",
                 transformOrigin: "left center",

@@ -23,6 +23,7 @@ import { getImageUrl } from "../../../utils/Image"; // 👈 Tu función utilitar
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
+import { shortenText } from "../../../utils/ShortText";
 
 const NewCourses = () => {
   const { courses, getLastestCourses } = useContext(CoursesContext);
@@ -276,7 +277,7 @@ const NewCourses = () => {
                           mt: 1.2,
                         }}
                       >
-                        {c.title}
+                        {shortenText(c.title, 35)}
                       </Typography>
                     </Box>
                   </Card>

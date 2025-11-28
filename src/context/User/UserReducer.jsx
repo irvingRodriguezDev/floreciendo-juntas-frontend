@@ -1,7 +1,9 @@
 import {
+  ADD_SHIPPING_ADDRESS,
   CALENDAR_ERROR,
   COURSES_COMPLETED,
   COURSES_COMPLETED_USER,
+  GET_ADDRESS,
   GET_CALENDAR_LINKS,
   GET_TICKETS_BY_USER,
 } from "../../types";
@@ -44,6 +46,16 @@ export default (state, action) => {
         ...state,
         calendarError: action.payload,
         calendarLoading: false,
+      };
+    case ADD_SHIPPING_ADDRESS:
+      return {
+        ...state,
+        address: [action.payload, ...state.address],
+      };
+    case GET_ADDRESS:
+      return {
+        ...state,
+        address: action.payload,
       };
 
     default:

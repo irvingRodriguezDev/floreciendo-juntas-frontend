@@ -149,27 +149,29 @@ export default function CartSidebar({ open, onClose }) {
             </Typography>
           </Box>
           {autenticado ? (
-            <Box
-              component='button'
-              onClick={async () => {
-                const ok = await createOrder(); // espera a que termine
-                if (ok) onClose(); // solo cerramos si salió bien
-              }}
-              style={{
-                width: "100%",
-                padding: "14px 0",
-                background: "#E53888",
-                color: "#fff",
-                borderRadius: 12,
-                fontWeight: 600,
-                cursor: "pointer",
-                border: "none",
-                fontSize: "16px",
-                transition: "0.3s",
-              }}
-            >
-              Proceder al pago
-            </Box>
+            <Link to={"/checkout"}>
+              <Box
+                component='button'
+                // onClick={async () => {
+                //   const ok = await createOrder(); // espera a que termine
+                //   if (ok) onClose(); // solo cerramos si salió bien
+                // }}
+                style={{
+                  width: "100%",
+                  padding: "14px 0",
+                  background: "#E53888",
+                  color: "#fff",
+                  borderRadius: 12,
+                  fontWeight: 600,
+                  cursor: "pointer",
+                  border: "none",
+                  fontSize: "16px",
+                  transition: "0.3s",
+                }}
+              >
+                ver carrito
+              </Box>
+            </Link>
           ) : (
             <Link to={"/iniciar-sesion"}>
               <Box

@@ -20,7 +20,7 @@ const features = [
     icon: <CreditCardIcon width={100} />,
   },
   {
-    title: "Tienes 3 meses para liquidarlo ⏳",
+    title: "Tienes hasta 6 meses para liquidarlo ⏳",
     description:
       "Realiza tus pagos a tu ritmo. Disfruta de flexibilidad total para completar tu inversión.",
     icon: <CalendarIcon width={100} />,
@@ -28,7 +28,7 @@ const features = [
   {
     title: "Recíbelo en tu domicilio 🚚",
     description:
-      "Nos encargamos de llevarte todo hasta la puerta de tu salón. Instalación y entrega segura garantizada.",
+      "Nos encargamos de llevarte todo hasta la puerta de tu casa, con costo adicional ",
     icon: <TruckIcon width={100} />,
   },
 ];
