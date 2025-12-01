@@ -17,7 +17,7 @@ import {
   Button,
   Stack,
 } from "@mui/material";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import MethodGet from "../../config/Service";
 import DownloadIcon from "@mui/icons-material/Download";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
@@ -318,8 +318,48 @@ const DetailOrders = () => {
                 {order.address.instructions}
               </span>
             </Typography>
+            <Box>
+              <Typography
+                variant='h6'
+                fontWeight='bold'
+                sx={{ mb: 2, color: pinkColor }}
+              >
+                Detalles de envio
+              </Typography>
+              <Grid container spacing={2}>
+                <Grid size={{ xs: 12, sm: 6, md: 6, lg: 6 }}>
+                  <Typography>
+                    <strong>Nº Guia:</strong> {order.trackingNumber}
+                  </Typography>
+                </Grid>
+                <Grid size={{ xs: 12, sm: 6, md: 6, lg: 6 }}>
+                  <strong>Paqueteria:</strong> {order.carrier}
+                </Grid>
+                <Grid size={{ xs: 12, sm: 12, md: 12, lg: 12 }}>
+                  <Link
+                    to={order.trackingUrl}
+                    target='__blank'
+                    style={{ textDecoration: "none" }}
+                  >
+                    <Button
+                      variant='contanied'
+                      fullWidth
+                      size='small'
+                      sx={{
+                        bgcolor: "#E53888",
+                        borderRadius: "16px",
+                        color: "white",
+                      }}
+                    >
+                      Rastrear
+                    </Button>
+                  </Link>
+                </Grid>
+              </Grid>
+            </Box>
           </Paper>
         </Grid>
+
         {/* PRODUCTOS */}
         <Grid size={12}>
           <Paper
