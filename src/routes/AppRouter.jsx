@@ -47,7 +47,7 @@ function AppRouter() {
     { path: "/tienda", element: <Shop /> },
     { path: "/eventos", element: <Events /> },
     { path: "/detalle-evento/:id", element: <DetailEvent /> },
-    { path: "/10-secretos", element: <Secrets /> },
+    { path: "/secretos", element: <Secrets /> },
     { path: "/el-salon-de-tus-sueños", element: <Saloon /> },
     { path: "/detalle-curso/:id", element: <DetailsCourse /> },
     { path: "/cursos/bysystem/:id", element: <BySystemId /> },
