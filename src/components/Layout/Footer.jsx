@@ -22,7 +22,7 @@ const Footer = () => {
         borderTop: "1px solid rgba(241,189,206,0.3)",
         boxShadow: "0 -4px 20px rgba(229,56,136,0.15)",
         py: { xs: 4, md: 6 },
-        mt: 8,
+        // mt: 8,
       }}
     >
       {/* Figuras decorativas flotantes */}
@@ -63,7 +63,7 @@ const Footer = () => {
 
       <Container maxWidth='lg' sx={{ position: "relative", zIndex: 2 }}>
         {/* Enlaces */}
-        <Stack
+        {/* <Stack
           direction={{ xs: "column", sm: "row" }}
           justifyContent='center'
           alignItems='center'
@@ -98,7 +98,7 @@ const Footer = () => {
               </Link>
             </motion.div>
           ))}
-        </Stack>
+        </Stack> */}
 
         <Divider
           sx={{

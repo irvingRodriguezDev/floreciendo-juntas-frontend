@@ -19,6 +19,7 @@ import GerberaImg2 from "../../assets/images/FLOR ROSA 2.png";
 import GerberaImg3 from "../../assets/images/GERBERA MAGENTA.png";
 import GerberaImg4 from "../../assets/images/GERBERA MAGENTA desenfoque.png";
 import GerberaImg5 from "../../assets/images/FLOR ROSA CONVEN.png";
+import firmacaro from "../../assets/images/logo_carolina_tavera.png";
 const BannerHome = () => {
   const theme = useTheme();
   const videoSource =
@@ -402,7 +403,7 @@ const BannerHome = () => {
 
         <Box
           component='img'
-          src='https://floreciendo.wapizima.com.mx/static/media/firma_caro_negra.2d934595178c23de9acb.png'
+          src={firmacaro}
           alt='caro'
           sx={{
             width: "100%",

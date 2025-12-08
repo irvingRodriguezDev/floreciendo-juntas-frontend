@@ -16,7 +16,8 @@ import FavoriteRoundedIcon from "@mui/icons-material/FavoriteRounded";
 import UserContext from "../../context/User/UserContext";
 import ShippingAddressModal from "../../components/Orders/ShippingAddressModal";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
-
+import UpdateAddressModal from "../../components/Orders/UpdateAddressModal";
+import DeleteIcon from "@mui/icons-material/Delete";
 const AddressCard = styled(Card)(({ theme }) => ({
   borderRadius: 20,
   background: "#fff5fa",
@@ -41,7 +42,7 @@ const IconBox = styled(Box)(({ theme }) => ({
 }));
 
 export default function AddressSection() {
-  const { address, getAddresses } = useContext(UserContext);
+  const { address, getAddresses, DeleteAddress } = useContext(UserContext);
 
   useEffect(() => {
     getAddresses();
@@ -55,21 +56,21 @@ export default function AddressSection() {
     setOpen(false);
   };
 
+  //modal update
+  const [openUpdateAddress, setOpenUpdateAddress] = useState(false);
+  const [direction, setDirection] = useState(null);
+  const openModalUpdate = (dir) => {
+    setOpenUpdateAddress(true);
+    setDirection(dir);
+  };
+  const closeModalUpdate = () => {
+    setOpenUpdateAddress(false);
+    setDirection(null);
+  };
+
   return (
     <>
       <Box sx={{ mt: 2 }}>
-        <Typography
-          sx={{
-            fontSize: "1.6rem",
-            fontWeight: "900",
-            color: "#d63384",
-            mb: 2,
-            textAlign: "center",
-            letterSpacing: "0.5px",
-          }}
-        >
-          🌸 Mis Direcciones
-        </Typography>
         <Grid size={12} sx={{ display: "flex", justifyContent: "end", mb: 4 }}>
           <Button
             variant='outlined'
@@ -162,7 +163,7 @@ export default function AddressSection() {
                     pb: 2,
                   }}
                 >
-                  <Button
+                  {/* <Button
                     variant='contained'
                     sx={{
                       backgroundColor: "#d63384",
@@ -172,11 +173,12 @@ export default function AddressSection() {
                     }}
                   >
                     Usar esta dirección
-                  </Button>
+                  </Button> */}
 
                   <Button
                     variant='text'
                     startIcon={<EditRoundedIcon />}
+                    onClick={() => openModalUpdate(dir)}
                     sx={{
                       color: "#d63384",
                       fontWeight: "bold",
@@ -185,6 +187,19 @@ export default function AddressSection() {
                   >
                     Editar
                   </Button>
+
+                  <Button
+                    variant='text'
+                    startIcon={<DeleteIcon />}
+                    onClick={() => DeleteAddress(dir.id)}
+                    sx={{
+                      color: "#d63384",
+                      fontWeight: "bold",
+                      textTransform: "none",
+                    }}
+                  >
+                    Eliminar
+                  </Button>
                 </CardActions>
               </AddressCard>
             </Grid>
@@ -192,6 +207,13 @@ export default function AddressSection() {
         </Grid>
       </Box>
       <ShippingAddressModal open={open} onClose={handleClose} />
+      {direction !== null && (
+        <UpdateAddressModal
+          open={openUpdateAddress}
+          onClose={closeModalUpdate}
+          dir={direction}
+        />
+      )}
     </>
   );
 }

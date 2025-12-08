@@ -164,6 +164,7 @@ const ForgotPassword = () => {
                       variant='h4'
                       fontWeight='bold'
                       mb={4}
+                      textAlign='justify'
                       sx={{
                         background: "linear-gradient(135deg, #d82e7a, #ff69b4)",
                         backgroundClip: "text",
@@ -245,7 +246,7 @@ const ForgotPassword = () => {
                         display: "block",
                         textAlign: "right",
                         marginTop: 1,
-                        marginBottom: 3,
+                        marginBottom: "15px",
                         color: "#D82E7A",
                         fontWeight: "bold",
                         "&:hover": { color: "#FF69B4" },

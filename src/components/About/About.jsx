@@ -6,7 +6,10 @@ import PeopleAltIcon from "@mui/icons-material/PeopleAlt";
 import PersonIcon from "@mui/icons-material/Person";
 import CameraAltIcon from "@mui/icons-material/CameraAlt";
 import WorkspacePremiumIcon from "@mui/icons-material/WorkspacePremium";
-
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Autoplay, Pagination } from "swiper/modules";
+import "swiper/css";
+import "swiper/css/pagination";
 import foto1 from "../../assets/images/IMG_7049.JPG";
 import foto2 from "../../assets/images/IMG_7048.JPG";
 
@@ -49,7 +52,18 @@ const StatisticCard = ({ icon: Icon, value, label, color }) => (
 
 const About = () => {
   const theme = useTheme();
-
+  const slides = [
+    {
+      img: foto1,
+      title: "+10 Años",
+      text: "de experiencia formando manicuristas exitosas",
+    },
+    {
+      img: foto2,
+      title: "Certificaciones",
+      text: "Cursos avalados y reconocidos",
+    },
+  ];
   return (
     <Box
       sx={{
@@ -69,82 +83,86 @@ const About = () => {
             alignItems: "center",
           }}
         >
-          <Box
-            sx={{
-              position: "relative",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              width: "100%",
-              maxWidth: 600,
-              gap: { xs: 2, md: 4 },
-            }}
+          <Swiper
+            modules={[Autoplay]}
+            autoplay={{ delay: 2200 }}
+            loop
+            style={{ width: "100%", maxWidth: 650 }}
           >
-            {/* Imagen izquierda */}
-            <Box
-              component='img'
-              src={foto1}
-              alt='Graduadas'
-              sx={{
-                width: { xs: "65%", sm: "42%", md: "46%" },
-                height: "auto",
-                aspectRatio: "3/5",
-                objectFit: "cover",
-                borderRadius: "120px",
-                boxShadow: theme.shadows[4],
-                transform: { xs: "translateY(0)", md: "translateY(20px)" },
-              }}
-            />
+            {slides.map((item, i) => (
+              <SwiperSlide key={i}>
+                <Box
+                  sx={{
+                    position: "relative",
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    border: "10px solid #FCADCF ",
+                    borderRadius: "12px",
+                    bgcolor: "#FCADCF",
+                  }}
+                >
+                  {/* Imagen */}
+                  <Box
+                    component='img'
+                    src={item.img}
+                    alt={item.title}
+                    sx={{
+                      width: { xs: "100%", md: "100%" },
+                      height: { xs: "300px", md: "600px" },
+                      objectFit: "cover",
+                      aspectRatio: "3/5",
+                      boxShadow: theme.shadows[4],
+                      borderRadius: "12px",
+                    }}
+                  />
 
-            {/* Imagen derecha */}
-            <Box
-              component='img'
-              src={foto2}
-              alt='Estudiante'
-              sx={{
-                width: { xs: "65%", sm: "42%", md: "46%" },
-                height: "auto",
-                aspectRatio: "3/5",
-                objectFit: "cover",
-                borderRadius: "120px",
-                boxShadow: theme.shadows[4],
-                transform: { xs: "translateY(0)", md: "translateY(-20px)" },
-                position: "relative",
-                zIndex: 2,
-              }}
-            />
-
-            {/* Tarjeta flotante */}
-            <Paper
-              elevation={6}
-              sx={{
-                position: "absolute",
-                bottom: { xs: "-50px", sm: "-60px", md: "-70px" },
-                left: { xs: "50%", md: "60%" },
-                transform: "translateX(-50%)",
-                backgroundColor: "#F971AF",
-                color: "white",
-                px: { xs: 3, sm: 4 },
-                py: { xs: 2, sm: 3 },
-                borderRadius: "16px",
-                display: "flex",
-                alignItems: "center",
-                gap: theme.spacing(2),
-                minWidth: { xs: 280, sm: 280, md: 320 },
-                textAlign: "left",
-              }}
-            >
-              <WorkspacePremiumIcon sx={{ fontSize: { xs: 36, sm: 48 } }} />
-              <Box>
-                <Typography variant='h6' sx={{ fontWeight: 700 }}>
-                  +10 Años
-                </Typography>
-                <Typography variant='body2' sx={{ lineHeight: 1.2 }}>
-                  De Experiencia Formando Manicuristas Éxitosas
-                </Typography>
-              </Box>
-            </Paper>
-          </Box>
+                  {/* Tarjeta flotante */}
+                  <Paper
+                    elevation={6}
+                    sx={{
+                      position: "absolute",
+                      bottom: { xs: "40px", sm: "50px" },
+                      backgroundColor: "#F971AF",
+                      color: "white",
+                      px: { xs: 2, sm: 3 },
+                      py: { xs: 1.5, sm: 2 },
+                      borderRadius: "16px",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: theme.spacing(2),
+                      minWidth: { xs: 230, sm: 260 },
+                      textAlign: "left",
+                    }}
+                  >
+                    <WorkspacePremiumIcon
+                      sx={{ fontSize: { xs: 34, sm: 44 } }}
+                    />
+                    <Box>
+                      <Typography
+                        variant='h6'
+                        sx={{
+                          fontWeight: 700,
+                          fontSize: { xs: "1rem", sm: "1.2rem" },
+                        }}
+                      >
+                        {item.title}
+                      </Typography>
+                      <Typography
+                        variant='body2'
+                        sx={{
+                          lineHeight: 1.2,
+                          fontSize: { xs: "0.75rem", sm: "0.9rem" },
+                        }}
+                      >
+                        {item.text}
+                      </Typography>
+                    </Box>
+                  </Paper>
+                </Box>
+              </SwiperSlide>
+            ))}
+          </Swiper>
         </Grid>
 
         {/* Sección de Texto */}

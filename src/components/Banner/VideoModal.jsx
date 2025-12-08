@@ -3,21 +3,18 @@ import React, { useState } from "react";
 import {
   Dialog,
   DialogContent,
-  Button,
-  Box,
-  useTheme,
   IconButton,
+  useTheme,
   useMediaQuery,
 } from "@mui/material";
 import { motion } from "framer-motion";
 import CloseIcon from "@mui/icons-material/Close";
-import VideoPlayer from "../FullScreenVideo"; // Asegúrate de la ruta correcta
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
+import VideoPlayer from "../FullScreenVideo";
 
 const VideoModal = ({ buttonText = "Ver Nuestro Video", videoUrl }) => {
   const [open, setOpen] = useState(false);
   const theme = useTheme();
-  // Para que el modal sea full screen en móviles, como es común en UX
   const fullScreen = useMediaQuery(theme.breakpoints.down("sm"));
 
   const primaryPink = "#DB4586";
@@ -25,14 +22,23 @@ const VideoModal = ({ buttonText = "Ver Nuestro Video", videoUrl }) => {
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
+  /** Tamaños dinámicos según breakpoints */
+  const size = useMediaQuery(theme.breakpoints.down("sm"))
+    ? 65
+    : useMediaQuery(theme.breakpoints.down("md"))
+    ? 80
+    : 100;
+
+  const iconSize = size * 0.7;
+
   return (
     <>
-      {/* PLAY ANIMADO */}
+      {/* BOTÓN PLAY RESPONSIVE */}
       <motion.div
         onClick={handleOpen}
         style={{
-          width: 80,
-          height: 80,
+          width: size,
+          height: size,
           borderRadius: "50%",
           background: "transparent",
           display: "flex",
@@ -45,7 +51,7 @@ const VideoModal = ({ buttonText = "Ver Nuestro Video", videoUrl }) => {
         whileHover={{ scale: 1.12 }}
         whileTap={{ scale: 0.95 }}
       >
-        {/* Burbuja animada detrás */}
+        {/* Glow animado */}
         <motion.div
           style={{
             position: "absolute",
@@ -67,25 +73,41 @@ const VideoModal = ({ buttonText = "Ver Nuestro Video", videoUrl }) => {
           }}
         />
 
-        <PlayArrowIcon sx={{ fontSize: 58, color: "#F971AF" }} />
+        <PlayArrowIcon sx={{ fontSize: iconSize, color: "#F971AF" }} />
       </motion.div>
 
-      {/* MODAL DE VIDEO */}
+      {/* MODAL DE VIDEO MEJORADO */}
       <Dialog
         open={open}
         onClose={handleClose}
         fullWidth
-        maxWidth='md'
+        maxWidth='lg'
         fullScreen={fullScreen}
         PaperProps={{
           sx: {
             borderRadius: fullScreen ? 0 : "16px",
             backgroundColor: "black",
             m: fullScreen ? 0 : 2,
+            overflow: "hidden",
           },
         }}
       >
-        <DialogContent sx={{ p: 0, position: "relative" }}>
+        <DialogContent
+          sx={{
+            p: 0,
+            position: "relative",
+            backgroundColor: "black",
+
+            // 🔥 Mantener proporción 16:9 en todas las pantallas
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            aspectRatio: "16/9",
+
+            // Para evitar barras negras en móviles landscape
+            maxHeight: "90vh",
+          }}
+        >
           <IconButton
             onClick={handleClose}
             sx={{
@@ -103,7 +125,7 @@ const VideoModal = ({ buttonText = "Ver Nuestro Video", videoUrl }) => {
             <CloseIcon />
           </IconButton>
 
-          {open && <VideoPlayer videoSrc={videoUrl} />}
+          {open && <VideoPlayer key={videoUrl} videoSrc={videoUrl} />}
         </DialogContent>
       </Dialog>
     </>

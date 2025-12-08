@@ -200,7 +200,7 @@ const ProfileMain = () => {
                 fontSize: ".95rem",
               }}
             >
-              “Florece cada día con tus sueños y tu esfuerzo.”
+              “Florece cada día con tus sueños y tu esfuerzo”
             </Typography>
 
             {/* --- Tarjeta Suscripción --- */}

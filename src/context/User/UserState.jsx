@@ -1,5 +1,9 @@
 import React, { useCallback, useReducer } from "react";
-import MethodGet, { MethodPost, MethodPut } from "../../config/Service";
+import MethodGet, {
+  MethodDelete,
+  MethodPost,
+  MethodPut,
+} from "../../config/Service";
 import UserContext from "./UserContext";
 import UserReducer from "./UserReducer";
 import {
@@ -8,9 +12,11 @@ import {
   CALENDAR_LOADING,
   COURSES_COMPLETED,
   COURSES_COMPLETED_USER,
+  DELETE_ADDRESS_SHIPPING,
   GET_ADDRESS,
   GET_CALENDAR_LINKS,
   GET_TICKETS_BY_USER,
+  UPDATE_ADDRESS_SHIPPING,
 } from "../../types";
 import fileDownload from "js-file-download";
 import clienteAxios from "../../config/Axios";
@@ -40,7 +46,6 @@ const UserState = ({ children }) => {
   };
 
   const [state, dispatch] = useReducer(UserReducer, initialState);
-
   const getCoursesCompletedByUser = (userId) => {
     let url = `/user/coursesCompleted?userId=${userId}`;
     MethodGet(url)
@@ -54,7 +59,6 @@ const UserState = ({ children }) => {
         console.log(error, "ocurrio un error al consultar los sistemas");
       });
   };
-
   const getCoursesCompleted = (userId, page, limit) => {
     const url = `/user/completedByUser?userId=${userId}&page=${page}&limit=${limit}`;
     MethodGet(url)
@@ -73,7 +77,6 @@ const UserState = ({ children }) => {
       })
       .catch((error) => console.error(error));
   };
-
   const getTicketsByUser = (userId, page, limit) => {
     const url = `/tickets/byUser/${userId}?page=${page}&limit=${limit}`;
     MethodGet(url)
@@ -129,7 +132,6 @@ const UserState = ({ children }) => {
       throw error;
     }
   };
-
   const getAddresses = async () => {
     try {
       let url = "/address";
@@ -195,6 +197,99 @@ const UserState = ({ children }) => {
       });
     }
   };
+  const UpdateAddress = async (datos) => {
+    if (!datos || Object.keys(datos).length === 0) {
+      Swal.fire({
+        icon: "warning",
+        title: "Datos incompletos",
+        text: "Por favor completa los campos obligatorios.",
+      });
+      return;
+    }
+
+    // Spinner de carga
+    Swal.fire({
+      title: "Actualizando dirección...",
+      text: "Por favor espera",
+      allowOutsideClick: false,
+      didOpen: () => {
+        Swal.showLoading();
+      },
+    });
+    try {
+      const url = `/address/${datos.id}`;
+      const res = await MethodPut(url, datos);
+
+      // Actualiza el estado
+      dispatch({
+        type: UPDATE_ADDRESS_SHIPPING,
+        payload: res.data,
+      });
+
+      // Cierra el spinner y muestra confirmación
+      Swal.fire({
+        icon: "success",
+        title: "Dirección actualizada",
+        text: "La dirección se actualizó correctamente.",
+        timer: 1800,
+        showConfirmButton: false,
+      });
+
+      return res.data;
+    } catch (error) {
+      console.error("Ocurrió un error al guardar la dirección:", error);
+
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text:
+          error?.response?.data?.message ||
+          "Ocurrió un error al guardar la dirección.",
+      });
+    }
+  };
+  const DeleteAddress = async (id) => {
+    // Spinner de carga
+    Swal.fire({
+      title: "Borrando dirección...",
+      text: "Por favor espera",
+      allowOutsideClick: false,
+      didOpen: () => {
+        Swal.showLoading();
+      },
+    });
+    try {
+      const url = `/address/${id}`;
+      const res = await MethodDelete(url);
+
+      // Actualiza el estado
+      dispatch({
+        type: DELETE_ADDRESS_SHIPPING,
+        payload: id,
+      });
+
+      // Cierra el spinner y muestra confirmación
+      Swal.fire({
+        icon: "success",
+        title: "Dirección eliminada",
+        text: "La dirección se elimino correctamente.",
+        timer: 1800,
+        showConfirmButton: false,
+      });
+
+      return res.data;
+    } catch (error) {
+      console.error("Ocurrió un error al eliminar la dirección:", error);
+
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text:
+          error?.response?.data?.message ||
+          "Ocurrió un error al eliminar la dirección.",
+      });
+    }
+  };
 
   return (
     <UserContext.Provider
@@ -212,6 +307,8 @@ const UserState = ({ children }) => {
         downloadTicket,
         AddNewAddress,
         getAddresses,
+        UpdateAddress,
+        DeleteAddress,
       }}
     >
       {children}

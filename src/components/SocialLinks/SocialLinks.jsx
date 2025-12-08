@@ -49,7 +49,7 @@ const SocialCards = () => {
       {/* TÍTULO CON ANIMACIÓN */}
       <MotionStack
         alignItems='center'
-        sx={{ mb: 6 }}
+        sx={{ mb: 5 }}
         initial={{ opacity: 0, y: 40 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, ease: "easeOut" }}
@@ -63,7 +63,7 @@ const SocialCards = () => {
             letterSpacing: "1.5px",
           }}
         >
-          Síguenos en todas las
+          Síguenos en todas nuestras
         </Typography>
 
         <Typography
