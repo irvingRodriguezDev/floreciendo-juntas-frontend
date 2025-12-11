@@ -1,0 +1,16 @@
+<svg width="260" height="2000" viewBox="0 0 260 2000" xmlns="http://www.w3.org/2000/svg">
+  <path d="M130 0 
+           C180 120 70 240 130 360 
+           C190 480 80 600 130 720
+           C180 840 70 960 130 1080
+           C190 1200 80 1320 130 1440
+           C180 1560 70 1680 130 1800
+           C190 1920 130 2000 130 2000"
+        stroke="#e88fb8"
+        stroke-width="4"
+        stroke-linecap="round"
+        stroke-dasharray="12 12"
+        fill="none"
+        opacity="0.6"
+  />
+</svg>

@@ -24,6 +24,7 @@
     "framer-motion": "^12.23.22",
     "hls.js": "^1.6.13",
     "js-file-download": "^0.4.12",
+    "lucide-react": "^0.560.0",
     "node-cron": "^4.2.1",
     "notistack": "^3.0.2",
     "react": "^19.1.1",
