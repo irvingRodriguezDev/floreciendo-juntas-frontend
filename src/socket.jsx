@@ -12,17 +12,14 @@ if (!SOCKET_URL) {
 
 let socket;
 
-/**
- * Inicializa el socket solo una vez (singleton)
- * @param {string} token - JWT del usuario para autenticación
- * @returns {SocketIOClient.Socket} socket
- */
 export const initSocket = (token) => {
   if (socket) return socket;
 
   socket = io(SOCKET_URL, {
-    path: "/socket.io", // 👈 path coincide con el backend
-    auth: { token },
+    path: "/socket.io",
+    auth: {
+      token,
+    },
     autoConnect: true,
     reconnection: true,
     reconnectionAttempts: 5,

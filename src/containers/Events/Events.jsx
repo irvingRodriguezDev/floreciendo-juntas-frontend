@@ -40,8 +40,8 @@ const Events = () => {
   return (
     <Layout>
       {/* Banner y Buscador */}
-      <Grid container spacing={2} sx={{ padding: "20px" }}>
-        <Grid size={12} sx={{ marginTop: { xs: "90px", md: "50px" } }}>
+      <Grid container spacing={2}>
+        <Grid size={12}>
           <EventsBanner />
         </Grid>
         <Grid size={12}>

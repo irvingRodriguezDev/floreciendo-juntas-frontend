@@ -63,7 +63,7 @@ const NewCourses = () => {
   return (
     <Box
       sx={{
-        background: `linear-gradient(180deg, #fff5f7 100%, #fff 0%)`,
+        background: `#FFF`,
         position: "relative",
         py: { xs: 6, md: 10 },
         overflow: "hidden",

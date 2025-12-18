@@ -34,11 +34,13 @@
     "react-player": "^3.3.3",
     "react-router-dom": "^7.9.3",
     "react-select": "^5.10.2",
+    "react-snowfall": "^2.4.0",
     "socket.io-client": "^4.8.1",
     "sweet-alert": "^2.0.5",
     "sweetalert2": "^11.26.2",
     "swiper": "^12.0.2",
     "use-debounce": "^10.0.6",
+    "video.js": "^7.6.6",
     "yup": "^1.7.1"
   },
   "devDependencies": {

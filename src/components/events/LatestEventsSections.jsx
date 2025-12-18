@@ -65,6 +65,7 @@ const LatestEventsSection = () => {
       sx={{
         backgroundColor: theme.palette.background.paper || "#ffffff",
         padding: theme.spacing(8, 4),
+        borderRadius: "20px",
       }}
     >
       {/* === Encabezado === */}

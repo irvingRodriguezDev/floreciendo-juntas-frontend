@@ -31,6 +31,7 @@ const menuItems = [
   { name: "Salón", path: "/el-salon-de-tus-sueños", auth: "both" },
   { name: "Eventos", path: "/eventos", auth: "both" },
   { name: "Secretos", path: "/secretos", auth: "both" },
+  { name: "Lives", path: "/lives", auth: "both" },
 ];
 
 const Header = () => {

@@ -75,3 +75,8 @@ export const GET_ORDER_USER = "GET_ORDER_USER";
 
 //ORDERS PAYMENTS
 export const PARTIAL_PAYMENT = "PARTIAL_PAYMENT";
+
+//LIVES
+export const GET_ALL_LIVES = "GET_ALL_LIVES";
+export const GET_LATEST_LIVES = "GET_LATEST_LIVES";
+export const GET_LIVE_BY_ID = "GET_LIVE_BY_ID";

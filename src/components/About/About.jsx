@@ -70,6 +70,7 @@ const About = () => {
         py: { xs: 6, md: 10 },
         px: { xs: 3, sm: 6, md: 10 },
         backgroundColor: "#fff",
+        borderRadius: "20px",
       }}
     >
       <Grid container spacing={6} alignItems='center' justifyContent='center'>

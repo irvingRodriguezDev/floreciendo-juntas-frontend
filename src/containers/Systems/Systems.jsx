@@ -37,7 +37,7 @@ const Systems = () => {
         display: "flex",
         flexDirection: "column",
         justifyContent: "center",
-        borderRadius: "16px",
+        borderRadius: "20px",
         overflow: "hidden",
 
         // ---------- ANIMACIONES KEYFRAMES ----------

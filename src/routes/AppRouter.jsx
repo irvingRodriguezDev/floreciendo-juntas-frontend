@@ -28,7 +28,8 @@ import SuccessSubscription from "../SuccessSubscription";
 import DetailOrders from "../components/Orders/DetailOrders";
 import useLastPath from "../hooks/useLastPath";
 import Checkout from "../containers/Checkout/Checkout";
-
+import Lives from "../containers/Lives/Lives";
+import LiveDetail from "../containers/Lives/LiveDetail";
 function AppRouter() {
   const { autenticado, usuarioAutenticado, cargando } = useContext(AuthContext);
   useEffect(() => {
@@ -48,6 +49,9 @@ function AppRouter() {
     { path: "/eventos", element: <Events /> },
     { path: "/detalle-evento/:id", element: <DetailEvent /> },
     { path: "/secretos", element: <Secrets /> },
+    { path: "/lives", element: <Lives /> },
+    { path: "/detalle-live/:id", element: <LiveDetail /> },
+
     { path: "/el-salon-de-tus-sueños", element: <Saloon /> },
     { path: "/detalle-curso/:id", element: <DetailsCourse /> },
     { path: "/cursos/bysystem/:id", element: <BySystemId /> },

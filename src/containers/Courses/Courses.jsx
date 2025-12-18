@@ -49,7 +49,7 @@ const Courses = () => {
   return (
     <Layout>
       {/* Banner y Buscador */}
-      <Grid container spacing={2} sx={{ padding: "20px" }}>
+      <Grid container spacing={2}>
         <Grid size={12}>
           <CoursesBanner />
         </Grid>

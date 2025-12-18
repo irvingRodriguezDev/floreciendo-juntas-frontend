@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 // ASSETS
 import underline from "../../assets/svg/underline.svg";
 import floralPath from "../../assets/svg/floral-path.svg";
+import SecretsBanner from "../../components/Banner/SecretsBanner";
 
 // --- VARIANTS DE FRAMER MOTION ---
 const cardVariants = {
@@ -85,70 +86,7 @@ const Secrets = () => {
   return (
     <Layout>
       {/* HEADER */}
-      <Container
-        maxWidth='lg'
-        sx={{ mt: { xs: 8, md: 12 }, mb: { xs: 4, md: 6 } }}
-      >
-        <Stack alignItems='center' sx={{ mb: 2 }}>
-          <Typography
-            variant='overline'
-            component={motion.p}
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2, duration: 0.5 }}
-            sx={{
-              color: "#d63384", // Rosa Fuerte
-              fontWeight: 600,
-              fontSize: "1.1rem",
-              letterSpacing: 3,
-            }}
-          >
-            LA FÓRMULA DEL ÉXITO
-          </Typography>
-
-          <Typography
-            variant='h3'
-            component={motion.h1}
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.4, duration: 0.6 }}
-            sx={{
-              fontWeight: 900,
-              textAlign: "center",
-              color: "#a30b5d", // Tono más oscuro para el impacto
-              lineHeight: 1.2,
-              fontSize: { xs: "2.4rem", sm: "3.2rem", md: "3.8rem" },
-              position: "relative",
-            }}
-          >
-            Descubre los 10 Secretos{" "}
-            <Box
-              component='span'
-              sx={{
-                display: "inline-block",
-                position: "relative",
-                px: 1,
-              }}
-            >
-              Manicurista Exitosa
-              <Box
-                component='span'
-                sx={{
-                  position: "absolute",
-                  left: 0,
-                  bottom: -8,
-                  width: "100%",
-                  height: "14px",
-                  backgroundImage: `url(${underline})`,
-                  backgroundRepeat: "no-repeat",
-                  backgroundSize: "contain",
-                }}
-              />
-            </Box>
-          </Typography>
-        </Stack>
-      </Container>
-
+      <SecretsBanner />
       {/* SECTION - ESTRUCTURA CUADRADA Y NEUMORFISMO SUAVE */}
       <Box
         sx={{
@@ -156,7 +94,7 @@ const Secrets = () => {
           width: "100%",
           padding: { xs: "30px 0", md: "80px 0" },
           // Fondo femenino muy suave (Blanco a Rosa Pastel muy claro)
-          background: "linear-gradient(to bottom, #fefefe 0%, #fff0f5 100%)",
+          // background: "linear-gradient(to bottom, #fefefe 0%, #fff0f5 100%)",
           overflow: "hidden",
         }}
       >

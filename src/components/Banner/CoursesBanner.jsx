@@ -1,116 +1,123 @@
 import React from "react";
-import { Box, Typography } from "@mui/material";
+import { Box, Typography, Container } from "@mui/material";
+import { motion } from "framer-motion";
 
 const CoursesBanner = () => {
-  // El texto que deseas
-  const titleText = "Tu crecimiento empieza aquí 🌺";
-  const subtitleText =
-    "Descubre los cursos que te ayudarán a seguir floreciendo.";
-
-  // Estilos base del banner (Fondo, Padding y Posición)
-  const bannerSx = {
-    bgcolor: "#FFF0F0", // Fondo similar al color crema de la imagen
-    padding: { xs: "60px 20px", md: "80px 40px" }, // Padding responsivo
-    textAlign: "center",
-    position: "relative",
-    overflow: "hidden",
-    borderBottom: "1px solid #EBEBEB",
-    borderRadius: "16px",
-    marginTop: { md: "90px" },
-  };
-
-  // --- Estilos para los Adornos (elementos decorativos) ---
-
-  // Función helper para los estilos de adorno base
-  const getAdornmentBaseSx = (position) => ({
-    position: "absolute",
-    opacity: 0.6,
-    zIndex: 0, // Asegura que el texto esté encima
-    ...position, // Combina las propiedades de posición
-  });
-
-  // 1. Adorno de ondas verde/turquesa (arriba-izquierda)
-  const adornmentGreenSx = getAdornmentBaseSx({
-    top: "30px",
-    left: { xs: "5%", md: "15%" },
-    color: "#E36F9E",
-    fontSize: { xs: "20px", md: "30px" },
-    transform: "rotate(-5deg)",
-  });
-
-  // 2. Adorno de puntos/círculos amarillos (abajo-izquierda)
-  const adornmentYellowSx = getAdornmentBaseSx({
-    bottom: "20px",
-    left: "5%",
-    color: "#F7CDD9",
-    fontSize: { xs: "30px", md: "40px" },
-    lineHeight: "0.8",
-  });
-
-  // 3. Adorno de forma angular/triangular violeta (abajo-derecha) - Usamos un truco CSS
-  const adornmentVioletSx = getAdornmentBaseSx({
-    bottom: "40px",
-    right: "5%",
-    width: "40px",
-    height: "40px",
-    // Creación del triángulo con bordes transparentes
-    borderLeft: "20px solid transparent",
-    borderRight: "20px solid transparent",
-    borderBottom: "40px solid #E53888",
-    transform: "rotate(150deg)",
-  });
-
-  // 4. Adorno circular/anillo (arriba-derecha)
-  const adornmentRingSx = getAdornmentBaseSx({
-    top: "10px",
-    right: "2%",
-    width: "60px",
-    height: "60px",
-    borderRadius: "50%",
-    border: "4px solid #E53888",
-    opacity: 0.5,
-  });
-
   return (
-    <Box sx={bannerSx}>
-      {/* --- Adornos Geométricos --- */}
-      <Box sx={adornmentGreenSx}>&lt;&gt;&lt;&gt;&lt;&gt;&lt;&gt;</Box>
-      <Box sx={adornmentYellowSx}>
-        &#x25CF; &#x25CF; <br />
-        &#x25CF; &#x25CF; &#x25CF; <br />
-        &#x25CF; &#x25CF;
-      </Box>
-      <Box sx={adornmentVioletSx} />{" "}
-      {/* Box sin contenido, solo para el adorno */}
-      <Box sx={adornmentRingSx} />{" "}
-      {/* Box sin contenido, solo para el adorno */}
-      {/* --- Contenido del Banner --- */}
-      <Typography
-        variant='h3'
-        component='h1' // Usa h1 semánticamente
+    <Box
+      component={motion.section}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 1 }}
+      sx={{
+        minHeight: "60vh",
+        display: "flex",
+        alignItems: "center",
+        position: "relative",
+        overflow: "hidden",
+        background: `
+          radial-gradient(circle at top left, #FFE3EC 0%, transparent 40%),
+          radial-gradient(circle at bottom right, #FFD6E6 0%, transparent 45%),
+          linear-gradient(180deg, #FFF5F7 0%, #FFF 100%)
+        `,
+      }}
+    >
+      {/* 🌿 Adornos orgánicos */}
+      <Box
+        component={motion.div}
+        animate={{ y: [0, -15, 0] }}
+        transition={{ duration: 8, repeat: Infinity }}
         sx={{
-          fontWeight: 700,
-          color: "#333",
-          mb: 1,
-          zIndex: 1,
+          position: "absolute",
+          top: "10%",
+          left: "5%",
+          width: 120,
+          height: 120,
+          borderRadius: "50%",
+          background: "rgba(229, 56, 136, 0.12)",
+          filter: "blur(40px)",
+        }}
+      />
+
+      <Box
+        component={motion.div}
+        animate={{ y: [0, 20, 0] }}
+        transition={{ duration: 10, repeat: Infinity }}
+        sx={{
+          position: "absolute",
+          bottom: "10%",
+          right: "8%",
+          width: 160,
+          height: 160,
+          borderRadius: "50%",
+          background: "rgba(247, 205, 217, 0.35)",
+          filter: "blur(50px)",
+        }}
+      />
+
+      {/* 🌸 Contenido */}
+      <Container
+        maxWidth='md'
+        component={motion.div}
+        initial={{ y: 40, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 0.3, duration: 0.8 }}
+        sx={{
+          textAlign: "center",
           position: "relative",
-          fontSize: { xs: "1.8rem", md: "2.5rem" }, // Tamaño responsivo
+          zIndex: 2,
         }}
       >
-        {titleText}
-      </Typography>
-      <Typography
-        variant='h6'
-        component='p'
-        sx={{
-          color: "#555",
-          zIndex: 1,
-          position: "relative",
-          fontSize: { xs: "1rem", md: "1.2rem" }, // Tamaño responsivo
-        }}
-      >
-        {subtitleText}
-      </Typography>
+        <Typography
+          variant='h1'
+          sx={{
+            fontWeight: 800,
+            color: "#2E2E2E",
+            lineHeight: 1.1,
+            mb: 2,
+            fontSize: {
+              xs: "2.2rem",
+              sm: "2.8rem",
+              md: "3.4rem",
+            },
+          }}
+        >
+          Tu crecimiento empieza aquí 🌺
+        </Typography>
+
+        <Typography
+          variant='h6'
+          sx={{
+            maxWidth: 520,
+            mx: "auto",
+            color: "#555",
+            fontWeight: 400,
+            fontSize: {
+              xs: "1rem",
+              md: "1.2rem",
+            },
+          }}
+        >
+          Descubre los cursos que te acompañan en cada etapa de tu camino,
+          aprende a tu ritmo y sigue floreciendo con intención.
+        </Typography>
+
+        {/* 🌷 Línea decorativa */}
+        <Box
+          component={motion.div}
+          initial={{ scaleX: 0 }}
+          animate={{ scaleX: 1 }}
+          transition={{ delay: 0.7, duration: 0.6 }}
+          sx={{
+            width: 90,
+            height: 4,
+            bgcolor: "#E53888",
+            borderRadius: 10,
+            mx: "auto",
+            mt: 4,
+          }}
+        />
+      </Container>
     </Box>
   );
 };

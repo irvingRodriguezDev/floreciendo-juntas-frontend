@@ -1,109 +1,123 @@
 import React from "react";
-import { Box, Typography, Button } from "@mui/material";
+import { Box, Typography, Button, Container } from "@mui/material";
+import { motion } from "framer-motion";
 
 const EventsBanner = () => {
-  // Texto del banner
-  const titleText = "¡Eventos que te harán florecer! 🌸";
-  const subtitleText =
-    "Únete a nuestras actividades y descubre cómo seguir creciendo junto a otras mujeres increíbles.";
-
-  // Estilos base del banner
-  const bannerSx = {
-    bgcolor: "#FFF0F0",
-    padding: { xs: "60px 20px", md: "80px 40px" },
-    textAlign: "center",
-    position: "relative",
-    overflow: "hidden",
-    borderBottom: "1px solid #EBEBEB",
-    borderRadius: "16px",
-    marginTop: { md: "50px" },
-  };
-
-  // Helper adornos
-  const getAdornmentBaseSx = (position) => ({
-    position: "absolute",
-    opacity: 0.6,
-    zIndex: 0,
-    ...position,
-  });
-
-  const adornmentGreenSx = getAdornmentBaseSx({
-    top: "30px",
-    left: { xs: "5%", md: "15%" },
-    color: "#E36F9E",
-    fontSize: { xs: "20px", md: "30px" },
-    transform: "rotate(-5deg)",
-  });
-
-  const adornmentYellowSx = getAdornmentBaseSx({
-    bottom: "20px",
-    left: "5%",
-    color: "#F7CDD9",
-    fontSize: { xs: "30px", md: "40px" },
-    lineHeight: "0.8",
-  });
-
-  const adornmentVioletSx = getAdornmentBaseSx({
-    bottom: "40px",
-    right: "5%",
-    width: "40px",
-    height: "40px",
-    borderLeft: "20px solid transparent",
-    borderRight: "20px solid transparent",
-    borderBottom: "40px solid #E53888",
-    transform: "rotate(150deg)",
-  });
-
-  const adornmentRingSx = getAdornmentBaseSx({
-    top: "10px",
-    right: "2%",
-    width: "60px",
-    height: "60px",
-    borderRadius: "50%",
-    border: "4px solid #E53888",
-    opacity: 0.5,
-  });
-
   return (
-    <Box sx={bannerSx}>
-      {/* Adornos */}
-      <Box sx={adornmentGreenSx}>&lt;&gt;&lt;&gt;&lt;&gt;&lt;&gt;</Box>
-      <Box sx={adornmentYellowSx}>
-        &#x25CF; &#x25CF; <br />
-        &#x25CF; &#x25CF; &#x25CF; <br />
-        &#x25CF; &#x25CF;
-      </Box>
-      <Box sx={adornmentVioletSx} />
-      <Box sx={adornmentRingSx} />
+    <Box
+      component={motion.section}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.8 }}
+      sx={{
+        minHeight: "60vh",
+        display: "flex",
+        alignItems: "center",
+        position: "relative",
+        overflow: "hidden",
+        px: { xs: 2, sm: 4 },
+        background: `
+          radial-gradient(circle at top left, #FFE3EC 0%, transparent 40%),
+          radial-gradient(circle at bottom right, #FFD6E6 0%, transparent 45%),
+          linear-gradient(180deg, #FFF5F7 0%, #FFFFFF 100%)
+        `,
+      }}
+    >
+      {/* 🌿 Adornos flotantes */}
+      <Box
+        component={motion.div}
+        animate={{ y: [0, -18, 0] }}
+        transition={{ duration: 9, repeat: Infinity }}
+        sx={{
+          position: "absolute",
+          top: "12%",
+          left: "6%",
+          width: 110,
+          height: 110,
+          borderRadius: "50%",
+          bgcolor: "rgba(229, 56, 136, 0.14)",
+          filter: "blur(40px)",
+        }}
+      />
 
-      {/* Contenido */}
-      <Typography
-        variant='h3'
-        component='h1'
+      <Box
+        component={motion.div}
+        animate={{ y: [0, 22, 0] }}
+        transition={{ duration: 11, repeat: Infinity }}
         sx={{
-          fontWeight: 700,
-          color: "#E53888",
-          mb: 2,
-          zIndex: 1,
-          position: "relative",
-          fontSize: { xs: "1.8rem", md: "2.5rem" },
+          position: "absolute",
+          bottom: "10%",
+          right: "8%",
+          width: 150,
+          height: 150,
+          borderRadius: "50%",
+          bgcolor: "rgba(247, 205, 217, 0.4)",
+          filter: "blur(55px)",
+        }}
+      />
+
+      {/* 🌸 Contenido */}
+      <Container
+        maxWidth='md'
+        component={motion.div}
+        initial={{ y: 32, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 0.25, duration: 0.7 }}
+        sx={{
+          textAlign: "center",
+          zIndex: 2,
         }}
       >
-        {titleText}
-      </Typography>
-      <Typography
-        variant='h6'
-        component='p'
-        sx={{
-          color: "#555",
-          zIndex: 1,
-          position: "relative",
-          fontSize: { xs: "1rem", md: "1.2rem" },
-          mb: 3,
-        }}
-      >
-        {subtitleText}
-      </Typography>
+        <Typography
+          component='h1'
+          sx={{
+            fontWeight: 800,
+            color: "#E53888",
+            lineHeight: 1.15,
+            mb: 2,
+            fontSize: {
+              xs: "2rem", // 📱 Mobile first
+              sm: "2.6rem",
+              md: "3.2rem",
+            },
+          }}
+        >
+          ¡Eventos que te harán florecer! 🌸
+        </Typography>
+
+        <Typography
+          component='p'
+          sx={{
+            color: "#555",
+            maxWidth: 520,
+            mx: "auto",
+            mb: 4,
+            fontSize: {
+              xs: "1rem", // 📱 Mobile first
+              md: "1.2rem",
+            },
+          }}
+        >
+          Únete a nuestras actividades, conecta con mujeres increíbles y vive
+          experiencias que impulsan tu crecimiento personal.
+        </Typography>
+
+        {/* 🌼 Línea decorativa */}
+        <Box
+          component={motion.div}
+          initial={{ scaleX: 0 }}
+          animate={{ scaleX: 1 }}
+          transition={{ delay: 0.6, duration: 0.5 }}
+          sx={{
+            width: 180,
+            height: 4,
+            bgcolor: "#E53888",
+            borderRadius: 10,
+            mx: "auto",
+            mt: 5,
+          }}
+        />
+      </Container>
     </Box>
   );
 };
