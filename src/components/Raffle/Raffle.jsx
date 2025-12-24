@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import { Box, Typography, Stack, Grid, Paper, Button } from "@mui/material";
 import { motion } from "framer-motion";
 
@@ -6,11 +6,15 @@ import WorkspacePremiumIcon from "@mui/icons-material/WorkspacePremium";
 import CardGiftcardIcon from "@mui/icons-material/CardGiftcard";
 import VolunteerActivismIcon from "@mui/icons-material/VolunteerActivism";
 import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
-
+import SubscriptionForm from "../Payment/SubscriptionButton";
+import AuthContext from "../../context/Auth/AuthContext";
+import { Link } from "react-router-dom";
 // Fondo elegante rosado pastel
 const fancyGradient = "linear-gradient(145deg, #FFE6EE 0%, #F8C0D8 100%)";
 
 export default function RifaSalonPro() {
+  const { usuario, autenticado } = useContext(AuthContext);
+  const isSuscribed = usuario ? usuario.isSuscribed : null;
   return (
     <Box
       sx={{
@@ -41,7 +45,7 @@ export default function RifaSalonPro() {
               textAlign: { xs: "center", md: "left" },
             }}
           >
-            🎀 RIFA MENSUAL PREMIUM
+            🎀 RIFA MENSUAL
           </Typography>
 
           <Typography
@@ -192,6 +196,23 @@ export default function RifaSalonPro() {
                   </Typography>
                 ))}
               </Stack>
+              {/* <SubscriptionForm userId={usuario ? usuario.id : null} /> */}
+              {autenticado && isSuscribed && (
+                <Link to='/subscripcion'>
+                  <Button
+                    variant='contained'
+                    sx={{
+                      bgcolor: "#E33685",
+                      color: "white",
+                      borderRadius: "12px",
+                      m: 2,
+                    }}
+                    fullWidth
+                  >
+                    Subscribirme
+                  </Button>
+                </Link>
+              )}
             </Paper>
           </motion.div>
         </Grid>

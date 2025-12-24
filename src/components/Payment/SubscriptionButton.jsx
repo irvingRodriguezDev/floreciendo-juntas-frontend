@@ -51,7 +51,6 @@ const SubscriptionForm = ({ userId }) => {
           : "/payment/create-payment-recurring";
 
       const res = await MethodPost(url, data);
-      console.log(res, "la res");
 
       // Verificación correcta
       if (res.status !== 200) {

@@ -86,7 +86,7 @@ export default function AddressSection() {
               borderWidth: 2,
             }}
           >
-            Registrar nueva direccion de envio
+            Registrar nueva dirección de envío
           </Button>
         </Grid>
 

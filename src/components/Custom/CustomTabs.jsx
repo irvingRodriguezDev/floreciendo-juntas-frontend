@@ -14,7 +14,9 @@ const CustomTabs = ({ tabs }) => {
       <Tabs
         value={activeTab}
         onChange={handleChange}
-        centered
+        variant='scrollable'
+        scrollButtons
+        allowScrollButtonsMobile
         TabIndicatorProps={{
           style: {
             backgroundColor: "#ec4899", // Rosa personalizado

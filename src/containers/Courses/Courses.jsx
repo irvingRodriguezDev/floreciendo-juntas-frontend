@@ -74,7 +74,7 @@ const Courses = () => {
             spacing={3}
             justifyContent='center'
             sx={{
-              maxWidth: "1200px",
+              maxWidth: { xs: "90%", lg: "1200px" },
               margin: "0 auto",
               paddingY: 4,
             }}

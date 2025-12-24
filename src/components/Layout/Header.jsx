@@ -24,7 +24,8 @@ import Logo from "../../assets/images/LOGOTIPO FLORECIENDO JUNTAS negro.png";
 import CartButton from "./CartButton";
 import CartSidebar from "./CartSidebar";
 import BadgeBox from "../ui/BadgeBox";
-
+import ShopifyCartButton from "../../containers/Store/ShopifyCartButton";
+import ShopifyCartDrawer from "../../containers/Store/ShopifyCartDrawer";
 /* Menu items (igual que antes) */
 const menuItems = [
   { name: "Cursos", path: "/cursos", auth: "both" },
@@ -32,12 +33,14 @@ const menuItems = [
   { name: "Eventos", path: "/eventos", auth: "both" },
   { name: "Secretos", path: "/secretos", auth: "both" },
   { name: "Lives", path: "/lives", auth: "both" },
+  { name: "Tienda", path: "/tienda", auth: "both" },
 ];
 
 const Header = () => {
   const theme = useTheme();
   const [open, setOpen] = useState(false);
   const [openCart, setOpenCart] = useState(false);
+  const [openCartShopify, setOpenCartShopify] = useState(false);
   const { autenticado } = useContext(AuthContext);
   const { cart, guest_cart, getUserCart } = useContext(CartContext);
 
@@ -292,7 +295,11 @@ const Header = () => {
               >
                 <CartButton onOpen={() => setOpenCart(true)} />
               </BadgeBox>
-
+              <ShopifyCartButton onClick={() => setOpenCartShopify(true)} />
+              <ShopifyCartDrawer
+                open={openCartShopify}
+                onClose={() => setOpenCartShopify(false)}
+              />
               {/* Auth */}
               {!autenticado ? (
                 <Button
@@ -381,12 +388,14 @@ const Header = () => {
                   }}
                 >
                   <Box>
-                    <Typography
-                      variant='h6'
-                      sx={{ color: "#E53888", fontWeight: "bold", mb: 2 }}
-                    >
-                      Menú
-                    </Typography>
+                    <Link to='/' style={{ textDecoration: "none" }}>
+                      <Typography
+                        variant='h6'
+                        sx={{ color: "#E53888", fontWeight: "bold", mb: 2 }}
+                      >
+                        <img src={Logo} width='95%' height={70} />
+                      </Typography>
+                    </Link>
                     <List>
                       {filteredMenu.map((item) => (
                         <ListItem key={item.path} disablePadding>

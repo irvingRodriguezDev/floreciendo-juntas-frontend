@@ -16,7 +16,7 @@ const CourseDetailScreen = () => {
   const params = useParams();
   const { id } = params;
   const { course, getCourseById } = useContext(CoursesContext);
-  const { usuario, isAuthenticating } = useContext(AuthContext);
+  const { usuario, isAuthenticating, autenticado } = useContext(AuthContext);
 
   useEffect(() => {
     getCourseById(id);
@@ -45,6 +45,7 @@ const CourseDetailScreen = () => {
           <Typography
             variant='body1'
             color='text.secondary'
+            textAlign='justify'
             sx={{ mb: 3, lineHeight: 1.8 }}
             component='div'
             dangerouslySetInnerHTML={{
@@ -55,13 +56,13 @@ const CourseDetailScreen = () => {
       ),
     },
     {
-      label: "Preguntas y respuestas del curso",
+      label: "Preguntas y comentarios",
       content: (
         <Box sx={{ position: "relative", zIndex: 1, mt: 2 }}>
-          {isAuthenticating && isSubscribed ? (
+          {autenticado && isSubscribed ? (
             <Wall
               courseId={id}
-              isAuthenticating={isAuthenticating}
+              isAuthenticating={autenticado}
               isSubscribed={isSubscribed}
             />
           ) : (

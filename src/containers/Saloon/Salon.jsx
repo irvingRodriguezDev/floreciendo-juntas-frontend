@@ -45,7 +45,7 @@ const Salon = () => {
         <Grid size={12}>
           <DreamSalonFeatures />
         </Grid>
-        <Grid size={12}>
+        <Grid size={12} sx={{ marginBottom: -15 }}>
           <Box
             component={motion.div}
             initial={{ opacity: 0, y: 30 }}
@@ -80,6 +80,7 @@ const Salon = () => {
                 maxWidth: 600,
                 mx: "auto",
                 lineHeight: 1.6,
+                textAlign: "justify",
               }}
             >
               Descubre nuestros productos más populares — seleccionados por su
@@ -90,7 +91,7 @@ const Salon = () => {
             <Box
               component='div'
               sx={{
-                width: 80,
+                width: 180,
                 height: 3,
                 backgroundColor: "#c94f7c",
                 borderRadius: "2px",

@@ -13,7 +13,7 @@ import Certifications from "../containers/Certificationes/Certifications";
 import Events from "../containers/Events/Events";
 import Saloon from "../containers/Saloon/Salon";
 import Secrets from "../containers/Secrets/Secrets";
-import Shop from "../containers/Shop/Shop";
+
 import Profile from "../containers/Profile/Profile";
 import DetailEvent from "../containers/Events/EventDetail/DetailEvent";
 import Home from "../containers/Home/Home";
@@ -30,6 +30,8 @@ import useLastPath from "../hooks/useLastPath";
 import Checkout from "../containers/Checkout/Checkout";
 import Lives from "../containers/Lives/Lives";
 import LiveDetail from "../containers/Lives/LiveDetail";
+import Store from "../containers/Store/Store";
+import Subscription from "../containers/Subscription/Subscription";
 function AppRouter() {
   const { autenticado, usuarioAutenticado, cargando } = useContext(AuthContext);
   useEffect(() => {
@@ -45,13 +47,13 @@ function AppRouter() {
     { path: "/", element: <Home /> },
     { path: "/cursos", element: <Courses /> },
     { path: "/certificaciones", element: <Certifications /> },
-    { path: "/tienda", element: <Shop /> },
     { path: "/eventos", element: <Events /> },
     { path: "/detalle-evento/:id", element: <DetailEvent /> },
     { path: "/secretos", element: <Secrets /> },
     { path: "/lives", element: <Lives /> },
     { path: "/detalle-live/:id", element: <LiveDetail /> },
-
+    { path: "/tienda", element: <Store /> },
+    { path: "/subscripcion", element: <Subscription /> },
     { path: "/el-salon-de-tus-sueños", element: <Saloon /> },
     { path: "/detalle-curso/:id", element: <DetailsCourse /> },
     { path: "/cursos/bysystem/:id", element: <BySystemId /> },

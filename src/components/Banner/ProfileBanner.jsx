@@ -1,131 +1,106 @@
 import React from "react";
 import { Box, Typography } from "@mui/material";
-import gerbera1 from "../../assets/images/Gerbera Daisy -7.png";
-import gerbera2 from "../../assets/images/Gerbera Daisy floreciendo juntas.png";
-import gerbera3 from "../../assets/images/GERBERA MAGENTA desenfoque.png";
-import gerbera4 from "../../assets/images/GERBERA MAGENTA.png";
+import { motion } from "framer-motion";
+
+import gerberaSoft from "../../assets/images/GERBERA MAGENTA desenfoque.png";
+import gerberaDetail from "../../assets/images/GERBERA MAGENTA.png";
+
 const ProfileBanner = () => {
-  const titleText = "Mi Perfil";
-  const subtitleText = "Qué alegría verte floreciendo juntas ✨";
-
-  // ----------------------------------------------------
-  // Banner
-  // ----------------------------------------------------
-  const bannerSx = {
-    background: "linear-gradient(135deg, #FFE5EE 0%, #FFF7FA 100%)",
-    padding: { xs: "70px 25px", md: "100px 60px" },
-    textAlign: "center",
-    position: "relative",
-    overflow: "hidden",
-    borderRadius: "30px",
-    boxShadow: "0 8px 24px rgba(229, 56, 136, 0.12)",
-  };
-
-  // Helper estilos base
-  const getAdornment = (extra) => ({
-    position: "absolute",
-    opacity: 0.55,
-    zIndex: 0,
-    filter: "blur(0.5px)",
-    userSelect: "none",
-    ...extra,
-  });
-
-  // ----------------------------------------------------
-  // Adornos
-  // ----------------------------------------------------
-
-  // 🌸 Flor grande en difuminado (arriba izquierda)
-  const flowerBlurPink = getAdornment({
-    top: "-40px",
-    left: "-20px",
-    width: "180px",
-    height: "180px",
-    background: "radial-gradient(circle, #FFB6D5 0%, transparent 70%)",
-    borderRadius: "50%",
-  });
-
-  // 🌼 Flor dorada suave (abajo derecha)
-  const flowerSoftGold = getAdornment({
-    bottom: "-30px",
-    right: "-10px",
-    width: "150px",
-    height: "150px",
-    background: "radial-gradient(circle, #FFD9A8 0%, transparent 70%)",
-    borderRadius: "50%",
-  });
-
-  // 🌸 Pétalos flotando (varios)
-  const petalSx = (pos) =>
-    getAdornment({
-      fontSize: { xs: "26px", md: "32px" },
-      color: "#E56A9F",
-      animation: "floatPetal 6s ease-in-out infinite",
-      ...pos,
-    });
-
-  // Animación
-  const floatAnimation = `
-    @keyframes floatPetal {
-      0% { transform: translateY(0px) rotate(0deg); }
-      50% { transform: translateY(-15px) rotate(8deg); }
-      100% { transform: translateY(0px) rotate(0deg); }
-    }
-  `;
-
   return (
-    <Box sx={bannerSx}>
-      <style>{floatAnimation}</style>
-
-      {/* --- Adornos --- */}
-      <Box sx={flowerBlurPink} />
-      <Box sx={flowerSoftGold} />
-
-      {/* pétalos */}
-      <Box sx={petalSx({ top: "20px", left: "5%" })}>
-        <img width={150} height={150} src={gerbera1} />
-      </Box>
-      <Box sx={petalSx({ top: "60px", right: "18%" })}>
-        <img width={150} height={150} src={gerbera2} />
-      </Box>
-      <Box sx={petalSx({ bottom: "40px", left: "25%" })}>
-        <img width={150} height={150} src={gerbera3} />
-      </Box>
-      <Box sx={petalSx({ bottom: "30px", right: "10%" })}>
-        <img width={150} height={150} src={gerbera4} />
-      </Box>
-
-      {/* --- Contenido --- */}
-      <Typography
-        variant='h3'
-        component='h1'
+    <Box
+      component={motion.div}
+      initial={{ opacity: 0, y: 18 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.8, ease: "easeOut" }}
+      sx={{
+        position: "relative",
+        overflow: "hidden",
+        borderRadius: "32px",
+        px: { xs: 3, md: 6 },
+        py: { xs: 7, md: 10 },
+        textAlign: "center",
+        background: "linear-gradient(135deg, #FFE5EE 0%, #FFF7FA 100%)",
+        boxShadow: "0 12px 30px rgba(229,56,136,0.15)",
+      }}
+    >
+      {/* 🌸 Halo floral suave */}
+      <Box
+        component='img'
+        src={gerberaSoft}
+        alt=''
+        aria-hidden
         sx={{
-          fontWeight: 800,
-          color: "#C73578",
-          mb: 2,
-          zIndex: 1,
-          position: "relative",
-          fontFamily: "'Poppins', sans-serif",
-          fontSize: { xs: "2.2rem", md: "3.2rem" },
+          position: "absolute",
+          top: "-40px",
+          left: "-60px",
+          width: 220,
+          opacity: 0.35,
+          filter: "blur(6px)",
+          pointerEvents: "none",
         }}
-      >
-        {titleText}
-      </Typography>
+      />
 
-      <Typography
-        variant='h6'
-        component='p'
+      {/* 🌷 Flor detalle */}
+      <Box
+        component={motion.img}
+        src={gerberaDetail}
+        alt=''
+        aria-hidden
+        initial={{ opacity: 0, scale: 0.96 }}
+        animate={{ opacity: 0.9, scale: 1 }}
+        transition={{ duration: 1.2, ease: "easeOut" }}
         sx={{
-          color: "#6A6A6A",
-          zIndex: 1,
-          position: "relative",
-          fontWeight: 400,
-          fontSize: { xs: "1.2rem", md: "1.5rem" },
-          fontFamily: "'Poppins', sans-serif",
+          position: "absolute",
+          bottom: "-20px",
+          right: "-10px",
+          width: 160,
+          opacity: 0.55,
+          pointerEvents: "none",
         }}
-      >
-        {subtitleText}
-      </Typography>
+      />
+
+      {/* ✨ Contenido */}
+      <Box sx={{ position: "relative", zIndex: 2 }}>
+        <Typography
+          component='h1'
+          sx={{
+            fontFamily: "'Poppins', sans-serif",
+            fontWeight: 800,
+            color: "#C73578",
+            fontSize: { xs: "2.1rem", md: "3rem" },
+            mb: 1,
+            letterSpacing: "-0.5px",
+          }}
+        >
+          Mi Perfil
+        </Typography>
+
+        {/* Línea emocional */}
+        <Box
+          sx={{
+            width: 56,
+            height: 5,
+            mx: "auto",
+            mb: 3,
+            borderRadius: 8,
+            background: "linear-gradient(90deg, #E53888, #FFB6D5)",
+          }}
+        />
+
+        <Typography
+          sx={{
+            fontFamily: "'Poppins', sans-serif",
+            fontWeight: 400,
+            color: "#6A6A6A",
+            fontSize: { xs: "1.05rem", md: "1.4rem" },
+            maxWidth: 520,
+            mx: "auto",
+            lineHeight: 1.5,
+          }}
+        >
+          Qué alegría verte floreciendo juntas ✨
+        </Typography>
+      </Box>
     </Box>
   );
 };

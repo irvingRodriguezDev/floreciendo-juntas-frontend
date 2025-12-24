@@ -87,8 +87,6 @@ const AuthState = (props) => {
     } catch (error) {
       dispatch({ type: types.LOGIN_ERROR });
       return false;
-    } finally {
-      dispatch({ type: types.FIN_AUTENTICACION }); // 🔥 NECESITA que FIN ponga isAuthenticating=false
     }
   };
 

@@ -134,6 +134,7 @@ const DetailEvent = () => {
               sx={{
                 position: "relative",
                 width: "100%",
+                textAlign: "justify",
                 // Altura responsiva y scrollable solo si es necesario
                 maxHeight: { xs: 300, md: 650 },
                 overflowY: "auto",
