@@ -98,9 +98,9 @@ const About = () => {
                     display: "flex",
                     justifyContent: "center",
                     alignItems: "center",
-                    border: "10px solid #FCADCF ",
+                    border: "10px solid #F971AF ",
                     borderRadius: "12px",
-                    bgcolor: "#FCADCF",
+                    bgcolor: "#F971AF",
                   }}
                 >
                   {/* Imagen */}
@@ -124,7 +124,7 @@ const About = () => {
                     sx={{
                       position: "absolute",
                       bottom: { xs: "40px", sm: "50px" },
-                      backgroundColor: "#F971AF",
+                      backgroundColor: "#F970AF",
                       color: "white",
                       px: { xs: 2, sm: 3 },
                       py: { xs: 1.5, sm: 2 },

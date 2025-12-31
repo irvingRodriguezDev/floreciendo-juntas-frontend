@@ -41,7 +41,7 @@ export default function DreamSalonFeatures() {
         backgroundColor: "#fff",
         py: { xs: 6, md: 10 },
         px: { xs: 3, md: 8 },
-        borderRadius: "20px",
+        borderRadius: "32px",
       }}
     >
       <Typography

@@ -10,21 +10,10 @@ import WhyChooseUsSection from "../../components/WhyChose/WhyChoseUsSection";
 import LatestEventsSection from "../../components/events/LatestEventsSections";
 import SocialLinks from "../../components/SocialLinks/SocialLinks";
 import RifaSalonSuenos from "../../components/Raffle/Raffle";
-import Snowfall from "react-snowfall";
 const Home = () => {
   return (
     <Layout>
       <Grid container spacing={2} sx={{ mt: 10, padding: "25px" }}>
-        <Snowfall
-          color='#D82E7A'
-          snowflakeCount={200}
-          style={{
-            position: "fixed",
-            width: "100vw",
-            height: "100vh",
-            zIndex: 9999,
-          }}
-        />
         <Grid size={12}>
           <BannerHome />
         </Grid>

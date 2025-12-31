@@ -29,7 +29,7 @@ const socialData = [
   {
     id: 2,
     name: "Instagram",
-    followers: "+9K Seguidores",
+    followers: "+10K Seguidores",
     icon: <InstagramIcon width={50} />,
     link: "https://www.instagram.com/carolina_tavera1997/",
   },

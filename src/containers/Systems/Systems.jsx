@@ -30,7 +30,7 @@ const Systems = () => {
   return (
     <Box
       sx={{
-        backgroundColor: "#FFF0F0",
+        backgroundColor: "#F971AF",
         p: { xs: 4, sm: 6, md: 8 },
         position: "relative",
         minHeight: "70vh",
@@ -196,7 +196,7 @@ const Systems = () => {
           width: "50px",
           height: "50px",
           borderRadius: "50%",
-          border: "3px solid #D72E79",
+          border: "30px solid #D72E79",
           opacity: 0.4,
           display: { xs: "none", md: "block" },
           zIndex: 0,
@@ -235,6 +235,7 @@ const Systems = () => {
             fontWeight: 700,
             lineHeight: 1.2,
             textAlign: "center",
+            color: "white",
             fontSize: { xs: "2rem", sm: "2.5rem", md: "3.5rem" },
           }}
         >
@@ -249,7 +250,7 @@ const Systems = () => {
                 bottom: 0,
                 width: "100%",
                 height: "8px",
-                backgroundColor: "#DC4485",
+                backgroundColor: "#FFF",
                 opacity: 0.7,
                 borderRadius: "4px",
                 zIndex: -1,

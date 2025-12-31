@@ -33,7 +33,7 @@ const BannerHome = () => {
         alignItems: "center",
         justifyContent: "center",
         minHeight: "80vh",
-        background: "#fff0f0",
+        background: "linear-gradient(135deg, #F971AF 100%, #FFF 100%)",
         padding: 4,
         position: "relative",
         overflow: "hidden",
@@ -318,13 +318,14 @@ const BannerHome = () => {
           zIndex: 1,
         }}
       >
-        <Typography variant='body2' color='text.secondary' sx={{ mb: 1 }}>
+        <Typography variant='body2' color='white' sx={{ mb: 1 }}>
           Tu Camino al Éxito en Uñas
         </Typography>
 
         <Typography
           variant='h3'
           component='h1'
+          color='white'
           sx={{
             fontWeight: 700,
             mb: 2,
@@ -343,7 +344,7 @@ const BannerHome = () => {
                 bottom: 0,
                 width: "100%",
                 height: "8px",
-                backgroundColor: "#F971AF",
+                backgroundColor: "#F8CDDA",
                 zIndex: -1,
                 opacity: 0.7,
                 borderRadius: "4px",
@@ -372,7 +373,7 @@ const BannerHome = () => {
 
         <Typography
           variant='body1'
-          color='text.secondary'
+          color='white'
           sx={{ mb: 4, maxWidth: 500, padding: 4 }}
           textAlign='justify'
         >
@@ -381,7 +382,7 @@ const BannerHome = () => {
           tus sueños realidad!
         </Typography>
 
-        <Stack
+        {/* <Stack
           direction={{ xs: "column", md: "row" }}
           spacing={2}
           justifyContent={{ xs: "center", md: "flex-start" }}
@@ -399,7 +400,7 @@ const BannerHome = () => {
             }}
             label='¡Quiero empezar a florecer!'
           />
-        </Stack>
+        </Stack> */}
 
         <Box
           component='img'
