@@ -63,7 +63,10 @@ const NewCourses = () => {
   return (
     <Box
       sx={{
-        background: `#FFF`,
+        background: `
+      linear-gradient(180deg, #fff 0%, #FFDFEF 100%),
+      radial-gradient(circle at top left, rgba(255,200,220,0.25), transparent 60%)
+    `,
         position: "relative",
         py: { xs: 6, md: 10 },
         overflow: "hidden",
@@ -73,59 +76,116 @@ const NewCourses = () => {
       {/* ————— Header mejorado ————— */}
       <Stack
         alignItems='center'
-        sx={{ mb: 8, px: { xs: 2, md: 4 } }}
+        sx={{
+          mb: 8,
+          px: { xs: 2, md: 4 },
+        }}
         component={motion.div}
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
       >
+        {/* TÍTULO */}
         <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.3, duration: 0.6 }}
+          initial={{ opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8 }}
+          style={{ textAlign: "center", marginBottom: "70px" }}
+        >
+          {/* KICKER / OVERLINE */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+          >
+            <Typography
+              variant='overline'
+              sx={{
+                color: theme.palette.text.secondary,
+                letterSpacing: "3px",
+                fontWeight: 600,
+                textTransform: "uppercase",
+                mb: 1,
+                fontSize: { xs: "15px", md: "18px" },
+              }}
+            >
+              {/* Los favoritos de nuestra comunidad */}
+            </Typography>
+          </motion.div>
+
+          {/* TÍTULO */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+          >
+            <Typography
+              variant='h3'
+              sx={{
+                fontWeight: 700,
+                lineHeight: 1.2,
+                textAlign: "center",
+                color: "#E53888",
+                fontSize: { xs: "2rem", sm: "2.5rem", md: "3.5rem" },
+              }}
+            >
+              {""}
+              <Box component='span' sx={{ position: "relative" }}>
+                Lo Más Nuevo
+                <Box
+                  component='span'
+                  sx={{
+                    position: "absolute",
+                    left: 0,
+                    bottom: 0,
+                    width: "100%",
+                    height: "8px",
+                    backgroundColor: "#FFF",
+                    opacity: 0.7,
+                    borderRadius: "4px",
+                    zIndex: -1,
+                  }}
+                />
+              </Box>{" "}
+            </Typography>
+          </motion.div>
+
+          {/* SUBTÍTULO */}
+          {/* <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, delay: 0.4 }}
         >
           <Typography
-            variant='h3'
             sx={{
-              fontWeight: 800,
-              lineHeight: 1.2,
-              textAlign: "center",
-              fontSize: { xs: "2.2rem", sm: "2.8rem", md: "3.4rem" },
+              mt: 2,
+              maxWidth: 720,
+              mx: "auto",
+              fontSize: { xs: "1rem", md: "1.1rem" },
+              color: "text.secondary",
             }}
           >
-            Descubre Nuestro{" "}
-            <Box
-              component={motion.span}
-              sx={{ display: "inline-block", position: "relative" }}
-            >
-              Contenido Nuevo
-              {/* Subrayado animado */}
-              <Box
-                component={motion.span}
-                initial={{ scaleX: 0 }}
-                animate={{ scaleX: 1 }}
-                transition={{ duration: 0.6, delay: 0.5 }}
-                sx={{
-                  position: "absolute",
-                  left: 0,
-                  bottom: -2,
-                  width: "100%",
-                  height: "10px",
-                  background: `linear-gradient(90deg, #F971AF, #FFABD1)`,
-                  borderRadius: "6px",
-                  transformOrigin: "left",
-                  opacity: 0.8,
-                  zIndex: -1,
-                }}
-              />
-            </Box>
+            Cursos que han acompañado a cientos de mujeres en su crecimiento
+            personal y profesional dentro de nuestra academia.
           </Typography>
+        </motion.div> */}
         </motion.div>
+
+        {/* SUBTÍTULO */}
       </Stack>
 
       {/* ————— Swiper o mensaje vacío ————— */}
       <Box
-        sx={{ position: "relative", maxWidth: "100%", px: { xs: 2, md: 4 } }}
+        sx={{
+          mt: -10,
+          position: "relative",
+          maxWidth: "100%",
+          px: { xs: 2, md: 4 },
+        }}
       >
         {!courses.length ? (
           <Typography
@@ -297,9 +357,9 @@ const NewCourses = () => {
                 left: { xs: 5, sm: 20 },
                 top: "40%",
                 transform: "translateY(-50%)",
-                backgroundColor: "#F3BBCE",
+                backgroundColor: "#E53888",
                 color: "white",
-                "&:hover": { backgroundColor: "#d81b60" },
+                "&:hover": { backgroundColor: "#E53888" },
                 zIndex: 10,
                 width: 44,
                 height: 44,
@@ -316,9 +376,9 @@ const NewCourses = () => {
                 right: { xs: 5, sm: 20 },
                 top: "40%",
                 transform: "translateY(-50%)",
-                backgroundColor: "#F3BBCE",
+                backgroundColor: "#E53888",
                 color: "white",
-                "&:hover": { backgroundColor: "#d81b60" },
+                "&:hover": { backgroundColor: "#E53888" },
                 zIndex: 10,
                 width: 44,
                 height: 44,

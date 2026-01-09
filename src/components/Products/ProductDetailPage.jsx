@@ -1,17 +1,13 @@
-import React, { useContext, useEffect } from "react";
+import { useContext, useEffect } from "react";
 import {
   Box,
   Grid,
   Typography,
   Button,
-  IconButton,
   Divider,
-  TextField,
   Chip,
+  ButtonGroup,
 } from "@mui/material";
-import { Add, Remove } from "@mui/icons-material";
-import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
-import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import Layout from "../Layout/Layout";
 import { useParams } from "react-router-dom";
 import ProductsContext from "../../context/Products/ProductsContext";
@@ -19,41 +15,120 @@ import { formatMexicanCurrency } from "../../utils/FormatCurrency";
 import ProductDetailBanner from "../Banner/ProductDetailBanner";
 import PinkSpinner from "../Loading/PinkSpinner";
 import ProductCard from "./ProductCard";
+import CartContext from "../../context/Cart/CartContext";
+import AuthContext from "../../context/Auth/AuthContext";
+import { useSnackbar } from "notistack";
 const ProductDetailPage = () => {
   const params = useParams();
   const { id } = params;
+  const { autenticado } = useContext(AuthContext);
+  const { enqueueSnackbar } = useSnackbar();
+
   const { product, getOneProduct } = useContext(ProductsContext);
   useEffect(() => {
     getOneProduct(id);
   }, [id]);
+  const {
+    cart = [],
+    guest_cart = [],
+    addItemCart,
+    updateItemCart,
+    deleteItemCart,
+    addItemGuest,
+    updateItemGuest,
+    deleteItemGuest,
+  } = useContext(CartContext);
+  const itemInCart = autenticado
+    ? product && cart.items.find((i) => i.productId === product.product.id)
+    : product &&
+      guest_cart.items.find((i) => i.product.product_id === product.product.id);
 
-  const relatedProducts = [
-    {
-      id: 1,
-      name: "Premium Face Serum",
-      price: 199.99,
-      image: {
-        url: "https://template.hasthemes.com/brancy/brancy/assets/images/shop/product-details/1.webp",
-      },
-    },
-    {
-      id: 2,
-      name: "Hydrating Cream",
-      price: 149.99,
-      image: {
-        url: "https://template.hasthemes.com/brancy/brancy/assets/images/shop/8.webp",
-      },
-    },
-    {
-      id: 3,
-      name: "Vitamin C Mask",
-      price: 89.99,
-      image: {
-        url: "https://template.hasthemes.com/brancy/brancy/assets/images/shop/5.webp",
-      },
-    },
-  ];
+  // Helper para agregar al guest: mandamos objeto completo para localStorage/preview
+  const handleAddGuest = (product) => {
+    const guestItem = {
+      product_id: product.id,
+      quantity: 1,
+      name: product.name,
+      image: product.image?.url || product.image || null,
+      price: Number(product.price),
+    };
+    return addItemGuest(guestItem);
+  };
 
+  // Helper para agregar cuando autenticado (API)
+  const handleAddAuth = () => {
+    return addItemCart({ product_id: product.product.id, quantity: 1 });
+  };
+
+  // Handler para click en "Agregar"
+  const handleClickAddCart = (product) => {
+    if (autenticado) {
+      handleAddAuth(product);
+      enqueueSnackbar("Producto agregado al carrito 💗", {
+        variant: "success",
+      });
+    } else {
+      handleAddGuest(product);
+      enqueueSnackbar("Producto guardado para después 💗", {
+        variant: "info",
+      });
+    }
+  };
+
+  // Decrement / Increment handlers (works for both guest and auth)
+  const handleDecrease = () => {
+    if (!itemInCart) return;
+
+    const newQty = itemInCart.quantity - 1;
+
+    if (autenticado) {
+      if (newQty < 1) {
+        deleteItemCart(itemInCart.product_id);
+        enqueueSnackbar("Producto eliminado del carrito", {
+          variant: "warning",
+        });
+      } else {
+        updateItemCart({
+          cart_id: itemInCart.id,
+          product_id: product.id,
+          quantity: newQty,
+        });
+        enqueueSnackbar("Cantidad actualizada", { variant: "info" });
+      }
+    } else {
+      if (newQty < 1) {
+        deleteItemGuest(itemInCart.product.product_id);
+        enqueueSnackbar("Producto eliminado del carrito", {
+          variant: "warning",
+        });
+      } else {
+        updateItemGuest(itemInCart.product.product_id, newQty);
+        enqueueSnackbar("Cantidad actualizada", { variant: "info" });
+      }
+    }
+  };
+
+  const handleIncrease = (item, product) => {
+    if (!itemInCart) {
+      handleClickAddCart(product);
+      enqueueSnackbar("Producto agregado al carrito", { variant: "success" });
+      return;
+    }
+
+    const newQty = itemInCart.quantity + 1;
+
+    if (autenticado) {
+      updateItemCart({
+        cart_id: item.id,
+        product_id: product.id,
+        quantity: newQty,
+      });
+      enqueueSnackbar("Cantidad Actualizada", { variant: "success" });
+    } else {
+      updateItemGuest(product.id, newQty);
+      enqueueSnackbar("Cantidad Actualizada", { variant: "success" });
+    }
+  };
   return (
     <Layout>
       {product ? (
@@ -89,18 +164,17 @@ const ProductDetailPage = () => {
                   borderRadius: "24px",
                   overflow: "hidden",
                   boxShadow: "0 10px 40px rgba(0,0,0,0.12)",
-                  background:
-                    "linear-gradient(135deg, rgba(255,200,220,0.5), rgba(255,240,245,0.8))",
+                  background: "#D72E7A",
                   p: "6px",
                 }}
               >
                 <Box
                   component='img'
-                  src={product.image}
-                  alt={product.name}
+                  src={product.product.image}
+                  alt={product.product.name}
                   sx={{
                     width: "100%",
-                    height: "100%",
+                    height: "350px",
                     objectFit: "cover",
                     borderRadius: "20px",
                     transition: "transform .5s ease",
@@ -121,7 +195,7 @@ const ProductDetailPage = () => {
                   fontSize: { xs: "1.8rem", md: "2.4rem" },
                 }}
               >
-                {product.name}
+                {product.product.name}
               </Typography>
 
               <Typography
@@ -132,59 +206,10 @@ const ProductDetailPage = () => {
                   lineHeight: 1.6,
                 }}
               >
-                {product.description}
+                {product.product.description}
               </Typography>
 
               <Divider sx={{ my: 4 }} />
-
-              {/* 🔢 Control de cantidad mejorado */}
-              <Box display='flex' alignItems='center' gap={2} mb={4}>
-                <IconButton
-                  sx={{
-                    width: 42,
-                    height: 42,
-                    borderRadius: "12px",
-                    backdropFilter: "blur(8px)",
-                    border: "1px solid rgba(200,150,170,0.4)",
-                    background: "rgba(255,240,245,0.6)",
-                  }}
-                >
-                  <Remove />
-                </IconButton>
-
-                <TextField
-                  size='small'
-                  value={4}
-                  sx={{
-                    width: 60,
-                    "& .MuiOutlinedInput-root": {
-                      textAlign: "center",
-                      borderRadius: "12px",
-                    },
-                  }}
-                  inputProps={{
-                    style: {
-                      textAlign: "center",
-                      padding: "10px",
-                      fontWeight: 700,
-                    },
-                  }}
-                />
-
-                <IconButton
-                  sx={{
-                    width: 42,
-                    height: 42,
-                    borderRadius: "12px",
-                    backdropFilter: "blur(8px)",
-                    border: "1px solid rgba(200,150,170,0.4)",
-                    background: "rgba(255,240,245,0.6)",
-                  }}
-                >
-                  <Add />
-                </IconButton>
-              </Box>
-
               {/* 💸 Precio + botón */}
               <Box
                 display='flex'
@@ -201,32 +226,93 @@ const ProductDetailPage = () => {
                     fontSize: { xs: "2rem", md: "2.4rem" },
                   }}
                 >
-                  {formatMexicanCurrency(Number(product.price))}
+                  {formatMexicanCurrency(Number(product.product.price))}
                 </Typography>
               </Box>
-              <Box>
+              <Divider sx={{ my: 4 }} />
+
+              {/* 🔢 Control de cantidad mejorado */}
+              {itemInCart ? (
+                <Box width='30%'>
+                  <ButtonGroup
+                    fullWidth
+                    variant='outlined'
+                    sx={{
+                      borderRadius: "18px",
+                      padding: "5px",
+                      overflow: "hidden",
+                      borderColor: "#d82e7a",
+                      // bgcolor: "#FFE4EF", // Rosa pastel suave
+                      "& .MuiButton-root": {
+                        borderColor: "#d82e7a",
+                      },
+                    }}
+                  >
+                    <Button
+                      onClick={handleDecrease}
+                      sx={{
+                        minWidth: 48,
+                        color: "#d82e7a",
+                        fontWeight: 800,
+                        "&:hover": {
+                          bgcolor: "#FFD6E8", // hover mas notable
+                        },
+                      }}
+                      aria-label='disminuir cantidad'
+                    >
+                      -
+                    </Button>
+
+                    <Button
+                      disabled
+                      sx={{
+                        fontWeight: 800,
+                        color: "#d82e7a",
+                        bgcolor: "#FFF0F6",
+                        cursor: "default",
+                      }}
+                    >
+                      {itemInCart.quantity}
+                    </Button>
+
+                    <Button
+                      onClick={() =>
+                        handleIncrease(itemInCart, product.product)
+                      }
+                      sx={{
+                        minWidth: 48,
+                        color: "#d82e7a",
+                        fontWeight: 800,
+                        "&:hover": {
+                          bgcolor: "#FFD6E8",
+                        },
+                      }}
+                      aria-label='aumentar cantidad'
+                    >
+                      +
+                    </Button>
+                  </ButtonGroup>
+                </Box>
+              ) : (
                 <Button
+                  fullWidth
                   variant='contained'
-                  startIcon={<ShoppingCartIcon />}
+                  onClick={() => handleClickAddCart(product.product)}
                   sx={{
-                    background: "linear-gradient(90deg, #d72e7a, #e84f93)",
-                    color: "#fff",
-                    px: { xs: 3, md: 5 },
-                    py: 1.5,
-                    fontSize: "1rem",
-                    borderRadius: "40px",
-                    fontWeight: 700,
-                    boxShadow: "0 6px 20px rgba(215,46,122,0.4)",
+                    borderRadius: 2,
+                    py: 1.1,
                     textTransform: "none",
+                    fontWeight: 700,
+                    background: "#D72E7A",
+                    boxShadow: "0 8px 20px rgba(216,46,136,0.12)",
                     "&:hover": {
-                      background: "linear-gradient(90deg, #c5286f, #d03c82)",
-                      boxShadow: "0 8px 22px rgba(215,46,122,0.55)",
+                      boxShadow: "0 12px 30px rgba(216,46,136,0.18)",
                     },
                   }}
                 >
                   Agregar al carrito
                 </Button>
-              </Box>
+              )}
             </Grid>
           </Grid>
 
@@ -237,31 +323,30 @@ const ProductDetailPage = () => {
             />
           </Divider>
           {/* 🔹 Productos relacionados */}
-          <Box
+
+          <Grid
+            container
+            spacing={2}
             sx={{
-              px: { xs: 2, md: 8 },
-              pb: 10,
+              mt: 4,
+              maxWidth: "1200px",
               display: "flex",
               justifyContent: "center",
+              mb: 7,
             }}
           >
-            <Grid
-              container
-              spacing={2}
-              sx={{
-                mt: 4,
-                maxWidth: "1200px",
-                display: "flex",
-                justifyContent: "center",
-              }}
-            >
-              {relatedProducts.map((p) => (
+            {product && product.related.length === 0 ? (
+              <Typography>
+                No se encontraron productos relacionados con este producto
+              </Typography>
+            ) : (
+              product.related.map((p) => (
                 <Grid size={{ xs: 12, md: 6, lg: 4 }} key={p.id}>
                   <ProductCard product={p} />
                 </Grid>
-              ))}
-            </Grid>
-          </Box>
+              ))
+            )}
+          </Grid>
         </Box>
       ) : (
         <PinkSpinner />

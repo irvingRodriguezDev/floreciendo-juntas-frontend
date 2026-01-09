@@ -33,7 +33,7 @@ const BannerHome = () => {
         alignItems: "center",
         justifyContent: "center",
         minHeight: "80vh",
-        background: "linear-gradient(135deg, #F971AF 100%, #FFF 100%)",
+        background: "#f971af",
         padding: 4,
         position: "relative",
         overflow: "hidden",
@@ -244,7 +244,7 @@ const BannerHome = () => {
         sx={{
           position: "absolute",
           top: "50%",
-          left: "30%",
+          left: "40%",
           transform: "translate(-50%, -50%) rotate(15deg)",
           width: "350px",
           height: "350px",
@@ -319,7 +319,7 @@ const BannerHome = () => {
         }}
       >
         <Typography variant='body2' color='white' sx={{ mb: 1 }}>
-          Tu Camino al Éxito en Uñas
+          TU CAMINO AL ÉXITO
         </Typography>
 
         <Typography
@@ -333,9 +333,10 @@ const BannerHome = () => {
             fontSize: { xs: "2.5rem", sm: "3rem", md: "3.5rem" },
           }}
         >
-          Conviértete en una artista de uñas y adquiere <br />
+          LA COMUNIDAD #1 DE
+          <br />
           <span style={{ position: "relative", display: "inline-block" }}>
-            Nuevos conocimientos
+            EMPRENDEDORAS
             <Box
               component='span'
               sx={{
@@ -351,9 +352,10 @@ const BannerHome = () => {
               }}
             />
           </span>
-          <br />y{" "}
+          <br />
+          DE LA{" "}
           <span style={{ position: "relative", display: "inline-block" }}>
-            Habilidades
+            BELLEZA
             <Box
               component='span'
               sx={{
@@ -377,45 +379,11 @@ const BannerHome = () => {
           sx={{ mb: 4, maxWidth: 500, padding: 4 }}
           textAlign='justify'
         >
-          Somos la comunidad "Floreciendo Juntas", el impulso que necesitas para
-          transformar tu pasión en un negocio exitoso. ¡Únete a nosotras y haz
-          tus sueños realidad!
+          Aquí se fortalece el talento, las habilidades y el conocimiento. Se
+          amplia la visión y se aprende a construir un negocio real. Porque
+          <b> Florecer</b> no es casualidad es preparación. Y <b>juntas</b>, es
+          más poderoso
         </Typography>
-
-        {/* <Stack
-          direction={{ xs: "column", md: "row" }}
-          spacing={2}
-          justifyContent={{ xs: "center", md: "flex-start" }}
-        >
-          <Chip
-            variant='contained'
-            sx={{
-              backgroundColor: "#F971AF",
-              color: "#fff",
-              "&:hover": { backgroundColor: "#F971AF" },
-              fontWeight: "bold",
-              padding: "20px 25px",
-              borderRadius: "12px",
-              fontSize: "20px",
-            }}
-            label='¡Quiero empezar a florecer!'
-          />
-        </Stack> */}
-
-        <Box
-          component='img'
-          src={firmacaro}
-          alt='caro'
-          sx={{
-            width: "100%",
-            maxWidth: { xs: 300, sm: 400, md: 500 },
-            height: "auto",
-            borderRadius: "50%",
-            objectFit: "cover",
-            position: "relative",
-            zIndex: 1,
-          }}
-        />
       </Box>
 
       {/* ---- CONTENIDO DERECHO ---- */}
@@ -448,7 +416,7 @@ const BannerHome = () => {
           <VideoModal buttonText='Ver nuestro video' videoUrl={videoSource} />
         </Box>
         {/* Floating Card */}
-        <Box
+        {/* <Box
           sx={{
             position: "absolute",
             top: { xs: "-60px", md: "10px" },
@@ -475,7 +443,7 @@ const BannerHome = () => {
               Mujeres Empoderadas
             </Typography>
           </Box>
-        </Box>
+        </Box> */}
       </Box>
     </Box>
   );

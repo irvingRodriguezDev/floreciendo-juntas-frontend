@@ -196,7 +196,7 @@ const CartState = ({ children }) => {
   const syncGuestToServer = async () => {
     const guest = readGuestCart();
     if (!guest || guest.length === 0) return null;
-
+    if (guest.total === 0) return;
     try {
       // POST /cart/sync -> body { items: [...] }
       const res = await MethodPost("/cart/sync", { items: guest });

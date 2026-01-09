@@ -23,61 +23,60 @@ const Secrets = () => {
   const secretos = [
     {
       num: 1,
-      title: "Técnicas Básicas",
-      description:
-        "La excelencia comienza con la maestría en la preparación de la uña y el limado. Son los cimientos de todo arte.",
+      title: "Capacitación Constante",
+      description: "",
     },
     {
       num: 2,
-      title: "Inversión en Calidad",
+      title: "Marca Personal",
       description:
         "Herramientas e insumos premium garantizan un acabado superior, durabilidad y elevan la percepción de valor de tu servicio.",
     },
     {
       num: 3,
-      title: "Higiene Impecable",
+      title: "Marketing Digital",
       description:
         "La esterilización y la sanidad son innegociables. Transmiten profesionalismo y generan total confianza en la clienta.",
     },
     {
       num: 4,
-      title: "Comunicación Efectiva",
+      title: "Diferenciación",
       description:
         "Aprender a escuchar y a traducir los deseos de tu clienta en arte es la clave para la satisfacción y las recomendaciones.",
     },
     {
       num: 5,
-      title: "Esmaltado Perfecto",
+      title: "Atención al cliente",
       description:
         "Dominar la aplicación fina, uniforme y el curado preciso previene levantamientos y asegura un brillo duradero.",
     },
     {
       num: 6,
-      title: "Creatividad Actualizada",
+      title: "Incremento de Ticket",
       description:
         "Mantente siempre al día con las tendencias de nail art, colores y técnicas emergentes para ofrecer servicios innovadores.",
     },
     {
       num: 7,
-      title: "Gestión de Tiempo",
+      title: "Fidelización",
       description:
         "La eficiencia en la duración de la cita es vital para la rentabilidad sin comprometer la calidad. Sé rápida y precisa.",
     },
     {
       num: 8,
-      title: "Fidelidad del Cliente",
+      title: "Finanzas",
       description:
         "Ofrece una experiencia completa y personalizada; la relación es tan importante como el resultado final en la uña.",
     },
     {
       num: 9,
-      title: "Educación Continua",
+      title: "Administración",
       description:
         "Nunca dejes de capacitarte. La inversión en conocimiento es lo que te diferencia de la competencia.",
     },
     {
       num: 10,
-      title: "Bienestar Personal",
+      title: "Autorrealización y Crecimiento",
       description:
         "Cuida tu postura y salud. Un profesional saludable es un profesional que puede dedicarse a su carrera a largo plazo.",
     },

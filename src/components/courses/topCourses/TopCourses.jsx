@@ -24,7 +24,7 @@ const TopCourses = () => {
         py: { xs: 6, md: 8 },
         px: { xs: 2, md: 4 },
         background: `
-      linear-gradient(180deg, #fff 0%, #FFDFEF 100%),
+linear-gradient(181deg,rgba(255, 223, 239, 1) 0%, rgba(255, 255, 255, 1) 100%);
       radial-gradient(circle at top left, rgba(255,200,220,0.25), transparent 60%)
     `,
         borderRadius: "24px",
@@ -37,59 +37,86 @@ const TopCourses = () => {
         transition={{ duration: 0.8 }}
         style={{ textAlign: "center", marginBottom: "70px" }}
       >
-        <Typography
-          variant='overline'
-          sx={{
-            color: theme.palette.text.secondary,
-            letterSpacing: "3px",
-            fontWeight: 600,
-            textTransform: "uppercase",
-            mb: 1,
-            fontSize: { xs: "15px", md: "18px" },
-          }}
+        {/* KICKER / OVERLINE */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
         >
-          Lo más visto en nuestra academia
-        </Typography>
-
-        <Typography
-          variant='h2'
-          sx={{
-            fontWeight: 800,
-            lineHeight: 1.1,
-            fontSize: { xs: "2.6rem", sm: "3.3rem", md: "4.2rem" },
-            maxWidth: "900px",
-            margin: "0 auto",
-            position: "relative",
-          }}
-        >
-          Nuestros{" "}
-          <Box
-            component={motion.span}
-            initial={{ "--w": "0%" }}
-            whileInView={{ "--w": "100%" }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8, ease: "easeOut" }}
+          <Typography
+            variant='overline'
             sx={{
-              position: "relative",
-              display: "inline-block",
-              "&::after": {
-                content: '""',
-                position: "absolute",
-                bottom: 4,
-                left: 0,
-                width: "var(--w)",
-                height: "10px",
-                background: "#e36f9e",
-                opacity: 0.7,
-                borderRadius: "6px",
-                transition: "width 0.6s ease",
-                zIndex: -1,
-              },
+              color: theme.palette.text.secondary,
+              letterSpacing: "3px",
+              fontWeight: 600,
+              textTransform: "uppercase",
+              mb: 1,
+              fontSize: { xs: "15px", md: "18px" },
             }}
           >
-            Cursos Top
-          </Box>{" "}
-        </Typography>
+            {/* Los favoritos de nuestra comunidad */}
+          </Typography>
+        </motion.div>
+
+        {/* TÍTULO */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8, delay: 0.2 }}
+        >
+          <Typography
+            variant='h3'
+            sx={{
+              fontWeight: 700,
+              lineHeight: 1.2,
+              textAlign: "center",
+              color: "#E53888",
+              fontSize: { xs: "2rem", sm: "2.5rem", md: "3.5rem" },
+            }}
+          >
+            {""}
+            <Box component='span' sx={{ position: "relative" }}>
+              En Tendencia
+              <Box
+                component='span'
+                sx={{
+                  position: "absolute",
+                  left: 0,
+                  bottom: 0,
+                  width: "100%",
+                  height: "8px",
+                  backgroundColor: "#FFF",
+                  opacity: 0.7,
+                  borderRadius: "4px",
+                  zIndex: -1,
+                }}
+              />
+            </Box>{" "}
+          </Typography>
+        </motion.div>
+
+        {/* SUBTÍTULO */}
+        {/* <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, delay: 0.4 }}
+        >
+          <Typography
+            sx={{
+              mt: 2,
+              maxWidth: 720,
+              mx: "auto",
+              fontSize: { xs: "1rem", md: "1.1rem" },
+              color: "text.secondary",
+            }}
+          >
+            Cursos que han acompañado a cientos de mujeres en su crecimiento
+            personal y profesional dentro de nuestra academia.
+          </Typography>
+        </motion.div> */}
       </motion.div>
 
       <Grid
@@ -100,7 +127,11 @@ const TopCourses = () => {
         }}
       >
         {topCourses.map((course, index) => (
-          <Grid size={{ xs: 12, sm: 6, md: 4, lg: 3, xl: 3 }} key={index}>
+          <Grid
+            size={{ xs: 12, sm: 6, md: 4, lg: 3, xl: 3 }}
+            key={index}
+            sx={{ marginTop: -10 }}
+          >
             <Link
               to={`/detalle-curso/${course.courseId}`}
               style={{ textDecoration: "none" }}

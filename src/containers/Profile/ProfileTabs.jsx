@@ -7,6 +7,7 @@ import UserTicketsTable from "./UserTicketsTable";
 import CertificatesSection from "./CertificatesSection";
 import DreamSalonSection from "./DreamSalonSection";
 import AddressSection from "./AddressSection";
+import OrdersShopifySection from "./OrdersShopifySection";
 
 // Paleta Floreciendo Juntas 🌸
 const colors = {
@@ -58,6 +59,7 @@ export default function ProfileTabs() {
           onChange={handleChange}
           variant='scrollable'
           scrollButtons='auto'
+          aria-label='scrollable auto tabs example'
           TabIndicatorProps={{
             style: { backgroundColor: "#d82e7a" },
           }}
@@ -79,9 +81,9 @@ export default function ProfileTabs() {
           <Tab label='Información' />
           <Tab label='Insignias' />
           <Tab label='Mis Tickets' />
-          <Tab label='Mis Salón' />
-          <Tab label='Certificados' />
+          <Tab label='Mi Salón' />
           <Tab label='Mis Direcciones' />
+          <Tab label='Mis pedidos(tienda)' />
         </Tabs>
       </Paper>
 
@@ -123,12 +125,12 @@ export default function ProfileTabs() {
 
           {value === 4 && (
             <motion.div key='t4' {...animation}>
-              <CertificatesSection />
+              <AddressSection />
             </motion.div>
           )}
           {value === 5 && (
             <motion.div key='t4' {...animation}>
-              <AddressSection />
+              <OrdersShopifySection />
             </motion.div>
           )}
         </AnimatePresence>

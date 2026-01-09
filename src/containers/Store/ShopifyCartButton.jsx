@@ -2,6 +2,7 @@ import { useContext } from "react";
 import { IconButton, Badge, CircularProgress } from "@mui/material";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import { ShopifyCartContext } from "../../context/ShopifyCart/ShopifyCartContext";
+import CartIcon from "../../components/icons/CartIcon";
 
 export default function ShopifyCartButton({ onClick }) {
   const { cart, loadingCart } = useContext(ShopifyCartContext);
@@ -15,7 +16,7 @@ export default function ShopifyCartButton({ onClick }) {
         {loadingCart ? (
           <CircularProgress size={20} color='inherit' />
         ) : (
-          <ShoppingCartIcon />
+          <CartIcon width={50} />
         )}
       </Badge>
     </IconButton>

@@ -168,7 +168,7 @@ const ProductCard = ({ product }) => {
         <Box sx={{ position: "relative", zIndex: 0 }}>
           <CardMedia
             component='img'
-            height={{ xs: "220px", md: "280px", lg: "350px" }}
+            height='200'
             image={product.image?.url || product.image || ""}
             alt={product.name}
             sx={{ objectFit: "cover" }}
@@ -191,17 +191,17 @@ const ProductCard = ({ product }) => {
               style={{ textDecoration: "none" }}
             >
               <Typography
-                variant='h6'
-                fontWeight={700}
+                variant='subtitle1'
+                fontWeight='bold'
                 color='#D82E7A'
                 sx={{ mb: 0.5 }}
               >
-                {product.name}
+                {shortenText(product.name || "", 35)}
               </Typography>
             </Link>
 
             <Typography variant='body2' color='text.secondary' sx={{ mb: 1 }}>
-              {shortenText(product.description || "", 70)}
+              {shortenText(product.description || "", 50)}
             </Typography>
 
             <Box display='flex' alignItems='center' sx={{ mb: 5 }}>
@@ -318,17 +318,18 @@ const ProductCard = ({ product }) => {
               )}
 
               {/* Detalle */}
-              <IconButton
-                onClick={() => handleClickOpen(product)}
-                sx={{
-                  bgcolor: "white",
-                  borderRadius: 2,
-                  boxShadow: "0 6px 16px rgba(0,0,0,0.06)",
-                }}
-                aria-label='ver detalle'
-              >
-                <ZoomOutMapIcon sx={{ color: "#D82E7A" }} />
-              </IconButton>
+              <Link to={`/detalle-producto/${product.id}`}>
+                <IconButton
+                  sx={{
+                    bgcolor: "white",
+                    borderRadius: 2,
+                    boxShadow: "0 6px 16px rgba(0,0,0,0.06)",
+                  }}
+                  aria-label='ver detalle'
+                >
+                  <ZoomOutMapIcon sx={{ color: "#D82E7A" }} />
+                </IconButton>
+              </Link>
             </Box>
           </CardContent>
         </Box>

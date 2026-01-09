@@ -83,7 +83,7 @@ export default function CartSidebar({ open, onClose }) {
             fontWeight={700}
             sx={{ color: "#E53888", textShadow: "0 1px 6px rgba(0,0,0,0.09)" }}
           >
-            Mi Carrito
+            El salón de mis sueños
           </Typography>
 
           <IconButton onClick={onClose} sx={{ color: "#E53888" }}>

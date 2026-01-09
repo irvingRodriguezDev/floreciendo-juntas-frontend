@@ -1,7 +1,6 @@
-import React from "react";
 import { Box, Typography } from "@mui/material";
 
-const ProductDetailBanner = ({ title }) => {
+const ProductDetailBanner = () => {
   const bannerSubtitle =
     "Da el siguiente paso para construir el salón de tus sueños ✨";
 

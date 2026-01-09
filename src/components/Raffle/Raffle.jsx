@@ -11,19 +11,21 @@ import AuthContext from "../../context/Auth/AuthContext";
 import { Link } from "react-router-dom";
 // Fondo elegante rosado pastel
 const fancyGradient = "linear-gradient(145deg, #FFE6EE 0%, #F8C0D8 100%)";
-
+import Marquee from "react-fast-marquee";
 export default function RifaSalonPro() {
   const { usuario, autenticado } = useContext(AuthContext);
   const isSuscribed = usuario ? usuario.isSuscribed : null;
+
   return (
     <Box
       sx={{
         width: "100%",
-        background: "linear-gradient(to top, #fff 0%, #F7BED3 100%)",
+        background:
+          "linear-gradient(181deg,rgba(255, 223, 239, 1) 0%, rgba(255, 255, 255, 1) 100%);",
         borderRadius: "24px",
         py: { xs: 6, md: 10 },
         px: { xs: 3, sm: 6, md: 10 },
-        boxShadow: "0px 8px 35px rgba(255, 115, 160, 0.25)",
+        // boxShadow: "0px 8px 35px rgba(255, 115, 160, 0.25)",
       }}
     >
       <Grid
@@ -34,20 +36,31 @@ export default function RifaSalonPro() {
         sx={{ maxWidth: "1300px", margin: "0 auto" }}
       >
         {/* Texto principal */}
-        <Grid size={{ xs: 12, md: 6 }}>
-          <Typography
-            variant='body2'
-            sx={{
-              fontWeight: 700,
-              mb: 1,
-              letterSpacing: 1.3,
-              color: "#B23A5A",
-              textAlign: { xs: "center", md: "left" },
-            }}
-          >
-            🎀 RIFA MENSUAL
-          </Typography>
+        <Marquee speed={200}>
+          <Grid size={12} sx={{ display: "flex", justifyContent: "center" }}>
+            <Typography
+              variant='h3'
+              component='h2'
+              sx={{
+                fontWeight: 700,
+                lineHeight: 1.2,
+                textAlign: "center",
+                fontSize: { xs: "2.5rem", sm: "3rem", md: "3.5rem" },
+              }}
+            >
+              🎁 GANA EL{" "}
+              <Box
+                component='span'
+                sx={{ position: "relative", display: "inline-block" }}
+              >
+                SALÓN DE TUS SUEÑOS 🎁
+                {/* <Underline color={lightYellow} /> */}
+              </Box>
+            </Typography>
+          </Grid>
+        </Marquee>
 
+        <Grid size={{ xs: 12, md: 6 }}>
           <Typography
             variant='h3'
             sx={{
@@ -58,7 +71,6 @@ export default function RifaSalonPro() {
               color: "#3A0028",
             }}
           >
-            ¡Gana el Salón de Tus Sueños!
             <Box component='span' sx={{ color: "#C21463" }}>
               {" "}
               Participa Todos Los Meses
@@ -197,7 +209,7 @@ export default function RifaSalonPro() {
                 ))}
               </Stack>
               {/* <SubscriptionForm userId={usuario ? usuario.id : null} /> */}
-              {autenticado && isSuscribed && (
+              {autenticado && isSuscribed === false ? (
                 <Link to='/subscripcion'>
                   <Button
                     variant='contained'
@@ -212,6 +224,23 @@ export default function RifaSalonPro() {
                     Subscribirme
                   </Button>
                 </Link>
+              ) : (
+                !autenticado && (
+                  <Link to='/iniciar-sesion'>
+                    <Button
+                      variant='contained'
+                      sx={{
+                        bgcolor: "#E33685",
+                        color: "white",
+                        borderRadius: "12px",
+                        m: 2,
+                      }}
+                      fullWidth
+                    >
+                      Inicia sesión para suscribirte
+                    </Button>
+                  </Link>
+                )
               )}
             </Paper>
           </motion.div>

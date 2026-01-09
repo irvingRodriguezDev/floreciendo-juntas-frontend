@@ -54,7 +54,10 @@ const SocialCards = () => {
         sx={{
           py: 5,
           px: 1,
-          background: "linear-gradient(180deg, #fff 0%, #fff5f7 100%)",
+          background: `
+linear-gradient(181deg,rgba(255, 223, 239, 1) 0%, rgba(255, 255, 255, 1) 100%);
+      radial-gradient(circle at top left, rgba(255,200,220,0.25), transparent 60%)
+    `,
           borderRadius: "16px",
         }}
       >

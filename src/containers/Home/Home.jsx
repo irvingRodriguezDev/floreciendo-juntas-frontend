@@ -10,34 +10,30 @@ import WhyChooseUsSection from "../../components/WhyChose/WhyChoseUsSection";
 import LatestEventsSection from "../../components/events/LatestEventsSections";
 import SocialLinks from "../../components/SocialLinks/SocialLinks";
 import RifaSalonSuenos from "../../components/Raffle/Raffle";
+import FullScreenVideo from "../../components/FullScreenVideo";
 const Home = () => {
   return (
     <Layout>
       <Grid container spacing={2} sx={{ mt: 10, padding: "25px" }}>
         <Grid size={12}>
           <BannerHome />
+          {/* <FullScreenVideo /> */}
         </Grid>
+        <Grid size={12}>{/* <About /> */}</Grid>
         <Grid size={12}>
-          <About />
-        </Grid>
-        <Grid size={12}>
-          <RifaSalonSuenos />
-        </Grid>
-        <Grid size={12}>
-          <Systems />
+          <TopCourses />
         </Grid>
         <Grid size={12}>
           <NewCourses />
         </Grid>
         <Grid size={12}>
-          <TopCourses />
+          <Systems />
         </Grid>
-        <Grid size={12}>
-          <WhyChooseUsSection />
-        </Grid>
+        <Grid size={12}>{/* <WhyChooseUsSection /> */}</Grid>
         <Grid size={12}>
           <LatestEventsSection />
         </Grid>
+        <Grid size={12}>{/* <RifaSalonSuenos /> */}</Grid>{" "}
         <Grid size={12}>
           <SocialLinks />
         </Grid>

@@ -26,6 +26,7 @@ import { formatMexicanCurrency } from "../../utils/FormatCurrency";
 import ShippingAddressModal from "./ShippingAddressModal";
 import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
 import LocalShippingIcon from "@mui/icons-material/LocalShipping";
+import PinkSpinner from "../Loading/PinkSpinner";
 const DetailOrders = () => {
   const { id } = useParams();
   const [order, setOrder] = useState(null);
@@ -58,7 +59,7 @@ const DetailOrders = () => {
     return (
       <Layout>
         <Box sx={{ display: "flex", justifyContent: "center", mt: 10 }}>
-          <CircularProgress color='secondary' />
+          <PinkSpinner label='Consultando información' />
         </Box>
       </Layout>
     );

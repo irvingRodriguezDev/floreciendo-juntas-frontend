@@ -62,7 +62,7 @@ const OrdersTable = ({ orders }) => {
           },
         }}
       >
-        <Table sx={{ minWidth: 800 }}>
+        <Table sx={{ minWidth: 800, overflowX: "auto" }}>
           <TableHead>
             <TableRow sx={{ bgcolor: "#FFF0F6" }}>
               {[
@@ -81,6 +81,7 @@ const OrdersTable = ({ orders }) => {
                     fontWeight: "bold",
                     color: "#D82F7A",
                     fontSize: "0.9rem",
+                    textAlign: "center",
                   }}
                 >
                   {header}
@@ -101,24 +102,48 @@ const OrdersTable = ({ orders }) => {
                   transition: "0.2s ease",
                 }}
               >
-                <TableCell sx={{ fontWeight: "bold", color: "#333" }}>
+                <TableCell
+                  sx={{
+                    fontWeight: "bold",
+                    color: "#333",
+                    textAlign: "center",
+                  }}
+                >
                   #{order.id}
                 </TableCell>
 
-                <TableCell>{formatCurrency(order.totalAmount)}</TableCell>
+                <TableCell sx={{ textAlign: "center" }}>
+                  {formatCurrency(order.totalAmount)}
+                </TableCell>
 
-                <TableCell sx={{ color: "success.main", fontWeight: 600 }}>
+                <TableCell
+                  sx={{
+                    color: "success.main",
+                    fontWeight: 600,
+                    textAlign: "center",
+                  }}
+                >
                   {formatCurrency(order.paidAmount)}
                 </TableCell>
 
-                <TableCell sx={{ color: "error.main", fontWeight: 600 }}>
+                <TableCell
+                  sx={{
+                    color: "error.main",
+                    fontWeight: 600,
+                    textAlign: "center",
+                  }}
+                >
                   {formatCurrency(order.remainingAmount)}
                 </TableCell>
 
-                <TableCell>{order.startDate}</TableCell>
-                <TableCell>{order.dueDate}</TableCell>
+                <TableCell sx={{ textAlign: "center" }}>
+                  {order.startDate}
+                </TableCell>
+                <TableCell sx={{ textAlign: "center" }}>
+                  {order.dueDate}
+                </TableCell>
 
-                <TableCell>
+                <TableCell sx={{ textAlign: "center" }}>
                   <Typography
                     sx={{
                       display: "inline-block",
@@ -184,7 +209,7 @@ const OrdersTable = ({ orders }) => {
                           },
                         }}
                       >
-                        Detalle compra
+                        Detalle
                       </Button>
                     </Link>
                     <Button
@@ -204,7 +229,7 @@ const OrdersTable = ({ orders }) => {
                         },
                       }}
                     >
-                      Edo. Cuenta
+                      Edo. Cta
                     </Button>
                   </Box>
                 </TableCell>

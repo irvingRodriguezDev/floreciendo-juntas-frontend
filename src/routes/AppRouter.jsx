@@ -32,6 +32,7 @@ import Lives from "../containers/Lives/Lives";
 import LiveDetail from "../containers/Lives/LiveDetail";
 import Store from "../containers/Store/Store";
 import Subscription from "../containers/Subscription/Subscription";
+import NewHome from "../containers/NewHome";
 function AppRouter() {
   const { autenticado, usuarioAutenticado, cargando } = useContext(AuthContext);
   useEffect(() => {
@@ -64,6 +65,7 @@ function AppRouter() {
     { path: "/detalle-producto/:id", element: <ProductDetailPage /> },
     { path: "/detalle-orden/:id", element: <DetailOrders /> },
     { path: "/checkout", element: <Checkout /> },
+    { path: "/new-home", element: <NewHome /> },
   ];
 
   // Rutas públicas solo para no autenticados
@@ -71,6 +73,7 @@ function AppRouter() {
     { path: "/iniciar-sesion", element: <Login /> },
     { path: "/registro", element: <Register /> },
     { path: "/recuperar-contraseña", element: <ForgotPassword /> },
+    { path: "/new-home", element: <NewHome /> },
   ];
 
   // Rutas privadas solo para autenticados

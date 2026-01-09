@@ -105,7 +105,7 @@ const SecretsBanner = () => {
                 px: 1,
               }}
             >
-              Manicurista Exitosa
+              para ser exitosa en tu negocio de belleza
               <Box
                 component='span'
                 sx={{

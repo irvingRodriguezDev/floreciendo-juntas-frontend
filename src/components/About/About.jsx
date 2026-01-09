@@ -70,6 +70,8 @@ const About = () => {
         py: { xs: 6, md: 10 },
         px: { xs: 3, sm: 6, md: 10 },
         backgroundColor: "#fff",
+        background:
+          "linear-gradient(181deg,rgba(255, 223, 239, 1) 0%, rgba(255, 255, 255, 1) 100%);",
         borderRadius: "20px",
       }}
     >

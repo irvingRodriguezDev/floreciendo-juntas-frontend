@@ -63,7 +63,10 @@ const LatestEventsSection = () => {
   return (
     <Box
       sx={{
-        backgroundColor: theme.palette.background.paper || "#ffffff",
+        background: `
+      linear-gradient(180deg, #fff 0%, #FFDFEF 100%),
+      radial-gradient(circle at top left, rgba(255,200,220,0.25), transparent 60%)
+    `,
         padding: theme.spacing(8, 4),
         borderRadius: "20px",
       }}
@@ -78,7 +81,7 @@ const LatestEventsSection = () => {
             textTransform: "uppercase",
           }}
         >
-          Nuestros Eventos
+          Próximos
         </Typography>
 
         <Typography
@@ -91,7 +94,6 @@ const LatestEventsSection = () => {
             fontSize: { xs: "2.5rem", sm: "3rem", md: "3.5rem" },
           }}
         >
-          Próximos{" "}
           <Box
             component='span'
             sx={{ position: "relative", display: "inline-block" }}

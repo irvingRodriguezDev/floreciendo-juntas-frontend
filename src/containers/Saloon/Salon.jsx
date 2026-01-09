@@ -124,7 +124,7 @@ const Salon = () => {
         </Grid>
         {products.map((p) => (
           <Grid
-            size={{ xs: 12, md: 6, lg: 4, xl: 3 }}
+            size={{ xs: 12, sm: 6, md: 4, lg: 4, xl: 3 }}
             sx={{ padding: { xs: "20px" } }}
             key={p.id}
           >

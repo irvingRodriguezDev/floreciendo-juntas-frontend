@@ -30,7 +30,10 @@ const Systems = () => {
   return (
     <Box
       sx={{
-        backgroundColor: "#F971AF",
+        background: `
+linear-gradient(181deg,rgba(255, 223, 239, 1) 0%, rgba(255, 255, 255, 1) 100%);
+      radial-gradient(circle at top left, rgba(255,200,220,0.25), transparent 60%)
+    `,
         p: { xs: 4, sm: 6, md: 8 },
         position: "relative",
         minHeight: "70vh",
@@ -235,7 +238,7 @@ const Systems = () => {
             fontWeight: 700,
             lineHeight: 1.2,
             textAlign: "center",
-            color: "white",
+            color: "#E53888",
             fontSize: { xs: "2rem", sm: "2.5rem", md: "3.5rem" },
           }}
         >
@@ -314,8 +317,8 @@ const Systems = () => {
                   >
                     <Box
                       sx={{
-                        width: 80,
-                        height: 80,
+                        width: 100,
+                        height: 100,
                         borderRadius: "50%",
                         backgroundColor: "#FCE4EC",
                         display: "flex",
@@ -330,8 +333,8 @@ const Systems = () => {
                         src={system.icon}
                         alt={system.name}
                         sx={{
-                          width: "60%",
-                          height: "60%",
+                          width: "80%",
+                          height: "80%",
                           objectFit: "contain",
                         }}
                       />
@@ -373,9 +376,9 @@ const Systems = () => {
             left: { xs: -5, sm: -50 },
             top: "50%",
             transform: "translateY(-50%)",
-            backgroundColor: "#F3BBCE",
+            backgroundColor: "#E53888",
             color: "white",
-            "&:hover": { backgroundColor: "#F3BBCE" },
+            "&:hover": { backgroundColor: "#E53888" },
             zIndex: 10,
             width: 44,
             height: 44,
@@ -392,9 +395,9 @@ const Systems = () => {
             right: { xs: -5, sm: -50 },
             top: "50%",
             transform: "translateY(-50%)",
-            backgroundColor: "#F3BBCE",
+            backgroundColor: "#E53888",
             color: "white",
-            "&:hover": { backgroundColor: "#F3BBCE" },
+            "&:hover": { backgroundColor: "#E53888" },
             zIndex: 10,
             width: 44,
             height: 44,

@@ -26,8 +26,10 @@ import CartSidebar from "./CartSidebar";
 import BadgeBox from "../ui/BadgeBox";
 import ShopifyCartButton from "../../containers/Store/ShopifyCartButton";
 import ShopifyCartDrawer from "../../containers/Store/ShopifyCartDrawer";
+import FornitureIcon from "../icons/FornitureIcon";
 /* Menu items (igual que antes) */
 const menuItems = [
+  { name: "Comunidad", path: "/cursos", auth: "both" },
   { name: "Cursos", path: "/cursos", auth: "both" },
   { name: "Salón", path: "/el-salon-de-tus-sueños", auth: "both" },
   { name: "Eventos", path: "/eventos", auth: "both" },
@@ -293,7 +295,9 @@ const Header = () => {
                 right='6px'
                 size='md'
               >
-                <CartButton onOpen={() => setOpenCart(true)} />
+                <IconButton onClick={() => setOpenCart(true)}>
+                  <FornitureIcon width={50} />
+                </IconButton>
               </BadgeBox>
               <ShopifyCartButton onClick={() => setOpenCartShopify(true)} />
               <ShopifyCartDrawer
@@ -435,19 +439,34 @@ const Header = () => {
                         Iniciar
                       </Button>
                     ) : (
-                      <Button
-                        component={Link}
-                        to='/mi-perfil'
-                        variant='contained'
-                        sx={{
-                          color: "#fff",
-                          backgroundColor: "#E53888",
-                          borderRadius: "10px",
-                          "&:hover": { backgroundColor: "#d82e7a" },
-                        }}
-                      >
-                        Mi Perfil
-                      </Button>
+                      <>
+                        <Button
+                          component={Link}
+                          to='/mi-perfil'
+                          variant='contained'
+                          sx={{
+                            color: "#fff",
+                            backgroundColor: "#E53888",
+                            borderRadius: "10px",
+                            "&:hover": { backgroundColor: "#d82e7a" },
+                          }}
+                        >
+                          Mi Perfil
+                        </Button>
+                        <Button
+                          component={Link}
+                          variant='outlined'
+                          sx={{
+                            color: "#fff",
+                            borderColor: "#E53888",
+                            color: "#E53888",
+                            borderRadius: "10px",
+                            "&:hover": { borderColor: "#d82e7a" },
+                          }}
+                        >
+                          Cerrar Sesión
+                        </Button>
+                      </>
                     )}
                   </Box>
                 </Box>

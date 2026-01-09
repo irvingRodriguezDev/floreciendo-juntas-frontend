@@ -36,12 +36,9 @@ const OrdersState = ({ children }) => {
         didOpen: () => Swal.showLoading(),
       });
 
-      console.log("➡ Creando orden...");
       const resOrder = await MethodPost("/orders/create", {
-        body: { AddressId: address },
+        deliveryAddressId: address,
       });
-
-      console.log("✔ Orden creada", resOrder);
 
       if (resOrder.status !== 200) throw new Error("Error al crear orden");
 

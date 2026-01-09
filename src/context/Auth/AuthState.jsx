@@ -7,7 +7,11 @@ import { initSocket } from "../../socket";
 import { SHOW_ERRORS_API, types } from "../../types";
 import Swal from "sweetalert2";
 import clienteAxios from "../../config/Axios";
-
+import {
+  CUSTOMER_LOGIN_MUTATION,
+  CUSTOMER_CREATE_MUTATION,
+} from "./grapql/auth";
+import { shopifyFetch } from "../../containers/Store/ShopifyClient";
 const AuthState = (props) => {
   const initialState = {
     token: localStorage.getItem("token"),
@@ -95,9 +99,42 @@ const AuthState = (props) => {
    */
   const iniciarSesion = async (datos) => {
     try {
+      // 1️⃣ Login en TU backend
       const res = await MethodPost("/auth/login", datos);
-      localStorage.setItem("token", res.data.token);
+      const token = res.data.token;
 
+      localStorage.setItem("token", token);
+      tokenAuth(token);
+
+      // 2️⃣ Login silencioso en Shopify
+      try {
+        const shopifyVariables = {
+          input: {
+            email: datos.email,
+            password: datos.password,
+          },
+        };
+
+        const shopifyResponse = await shopifyFetch(
+          CUSTOMER_LOGIN_MUTATION,
+          shopifyVariables
+        );
+
+        const authData = shopifyResponse?.data?.customerAccessTokenCreate;
+
+        if (authData?.customerAccessToken) {
+          localStorage.setItem(
+            "customerAccessToken",
+            authData.customerAccessToken.accessToken
+          );
+        } else if (authData?.customerUserErrors?.length) {
+          console.warn("Shopify:", authData.customerUserErrors[0].message);
+        }
+      } catch (err) {
+        console.error("Shopify login failed:", err);
+      }
+
+      // 3️⃣ Estado global
       dispatch({
         type: types.LOGIN_EXITOSO,
         payload: res.data,
@@ -108,12 +145,9 @@ const AuthState = (props) => {
     } catch (error) {
       Swal.fire({
         title: "Error",
+        text: error.response?.data?.msg || "Credenciales incorrectas",
         icon: "error",
-        timer: 2000,
-        showConfirmButton: false,
-        text: error.response?.data?.msg || "Error al iniciar sesión",
       });
-      dispatch({ type: SHOW_ERRORS_API });
       return false;
     }
   };
@@ -123,31 +157,60 @@ const AuthState = (props) => {
    */
   const registerUser = async (data) => {
     try {
+      // 1️⃣ Registro en TU backend
       const res = await MethodPost("/auth/register", data);
       const token = res.data.token;
+
       localStorage.setItem("token", token);
       tokenAuth(token);
 
+      // 2️⃣ Registro en Shopify (sin login)
+      try {
+        const shopifyVariables = {
+          input: {
+            firstName: data.name || "",
+            lastName: data.username || "",
+            email: data.email,
+            password: data.password,
+            acceptsMarketing: false,
+          },
+        };
+
+        const shopifyResponse = await shopifyFetch(
+          CUSTOMER_CREATE_MUTATION,
+          shopifyVariables
+        );
+
+        const createData = shopifyResponse?.data?.customerCreate;
+
+        if (createData?.customer) {
+          console.log("✅ Usuario creado en Shopify");
+        } else if (createData?.customerUserErrors?.length) {
+          console.warn("Shopify:", createData.customerUserErrors[0].message);
+        }
+      } catch (err) {
+        console.error("Shopify register failed:", err);
+      }
+
+      // 3️⃣ Estado global
       dispatch({
         type: types.REGISTRO_EXITOSO,
         payload: res.data,
       });
 
+      await usuarioAutenticado();
+
       Swal.fire({
-        title: "Registrado",
-        text: res.data.msg,
+        title: "¡Bienvenid@!",
         icon: "success",
         timer: 2000,
         showConfirmButton: false,
       });
-
-      await usuarioAutenticado();
     } catch (error) {
       Swal.fire({
         title: "Error",
         text: error.response?.data?.error || "Error al registrar",
         icon: "error",
-        showConfirmButton: false,
       });
     }
   };
@@ -258,6 +321,7 @@ const AuthState = (props) => {
   const cerrarSesion = (navigate) => {
     localStorage.removeItem("user_id");
     localStorage.removeItem("token");
+    localStorage.removeItem("customerAccessToken");
     dispatch({ type: types.CERRAR_SESION });
     navigate("/", { replace: true });
   };
@@ -285,6 +349,21 @@ const AuthState = (props) => {
       });
     }
   };
+  const logoutGlobal = () => {
+    localStorage.clear();
+    dispatch({ type: types.CERRAR_SESION });
+
+    Swal.fire({
+      title: "Sesión expirada",
+      text: "Inicia sesión nuevamente para continuar 🌷",
+      icon: "info",
+      timer: 2500,
+      showConfirmButton: false,
+      allowOutsideClick: false,
+    });
+
+    navigate("/iniciar-sesion");
+  };
 
   return (
     <AuthContext.Provider
@@ -309,6 +388,7 @@ const AuthState = (props) => {
         ChangePhoto,
         resetPassword,
         UpdateUser,
+        logoutGlobal,
       }}
     >
       {props.children}

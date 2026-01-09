@@ -64,7 +64,7 @@ export default function Checkout() {
       <Grid
         sx={{
           width: "100%",
-          backgroundColor: "#fde7ef",
+          // backgroundColor: "#fde7ef",
           pt: { xs: 12, md: 4, lg: 12 },
           pl: { xs: 2, md: 3, lg: 12 },
           pr: { xs: 2, md: 3, lg: 12 },

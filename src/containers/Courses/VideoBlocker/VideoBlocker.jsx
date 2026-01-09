@@ -28,11 +28,11 @@ const VideoBlocker = ({ userId, title }) => {
         variant='h5'
         sx={{ fontWeight: 600, color: PRIMARY_PINK, mb: 1, mt: -2 }}
       >
-        Desbloquea "{title}"
+        Unete a Floreciendo Juntas
       </Typography>
       <Typography variant='body1' color='text.secondary' mb={3}>
-        Este contenido es exclusivo. Suscríbete para acceder a este curso y todo
-        el catálogo.
+        Este contenido es exclusivo. Suscríbete para acceder a este curso y toda
+        la comunidad.
       </Typography>
 
       {/* ⚠️ NOTA: El SubscriptionForm ya incluye la lógica de Stripe */}

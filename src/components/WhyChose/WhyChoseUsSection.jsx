@@ -110,6 +110,8 @@ const WhyChooseUsSection = () => {
       <Box
         sx={{
           backgroundColor: theme.palette.background.paper,
+          background:
+            "linear-gradient(181deg,rgba(255, 223, 239, 1) 0%, rgba(255, 255, 255, 1) 100%);",
           padding: theme.spacing(8, 4),
           overflow: "hidden",
           position: "relative",
