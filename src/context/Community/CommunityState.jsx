@@ -89,7 +89,15 @@ const CommunityState = ({ children }) => {
           },
         });
       })
-      .catch(console.error);
+      .catch((error) => {
+        Swal.fire({
+          title: "Cuidado",
+          text: `Ocurrio un error, al obtener las publicaciones ${error.response.data.message}`,
+          icon: "error",
+          showConfirmButton: false,
+          timer: 3500,
+        });
+      });
   };
 
   // 📝 POST
@@ -97,7 +105,9 @@ const CommunityState = ({ children }) => {
     Swal.fire({
       title: "Publicando...",
       allowOutsideClick: false,
-      didOpen: Swal.showLoading,
+      didOpen: () => {
+        Swal.showLoading();
+      },
     });
 
     try {
