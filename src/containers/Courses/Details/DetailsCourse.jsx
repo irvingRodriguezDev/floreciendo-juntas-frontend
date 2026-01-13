@@ -39,23 +39,6 @@ const CourseDetailScreen = () => {
 
   const tabsData = [
     {
-      label: "Descripción del curso",
-      content: (
-        <Box>
-          <Typography
-            variant='body1'
-            color='text.secondary'
-            textAlign='justify'
-            sx={{ mb: 3, lineHeight: 1.8 }}
-            component='div'
-            dangerouslySetInnerHTML={{
-              __html: course ? course.description : "",
-            }}
-          />
-        </Box>
-      ),
-    },
-    {
       label: "Preguntas y comentarios",
       content: (
         <Box sx={{ position: "relative", zIndex: 1, mt: 2 }}>
@@ -74,13 +57,46 @@ const CourseDetailScreen = () => {
         </Box>
       ),
     },
+    {
+      label: "Descripción del curso",
+      content: (
+        <Box
+          sx={{
+            backgroundColor: "#FFF7FA",
+            borderRadius: "18px",
+            p: { xs: 2.5, md: 3 },
+            mb: 4,
+          }}
+        >
+          <Typography
+            component='div'
+            textAlign={{ xs: "left", md: "justify" }}
+            sx={{
+              fontSize: { xs: "0.95rem", md: "1.05rem" },
+              lineHeight: 1.9,
+              color: "#6B6B6B",
+              "& p": {
+                mb: 2,
+              },
+              "& strong": {
+                color: "#E53888",
+                fontWeight: 600,
+              },
+            }}
+            dangerouslySetInnerHTML={{
+              __html: course ? course.description : "",
+            }}
+          />
+        </Box>
+      ),
+    },
   ];
 
   return (
     <Layout>
       {course ? (
         <Box sx={{ bgcolor: "#fafafa", minHeight: "100vh" }}>
-          <CourseTitle title={course.title} />
+          {/* <CourseTitle title={course.title} /> */}
 
           {/* Contenido principal */}
           <Grid
@@ -122,6 +138,7 @@ const CourseDetailScreen = () => {
                         courseId={id}
                         userId={userId}
                         usuario={usuario}
+                        title={course.title}
                       />
                     ) : (
                       <VideoBlocker userId={userId} title={course.title} />

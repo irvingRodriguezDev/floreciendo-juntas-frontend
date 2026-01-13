@@ -1,6 +1,6 @@
 import { useContext, useEffect } from "react";
 import "./TopCourses.css";
-import { Box, Grid, Typography, useTheme } from "@mui/material";
+import { Box, CardMedia, Grid, Typography, useTheme } from "@mui/material";
 import { motion } from "framer-motion";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay } from "swiper/modules";
@@ -96,27 +96,6 @@ linear-gradient(181deg,rgba(255, 223, 239, 1) 0%, rgba(255, 255, 255, 1) 100%);
             </Box>{" "}
           </Typography>
         </motion.div>
-
-        {/* SUBTÍTULO */}
-        {/* <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6, delay: 0.4 }}
-        >
-          <Typography
-            sx={{
-              mt: 2,
-              maxWidth: 720,
-              mx: "auto",
-              fontSize: { xs: "1rem", md: "1.1rem" },
-              color: "text.secondary",
-            }}
-          >
-            Cursos que han acompañado a cientos de mujeres en su crecimiento
-            personal y profesional dentro de nuestra academia.
-          </Typography>
-        </motion.div> */}
       </motion.div>
 
       <Grid
@@ -190,14 +169,22 @@ linear-gradient(181deg,rgba(255, 223, 239, 1) 0%, rgba(255, 255, 255, 1) 100%);
                       justifyItems: "center",
                     }}
                   >
-                    <img
-                      src={course.cover_image_url}
+                    <CardMedia
+                      component='img'
+                      image={course.cover_image_url}
                       alt={course.title}
-                      style={{
+                      sx={{
                         width: "100%",
-                        height: "100%",
+                        aspectRatio: {
+                          xs: "5 / 4",
+                          sm: "4 / 3",
+                          md: "3 / 2",
+                          lg: "1 / 1",
+                        },
                         objectFit: "cover",
-                        borderRadius: "16px",
+                        borderRadius: { xs: "16px", lg: "12px" },
+                        backgroundColor: "#f5f5f5",
+                        filter: "saturate(0.95)",
                       }}
                     />
                   </Grid>

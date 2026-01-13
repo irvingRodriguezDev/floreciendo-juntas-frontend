@@ -1,140 +1,125 @@
 import React from "react";
 import { Box, Typography, Stack, useTheme } from "@mui/material";
 
-// Puedes pasar el título y el breadcrumb como props
 const CourseTitle = ({
   title = "Nombre del Curso Aquí",
-  //   breadcrumb = "Inicio / Cursos",
+  // subtitle = "Un espacio para crecer, aprender y florecer juntas",
 }) => {
   const theme = useTheme();
 
-  // Colores de los adornos para mantener la consistencia
-  const accentGreen = "#E53888"; // Verde vibrante
-  const accentYellow = "#E53888"; // Amarillo vibrante
-  const accentPurple = "#E53888"; // Morado oscuro
-  const softBgColor = "#FFF0F0"; // Fondo crema pálido
+  // Paleta Floreciendo Juntas
+  const primaryPink = "#E53888";
+  const softPink = "#FFF1F7";
+  const lavender = "#C8B6E2";
+  const warmYellow = "#FFD6A5";
 
   return (
     <Box
       sx={{
-        backgroundColor: softBgColor, // Fondo de color suave
-        padding: theme.spacing(20, 4), // Padding generoso
-        position: "relative", // Para posicionar los adornos
+        position: "relative",
         overflow: "hidden",
-        minHeight: { xs: "250px", sm: "200px" }, // Altura mínima para que los adornos se vean bien
+        borderRadius: { xs: "16px", md: "24px" },
+        mt: { xs: 2, md: 3 },
+
+        /* Mobile First */
+        px: { xs: 2.5, sm: 4, md: 6 },
+        py: { xs: 6, sm: 7, md: 9 },
+
+        minHeight: { xs: "200px", sm: "220px", md: "260px" },
+
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        textAlign: "center", // Centrar todo el contenido
-        mt: 2,
-        borderRadius: "18px",
+        textAlign: "center",
+
+        background: `
+          linear-gradient(
+            135deg,
+            ${softPink} 0%,
+            #FFFFFF 55%,
+            ${softPink} 100%
+          )
+        `,
       }}
     >
-      {/* --- Adornos de Fondo --- */}
-
-      {/* Adorno de ondas verde/agua (similar al de la imagen) */}
+      {/* 🌸 Decoración orgánica izquierda */}
       <Box
         sx={{
           position: "absolute",
-          top: "10%",
-          left: "5%",
+          top: "-40px",
+          left: "-40px",
+          width: "160px",
+          height: "160px",
+          borderRadius: "50%",
+          background: `radial-gradient(circle, ${lavender} 0%, transparent 70%)`,
+          opacity: 0.35,
+          display: { xs: "none", sm: "block" },
+        }}
+      />
+
+      {/* 🌼 Decoración orgánica derecha */}
+      <Box
+        sx={{
+          position: "absolute",
+          bottom: "-50px",
+          right: "-50px",
+          width: "200px",
+          height: "200px",
+          borderRadius: "50%",
+          background: `radial-gradient(circle, ${warmYellow} 0%, transparent 70%)`,
+          opacity: 0.35,
+          display: { xs: "none", sm: "block" },
+        }}
+      />
+
+      {/* 🌿 Líneas suaves (detalle femenino) */}
+      <Box
+        sx={{
+          position: "absolute",
+          top: "18%",
+          right: "12%",
           width: "60px",
           height: "30px",
-          borderTop: `4px double ${accentGreen}`,
-          borderBottom: `4px double ${accentGreen}`,
-          transform: "rotate(15deg)",
-          opacity: 0.7,
+          borderTop: `3px solid ${primaryPink}`,
+          borderBottom: `3px solid ${primaryPink}`,
+          borderRadius: "20px",
+          opacity: 0.35,
+          transform: "rotate(-12deg)",
           display: { xs: "none", md: "block" },
-          zIndex: 0,
         }}
       />
 
-      {/* Adorno de puntos/círculos amarillo (similar al de la imagen) */}
-      <Box
-        sx={{
-          position: "absolute",
-          bottom: "15%",
-          left: "8%",
-          width: "70px",
-          height: "70px",
-          backgroundImage: `radial-gradient(circle, ${accentYellow} 20%, transparent 20%)`,
-          backgroundSize: "12px 12px",
-          opacity: 0.6,
-          transform: "rotate(-25deg)",
-          display: { xs: "none", md: "block" },
-          zIndex: 0,
-        }}
-      />
-
-      {/* Adorno de líneas/figura abstracta morada (similar al de la imagen) */}
-      <Box
-        sx={{
-          position: "absolute",
-          top: "20%",
-          right: "5%",
-          width: "50px",
-          height: "50px",
-          borderRight: `5px double ${accentPurple}`,
-          borderLeft: `5px double ${accentPurple}`,
-          transform: "rotate(45deg)",
-          opacity: 0.5,
-          borderRadius: "5px",
-          display: { xs: "none", md: "block" },
-          zIndex: 0,
-        }}
-      />
-
-      {/* Adorno de círculos entrelazados (similar al de la imagen, esquina superior derecha) */}
-      <Box
-        sx={{
-          position: "absolute",
-          top: "5%",
-          right: "2%",
-          width: "80px",
-          height: "80px",
-          borderRadius: "50%",
-          border: `5px solid ${accentPurple}`,
-          opacity: 0.3,
-          display: { xs: "none", md: "block" },
-          zIndex: 0,
-          "&::before": {
-            content: '""',
-            position: "absolute",
-            width: "calc(100% - 10px)",
-            height: "calc(100% - 10px)",
-            borderRadius: "50%",
-            border: `5px solid ${accentPurple}`,
-            top: "5px",
-            left: "5px",
-            opacity: 0.5,
-          },
-        }}
-      />
-      {/* --- Fin Adornos --- */}
-
-      {/* --- Contenido Central (Título y Breadcrumb) --- */}
-      <Stack
-        alignItems='center'
-        spacing={1}
-        sx={{ maxWidth: "800px", zIndex: 1 }}
-      >
+      {/* 🌸 Contenido */}
+      <Stack spacing={1.5} sx={{ zIndex: 1, maxWidth: "760px" }}>
         <Typography
-          variant='h3' // h3 para un título grande y principal
           component='h1'
           sx={{
-            fontWeight: 700,
-            color: theme.palette.text.primary, // Color de texto oscuro
-            lineHeight: 1.2,
-            fontSize: { xs: "2.5rem", sm: "3rem", md: "4rem" }, // Responsivo
-            mb: 1,
+            fontWeight: 800,
+            lineHeight: 1.15,
+            color: theme.palette.text.primary,
+
+            fontSize: {
+              xs: "1.9rem",
+              sm: "2.4rem",
+              md: "3.2rem",
+            },
           }}
         >
           {title}
         </Typography>
 
-        {/* <Typography variant='body2' color='text.secondary'>
-          {breadcrumb}
-        </Typography> */}
+        <Typography
+          sx={{
+            color: theme.palette.text.secondary,
+            fontSize: {
+              xs: "0.95rem",
+              sm: "1.05rem",
+              md: "1.15rem",
+            },
+          }}
+        >
+          {/* {subtitle} */}
+        </Typography>
       </Stack>
     </Box>
   );

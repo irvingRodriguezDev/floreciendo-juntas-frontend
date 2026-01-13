@@ -152,27 +152,6 @@ const NewCourses = () => {
               </Box>{" "}
             </Typography>
           </motion.div>
-
-          {/* SUBTÍTULO */}
-          {/* <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6, delay: 0.4 }}
-        >
-          <Typography
-            sx={{
-              mt: 2,
-              maxWidth: 720,
-              mx: "auto",
-              fontSize: { xs: "1rem", md: "1.1rem" },
-              color: "text.secondary",
-            }}
-          >
-            Cursos que han acompañado a cientos de mujeres en su crecimiento
-            personal y profesional dentro de nuestra academia.
-          </Typography>
-        </motion.div> */}
         </motion.div>
 
         {/* SUBTÍTULO */}
@@ -305,12 +284,19 @@ const NewCourses = () => {
                     <CardMedia
                       component='img'
                       image={c.cover_image_url}
-                      alt={c.name}
+                      alt={c.title}
                       sx={{
                         width: "100%",
-                        height: "100%",
-
-                        objectFit: "contain",
+                        aspectRatio: {
+                          xs: "5 / 4",
+                          sm: "4 / 3",
+                          md: "3 / 2",
+                          lg: "1 / 1",
+                        },
+                        objectFit: "cover",
+                        borderRadius: { xs: "16px", lg: "12px" },
+                        backgroundColor: "#f5f5f5",
+                        filter: "saturate(0.95)",
                       }}
                     />
 

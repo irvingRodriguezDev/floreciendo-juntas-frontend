@@ -10,16 +10,17 @@ const EventsBanner = () => {
       animate={{ opacity: 1 }}
       transition={{ duration: 0.8 }}
       sx={{
-        minHeight: "60vh",
+        minHeight: {
+          xs: "28vh",
+          sm: "34vh",
+          md: "38vh",
+        },
         display: "flex",
         alignItems: "center",
         position: "relative",
         overflow: "hidden",
-        px: { xs: 2, sm: 4 },
         background: `
-          radial-gradient(circle at top left, #FFE3EC 0%, transparent 40%),
-          radial-gradient(circle at bottom right, #FFD6E6 0%, transparent 45%),
-          linear-gradient(180deg, #FFF5F7 0%, #FFFFFF 100%)
+#FFF4FA
         `,
       }}
     >

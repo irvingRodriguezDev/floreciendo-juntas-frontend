@@ -1,4 +1,3 @@
-import React from "react";
 import {
   Card,
   CardContent,
@@ -7,13 +6,11 @@ import {
   Stack,
   Button,
   keyframes,
-  useMediaQuery,
-  useTheme,
+  CardMedia,
 } from "@mui/material";
 
 import { Link } from "react-router-dom";
 import FormatDate from "../../utils/FormatDate";
-import { getImageUrl } from "../../utils/Image";
 
 // 🌸 Animación de pétalos flotando
 const floatPetal = keyframes`
@@ -23,23 +20,6 @@ const floatPetal = keyframes`
 `;
 
 const CardEvent = ({ event }) => {
-  const theme = useTheme();
-
-  // 💡 Hook para detectar el tamaño de la pantalla
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-  const isTablet = useMediaQuery(theme.breakpoints.down("md"));
-
-  // Función de ancho responsivo
-  const getOptimalWidth = () => {
-    if (isMobile) return 400;
-    if (isTablet) return 500;
-    return 600;
-  };
-
-  // 📌 El ancho y la calidad que se solicitarán a CloudFront
-  const optimalWidth = getOptimalWidth();
-  const imageQuality = 85;
-
   return (
     <Card
       sx={{
@@ -61,42 +41,33 @@ const CardEvent = ({ event }) => {
         flexDirection: "column",
       }}
     >
-      {/* 🖼️ Imagen del evento - Contenedor con Proporción */}
       <Box
         sx={{
           position: "relative",
           width: "100%",
-
           paddingTop: "100%",
           overflow: "hidden",
         }}
       >
-        <Box
+        <CardMedia
           component='img'
-          src={
-            event.image
-              ? getImageUrl(event.image, optimalWidth, imageQuality)
-              : null // Manejar src vacío para evitar la advertencia
-          }
+          image={event.image}
           alt={event.title}
-          loading='lazy'
-          decoding='async'
           sx={{
-            position: "absolute", // Necesario para la técnica de padding-top
+            aspectRatio: {
+              xs: "5 / 4",
+              sm: "4 / 3",
+              md: "3 / 2",
+              lg: "1 / 1",
+            },
+            position: "absolute",
             top: 0,
             left: 0,
             width: "100%",
-            height: "100%", // Llena el 100% del área proporcional
-            objectFit: "cover", // Recorta si es necesario, pero llena el espacio
-            borderRadius: 0,
-            transition: "transform 0.5s ease",
-            "&:hover": {
-              transform: "scale(1.05)",
-            },
+            height: "100%",
           }}
         />
 
-        {/* Fecha flotante */}
         <Box
           sx={{
             position: "absolute",

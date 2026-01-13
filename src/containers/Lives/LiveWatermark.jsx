@@ -17,7 +17,6 @@ const LiveWatermark = ({ text }) => {
           fontSize: 12,
           color: "#fff",
           fontWeight: 500,
-          border: "44px solid green",
           textShadow: "0 1px 3px rgba(0,0,0,0.6)",
         }}
       >

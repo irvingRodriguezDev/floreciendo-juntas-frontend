@@ -23,7 +23,7 @@ import firmacaro from "../../assets/images/logo_carolina_tavera.png";
 const BannerHome = () => {
   const theme = useTheme();
   const videoSource =
-    "https://floreciendojuntas1.s3.us-east-2.amazonaws.com/local/Statics/Bienvenida+2.mov";
+    "https://floreciendojuntas1.s3.us-east-2.amazonaws.com/local/Statics/FLORECIENDO+PLATAFORMA.mov";
 
   return (
     <Box
@@ -330,7 +330,7 @@ const BannerHome = () => {
             fontWeight: 700,
             mb: 2,
             lineHeight: 1.2,
-            fontSize: { xs: "2.5rem", sm: "3rem", md: "3.5rem" },
+            fontSize: { xs: "2.2rem", sm: "3rem", md: "3.5rem" },
           }}
         >
           LA COMUNIDAD #1 DE

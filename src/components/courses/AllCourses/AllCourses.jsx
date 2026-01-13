@@ -1,112 +1,87 @@
 import {
-  Avatar,
   Box,
   Card,
   CardContent,
   CardMedia,
   Chip,
-  Stack,
   Typography,
 } from "@mui/material";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-import StarIcon from "@mui/icons-material/Star";
-import PeopleAltIcon from "@mui/icons-material/PeopleAlt";
-import MenuBookIcon from "@mui/icons-material/MenuBook";
+
 const AllCourses = ({ courses }) => {
   return (
-    <>
-      <Link
-        to={`/detalle-curso/${courses.id}`}
-        style={{ textDecoration: "none" }}
+    <Link
+      to={`/detalle-curso/${courses.id}`}
+      style={{ textDecoration: "none" }}
+    >
+      <Card
+        component={motion.div}
+        whileHover={{
+          y: -4,
+          boxShadow: "0 16px 32px rgba(0,0,0,0.12)",
+          transition: { duration: 0.3 },
+        }}
+        sx={{
+          borderRadius: "20px",
+          width: "100%",
+          cursor: "pointer",
+          border: "1px solid #f2f2f2",
+          overflow: "hidden",
+          backgroundColor: "#fff",
+        }}
       >
-        <Card
-          component={motion.div}
-          whileHover={{ scale: 1.03, transition: { duration: 0.3 } }}
-          sx={{
-            borderRadius: "20px",
-            width: "100%",
-            boxShadow: "12px 12px 20px rgba(0,0,0,0.08)",
-            cursor: "pointer",
-            border: "1px solid #f3f3f3",
-            overflow: "hidden",
-            backgroundColor: "#fff",
-            transition: "all 0.3s ease-in-out",
-          }}
-        >
-          {/* Imagen del curso */}
-          <Box sx={{ position: "relative", padding: "10px" }}>
-            <CardMedia
-              component='img'
-              image={courses.cover_image_url}
-              // image={
-              //   "https://cloud.wapizima.com.mx/production/courses/mobile/112-mobile"
-              // }
-              alt={courses.name}
-              sx={{
-                objectFit: "cover",
-                width: "100%",
-                borderRadius: "16px",
-              }}
-            />
+        {/* Imagen */}
+        <Box sx={{ position: "relative", p: 1.5 }}>
+          <CardMedia
+            component='img'
+            image={courses.cover_image_url}
+            alt={courses.title}
+            sx={{
+              width: "100%",
+              aspectRatio: {
+                xs: "5 / 4",
+                sm: "4 / 3",
+                md: "3 / 2",
+                lg: "1 / 1",
+              },
+              objectFit: "cover",
+              borderRadius: { xs: "16px", lg: "12px" },
+              backgroundColor: "#f5f5f5",
+              filter: "saturate(0.95)",
+            }}
+          />
 
-            {/* Precio flotante */}
-            <Chip
-              label={`${courses.level}`}
-              sx={{
-                position: "absolute",
-                bottom: 12,
-                right: 12,
-                backgroundColor: "#D82E7A",
-                color: "white",
-                fontWeight: "bold",
-                fontSize: "0.9rem",
-                paddingX: "6px",
-              }}
-            />
-          </Box>
+          {/* Nivel */}
+        </Box>
 
-          {/* Contenido del curso */}
-          <CardContent sx={{ padding: 2 }}>
-            {/* Instructor */}
-            {/* <Stack direction='row' spacing={1} alignItems='center'>
-              <Avatar
-                src={courses.instructor_image}
-                sx={{ width: 28, height: 28 }}
-              />
-              <Typography variant='body2' color='text.secondary'>
-                {courses.instructor_name}
-              </Typography>
-              <Stack
-                direction='row'
-                spacing={0.5}
-                alignItems='center'
-                sx={{ ml: "auto" }}
-              >
-                <StarIcon sx={{ color: "#FFD700", fontSize: 18 }} />
-                <Typography variant='body2' fontWeight={600}>
-                  {courses.rating}
-                </Typography>
-              </Stack>
-            </Stack> */}
+        {/* Contenido */}
+        <CardContent sx={{ pt: 1.5, pb: 2 }}>
+          {/* Título */}
+          <Typography
+            sx={{
+              fontWeight: 700,
+              fontSize: "1rem",
+              lineHeight: 1.4,
+              color: "#2E2E2E",
+              mb: 0.5,
+            }}
+          >
+            {courses.title}
+          </Typography>
 
-            {/* Nombre del curso */}
-            <Typography
-              variant='subtitle1'
-              sx={{
-                fontWeight: 700,
-                marginTop: 1.5,
-                lineHeight: 1.3,
-              }}
-            >
-              {courses.title}
-            </Typography>
-
-            {/* Información de estudiantes y lecciones */}
-          </CardContent>
-        </Card>
-      </Link>
-    </>
+          {/* Meta info */}
+          <Typography
+            sx={{
+              fontSize: "0.8rem",
+              color: "#888",
+            }}
+          >
+            Curso • Nivel {courses.level}
+          </Typography>
+        </CardContent>
+      </Card>
+    </Link>
   );
 };
 

@@ -23,180 +23,131 @@ const LivesPage = () => {
 
   return (
     <Layout>
-      {/* Fondo general Floreciendo Juntas */}
-      <Box
-        sx={{
-          minHeight: "100vh",
-          // background: "linear-gradient(to bottom, #fefefe 0%, #fff0f5 100%)",
-          pb: 8,
-        }}
-      >
-        {/* Banner */}
-        <Grid container spacing={2}>
-          <Grid size={12}>
-            <LivesBanner />
-          </Grid>
-        </Grid>
+      <Box sx={{ minHeight: "100vh", pb: { xs: 6, md: 10 } }}>
+        {/* 🌸 Banner */}
+        <LivesBanner />
+
+        {/* 🌷 Estado vacío */}
         {lives.length === 0 && (
           <Box
             component={motion.div}
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, ease: "easeOut" }}
+            transition={{ duration: 0.7 }}
             sx={{
-              mt: 10,
+              mt: { xs: 8, md: 10 },
               textAlign: "center",
               px: 3,
             }}
           >
-            {/* Ícono / pétalo animado */}
-            <motion.div
+            <motion.img
+              src={petal}
+              width={64}
+              alt=''
               animate={{ y: [0, -10, 0] }}
-              transition={{ repeat: Infinity, duration: 5, ease: "easeInOut" }}
-              style={{ marginBottom: 16, opacity: 0.6 }}
-            >
-              <img src={petal} width={70} alt='' />
-            </motion.div>
+              transition={{ repeat: Infinity, duration: 6, ease: "easeInOut" }}
+              style={{ opacity: 0.6, marginBottom: 16 }}
+            />
 
-            {/* Texto principal */}
             <Typography
               sx={{
                 fontSize: { xs: "1.6rem", md: "2.2rem" },
                 fontWeight: 900,
-                color: "#9B365F",
+                color: "#D82E7A",
                 mb: 1,
-                letterSpacing: "-0.5px",
               }}
             >
-              No hay lives programados por el momento
+              No hay lives programados
             </Typography>
 
-            {/* Texto secundario */}
             <Typography
               sx={{
-                fontSize: "1.05rem",
+                fontSize: "1rem",
                 color: "#6D5A63",
                 maxWidth: 520,
                 mx: "auto",
                 lineHeight: 1.6,
               }}
             >
-              Estamos preparando nuevos espacios para crecer y florecer juntas
-              🌷 Muy pronto tendrás nuevas programaciones disponibles.
+              Estamos creando nuevos espacios para compartir, aprender y
+              florecer juntas 🌷 Muy pronto habrá novedades.
             </Typography>
           </Box>
         )}
-        {/* Cards */}
+
+        {/* 🌸 Grid de Lives */}
         <Grid
           container
           spacing={{ xs: 2, md: 3 }}
-          sx={{ px: { xs: 1.5, md: 12 }, py: { xs: 1.5, md: 6 } }}
+          sx={{
+            px: { xs: 2, sm: 4, md: 10 },
+            mt: { xs: 4, md: 6 },
+          }}
         >
           {lives.map((live, i) => (
-            <Grid size={{ xs: 12, sm: 6, md: 4, lg: 3 }} key={live.id}>
+            <Grid item xs={12} sm={6} md={4} lg={3} key={live.id}>
               <Link
                 to={`/detalle-live/${live.id}`}
-                aria-label={`Ver detalle del live ${live.title}`}
                 style={{ textDecoration: "none" }}
               >
                 <Card
                   component={motion.article}
-                  initial={{ opacity: 0, y: 30 }}
+                  initial={{ opacity: 0, y: 24 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: i * 0.1 }}
+                  transition={{ duration: 0.6, delay: i * 0.08 }}
                   whileHover={{
-                    scale: { xs: 1, md: 1.05 },
-                    boxShadow: "0 32px 80px rgba(232,106,146,0.35)",
+                    y: -6,
+                    boxShadow: "0 24px 60px rgba(232,106,146,0.3)",
                   }}
                   sx={{
-                    position: "relative",
-                    borderRadius: "28px",
+                    borderRadius: "24px",
                     overflow: "hidden",
-                    background: "rgba(255, 245, 250, 0.8)",
-                    backdropFilter: "blur(16px)",
-                    border: "1px solid rgba(255,180,210,0.35)",
-                    boxShadow: "0 18px 45px rgba(232,106,146,0.25)",
-                    transition: "transform .35s ease",
+                    background: "#FFF7FB",
+                    border: "1px solid #F3C6DA",
+                    height: "100%",
                   }}
                 >
-                  {/* Overlay */}
+                  {/* 🖼️ Imagen con aspect-ratio */}
                   <Box
                     sx={{
-                      position: "absolute",
-                      inset: 0,
-                      background:
-                        "linear-gradient(180deg, rgba(255,255,255,0) 45%, rgba(255,220,235,0.55) 100%)",
-                      zIndex: 2,
-                      pointerEvents: "none",
-                    }}
-                  />
-
-                  {/* 🌸 Pétalos decorativos */}
-                  <Box
-                    component={motion.div}
-                    animate={{ y: [0, -10, 0] }}
-                    transition={{ repeat: Infinity, duration: 9 }}
-                    sx={{
-                      position: "absolute",
-                      bottom: 10,
-                      right: 12,
-                      opacity: 0.18,
-                      display: { xs: "none", sm: "block" },
-                      zIndex: 1,
-                    }}
-                  >
-                    <img src={petal} width={56} alt='decoración floral' />
-                  </Box>
-
-                  <Box
-                    component={motion.div}
-                    animate={{ y: [0, 12, 0] }}
-                    transition={{ repeat: Infinity, duration: 11 }}
-                    sx={{
-                      position: "absolute",
-                      top: 16,
-                      left: 16,
-                      opacity: 0.15,
-                      display: { xs: "none", sm: "block" },
-                      zIndex: 1,
-                    }}
-                  >
-                    <img src={petal} width={44} alt='decoración floral' />
-                  </Box>
-
-                  {/* Imagen */}
-                  <CardMedia
-                    component='img'
-                    src={live.thumbnail_url}
-                    alt={live.title}
-                    height={220}
-                    sx={{
-                      objectFit: "cover",
-                      filter: "brightness(0.96)",
-                      transition: "transform .4s ease, filter .4s ease",
-                      ".MuiCard-root:hover &": {
-                        transform: "scale(1.05)",
-                        filter: "brightness(1.05)",
-                      },
-                    }}
-                  />
-
-                  {/* Contenido */}
-                  <CardContent
-                    sx={{
-                      px: { xs: 2.4, md: 3 },
-                      pb: 3,
-                      pt: 2.2,
                       position: "relative",
-                      zIndex: 3,
+                      width: "100%",
+                      aspectRatio: "1 / 1",
+                      overflow: "hidden",
                     }}
                   >
+                    <CardMedia
+                      component='img'
+                      src={live.thumbnail_url}
+                      alt={live.title}
+                      sx={{
+                        position: "absolute",
+                        inset: 0,
+                        width: "100%",
+                        height: "100%",
+                        objectFit: "cover",
+                      }}
+                    />
+
+                    {/* Overlay suave */}
+                    <Box
+                      sx={{
+                        position: "absolute",
+                        inset: 0,
+                        background:
+                          "linear-gradient(180deg, rgba(255,255,255,0) 55%, rgba(255,220,235,0.7) 100%)",
+                      }}
+                    />
+                  </Box>
+
+                  {/* 🌷 Contenido */}
+                  <CardContent sx={{ px: 2.5, py: 2.2 }}>
                     <Typography
                       sx={{
                         fontWeight: 900,
-                        fontSize: { xs: "1.15rem", md: "1.3rem" },
+                        fontSize: "1.15rem",
                         color: "#9B365F",
-                        letterSpacing: "-0.5px",
+                        lineHeight: 1.3,
                       }}
                     >
                       {live.title}
@@ -204,10 +155,9 @@ const LivesPage = () => {
 
                     <Typography
                       sx={{
-                        mt: 1,
+                        mt: 0.8,
+                        fontSize: "0.85rem",
                         color: "#6D5A63",
-                        fontSize: "0.9rem",
-                        fontWeight: 500,
                       }}
                     >
                       {new Date(live.start_time).toLocaleString("es-MX", {
@@ -219,24 +169,22 @@ const LivesPage = () => {
                     {/* Estado */}
                     <Box
                       sx={{
-                        mt: 2.2,
+                        mt: 2,
                         display: "inline-flex",
                         alignItems: "center",
                         gap: 1,
-                        px: 2.2,
+                        px: 2,
                         py: "6px",
                         borderRadius: "20px",
                         fontSize: "0.72rem",
                         fontWeight: 800,
-                        letterSpacing: "0.4px",
                         background:
                           live.status === "live"
                             ? "linear-gradient(90deg,#E86A92,#FF8FB3)"
                             : live.status === "scheduled"
-                            ? "linear-gradient(90deg,#FFD6E5,#FFB8D2)"
-                            : "linear-gradient(90deg,#E0E0E0,#CFCFCF)",
+                            ? "linear-gradient(90deg,#FFE1EC,#FFB8D2)"
+                            : "#E0E0E0",
                         color: live.status === "live" ? "#fff" : "#8A4A62",
-                        boxShadow: "0 6px 16px rgba(232,106,146,0.4)",
                       }}
                     >
                       <Box
@@ -244,16 +192,11 @@ const LivesPage = () => {
                           width: 7,
                           height: 7,
                           borderRadius: "50%",
-                          bgcolor:
-                            live.status === "live"
-                              ? "#fff"
-                              : live.status === "scheduled"
-                              ? "#9B365F"
-                              : "#777",
+                          bgcolor: live.status === "live" ? "#fff" : "#9B365F",
                         }}
                       />
                       {live.status === "live" && "EN VIVO"}
-                      {live.status === "scheduled" && "PRÓXIMO EVENTO"}
+                      {live.status === "scheduled" && "PRÓXIMAMENTE"}
                       {live.status === "ended" && "FINALIZADO"}
                     </Box>
                   </CardContent>

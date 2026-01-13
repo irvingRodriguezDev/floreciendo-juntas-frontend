@@ -11,10 +11,12 @@ import LatestEventsSection from "../../components/events/LatestEventsSections";
 import SocialLinks from "../../components/SocialLinks/SocialLinks";
 import RifaSalonSuenos from "../../components/Raffle/Raffle";
 import FullScreenVideo from "../../components/FullScreenVideo";
+import VideoFull from "../../components/fullscreen/VideoFull";
 const Home = () => {
   return (
     <Layout>
-      <Grid container spacing={2} sx={{ mt: 10, padding: "25px" }}>
+      {/* <VideoFull /> */}
+      <Grid container spacing={2} sx={{ mt: 5, padding: "25px" }}>
         <Grid size={12}>
           <BannerHome />
           {/* <FullScreenVideo /> */}

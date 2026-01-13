@@ -38,7 +38,7 @@ export default function DreamSalonFeatures() {
     <Box
       sx={{
         width: "100%",
-        backgroundColor: "#fff",
+        backgroundColor: "transparent",
         py: { xs: 6, md: 10 },
         px: { xs: 3, md: 8 },
         borderRadius: "32px",

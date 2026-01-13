@@ -12,7 +12,7 @@ import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import PauseIcon from "@mui/icons-material/Pause";
 import MethodGet, { MethodPost } from "../../../config/Service";
 import CoursesContext from "../../../context/Courses/CoursesContext";
-const VideoPlayer = ({ userId, courseId, src, poster, usuario }) => {
+const VideoPlayer = ({ userId, courseId, src, poster, usuario, title }) => {
   const { downloadCertificate } = useContext(CoursesContext);
   const videoRef = useRef(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -32,6 +32,12 @@ const VideoPlayer = ({ userId, courseId, src, poster, usuario }) => {
     } else {
       video.play();
       setIsPlaying(true);
+    }
+  };
+  const handlePause = () => {
+    setIsPlaying(false);
+    if (videoRef.current) {
+      saveProgress(videoRef.current.currentTime);
     }
   };
   // 🔹 Inicializar HLS
@@ -71,8 +77,8 @@ const VideoPlayer = ({ userId, courseId, src, poster, usuario }) => {
         completedRef.current = isCompleted;
 
         // Reanudar video desde donde quedó
-        if (videoRef.current && progressRef.current > 0) {
-          videoRef.current.currentTime = progressRef.current;
+        if (videoRef.current && progressRef.current >= 5) {
+          saveProgress(videoRef.current.currentTime);
         }
       } catch (error) {
         console.error("Error al cargar progreso:", error);
@@ -143,93 +149,152 @@ const VideoPlayer = ({ userId, courseId, src, poster, usuario }) => {
   }, []);
 
   return (
-    <Box sx={{ maxWidth: 900, mx: "auto", mt: 4 }}>
+    <Box
+      sx={{
+        maxWidth: 900,
+        mx: "auto",
+        mt: { xs: 2, md: 4 },
+        px: { xs: 1.5, md: 0 },
+      }}
+    >
       <Box
         sx={{
           position: "relative",
           width: "100%",
-          maxWidth: 900,
-          mx: "auto",
-          mt: 4,
-          borderRadius: "16px",
+          borderRadius: { xs: "18px", md: "20px" },
           overflow: "hidden",
-          boxShadow: "0 4px 20px rgba(0,0,0,0.1)",
           backgroundColor: "#000",
+          boxShadow: {
+            xs: "0 8px 20px rgba(229,56,136,0.18)",
+            md: "0 12px 30px rgba(229,56,136,0.15)",
+          },
         }}
       >
         {/* 🎬 Video */}
         <video
           ref={videoRef}
           controls
-          controlsList='nodownload noremoteplayback' // ✅ fullscreen permitido
+          controlsList='nodownload noremoteplayback'
           disablePictureInPicture
           onPlay={() => setIsPlaying(true)}
-          onPause={() => setIsPlaying(false)}
+          onPause={handlePause}
           onEnded={() => setIsPlaying(false)}
-          style={{ width: "100%", height: "500px", objectFit: "contain" }}
           poster={poster}
+          style={{
+            width: "100%",
+            aspectRatio: "16 / 9",
+            objectFit: "contain",
+          }}
         >
           <source src={src} type='video/mp4' />
           Tu navegador no soporta el video.
         </video>
 
         {/* ▶️ / ⏸️ Botón Play-Pause centrado */}
-        <IconButton
-          onClick={handleTogglePlay}
-          sx={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            backgroundColor: "rgba(255,255,255,0.8)",
-            "&:hover": {
-              backgroundColor: "rgba(255,255,255,1)",
-            },
-            width: 80,
-            height: 80,
-          }}
-        >
-          {isPlaying ? (
-            <PauseIcon sx={{ fontSize: 60, color: "#000" }} />
-          ) : (
-            <PlayArrowIcon sx={{ fontSize: 60, color: "#000" }} />
-          )}
-        </IconButton>
+        {!isPlaying && !completed && (
+          <IconButton
+            onClick={handleTogglePlay}
+            sx={{
+              position: "absolute",
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+              backgroundColor: "rgba(255,255,255,0.9)",
+              width: { xs: 64, md: 80 },
+              height: { xs: 64, md: 80 },
+              "&:hover": {
+                backgroundColor: "#fff",
+              },
+            }}
+          >
+            <PlayArrowIcon sx={{ fontSize: 48, color: "#E53888" }} />
+          </IconButton>
+        )}
       </Box>
 
       {/* Barra de progreso */}
-      <Box sx={{ mt: 2 }}>
-        <Typography variant='body1' color='#DC4485'>
-          Progreso del curso: {progress}%
+      <Box
+        sx={{
+          mt: 3,
+          p: { xs: 2, md: 2.5 },
+          mb: 1,
+          borderRadius: "16px",
+          backgroundColor: "#FFF6F9",
+        }}
+      >
+        <Typography
+          sx={{
+            fontWeight: 700,
+            fontSize: { xs: "1rem", md: "1.2rem" },
+            mb: 0.5,
+          }}
+        >
+          {title}
         </Typography>
+
+        <Typography
+          sx={{
+            fontSize: "0.85rem",
+            color: "#DC4485",
+            mb: 1.2,
+          }}
+        >
+          Has avanzado un {progress}% 🌸
+        </Typography>
+
         <LinearProgress
           variant='determinate'
           value={progress}
           sx={{
-            height: 10,
-            borderRadius: 5,
-            mt: 1,
+            height: 6,
+            borderRadius: 10,
+            backgroundColor: "#F3D6DF",
             "& .MuiLinearProgress-bar": {
-              backgroundColor: "#DC4485", // color de la barra
+              backgroundColor: "#E53888",
             },
-            backgroundColor: "#F0F0F0", // color de fondo
           }}
         />
       </Box>
 
       {/* Certificado */}
       {completed && (
-        <Box sx={{ mt: 3, textAlign: "center" }}>
-          <Typography variant='h3' color='success.main'>
-            ¡Curso completado! 🎉
+        <Box
+          sx={{
+            mt: 4,
+            p: { xs: 2.5, md: 3 },
+            borderRadius: "18px",
+            backgroundColor: "#F8FFF9",
+            textAlign: "center",
+            animation: "fadeIn 0.6s ease-out",
+          }}
+        >
+          <Typography
+            sx={{
+              fontSize: { xs: "1.6rem", md: "2rem" },
+              fontWeight: 700,
+              color: "#4CAF50",
+            }}
+          >
+            ¡Has florecido! 🌸
+          </Typography>
+
+          <Typography sx={{ mt: 1, color: "text.secondary" }}>
+            Completaste este curso y diste un paso más en tu crecimiento.
           </Typography>
           <Button
             variant='contained'
+            fullWidth
             sx={{
               mt: 2,
+              py: 1.2,
               backgroundColor: "#F7CDD9",
               color: "#DC4485",
-              borderRadius: "12px",
+              borderRadius: "14px",
+              fontWeight: 600,
+              textTransform: "none",
+              "&:hover": {
+                backgroundColor: "#F5BCCC",
+              },
             }}
             onClick={() => downloadCertificate(courseId, usuario.name)}
             disabled={loading}

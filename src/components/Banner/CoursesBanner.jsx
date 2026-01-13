@@ -8,113 +8,137 @@ const CoursesBanner = () => {
       component={motion.section}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      transition={{ duration: 1 }}
+      transition={{ duration: 0.6 }}
       sx={{
-        minHeight: "60vh",
+        minHeight: {
+          xs: "28vh",
+          sm: "34vh",
+          md: "38vh",
+        },
         display: "flex",
         alignItems: "center",
         position: "relative",
         overflow: "hidden",
         background: `
-          radial-gradient(circle at top left, #FFE3EC 0%, transparent 40%),
-          radial-gradient(circle at bottom right, #FFD6E6 0%, transparent 45%),
-          linear-gradient(180deg, #FFF5F7 0%, #FFF 100%)
+#FFF4FA
         `,
       }}
     >
-      {/* 🌿 Adornos orgánicos */}
+      {/* 🌿 Blobs suaves (solo desktop) */}
       <Box
         component={motion.div}
-        animate={{ y: [0, -15, 0] }}
-        transition={{ duration: 8, repeat: Infinity }}
+        animate={{ y: [0, -10, 0] }}
+        transition={{ duration: 10, repeat: Infinity }}
         sx={{
           position: "absolute",
-          top: "10%",
-          left: "5%",
-          width: 120,
-          height: 120,
+          top: "14%",
+          left: "6%",
+          width: 100,
+          height: 100,
           borderRadius: "50%",
-          background: "rgba(229, 56, 136, 0.12)",
+          background: "rgba(229, 56, 136, 0.1)",
           filter: "blur(40px)",
+          display: { xs: "none", md: "block" },
         }}
       />
 
       <Box
         component={motion.div}
-        animate={{ y: [0, 20, 0] }}
-        transition={{ duration: 10, repeat: Infinity }}
+        animate={{ y: [0, 14, 0] }}
+        transition={{ duration: 12, repeat: Infinity }}
         sx={{
           position: "absolute",
-          bottom: "10%",
+          bottom: "14%",
           right: "8%",
-          width: 160,
-          height: 160,
+          width: 130,
+          height: 130,
           borderRadius: "50%",
-          background: "rgba(247, 205, 217, 0.35)",
-          filter: "blur(50px)",
+          background: "rgba(247, 205, 217, 0.28)",
+          filter: "blur(48px)",
+          display: { xs: "none", md: "block" },
         }}
       />
 
       {/* 🌸 Contenido */}
       <Container
-        maxWidth='md'
+        maxWidth='sm'
         component={motion.div}
-        initial={{ y: 40, opacity: 0 }}
+        initial={{ y: 16, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.3, duration: 0.8 }}
+        transition={{ delay: 0.2, duration: 0.5 }}
         sx={{
           textAlign: "center",
           position: "relative",
           zIndex: 2,
         }}
       >
+        {/* Eyebrow */}
         <Typography
-          variant='h1'
           sx={{
-            fontWeight: 800,
+            fontSize: "0.75rem",
+            fontWeight: 600,
+            letterSpacing: "0.08em",
+            textTransform: "uppercase",
+            color: "#E53888",
+            mb: 1,
+          }}
+        >
+          Cursos
+        </Typography>
+
+        <Typography
+          variant='h2'
+          sx={{
+            fontWeight: 600,
             color: "#2E2E2E",
-            lineHeight: 1.1,
-            mb: 2,
+            lineHeight: 1.2,
+            mb: 1.5,
             fontSize: {
-              xs: "2.2rem",
-              sm: "2.8rem",
-              md: "3.4rem",
+              xs: "1.7rem",
+              sm: "2.1rem",
+              md: "2.4rem",
             },
           }}
         >
-          Tu crecimiento empieza aquí 🌺
+          Tu crecimiento empieza aquí
         </Typography>
 
         <Typography
-          variant='h6'
           sx={{
-            maxWidth: 520,
+            maxWidth: 480,
             mx: "auto",
-            color: "#555",
-            fontWeight: 400,
+            color: "#666",
             fontSize: {
-              xs: "1rem",
-              md: "1.2rem",
+              xs: "0.95rem",
+              md: "1.05rem",
             },
+            lineHeight: 1.7,
           }}
         >
-          Descubre los cursos que te acompañan en cada etapa de tu camino,
-          aprende a tu ritmo y sigue floreciendo con intención.
+          Cursos creados para acompañarte en cada etapa, aprender a tu ritmo y
+          seguir floreciendo con intención 🌸
         </Typography>
 
-        {/* 🌷 Línea decorativa */}
-        <Box
-          component={motion.div}
-          initial={{ scaleX: 0 }}
-          animate={{ scaleX: 1 }}
-          transition={{ delay: 0.7, duration: 0.6 }}
+        {/* Indicador de scroll */}
+        <Typography
           sx={{
-            width: 90,
-            height: 4,
+            mt: 2.5,
+            fontSize: "0.8rem",
+            color: "#E53888",
+            opacity: 0.85,
+          }}
+        >
+          Desliza para explorar
+        </Typography>
+
+        <Box
+          sx={{
+            width: 50,
+            height: 2,
             bgcolor: "#E53888",
             borderRadius: 10,
             mx: "auto",
-            mt: 4,
+            mt: 1,
           }}
         />
       </Container>

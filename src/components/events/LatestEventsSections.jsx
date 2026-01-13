@@ -9,21 +9,15 @@ import {
   Button,
   Stack,
   useTheme,
-  useMediaQuery,
 } from "@mui/material";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import EventsContext from "../../context/Events/EventsContext";
 import FormatDate from "../../utils/FormatDate";
 import { Link } from "react-router-dom";
-import { getImageUrl } from "../../utils/Image";
 
 const LatestEventsSection = () => {
   const { events, getLatestEvents } = useContext(EventsContext);
   const theme = useTheme();
-
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-  const isTablet = useMediaQuery(theme.breakpoints.down("md"));
-  const isDesktop = useMediaQuery(theme.breakpoints.up("lg")); // Usar 'up' para desktop
 
   useEffect(() => {
     getLatestEvents();
@@ -32,17 +26,6 @@ const LatestEventsSection = () => {
   const primaryPink = "#e91e63";
   const lightYellow = "#ffecb3";
 
-  // Función para determinar el ancho óptimo de la imagen basado en el viewport
-  const getOptimalWidth = () => {
-    // Pedir un ancho que sea apropiado para una de las 3-4 columnas de la cuadrícula
-    if (isMobile) return 400;
-    if (isTablet) return 500;
-    if (isDesktop) return 350; // Al tener 4 columnas, el ancho de cada una es menor
-    return 450;
-  };
-
-  const optimalWidth = getOptimalWidth();
-  const imageQuality = 85;
   const Underline = ({ color }) => (
     <Box
       component='span'
@@ -178,17 +161,20 @@ const LatestEventsSection = () => {
                 >
                   <CardMedia
                     component='img'
-                    image={getImageUrl(event.image, optimalWidth, imageQuality)}
+                    image={event.image}
                     alt={event.title}
                     sx={{
+                      aspectRatio: {
+                        xs: "5 / 4",
+                        sm: "4 / 3",
+                        md: "3 / 2",
+                        lg: "1 / 1",
+                      },
                       position: "absolute",
                       top: 0,
                       left: 0,
                       width: "100%",
                       height: "100%",
-                      objectFit: "cover",
-                      transition: "transform 0.5s ease",
-                      "&:hover": { transform: "scale(1.06)" },
                     }}
                   />
 
