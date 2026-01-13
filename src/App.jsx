@@ -14,6 +14,7 @@ import OrdersState from "./context/Orders/OrdersState";
 import LivesState from "./context/Lives/LivesState";
 import ShopifyCartState from "./context/ShopifyCart/ShopifyCartState";
 import ScrollTop from "./utils/ScrollTop";
+import CommunityState from "./context/Community/CommunityState";
 // Carga asíncrona de la clave pública
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_KEY);
 
@@ -21,28 +22,30 @@ function App() {
   return (
     <Elements stripe={stripePromise}>
       <AuthState>
-        <UserState>
-          <SystemState>
-            <CoursesState>
-              <PostsState>
-                <EventsState>
-                  <ProductsState>
-                    <CartState>
-                      <OrdersState>
-                        <LivesState>
-                          <ShopifyCartState>
-                            <ScrollTop />
-                            <AppRouter />
-                          </ShopifyCartState>
-                        </LivesState>
-                      </OrdersState>
-                    </CartState>
-                  </ProductsState>
-                </EventsState>
-              </PostsState>
-            </CoursesState>
-          </SystemState>
-        </UserState>
+        <CommunityState>
+          <UserState>
+            <SystemState>
+              <CoursesState>
+                <PostsState>
+                  <EventsState>
+                    <ProductsState>
+                      <CartState>
+                        <OrdersState>
+                          <LivesState>
+                            <ShopifyCartState>
+                              <ScrollTop />
+                              <AppRouter />
+                            </ShopifyCartState>
+                          </LivesState>
+                        </OrdersState>
+                      </CartState>
+                    </ProductsState>
+                  </EventsState>
+                </PostsState>
+              </CoursesState>
+            </SystemState>
+          </UserState>
+        </CommunityState>
       </AuthState>
     </Elements>
   );

@@ -23,7 +23,7 @@ import firmacaro from "../../assets/images/logo_carolina_tavera.png";
 const BannerHome = () => {
   const theme = useTheme();
   const videoSource =
-    "https://floreciendo.s3.us-east-2.amazonaws.com/INTROPLATAFORMAHORIZONTAL";
+    "https://floreciendojuntas1.s3.us-east-2.amazonaws.com/local/Statics/Bienvenida+2.mov";
 
   return (
     <Box
@@ -33,7 +33,7 @@ const BannerHome = () => {
         alignItems: "center",
         justifyContent: "center",
         minHeight: "80vh",
-        background: "#f971af",
+        background: "#F971AF",
         padding: 4,
         position: "relative",
         overflow: "hidden",

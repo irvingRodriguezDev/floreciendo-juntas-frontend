@@ -29,7 +29,7 @@ import ShopifyCartDrawer from "../../containers/Store/ShopifyCartDrawer";
 import FornitureIcon from "../icons/FornitureIcon";
 /* Menu items (igual que antes) */
 const menuItems = [
-  { name: "Comunidad", path: "/cursos", auth: "both" },
+  { name: "Comunidad", path: "/comunidad", auth: "both" },
   { name: "Cursos", path: "/cursos", auth: "both" },
   { name: "Salón", path: "/el-salon-de-tus-sueños", auth: "both" },
   { name: "Eventos", path: "/eventos", auth: "both" },
@@ -105,7 +105,7 @@ const Header = () => {
       />
 
       <AppBar
-        position='fixed'
+        position='relative'
         elevation={scrolled ? 6 : 0}
         sx={{
           width: "100%",
@@ -457,7 +457,6 @@ const Header = () => {
                           component={Link}
                           variant='outlined'
                           sx={{
-                            color: "#fff",
                             borderColor: "#E53888",
                             color: "#E53888",
                             borderRadius: "10px",
