@@ -15,7 +15,6 @@ import VideoFull from "../../components/fullscreen/VideoFull";
 const Home = () => {
   return (
     <Layout>
-      {/* <VideoFull /> */}
       <Grid container spacing={2} sx={{ mt: 5, padding: "25px" }}>
         <Grid size={12}>
           <BannerHome />

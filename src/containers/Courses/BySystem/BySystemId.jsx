@@ -10,6 +10,7 @@ import { useDebounce } from "use-debounce";
 import PinkSpinner from "../../../components/Loading/PinkSpinner";
 import AllCourses from "../../../components/courses/AllCourses/AllCourses";
 import Pagination from "../../../components/Pagination/Pagination";
+import VideoFull from "../../../components/fullscreen/VideoFull";
 const BySystemId = () => {
   const params = useParams();
   const { getCoursesBySystemId, courses, currentPage, totalPages, totalItems } =
@@ -57,6 +58,8 @@ const BySystemId = () => {
 
   return (
     <Layout>
+      <VideoFull />
+
       <Grid container spacing={2} sx={{ padding: "20px" }}>
         <Grid size={12} sx={{ marginTop: 12 }}>
           <SystemBanner

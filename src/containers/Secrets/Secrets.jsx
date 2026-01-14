@@ -1,4 +1,4 @@
-import React from "react";
+import React, { use, useContext, useEffect } from "react";
 import Layout from "../../components/Layout/Layout";
 import { Box, Grid, Stack, Typography, Container } from "@mui/material";
 import { motion } from "framer-motion";
@@ -7,7 +7,8 @@ import { motion } from "framer-motion";
 import underline from "../../assets/svg/underline.svg";
 import floralPath from "../../assets/svg/floral-path.svg";
 import SecretsBanner from "../../components/Banner/SecretsBanner";
-
+import { Link } from "react-router-dom";
+import SystemContext from "../../context/System/SystemContext";
 // --- VARIANTS DE FRAMER MOTION ---
 const cardVariants = {
   hidden: { opacity: 0, y: 30, scale: 0.95 },
@@ -20,68 +21,73 @@ const cardVariants = {
 };
 
 const Secrets = () => {
-  const secretos = [
-    {
-      num: 1,
-      title: "Capacitación Constante",
-      description: "",
-    },
-    {
-      num: 2,
-      title: "Marca Personal",
-      description:
-        "Herramientas e insumos premium garantizan un acabado superior, durabilidad y elevan la percepción de valor de tu servicio.",
-    },
-    {
-      num: 3,
-      title: "Marketing Digital",
-      description:
-        "La esterilización y la sanidad son innegociables. Transmiten profesionalismo y generan total confianza en la clienta.",
-    },
-    {
-      num: 4,
-      title: "Diferenciación",
-      description:
-        "Aprender a escuchar y a traducir los deseos de tu clienta en arte es la clave para la satisfacción y las recomendaciones.",
-    },
-    {
-      num: 5,
-      title: "Atención al cliente",
-      description:
-        "Dominar la aplicación fina, uniforme y el curado preciso previene levantamientos y asegura un brillo duradero.",
-    },
-    {
-      num: 6,
-      title: "Incremento de Ticket",
-      description:
-        "Mantente siempre al día con las tendencias de nail art, colores y técnicas emergentes para ofrecer servicios innovadores.",
-    },
-    {
-      num: 7,
-      title: "Fidelización",
-      description:
-        "La eficiencia en la duración de la cita es vital para la rentabilidad sin comprometer la calidad. Sé rápida y precisa.",
-    },
-    {
-      num: 8,
-      title: "Finanzas",
-      description:
-        "Ofrece una experiencia completa y personalizada; la relación es tan importante como el resultado final en la uña.",
-    },
-    {
-      num: 9,
-      title: "Administración",
-      description:
-        "Nunca dejes de capacitarte. La inversión en conocimiento es lo que te diferencia de la competencia.",
-    },
-    {
-      num: 10,
-      title: "Autorrealización y Crecimiento",
-      description:
-        "Cuida tu postura y salud. Un profesional saludable es un profesional que puede dedicarse a su carrera a largo plazo.",
-    },
-  ];
-
+  const { systems, getAllSystems } = useContext(SystemContext);
+  // const secretos = [
+  //   {
+  //     num: 1,
+  //     title: "Capacitación Constante",
+  //     description:
+  //       "La capacitación es la base de todo crecimiento profesional. En esta etapa  aprenderás por qué actualizarte no es una opción, sino una estrategia para mantenerte vigente, elevar la calidad de tu trabajo y diferenciarte en un mercado competitivo. La excelencia técnica abre puertas, aumenta tu valor y te permite cobrar mejor.",
+  //     path: "/cursos/bysystem/1",
+  //   },
+  //   {
+  //     num: 2,
+  //     title: "Marca Personal",
+  //     description:
+  //       "Tu marca personal es lo que hace que te elijan a ti y no a otra persona. Aquí aprenderás a construir una identidad clara, auténtica y coherente, para que tu trabajo, tu historia y tus valores se conviertan en tu mayor fortaleza profesional.",
+  //   },
+  //   {
+  //     num: 3,
+  //     title: "Marketing Digital",
+  //     description:
+  //       "No basta con ser buena, necesitas que te conozcan. En este módulo aprenderás a usar las redes sociales y el entorno digital como herramientas de crecimiento, atracción de clientas y generación de oportunidades, incluso si tienes poco tiempo disponible.",
+  //   },
+  //   {
+  //     num: 4,
+  //     title: "Diferenciación",
+  //     description:
+  //       "La diferenciación es lo que te saca de la guerra de precios. Aprenderás a identificar qué te hace única, cómo comunicarlo y cómo transformar tu estilo, tu atención y tu experiencia en un valor que no sea fácil de copiar.",
+  //   },
+  //   {
+  //     num: 5,
+  //     title: "Atención al cliente",
+  //     description:
+  //       "La atención al cliente es parte del servicio, no un extra. Aquí aprenderás a ofrecer una experiencia profesional, cálida y organizada, desde el primer mensaje hasta el seguimiento posterior, logrando que tus clientas se sientan valoradas y seguras.",
+  //   },
+  //   {
+  //     num: 6,
+  //     title: "Incremento de Ticket",
+  //     description:
+  //       "Ganar más no siempre significa trabajar más. Aquí aprenderás a aumentar el valor de cada servicio, ofrecer opciones complementarias y estructurar tus precios de forma inteligente para mejorar tus ingresos sin saturarte de trabajo.",
+  //   },
+  //   {
+  //     num: 7,
+  //     title: "Fidelización",
+  //     description:
+  //       "Una clienta que regresa es un negocio más estable. En este módulo aprenderás estrategias para construir relaciones a largo plazo, generar confianza y convertir clientas ocasionales en clientas fieles que recomienden tu trabajo.",
+  //   },
+  //   {
+  //     num: 8,
+  //     title: "Finanzas",
+  //     description:
+  //       "Aprenderás a entender tu dinero: ingresos, gastos, utilidades y metas. Este módulo te ayudará a dejar de trabajar “a ciegas” y comenzar a tomar decisiones financieras conscientes que te permitan crecer con estabilidad.",
+  //   },
+  //   {
+  //     num: 9,
+  //     title: "Administración",
+  //     description:
+  //       "La organización también es una habilidad profesional. Aquí aprenderás a administrar tu tiempo, tus citas, tus recursos y tu energía, para que tu negocio funcione con orden y no dependa únicamente de ti todo el tiempo.",
+  //   },
+  //   {
+  //     num: 10,
+  //     title: "Autorrealización y Crecimiento",
+  //     description:
+  //       "El éxito no es solo económico. En este módulo conectarás con tu propósito, tu crecimiento personal y tu visión a largo plazo. Porque cuando una mujer se realiza profesionalmente, cambia su forma de verse, de decidir y de proyectar su futuro.",
+  //   },
+  // ];
+  useEffect(() => {
+    getAllSystems();
+  }, []);
   return (
     <Layout>
       {/* HEADER */}
@@ -131,7 +137,7 @@ const Secrets = () => {
         {/* LISTADO: ESTRUCTURA CUADRADA 2x5 RESPONSIVA */}
         <Container maxWidth='lg' sx={{ position: "relative", zIndex: 2 }}>
           <Grid container spacing={{ xs: 4, md: 5 }} justifyContent='center'>
-            {secretos.map((item) => (
+            {systems.map((item, index) => (
               <Grid
                 key={item.num}
                 size={{ xs: 12, md: 6 }}
@@ -178,34 +184,39 @@ const Secrets = () => {
                       transform: "rotate(-5deg)", // Pequeño toque de estilo
                     }}
                   >
-                    {item.num}
+                    {index + 1}
                   </Box>
 
                   {/* 📝 CONTENIDO */}
-                  <Box sx={{ flexGrow: 1, pt: 0.5 }}>
-                    <Typography
-                      variant='h6'
-                      sx={{
-                        fontWeight: 800,
-                        color: "#a30b5d",
-                        mb: 0.5,
-                        lineHeight: 1.2,
-                      }}
-                    >
-                      {item.title}
-                    </Typography>
+                  <Link
+                    to={`/cursos/bysystem/${item.id}`}
+                    style={{ textDecoration: "none" }}
+                  >
+                    <Box sx={{ flexGrow: 1, pt: 0.5 }}>
+                      <Typography
+                        variant='h6'
+                        sx={{
+                          fontWeight: 800,
+                          color: "#a30b5d",
+                          mb: 0.5,
+                          lineHeight: 1.2,
+                        }}
+                      >
+                        {item.name}
+                      </Typography>
 
-                    <Typography
-                      sx={{
-                        fontSize: "1rem",
-                        fontWeight: 500,
-                        color: "#444",
-                        lineHeight: 1.4,
-                      }}
-                    >
-                      {item.description}
-                    </Typography>
-                  </Box>
+                      <Typography
+                        sx={{
+                          fontSize: "1rem",
+                          fontWeight: 500,
+                          color: "#444",
+                          lineHeight: 1.4,
+                        }}
+                      >
+                        {item.description}
+                      </Typography>
+                    </Box>
+                  </Link>
                 </motion.div>
               </Grid>
             ))}

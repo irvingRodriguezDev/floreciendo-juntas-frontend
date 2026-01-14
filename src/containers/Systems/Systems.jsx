@@ -242,9 +242,9 @@ linear-gradient(181deg,rgba(255, 223, 239, 1) 0%, rgba(255, 255, 255, 1) 100%);
             fontSize: { xs: "2rem", sm: "2.5rem", md: "3.5rem" },
           }}
         >
-          Explora Nuestras {""}
+          Aprende con los {""}
           <Box component='span' sx={{ position: "relative" }}>
-            Academias
+            10 Secretos
             <Box
               component='span'
               sx={{
@@ -253,13 +253,14 @@ linear-gradient(181deg,rgba(255, 223, 239, 1) 0%, rgba(255, 255, 255, 1) 100%);
                 bottom: 0,
                 width: "100%",
                 height: "8px",
-                backgroundColor: "#FFF",
+                backgroundColor: "#E53888",
                 opacity: 0.7,
                 borderRadius: "4px",
                 zIndex: -1,
               }}
             />
           </Box>{" "}
+          para ser exitosa
         </Typography>
       </Stack>
 
@@ -270,8 +271,9 @@ linear-gradient(181deg,rgba(255, 223, 239, 1) 0%, rgba(255, 255, 255, 1) 100%);
           width: "100%",
           maxWidth: "1300px",
           mx: "auto",
-          zIndex: 3,
           borderRadius: "12px",
+          bgcolor: "transparent",
+          padding: "10px",
         }}
       >
         <Swiper
@@ -294,25 +296,22 @@ linear-gradient(181deg,rgba(255, 223, 239, 1) 0%, rgba(255, 255, 255, 1) 100%);
           }}
         >
           {systems ? (
-            systems.map((system) => (
+            systems.map((system, index) => (
               <SwiperSlide key={system.id}>
                 <Link
                   to={`/cursos/bysystem/${system.id}`}
                   style={{ textDecoration: "none" }}
                 >
                   <Paper
-                    elevation={1}
+                    elevation={3}
                     sx={{
                       p: { xs: 3, sm: 4 },
                       textAlign: "center",
-                      borderRadius: "16px",
-                      minHeight: 280,
-                      boxShadow: "0px 6px 16px rgba(0, 0, 0, 0.08)",
-                      transition: "transform 0.3s ease, box-shadow 0.3s ease",
-                      "&:hover": {
-                        transform: "translateY(-6px)",
-                        boxShadow: "0px 12px 25px rgba(0, 0, 0, 0.12)",
-                      },
+                      borderRadius: "18px",
+                      minHeight: "300px",
+                      mb: "4px",
+                      ml: "3px",
+                      mr: "3px",
                     }}
                   >
                     <Box
@@ -329,15 +328,19 @@ linear-gradient(181deg,rgba(255, 223, 239, 1) 0%, rgba(255, 255, 255, 1) 100%);
                       }}
                     >
                       <Box
-                        component='img'
-                        src={system.icon}
-                        alt={system.name}
+                        component='div'
+                        // src={system.icon}
+                        // alt={system.name}
                         sx={{
                           width: "80%",
                           height: "80%",
                           objectFit: "contain",
                         }}
-                      />
+                      >
+                        <Typography variant='h2' fontWeight='bold'>
+                          {index + 1}
+                        </Typography>
+                      </Box>
                     </Box>
 
                     <Typography variant='h6' sx={{ fontWeight: 700, mb: 1 }}>
@@ -351,7 +354,7 @@ linear-gradient(181deg,rgba(255, 223, 239, 1) 0%, rgba(255, 255, 255, 1) 100%);
                       sx={{
                         flexGrow: 1,
                         display: "-webkit-box",
-                        WebkitLineClamp: 3,
+                        WebkitLineClamp: 5,
                         WebkitBoxOrient: "vertical",
                         overflow: "hidden",
                         textOverflow: "ellipsis",

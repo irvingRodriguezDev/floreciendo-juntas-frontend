@@ -1,4 +1,4 @@
-import React, { useEffect, useReducer, useContext, useRef } from "react";
+import React, { useEffect, useReducer, useContext } from "react";
 import CommunityContext from "./CommunityContext";
 import CommunityReducer from "./CommunityReducer";
 import MethodGet, { MethodPost } from "../../config/Service";
@@ -10,7 +10,7 @@ import {
   TOOGLE_REACTION_POST_COMMUNITY,
 } from "../../types";
 import clienteAxios from "../../config/Axios";
-import { initSocket } from "../../socket";
+import { getSocket } from "../../socket";
 import Swal from "sweetalert2";
 import AuthContext from "../Auth/AuthContext";
 
@@ -26,53 +26,40 @@ const CommunityState = ({ children }) => {
   const { usuario } = useContext(AuthContext);
   const usuarioId = usuario?.id;
 
-  // 🔌 SOCKET SINGLETON
-  const socketRef = useRef(null);
-  const token = localStorage.getItem("token");
-
-  // 🚀 Inicializar socket SOLO UNA VEZ
+  // 👂 SOCKET EVENTS (SIN MANEJAR CONEXIÓN)
   useEffect(() => {
-    if (!token || socketRef.current) return;
-
-    socketRef.current = initSocket(token);
-
-    return () => {
-      socketRef.current?.disconnect();
-      socketRef.current = null;
-    };
-  }, [token]);
-
-  // 👂 Escuchar eventos
-  useEffect(() => {
-    const socket = socketRef.current;
+    const socket = getSocket();
     if (!socket || !usuarioId) return;
 
-    socket.on("postCommunityCreated", (post) => {
+    const onPostCreated = (post) => {
       if (post.userId === usuarioId) return;
       dispatch({ type: CREATE_POST_COMMUNITY, payload: post });
-    });
+    };
 
-    socket.on("createCommentPostCommunity", ({ postId, comment, userId }) => {
+    const onCommentCreated = ({ postId, comment, userId }) => {
       if (userId === usuarioId) return;
       dispatch({
         type: CREATE_COMMENT_POST_COMMUNITY,
         payload: { postId, comment },
       });
-    });
+    };
 
-    socket.on("postLikeToggled", ({ postId, userId, liked }) => {
+    const onReactionToggled = ({ postId, userId, liked }) => {
       if (userId === usuarioId) return;
-
       dispatch({
-        type: SOCKET_REACTION_POST_COMMUNITY,
+        type: TOOGLE_REACTION_POST_COMMUNITY,
         payload: { postId, liked },
       });
-    });
+    };
+
+    socket.on("postCommunityCreated", onPostCreated);
+    socket.on("createCommentPostCommunity", onCommentCreated);
+    socket.on("postLikeToggled", onReactionToggled);
 
     return () => {
-      socket.off("postCommunityCreated");
-      socket.off("createCommentPostCommunity");
-      socket.off("postLikeToggled");
+      socket.off("postCommunityCreated", onPostCreated);
+      socket.off("createCommentPostCommunity", onCommentCreated);
+      socket.off("postLikeToggled", onReactionToggled);
     };
   }, [usuarioId]);
 
@@ -92,7 +79,9 @@ const CommunityState = ({ children }) => {
       .catch((error) => {
         Swal.fire({
           title: "Cuidado",
-          text: `Ocurrio un error, al obtener las publicaciones ${error.response.data.message}`,
+          text: `Ocurrió un error al obtener publicaciones: ${
+            error.response?.data?.message || "Error desconocido"
+          }`,
           icon: "error",
           showConfirmButton: false,
           timer: 3500,
@@ -100,14 +89,12 @@ const CommunityState = ({ children }) => {
       });
   };
 
-  // 📝 POST
+  // 📝 CREAR POST
   const createPostCommunity = async (data) => {
     Swal.fire({
       title: "Publicando...",
       allowOutsideClick: false,
-      didOpen: () => {
-        Swal.showLoading();
-      },
+      didOpen: () => Swal.showLoading(),
     });
 
     try {
@@ -131,13 +118,13 @@ const CommunityState = ({ children }) => {
     }
   };
 
-  // 💬 COMENTARIO (OPTIMISTIC)
+  // 💬 COMENTARIO (OPTIMISTIC UI)
   const createCommentPostCommunity = async (postId, data) => {
     const formData = new FormData();
     if (data.content) formData.append("content", data.content);
 
     if (data.files?.length) {
-      data.files.forEach((f) => formData.append("files", f));
+      data.files.forEach((file) => formData.append("files", file));
     }
 
     const tempId = `temp-${Date.now()}`;
@@ -147,28 +134,23 @@ const CommunityState = ({ children }) => {
       content: data.content,
       user: data.user,
       createdAt: new Date(),
+      optimistic: true,
       media: data.files?.map((file) => ({
         url: URL.createObjectURL(file),
         type: file.type.startsWith("video") ? "video" : "image",
       })),
-      optimistic: true,
     };
 
     dispatch({
       type: CREATE_COMMENT_POST_COMMUNITY,
-      payload: {
-        postId,
-        comment: optimisticComment,
-      },
+      payload: { postId, comment: optimisticComment },
     });
 
     try {
       const res = await clienteAxios.post(
         `/posts/${postId}/comments`,
         formData,
-        {
-          headers: { "Content-Type": "multipart/form-data" },
-        }
+        { headers: { "Content-Type": "multipart/form-data" } }
       );
 
       optimisticComment.media?.forEach((m) => URL.revokeObjectURL(m.url));
@@ -191,7 +173,7 @@ const CommunityState = ({ children }) => {
     }
   };
 
-  //toogleReaction
+  // ❤️ TOGGLE REACTION
   const createToogleReaction = async (postId) => {
     dispatch({
       type: TOOGLE_REACTION_POST_COMMUNITY,
@@ -202,7 +184,7 @@ const CommunityState = ({ children }) => {
       await MethodPost(`/posts/${postId}/reaction`);
     } catch (error) {
       console.error(error);
-      // rollback simple
+      // rollback
       dispatch({
         type: TOOGLE_REACTION_POST_COMMUNITY,
         payload: { postId },

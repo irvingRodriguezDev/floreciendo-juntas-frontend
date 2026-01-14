@@ -3,7 +3,7 @@ import PostsContext from "./PostsContext";
 import PostsReducer from "./PostsReducer";
 import MethodGet, { MethodDelete, MethodPost } from "../../config/Service";
 import clienteAxios from "../../config/Axios";
-import { initSocket } from "../../socket"; // socket global
+import { getSocket } from "../../socket";
 import AuthContext from "../Auth/AuthContext";
 import {
   ADD_COMMENT,
@@ -12,7 +12,6 @@ import {
   GET_REACTIONS_SUMMARY,
   GET_REACTIONS_SUMMARY_MULTIPLE,
   SET_POSTS,
-  SET_SOCKET,
   UPDATE_REACTIONS,
 } from "../../types";
 
@@ -22,42 +21,34 @@ const PostsState = ({ children }) => {
     totalPages: 0,
     currentPage: 1,
     reactionsSummary: {},
-    socket: null,
   };
 
   const [state, dispatch] = useReducer(PostsReducer, initialState);
 
-  // 🔹 Obtener usuario actual del AuthContext
   const { usuario } = useContext(AuthContext);
   const usuarioId = usuario?.id;
 
-  // 🔹 Inicializar socket global
-  const token = localStorage.getItem("token"); // JWT del usuario
-  const socket = initSocket(token);
-
+  // ===============================
+  // 🔌 SOCKET LISTENERS
+  // ===============================
   useEffect(() => {
-    if (!socket) return;
+    const socket = getSocket();
+    if (!socket || !usuarioId) return;
 
-    // Guardar socket en el state
-    dispatch({ type: SET_SOCKET, payload: socket });
-
-    // ---- Escuchar eventos del backend ----
-    socket.on("postCreated", (post) => {
-      if (post.userId === usuarioId) return; // ignorar posts creados por el usuario actual
+    const handlePostCreated = (post) => {
+      if (post.userId === usuarioId) return;
       dispatch({ type: ADD_POST, payload: post });
-    });
+    };
 
-    socket.on("commentCreated", ({ postId, comment }) => {
-      if (comment.userId === usuarioId) return; // ignorar comentarios creados por el usuario actual
+    const handleCommentCreated = ({ postId, comment }) => {
+      if (comment.userId === usuarioId) return;
       dispatch({
         type: ADD_COMMENT,
         payload: { postId, comment },
       });
-    });
+    };
 
-    socket.on("reactionUpdated", (data) => {
-      const { postId, reactions } = data;
-
+    const handleReactionUpdated = ({ postId, reactions }) => {
       const summary = reactions.reduce((acc, r) => {
         acc[r.type] = (acc[r.type] || 0) + 1;
         return acc;
@@ -70,17 +61,22 @@ const PostsState = ({ children }) => {
         type: UPDATE_REACTIONS,
         payload: { postId, summary, userReaction },
       });
-    });
-
-    // ---- Cleanup: remover listeners al desmontar ----
-    return () => {
-      socket.off("postCreated");
-      socket.off("commentCreated");
-      socket.off("reactionUpdated");
     };
-  }, [socket, usuarioId]);
 
-  // 🔹 Funciones para manejar posts y comentarios
+    socket.on("postCreated", handlePostCreated);
+    socket.on("commentCreated", handleCommentCreated);
+    socket.on("reactionUpdated", handleReactionUpdated);
+
+    return () => {
+      socket.off("postCreated", handlePostCreated);
+      socket.off("commentCreated", handleCommentCreated);
+      socket.off("reactionUpdated", handleReactionUpdated);
+    };
+  }, [usuarioId]);
+
+  // ===============================
+  // 📡 API ACTIONS
+  // ===============================
   const getPosts = async (id, page = 1, rowsPerPage = 10) => {
     const res = await MethodGet(
       `/community/posts/course/${id}?page=${page}&limit=${rowsPerPage}`
@@ -101,11 +97,8 @@ const PostsState = ({ children }) => {
       headers: { "Content-Type": "multipart/form-data" },
     });
 
-    // Actualizar estado local inmediatamente
+    // Optimistic update local
     dispatch({ type: ADD_POST, payload: res.data });
-
-    // Emitir evento socket para otros usuarios
-    state.socket?.emit("postCreated", res.data);
   };
 
   const createComment = async ({ postId, comment, userId }) => {
@@ -114,25 +107,16 @@ const PostsState = ({ children }) => {
       content: comment,
     });
 
-    // Actualiza estado local
     dispatch({
       type: ADD_COMMENT,
       payload: { postId, comment: res.data },
     });
 
-    // Emitir evento socket para otros usuarios
-    state.socket?.emit("commentCreated", { postId, comment: res.data });
-
     return res.data;
   };
 
   const addReaction = async (data) => {
-    const res = await MethodPost(`/community/reactions/toggle`, data);
-
-    state.socket?.emit("reactionUpdated", {
-      postId: data.postId,
-      reactions: res.data.reactions,
-    });
+    await MethodPost(`/community/reactions/toggle`, data);
   };
 
   const deleteComment = async (commentId) => {
@@ -144,6 +128,7 @@ const PostsState = ({ children }) => {
     const { data } = await MethodGet(
       `/community/reactions/summary?postId=${postId}`
     );
+
     dispatch({
       type: GET_REACTIONS_SUMMARY,
       payload: { postId, reactions: data },
@@ -155,7 +140,11 @@ const PostsState = ({ children }) => {
     const { data } = await MethodGet(
       `/community/reactions/summary/multiple?postIds=${idsParam}&userId=${usuarioId}`
     );
-    dispatch({ type: GET_REACTIONS_SUMMARY_MULTIPLE, payload: data });
+
+    dispatch({
+      type: GET_REACTIONS_SUMMARY_MULTIPLE,
+      payload: data,
+    });
   };
 
   return (

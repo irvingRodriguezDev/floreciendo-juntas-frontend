@@ -30,11 +30,11 @@ import FornitureIcon from "../icons/FornitureIcon";
 /* Menu items (igual que antes) */
 const menuItems = [
   { name: "Comunidad", path: "/comunidad", auth: "both" },
-  { name: "Cursos", path: "/cursos", auth: "both" },
+  { name: "10 Secretos", path: "/secretos", auth: "both" },
+  { name: "Lives", path: "/lives", auth: "both" },
+  // { name: "Cursos", path: "/cursos", auth: "both" },
   { name: "Salón", path: "/el-salon-de-tus-sueños", auth: "both" },
   { name: "Eventos", path: "/eventos", auth: "both" },
-  { name: "Secretos", path: "/secretos", auth: "both" },
-  { name: "Lives", path: "/lives", auth: "both" },
   { name: "Tienda", path: "/tienda", auth: "both" },
 ];
 
