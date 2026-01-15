@@ -85,24 +85,28 @@ const Store = () => {
       <Box
         sx={{
           textAlign: "center",
-          mt: { xs: 14, md: 14 },
+          mt: { xs: 5, md: 14 },
           mb: { xs: 6, md: 10 },
         }}
       >
         <Typography
           variant='h2'
           sx={{
-            fontWeight: 300,
-            color: "#4A2C3A",
+            fontWeight: "bold",
+            color: "#E53888",
             mb: 2,
-            fontFamily: "'Playfair Display', serif",
           }}
         >
           Tienda Floreciendo Juntas
         </Typography>
         <Typography
           variant='body2'
-          sx={{ opacity: 0.6, letterSpacing: 3, textTransform: "uppercase" }}
+          sx={{
+            opacity: 0.6,
+            letterSpacing: 3,
+            textTransform: "uppercase",
+            color: "#D82E7A",
+          }}
         >
           Los más vendidos • Disponibles ahora
         </Typography>

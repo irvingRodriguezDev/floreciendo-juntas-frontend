@@ -1,10 +1,12 @@
 import React, { useEffect, useRef, useState, useCallback } from "react";
+import { Box, useMediaQuery, Fade } from "@mui/material";
+import { motion, AnimatePresence } from "framer-motion";
+
 import LiveCommentsOverlay from "./LiveCommentsOverlay";
 import LivePlayerOverlay from "./LivePlayerOverlay";
 import LiveWatermark from "./LiveWatermark";
 import { useLiveComments } from "../../hooks/useLiveComments";
 import MethodGet from "../../config/Service";
-import { Box } from "@mui/material";
 
 const TOKEN_REFRESH_INTERVAL = 4 * 60 * 1000; // 4 min
 
@@ -12,7 +14,9 @@ const IVSPlayerComponent = ({ playbackUrl, liveId, usuario }) => {
   const videoRef = useRef(null);
   const playerRef = useRef(null);
   const refreshTimerRef = useRef(null);
-  const isMobile = window.matchMedia("(max-width: 768px)").matches;
+
+  const isMobile = useMediaQuery("(max-width:768px)");
+
   const [uiState, setUiState] = useState("loading"); // loading | playing | reconnecting
   const [tokenIvs, setTokenIvs] = useState(null);
   const [isReady, setIsReady] = useState(false);
@@ -31,7 +35,7 @@ const IVSPlayerComponent = ({ playbackUrl, liveId, usuario }) => {
   useEffect(() => {
     fetchToken()
       .then(setTokenIvs)
-      .catch(() => setError("No se pudo validar tu acceso al live"));
+      .catch(() => setError("No pudimos validar tu acceso al live 😔"));
   }, [fetchToken]);
 
   // ==========================
@@ -46,9 +50,7 @@ const IVSPlayerComponent = ({ playbackUrl, liveId, usuario }) => {
         const newToken = await fetchToken();
         setTokenIvs(newToken);
 
-        if (playerRef.current) {
-          playerRef.current.load(`${playbackUrl}?token=${newToken}`);
-        }
+        playerRef.current?.load(`${playbackUrl}?token=${newToken}`);
       } catch {
         setError("Se perdió la conexión con el live");
       }
@@ -58,7 +60,7 @@ const IVSPlayerComponent = ({ playbackUrl, liveId, usuario }) => {
   }, [tokenIvs, fetchToken, playbackUrl]);
 
   // ==========================
-  // 3️⃣ Esperar SDK
+  // 3️⃣ Esperar SDK IVS
   // ==========================
   useEffect(() => {
     const checkSDK = () => {
@@ -72,7 +74,7 @@ const IVSPlayerComponent = ({ playbackUrl, liveId, usuario }) => {
   }, []);
 
   // ==========================
-  // 4️⃣ Inicializar Player IVS
+  // 4️⃣ Inicializar Player
   // ==========================
   useEffect(() => {
     if (!isReady || !tokenIvs || playerRef.current) return;
@@ -81,10 +83,8 @@ const IVSPlayerComponent = ({ playbackUrl, liveId, usuario }) => {
 
     const player = window.IVSPlayer.create();
     playerRef.current = player;
-
     player.attachHTMLVideoElement(videoRef.current);
 
-    // Eventos IVS
     player.addEventListener(window.IVSPlayer.PlayerEventType.PLAYING, () =>
       setUiState("playing")
     );
@@ -108,7 +108,7 @@ const IVSPlayerComponent = ({ playbackUrl, liveId, usuario }) => {
   }, [isReady, tokenIvs, playbackUrl]);
 
   // ==========================
-  // 5️⃣ Escuchar VIDEO real (FIX CLAVE)
+  // 5️⃣ Eventos reales del <video>
   // ==========================
   useEffect(() => {
     const video = videoRef.current;
@@ -133,59 +133,93 @@ const IVSPlayerComponent = ({ playbackUrl, liveId, usuario }) => {
   // Render
   // ==========================
   return (
-    <div style={{ position: "relative", width: "100%" }}>
-      {uiState !== "playing" && (
-        <LivePlayerOverlay
-          status={uiState}
-          message={
-            error ||
-            (uiState === "loading"
-              ? "Conectando al live…"
-              : "Reconectando transmisión…")
-          }
-        />
-      )}
+    <Box
+      sx={{
+        position: "relative",
+        width: "100%",
+        height: isMobile ? "100vh" : "auto",
+        background: "#000",
+        overflow: "hidden",
+        borderRadius: { xs: 0, md: 4 },
+      }}
+    >
+      {/* 🎥 OVERLAY ESTADO */}
+      <AnimatePresence>
+        {uiState !== "playing" && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            style={{
+              position: "absolute",
+              inset: 0,
+              zIndex: 20,
+            }}
+          >
+            <LivePlayerOverlay
+              status={uiState}
+              message={
+                error ||
+                (uiState === "loading"
+                  ? "Conectando al live…"
+                  : "Reconectando transmisión…")
+              }
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
 
+      {/* 🎬 VIDEO */}
       <video
         ref={videoRef}
         playsInline
-        controls
-        sx={{
+        controls={!isMobile}
+        style={{
           width: "100%",
           height: isMobile ? "100vh" : "auto",
           objectFit: isMobile ? "cover" : "contain",
           backgroundColor: "#000",
         }}
       />
+
+      {/* 📱 TIP MOBILE */}
       {isMobile && (
-        <Box
-          sx={{
-            position: "absolute",
-            top: 12,
-            left: "50%",
-            transform: "translateX(-50%)",
-            px: 2.5,
-            py: 0.8,
-            borderRadius: "999px",
-            background: "rgba(0,0,0,0.6)",
-            backdropFilter: "blur(8px)",
-            color: "#fff",
-            fontSize: "0.8rem",
-            zIndex: 30,
-          }}
-        >
-          📱 Toca ⛶ para pantalla completa
-        </Box>
+        <Fade in>
+          <Box
+            sx={{
+              position: "absolute",
+              top: 14,
+              left: "50%",
+              transform: "translateX(-50%)",
+              px: 2.5,
+              py: 0.7,
+              borderRadius: 999,
+              background: "rgba(0,0,0,0.6)",
+              backdropFilter: "blur(6px)",
+              color: "#fff",
+              fontSize: "0.75rem",
+              zIndex: 30,
+            }}
+          >
+            ⛶ Pantalla completa recomendada
+          </Box>
+        </Fade>
       )}
 
-      {/* 💧 Watermark */}
-      {/* <LiveWatermark text={`${usuario?.email} • Floreciendo Juntas`} /> */}
+      {/* 💧 WATERMARK */}
 
-      {/* 💬 Comentarios */}
-      <div style={{ position: "absolute", inset: 0, pointerEvents: "none" }}>
+      {/* 💬 COMENTARIOS */}
+      <Box
+        sx={{
+          position: "absolute",
+          inset: 0,
+          zIndex: 15,
+          pointerEvents: "none",
+        }}
+      >
         <LiveCommentsOverlay comments={comments} onSend={sendComment} />
-      </div>
-    </div>
+      </Box>
+    </Box>
   );
 };
 

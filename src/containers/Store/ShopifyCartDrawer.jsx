@@ -11,6 +11,8 @@ import {
 // Importamos un icono para eliminar items si lo deseas
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import { ShopifyCartContext } from "../../context/ShopifyCart/ShopifyCartContext";
+import CloseIcons from "../../components/icons/CloseIcons";
+import { Link } from "react-router-dom";
 
 export default function ShopifyCartDrawer({ open, onClose }) {
   const { cart, loadingCart, checkout } = useContext(ShopifyCartContext);
@@ -52,7 +54,7 @@ export default function ShopifyCartDrawer({ open, onClose }) {
             </Typography>
           </Box>
           <Button onClick={onClose} sx={{ color: "#4A2C3A", minWidth: 0 }}>
-            X
+            <CloseIcons width={30} />
           </Button>
         </Box>
 
@@ -71,13 +73,15 @@ export default function ShopifyCartDrawer({ open, onClose }) {
               <Typography variant='body2' sx={{ opacity: 0.5, mb: 2 }}>
                 Aún no has agregado nada 🤍
               </Typography>
-              <Button
-                onClick={onClose}
-                variant='text'
-                sx={{ color: "#E8A1C4", textTransform: "none" }}
-              >
-                Ir a ver productos
-              </Button>
+              <Link to={"/tienda"}>
+                <Button
+                  onClick={onClose}
+                  variant='text'
+                  sx={{ color: "#E8A1C4", textTransform: "none" }}
+                >
+                  Ir a ver productos
+                </Button>
+              </Link>
             </Box>
           )}
 

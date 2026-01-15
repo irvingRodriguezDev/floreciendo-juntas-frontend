@@ -1,42 +1,66 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { getSocket } from "../socket";
 
 export const useLiveComments = (liveId) => {
   const [comments, setComments] = useState([]);
+  const [isLiveEnded, setIsLiveEnded] = useState(false);
+
+  const joinedRef = useRef(false);
 
   useEffect(() => {
     const socket = getSocket();
-    if (!socket || !liveId) return;
+    if (!socket || !liveId || joinedRef.current) return;
 
-    // 🔗 Unirse al live
+    // 🔗 Unirse al live (una sola vez)
     socket.emit("join-live", liveId);
+    joinedRef.current = true;
 
-    // 📥 Historial
-    const handleLoad = (initialComments) => {
-      setComments(initialComments);
+    // 📥 Historial inicial
+    const handleLoad = (initialComments = []) => {
+      setComments(initialComments.slice(-14));
     };
 
     // 💬 Nuevo comentario
     const handleNew = (comment) => {
-      setComments((prev) => [...prev.slice(-14), comment]);
+      setComments((prev) => [...prev.slice(-13), comment]);
+    };
+
+    // 🔴 Live terminado
+    const handleLiveEnded = ({ liveId: endedLiveId }) => {
+      if (endedLiveId !== liveId) return;
+      setIsLiveEnded(true);
     };
 
     socket.on("load_comments", handleLoad);
     socket.on("new_comment", handleNew);
+    socket.on("live_ended", handleLiveEnded);
 
     return () => {
       socket.emit("leave-live", liveId);
       socket.off("load_comments", handleLoad);
       socket.off("new_comment", handleNew);
+      socket.off("live_ended", handleLiveEnded);
+      joinedRef.current = false;
     };
   }, [liveId]);
 
+  // ✉️ Enviar comentario
   const sendComment = (message) => {
+    if (isLiveEnded) return;
+
     const socket = getSocket();
     if (!socket || !message?.trim()) return;
 
-    socket.emit("send_comment", { liveId, message });
+    socket.emit("send_comment", { liveId, message: message.trim() }, (ack) => {
+      if (!ack?.ok) {
+        console.warn("❌ Comentario no enviado");
+      }
+    });
   };
 
-  return { comments, sendComment };
+  return {
+    comments,
+    sendComment,
+    isLiveEnded, // 🔥 CLAVE
+  };
 };

@@ -15,19 +15,19 @@ import VideoPlayer from "../FullScreenVideo";
 const VideoModal = ({ buttonText = "Ver Nuestro Video", videoUrl }) => {
   const [open, setOpen] = useState(false);
   const theme = useTheme();
-  const fullScreen = useMediaQuery(theme.breakpoints.down("sm"));
 
   const primaryPink = "#DB4586";
 
+  const isSm = useMediaQuery(theme.breakpoints.down("sm"));
+  const isMd = useMediaQuery(theme.breakpoints.down("md"));
+  const fullScreen = isSm;
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
   /** Tamaños dinámicos según breakpoints */
-  const size = useMediaQuery(theme.breakpoints.down("sm"))
-    ? 65
-    : useMediaQuery(theme.breakpoints.down("md"))
-    ? 80
-    : 100;
+  let size = 100;
+  if (isSm) size = 65;
+  else if (isMd) size = 80;
 
   const iconSize = size * 0.7;
 

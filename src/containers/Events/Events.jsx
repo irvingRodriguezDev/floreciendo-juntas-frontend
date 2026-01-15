@@ -41,7 +41,7 @@ const Events = () => {
     <Layout>
       {/* Banner y Buscador */}
       <Grid container spacing={2}>
-        <Grid size={12}>
+        <Grid size={12} sx={{ mt: { xs: 2, lg: 2 } }}>
           <EventsBanner />
         </Grid>
         <Grid size={12}>

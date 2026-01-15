@@ -168,10 +168,17 @@ const ProductCard = ({ product }) => {
         <Box sx={{ position: "relative", zIndex: 0 }}>
           <CardMedia
             component='img'
-            height='200'
+            width='100%'
             image={product.image?.url || product.image || ""}
             alt={product.name}
-            sx={{ objectFit: "cover" }}
+            sx={{
+              aspectRatio: {
+                xs: "5 / 4",
+                sm: "4 / 3",
+                md: "3 / 2",
+                lg: "1 / 1",
+              },
+            }}
           />
         </Box>
 

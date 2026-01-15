@@ -20,6 +20,7 @@ const SecretsBanner = () => {
         alignItems: "center",
         position: "relative",
         overflow: "hidden",
+        mt: { xs: 5, lg: 2 },
         background: `
 #FFF4FA
         `,

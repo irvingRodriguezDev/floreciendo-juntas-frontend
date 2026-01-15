@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Box, Typography, Grid } from "@mui/material";
+import { Box, Typography, Grid, Stack } from "@mui/material";
 import { motion } from "framer-motion";
 
 const MotionBox = motion(Box);
@@ -7,7 +7,6 @@ const MotionBox = motion(Box);
 const getTimeRemaining = (targetDate) => {
   const now = new Date();
   const difference = targetDate.getTime() - now.getTime();
-
   if (difference <= 0) return null;
 
   return {
@@ -23,11 +22,7 @@ const LiveCountdown = ({ startTime }) => {
 
   useEffect(() => {
     const startDate = new Date(startTime);
-
-    const update = () => {
-      setTimeLeft(getTimeRemaining(startDate));
-    };
-
+    const update = () => setTimeLeft(getTimeRemaining(startDate));
     update();
     const timer = setInterval(update, 1000);
     return () => clearInterval(timer);
@@ -37,82 +32,79 @@ const LiveCountdown = ({ startTime }) => {
 
   return (
     <MotionBox
-      initial={{ opacity: 0, y: 24 }}
+      initial={{ opacity: 0, y: 32 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6, ease: "easeOut" }}
+      transition={{ duration: 0.8, ease: "easeOut" }}
       sx={{
-        maxWidth: 920,
+        maxWidth: 980,
         mx: "auto",
-        borderRadius: { xs: 4, md: 6 },
-        px: { xs: 2.5, sm: 4, md: 6 },
-        py: { xs: 4, md: 5 },
-        background: "#FFF4FA",
+        px: { xs: 3, sm: 5, md: 7 },
+        py: { xs: 4, md: 6 },
+        borderRadius: "28px",
+        background: "#fff7fa",
+        backdropFilter: "blur(14px)",
         textAlign: "center",
       }}
     >
-      {/* 🌸 TÍTULO */}
-      <Typography
-        sx={{
-          fontFamily: "'Playfair Display', serif",
-          fontWeight: 700,
-          color: "#C85A8E",
-          fontSize: { xs: 22, sm: 26, md: 32 },
-          mb: 1,
-        }}
-      >
-        El live comienza en
-      </Typography>
-
-      <Typography
-        sx={{
-          color: "#6D5A63",
-          fontSize: { xs: 14, md: 16 },
-          mb: { xs: 3, md: 4 },
-          maxWidth: 520,
-          mx: "auto",
-        }}
-      >
-        Un espacio para compartir, aprender y florecer juntas 🌷
-      </Typography>
+      {/* 🌸 HEADER */}
+      <Stack spacing={1.2} mb={{ xs: 4, md: 5 }}>
+        <Typography
+          sx={{
+            fontWeight: 900,
+            fontSize: { xs: 22, sm: 28, md: 34 },
+            color: "#9B365F",
+            letterSpacing: 0.3,
+          }}
+        >
+          El live comienza en
+        </Typography>
+      </Stack>
 
       {/* ⏳ CONTADOR */}
       <Grid container spacing={{ xs: 2, md: 3 }} justifyContent='center'>
         {Object.entries(timeLeft).map(([label, value], index) => (
-          <Grid item key={label}>
+          <Grid size={{ xs: 12, sm: 3 }} key={label}>
             <motion.div
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{
-                duration: 0.4,
-                delay: index * 0.08,
-              }}
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: index * 0.1, duration: 0.4 }}
             >
               <Box
                 sx={{
-                  minWidth: { xs: 72, sm: 88 },
-                  px: { xs: 2, sm: 2.5 },
-                  py: { xs: 1.8, sm: 2.2 },
-                  borderRadius: 3,
-                  background: "#FFFFFF",
-                  boxShadow: "0 10px 28px rgba(200,90,142,0.15)",
+                  height: "100%",
+                  borderRadius: "22px",
+                  background: "rgba(255,255,255,0.9)",
+                  backdropFilter: "blur(10px)",
+                  px: { xs: 2.5, sm: 3 },
+                  py: { xs: 2.5, sm: 3 },
+                  boxShadow: "0 18px 45px rgba(200,90,142,0.18)",
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  justifyContent: "center",
                 }}
               >
                 <Typography
                   sx={{
-                    fontWeight: 800,
-                    fontSize: { xs: 22, sm: 26 },
+                    fontWeight: 900,
+                    fontSize: {
+                      xs: 38,
+                      sm: 52,
+                      md: 64,
+                    },
                     color: "#E53888",
                     lineHeight: 1,
                   }}
                 >
-                  {value}
+                  {String(value).padStart(2, "0")}
                 </Typography>
 
                 <Typography
                   sx={{
-                    mt: 0.5,
-                    fontSize: 11,
-                    letterSpacing: 0.8,
+                    mt: 1,
+                    fontSize: { xs: 11, sm: 13 },
+                    letterSpacing: 1.4,
+                    fontWeight: 700,
                     color: "#9B6A84",
                     textTransform: "uppercase",
                   }}

@@ -16,6 +16,7 @@ const LivesBanner = () => {
           sm: "34vh",
           md: "38vh",
         },
+        mt: { xs: 3, lg: 2 },
         background: "#fff4fa",
         borderRadius: { xs: "0 0 24px 24px", md: "0 0 40px 40px" },
         display: "flex",

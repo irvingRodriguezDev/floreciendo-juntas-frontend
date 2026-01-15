@@ -85,34 +85,41 @@ const LivesPage = () => {
           }}
         >
           {lives.map((live, i) => (
-            <Grid item xs={12} sm={6} md={4} lg={3} key={live.id}>
+            <Grid size={{ xs: 12, sm: 6, md: 4, lg: 3, xl: 3 }} key={live.id}>
               <Link
                 to={`/detalle-live/${live.id}`}
                 style={{ textDecoration: "none" }}
+                aria-label={`Ver detalle del live ${live.title}`}
               >
                 <Card
                   component={motion.article}
-                  initial={{ opacity: 0, y: 24 }}
+                  initial={{ opacity: 0, y: 28 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: i * 0.08 }}
-                  whileHover={{
-                    y: -6,
-                    boxShadow: "0 24px 60px rgba(232,106,146,0.3)",
+                  transition={{
+                    duration: 0.55,
+                    ease: "easeOut",
+                    delay: i * 0.07,
                   }}
+                  whileHover={{
+                    y: -4,
+                    boxShadow: "0 22px 56px rgba(232,106,146,0.28)",
+                  }}
+                  whileTap={{ scale: 0.98 }}
                   sx={{
-                    borderRadius: "24px",
-                    overflow: "hidden",
-                    background: "#FFF7FB",
-                    border: "1px solid #F3C6DA",
                     height: "100%",
+                    borderRadius: 4,
+                    overflow: "hidden",
+                    background: "linear-gradient(180deg,#FFF7FB 0%,#FFF 100%)",
+                    border: "1px solid #F3C6DA",
+                    transition: "box-shadow .25s ease",
                   }}
                 >
-                  {/* 🖼️ Imagen con aspect-ratio */}
+                  {/* 🖼️ MEDIA */}
                   <Box
                     sx={{
                       position: "relative",
                       width: "100%",
-                      aspectRatio: "1 / 1",
+                      aspectRatio: "4 / 5",
                       overflow: "hidden",
                     }}
                   >
@@ -120,34 +127,58 @@ const LivesPage = () => {
                       component='img'
                       src={live.thumbnail_url}
                       alt={live.title}
+                      loading='lazy'
                       sx={{
                         position: "absolute",
                         inset: 0,
                         width: "100%",
                         height: "100%",
-                        objectFit: "cover",
+                        transition: "transform .6s ease",
+                        aspectRatio: {
+                          xs: "5 / 4",
+                          sm: "4 / 3",
+                          md: "3 / 2",
+                          lg: "1 / 1",
+                        },
                       }}
                     />
 
-                    {/* Overlay suave */}
-                    <Box
-                      sx={{
-                        position: "absolute",
-                        inset: 0,
-                        background:
-                          "linear-gradient(180deg, rgba(255,255,255,0) 55%, rgba(255,220,235,0.7) 100%)",
-                      }}
-                    />
+                    {/* 🔴 LIVE BADGE */}
+                    {live.status === "live" && (
+                      <Box
+                        sx={{
+                          position: "absolute",
+                          top: 12,
+                          left: 12,
+                          px: 1.6,
+                          py: 0.6,
+                          borderRadius: "999px",
+                          background: "linear-gradient(90deg,#E53888,#FF7AA8)",
+                          color: "#fff",
+                          fontSize: "0.7rem",
+                          fontWeight: 900,
+                          letterSpacing: 0.6,
+                          boxShadow: "0 6px 18px rgba(229,56,136,.45)",
+                        }}
+                      >
+                        ● EN VIVO
+                      </Box>
+                    )}
                   </Box>
 
-                  {/* 🌷 Contenido */}
-                  <CardContent sx={{ px: 2.5, py: 2.2 }}>
+                  {/* 🌷 CONTENT */}
+                  <CardContent sx={{ px: 2.5, py: 2.3 }}>
                     <Typography
                       sx={{
                         fontWeight: 900,
-                        fontSize: "1.15rem",
+                        fontSize: "1.05rem",
                         color: "#9B365F",
-                        lineHeight: 1.3,
+                        lineHeight: 1.25,
+                        display: "-webkit-box",
+                        WebkitLineClamp: 2,
+                        WebkitBoxOrient: "vertical",
+                        overflow: "hidden",
+                        textWrap: "balance",
                       }}
                     >
                       {live.title}
@@ -155,8 +186,8 @@ const LivesPage = () => {
 
                     <Typography
                       sx={{
-                        mt: 0.8,
-                        fontSize: "0.85rem",
+                        mt: 0.7,
+                        fontSize: "0.8rem",
                         color: "#6D5A63",
                       }}
                     >
@@ -166,24 +197,25 @@ const LivesPage = () => {
                       })}
                     </Typography>
 
-                    {/* Estado */}
+                    {/* STATUS CHIP */}
                     <Box
                       sx={{
-                        mt: 2,
+                        mt: 1.8,
                         display: "inline-flex",
                         alignItems: "center",
                         gap: 1,
                         px: 2,
                         py: "6px",
                         borderRadius: "20px",
-                        fontSize: "0.72rem",
+                        fontSize: "0.7rem",
                         fontWeight: 800,
+                        letterSpacing: 0.4,
                         background:
                           live.status === "live"
                             ? "linear-gradient(90deg,#E86A92,#FF8FB3)"
                             : live.status === "scheduled"
                             ? "linear-gradient(90deg,#FFE1EC,#FFB8D2)"
-                            : "#E0E0E0",
+                            : "#ECECEC",
                         color: live.status === "live" ? "#fff" : "#8A4A62",
                       }}
                     >

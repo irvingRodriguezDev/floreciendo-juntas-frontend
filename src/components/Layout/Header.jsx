@@ -212,7 +212,7 @@ const Header = () => {
               src={Logo}
               alt='Logo Floreciendo Juntas'
               sx={{
-                width: { xs: 220, md: 220 },
+                width: { xs: 190, md: 220 },
                 height: "auto",
                 transition: "transform 0.35s ease, box-shadow 0.35s ease",
                 transformOrigin: "left center",
@@ -361,8 +361,15 @@ const Header = () => {
                 right='6px'
                 size='md'
               >
-                <CartButton onOpen={() => setOpenCart(true)} />
+                <IconButton onClick={() => setOpenCart(true)}>
+                  <FornitureIcon width={50} />
+                </IconButton>
               </BadgeBox>
+              <ShopifyCartButton onClick={() => setOpenCartShopify(true)} />
+              <ShopifyCartDrawer
+                open={openCartShopify}
+                onClose={() => setOpenCartShopify(false)}
+              />
 
               <IconButton
                 edge='start'
@@ -397,7 +404,7 @@ const Header = () => {
                         variant='h6'
                         sx={{ color: "#E53888", fontWeight: "bold", mb: 2 }}
                       >
-                        <img src={Logo} width='95%' height={70} />
+                        <img src={Logo} width='90%' height={70} />
                       </Typography>
                     </Link>
                     <List>
@@ -420,53 +427,66 @@ const Header = () => {
                         </ListItem>
                       ))}
                     </List>
-                  </Box>
-
-                  <Box
-                    sx={{ display: "flex", flexDirection: "column", gap: 1 }}
-                  >
-                    {!autenticado ? (
-                      <Button
-                        component={Link}
-                        to='/iniciar-sesion'
-                        variant='outlined'
-                        sx={{
-                          color: "#E53888",
-                          borderColor: "#E53888",
-                          borderRadius: "10px",
-                        }}
-                      >
-                        Iniciar
-                      </Button>
-                    ) : (
-                      <>
-                        <Button
-                          component={Link}
-                          to='/mi-perfil'
-                          variant='contained'
-                          sx={{
-                            color: "#fff",
-                            backgroundColor: "#E53888",
-                            borderRadius: "10px",
-                            "&:hover": { backgroundColor: "#d82e7a" },
-                          }}
-                        >
-                          Mi Perfil
-                        </Button>
-                        <Button
-                          component={Link}
-                          variant='outlined'
-                          sx={{
-                            borderColor: "#E53888",
-                            color: "#E53888",
-                            borderRadius: "10px",
-                            "&:hover": { borderColor: "#d82e7a" },
-                          }}
-                        >
-                          Cerrar Sesión
-                        </Button>
-                      </>
-                    )}
+                    <Box
+                      sx={{ display: "flex", flexDirection: "column", gap: 1 }}
+                    >
+                      {!autenticado ? (
+                        <>
+                          <Button
+                            component={Link}
+                            to='/iniciar-sesion'
+                            variant='outlined'
+                            sx={{
+                              color: "#E53888",
+                              borderColor: "#E53888",
+                              borderRadius: "10px",
+                            }}
+                          >
+                            Iniciar sesión
+                          </Button>
+                          <Button
+                            component={Link}
+                            to='/registro'
+                            variant='contained'
+                            sx={{
+                              bgcolor: "#E53888",
+                              borderColor: "#E53888",
+                              borderRadius: "10px",
+                            }}
+                          >
+                            Crear cuenta
+                          </Button>
+                        </>
+                      ) : (
+                        <>
+                          <Button
+                            component={Link}
+                            to='/mi-perfil'
+                            variant='contained'
+                            sx={{
+                              color: "#fff",
+                              backgroundColor: "#E53888",
+                              borderRadius: "10px",
+                              "&:hover": { backgroundColor: "#d82e7a" },
+                            }}
+                          >
+                            Mi Perfil
+                          </Button>
+                          <Button
+                            component={Link}
+                            variant='outlined'
+                            sx={{
+                              borderColor: "#E53888",
+                              color: "#E53888",
+                              borderRadius: "10px",
+                              "&:hover": { borderColor: "#d82e7a" },
+                            }}
+                          >
+                            Cerrar Sesión
+                          </Button>
+                        </>
+                      )}
+                    </Box>
                   </Box>
                 </Box>
               </Drawer>
