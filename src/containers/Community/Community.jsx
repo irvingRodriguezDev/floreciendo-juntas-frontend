@@ -9,6 +9,7 @@ import {
   Paper,
   Fab,
   Button,
+  Tooltip,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import Layout from "../../components/Layout/Layout";
@@ -18,6 +19,7 @@ import PostCard from "../../components/Community/PostCard";
 import CommunityContext from "../../context/Community/CommunityContext";
 import Pagination from "../../components/Pagination/Pagination";
 import { Link } from "react-router-dom";
+import WritePostIcon from "../../components/icons/WritePostIcon";
 // Mock inicial
 
 const Community = () => {
@@ -195,7 +197,7 @@ const Community = () => {
             onClick={handleClickOpenWritePost}
             sx={{
               position: "fixed",
-              bottom: 20,
+              bottom: 100,
               right: 20,
               background: "#D82E7A",
               color: "#fff",
@@ -205,7 +207,9 @@ const Community = () => {
               display: { xs: "flex", sm: "none" },
             }}
           >
-            <AddIcon />
+            <Tooltip title='Escribir Post' placement='top'>
+              <WritePostIcon width={40} />
+            </Tooltip>
           </Fab>
           {totalPages > 1 && (
             <Grid container justifyContent='center' sx={{ mt: 3, pb: 2 }}>

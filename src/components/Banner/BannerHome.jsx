@@ -19,7 +19,7 @@ import GerberaImg2 from "../../assets/images/FLOR ROSA 2.png";
 import GerberaImg3 from "../../assets/images/GERBERA MAGENTA.png";
 import GerberaImg4 from "../../assets/images/GERBERA MAGENTA desenfoque.png";
 import GerberaImg5 from "../../assets/images/FLOR ROSA CONVEN.png";
-import firmacaro from "../../assets/images/logo_carolina_tavera.png";
+import firmacaro from "../../assets/images/LOGOTIPO FLORECIENDO JUNTAS negro.png";
 const BannerHome = () => {
   const theme = useTheme();
   const videoSource =
@@ -384,6 +384,7 @@ const BannerHome = () => {
           <b> Florecer</b> no es casualidad es preparación. Y <b>juntas</b>, es
           más poderoso
         </Typography>
+        {/* <img src={firmacaro} width='100%' height='100%' /> */}
       </Box>
 
       {/* ---- CONTENIDO DERECHO ---- */}

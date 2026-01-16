@@ -1,6 +1,5 @@
 import { Box, IconButton, Typography, Divider, Button } from "@mui/material";
 import { motion } from "framer-motion";
-import CloseIcon from "@mui/icons-material/Close";
 import { useContext, useEffect, useMemo } from "react";
 
 import CartContext from "../../context/Cart/CartContext";
@@ -10,6 +9,7 @@ import CartItem from "./CartItem";
 import { formatMexicanCurrency } from "../../utils/FormatCurrency";
 import { Link } from "react-router-dom";
 import OrdersContext from "../../context/Orders/OrdersContext";
+import CloseIcons from "../icons/CloseIcons";
 export default function CartSidebar({ open, onClose }) {
   const { cart, guest_cart, getUserCart, clearCart } = useContext(CartContext);
   const { autenticado } = useContext(AuthContext);
@@ -87,7 +87,7 @@ export default function CartSidebar({ open, onClose }) {
           </Typography>
 
           <IconButton onClick={onClose} sx={{ color: "#E53888" }}>
-            <CloseIcon />
+            <CloseIcons width={30} />
           </IconButton>
         </Box>
         {autenticado && activeCart?.items?.length > 0 && (

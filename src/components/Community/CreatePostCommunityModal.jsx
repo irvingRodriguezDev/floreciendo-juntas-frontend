@@ -16,6 +16,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import CommunityContext from "../../context/Community/CommunityContext";
 import Swal from "sweetalert2";
 import AuthContext from "../../context/Auth/AuthContext";
+import CloseIcons from "../icons/CloseIcons";
 export default function CreatePostModal({ open, handleClose }) {
   const { createPostCommunity } = useContext(CommunityContext);
   const { usuario } = useContext(AuthContext);
@@ -120,7 +121,7 @@ export default function CreatePostModal({ open, handleClose }) {
             </Box>
 
             <IconButton onClick={onClose}>
-              <CloseIcon sx={{ color: "#d72e7a" }} />
+              <CloseIcons width={40} />
             </IconButton>
           </Box>
 

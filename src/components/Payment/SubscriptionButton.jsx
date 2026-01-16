@@ -120,7 +120,7 @@ const SubscriptionForm = ({ userId }) => {
         textAlign='center'
         sx={{ mb: 3, opacity: 0.8 }}
       >
-        Por solo <b>$250.00 MXN</b>
+        Por solo <b>$200.00 MXN</b>
       </Typography>
 
       <Divider sx={{ mb: 3 }} />
@@ -157,7 +157,7 @@ const SubscriptionForm = ({ userId }) => {
           />
         </Box>
 
-        <Box
+        {/* <Box
           sx={{
             mb: 2,
             p: 1.5,
@@ -166,7 +166,7 @@ const SubscriptionForm = ({ userId }) => {
             "&:hover": { backgroundColor: "#fafafa" },
           }}
         >
-          {/* <FormControlLabel
+          <FormControlLabel
             value={PRICE_ONETIME}
             control={
               <Radio
@@ -184,8 +184,8 @@ const SubscriptionForm = ({ userId }) => {
                 </Typography>
               </Box>
             }
-          /> */}
-        </Box>
+          />
+        </Box> */}
       </RadioGroup>
 
       {/* BOTÓN */}
