@@ -3,8 +3,6 @@ import { getSocket } from "../socket";
 
 export const useLiveComments = (liveId) => {
   const [comments, setComments] = useState([]);
-  const [isLiveEnded, setIsLiveEnded] = useState(false);
-
   const joinedRef = useRef(false);
 
   useEffect(() => {
@@ -25,29 +23,19 @@ export const useLiveComments = (liveId) => {
       setComments((prev) => [...prev.slice(-13), comment]);
     };
 
-    // 🔴 Live terminado
-    const handleLiveEnded = ({ liveId: endedLiveId }) => {
-      if (endedLiveId !== liveId) return;
-      setIsLiveEnded(true);
-    };
-
     socket.on("load_comments", handleLoad);
     socket.on("new_comment", handleNew);
-    socket.on("live_ended", handleLiveEnded);
 
     return () => {
       socket.emit("leave-live", liveId);
       socket.off("load_comments", handleLoad);
       socket.off("new_comment", handleNew);
-      socket.off("live_ended", handleLiveEnded);
       joinedRef.current = false;
     };
   }, [liveId]);
 
   // ✉️ Enviar comentario
   const sendComment = (message) => {
-    if (isLiveEnded) return;
-
     const socket = getSocket();
     if (!socket || !message?.trim()) return;
 
@@ -61,6 +49,5 @@ export const useLiveComments = (liveId) => {
   return {
     comments,
     sendComment,
-    isLiveEnded, // 🔥 CLAVE
   };
 };

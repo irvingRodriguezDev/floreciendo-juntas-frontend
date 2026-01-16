@@ -15,7 +15,7 @@ const LiveEndedOverlay = ({ onReplay, onGoHome }) => {
         justifyContent: "center",
         alignItems: "center",
         background:
-          "linear-gradient(180deg, rgba(0,0,0,0.85), rgba(0,0,0,0.95))",
+          "linear-gradient(180deg, rgba(0,0,0,0.42),rgba(229, 56, 136, 0.43))",
         backdropFilter: "blur(6px)",
         px: 3,
         textAlign: "center",
@@ -28,13 +28,13 @@ const LiveEndedOverlay = ({ onReplay, onGoHome }) => {
           px: 1.5,
           py: 0.5,
           borderRadius: 999,
-          backgroundColor: "rgba(255,255,255,0.1)",
+          backgroundColor: "rgba(255, 255, 255, 0.53)",
         }}
       >
         <Typography
           variant='caption'
           sx={{
-            color: "#ff4d4f",
+            color: "#e53888",
             fontWeight: 600,
             letterSpacing: 0.5,
           }}
@@ -48,7 +48,7 @@ const LiveEndedOverlay = ({ onReplay, onGoHome }) => {
         sx={{
           fontSize: "1.5rem",
           fontWeight: 700,
-          color: "#fff",
+          color: "#e53888",
           mb: 1,
         }}
       >
@@ -59,7 +59,7 @@ const LiveEndedOverlay = ({ onReplay, onGoHome }) => {
       <Typography
         sx={{
           fontSize: "0.95rem",
-          color: "rgba(255,255,255,0.75)",
+          color: "#e53888",
           mb: 4,
           maxWidth: 320,
         }}
@@ -76,27 +76,6 @@ const LiveEndedOverlay = ({ onReplay, onGoHome }) => {
           maxWidth: 320,
         }}
       >
-        {onReplay && (
-          <Button
-            fullWidth
-            onClick={onReplay}
-            startIcon={<ReplayIcon />}
-            sx={{
-              textTransform: "none",
-              fontWeight: 600,
-              borderRadius: 2,
-              background: "linear-gradient(135deg, #ff416c, #ff4b2b)",
-              color: "#fff",
-              py: 1.2,
-              "&:hover": {
-                opacity: 0.9,
-              },
-            }}
-          >
-            Ver repetición
-          </Button>
-        )}
-
         {onGoHome && (
           <Button
             fullWidth
@@ -106,12 +85,12 @@ const LiveEndedOverlay = ({ onReplay, onGoHome }) => {
               textTransform: "none",
               fontWeight: 600,
               borderRadius: 2,
-              border: "1px solid rgba(255,255,255,0.2)",
-              color: "#fff",
+              border: "1px solid rgba(229, 56, 136, 0.43)",
+              color: "#e53888",
               py: 1.2,
             }}
           >
-            Salir
+            Ver proximos lives
           </Button>
         )}
       </Box>

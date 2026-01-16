@@ -1,69 +1,88 @@
-import { useReducer } from "react";
+import { useReducer, useEffect } from "react";
 import LivesReducer from "./LivesReducer";
 import LivesContext from "./LivesContext";
-import MethodGet, { MethodPost } from "../../config/Service";
+import MethodGet from "../../config/Service";
+import { getSocket } from "../../socket";
 
-import Swal from "sweetalert2";
-import { GET_ALL_LIVES, GET_LATEST_LIVES, GET_LIVE_BY_ID } from "../../types";
+import {
+  GET_ALL_LIVES,
+  GET_LATEST_LIVES,
+  GET_LIVE_BY_ID,
+  LIVE_STATUS_UPDATE,
+} from "../../types";
+
 const LivesState = ({ children }) => {
   const initialState = {
     lives: [],
-    live: {},
+    live: null, // 👈 live activo (o null)
+    isLiveActive: false, // 👈 flag global
     totalItems: 0,
     totalPages: 0,
     currentPage: 0,
-    topCourses: [],
   };
+
   const [state, dispatch] = useReducer(LivesReducer, initialState);
 
+  // 🔌 SOCKET GLOBAL (una sola vez)
+  useEffect(() => {
+    const socket = getSocket();
+    if (!socket) return;
+
+    socket.on("live_started", ({ liveId, status }) => {
+      dispatch({
+        type: LIVE_STATUS_UPDATE,
+        payload: { id: liveId, status },
+      });
+    });
+
+    socket.on("live_ended", ({ liveId }) => {
+      dispatch({
+        type: LIVE_STATUS_UPDATE,
+        payload: { id: liveId, status: "ended" },
+      });
+    });
+
+    return () => {
+      socket.off("live_started");
+      socket.off("live_ended");
+    };
+  }, []);
+  // 📡 REST (sin cambios)
   const getAllLives = (page, limit, search = "") => {
     let url = `/lives?page=${page}&limit=${limit}`;
-
     if (search.trim() !== "") {
-      url += `&search=${encodeURIComponent(search)}`; // 👈 usar +=
+      url += `&search=${encodeURIComponent(search)}`;
     }
 
-    MethodGet(url)
-      .then((res) => {
-        dispatch({
-          type: GET_ALL_LIVES,
-          payload: {
-            lives: res.data,
-            totalItems: res.data.total, // ⚠ ojo, tu backend devuelve 'total'
-            totalPages: res.data.totalPages,
-            currentPage: res.data.currentPage,
-          },
-        });
-      })
-      .catch((error) => {
-        console.log(error);
+    MethodGet(url).then((res) => {
+      dispatch({
+        type: GET_ALL_LIVES,
+        payload: {
+          lives: res.data,
+          totalItems: res.data.total,
+          totalPages: res.data.totalPages,
+          currentPage: res.data.currentPage,
+        },
       });
+    });
   };
+
   const getLatestlives = () => {
-    let url = "/lives/latest";
-    MethodGet(url)
-      .then((res) => {
-        dispatch({
-          type: GET_LATEST_LIVES,
-          payload: res.data.lives,
-        });
-      })
-      .catch((error) => {
-        console.log(error);
+    MethodGet("/lives/latest").then((res) => {
+      dispatch({
+        type: GET_LATEST_LIVES,
+        payload: res.data.lives,
       });
+    });
   };
+
   const getLiveById = (id) => {
-    let url = `/lives/${id}`;
-    MethodGet(url)
-      .then((res) => {
-        dispatch({
-          type: GET_LIVE_BY_ID,
-          payload: res.data,
-        });
-      })
-      .catch((error) => {
-        console.log(error);
+    MethodGet(`/lives/${id}`).then((res) => {
+      dispatch({
+        type: GET_LIVE_BY_ID,
+        payload: res.data,
       });
+    });
   };
 
   return (
@@ -71,6 +90,7 @@ const LivesState = ({ children }) => {
       value={{
         lives: state.lives,
         live: state.live,
+        isLiveActive: state.isLiveActive,
         totalItems: state.totalItems,
         totalPages: state.totalPages,
         currentPage: state.currentPage,
@@ -83,4 +103,5 @@ const LivesState = ({ children }) => {
     </LivesContext.Provider>
   );
 };
+
 export default LivesState;

@@ -13,7 +13,7 @@ import { motion, AnimatePresence } from "framer-motion";
 
 /**
  * LiveCommentsOverlay
- * TikTok Live Style | Mobile-first | Ultra-Optimizado
+ * TikTok Live Style | Mobile-first | NO SCROLL JUMP
  */
 const LiveCommentsOverlay = ({ comments = [], onSend }) => {
   const [message, setMessage] = useState("");
@@ -21,8 +21,9 @@ const LiveCommentsOverlay = ({ comments = [], onSend }) => {
   const [commentsHidden, setCommentsHidden] = useState(false);
   const [cooldown, setCooldown] = useState(false);
 
-  const bottomRef = useRef(null);
+  const listRef = useRef(null);
   const inputRef = useRef(null);
+  const isAtBottomRef = useRef(true); // ⭐
 
   const isMobile = window.innerWidth < 768;
 
@@ -32,25 +33,29 @@ const LiveCommentsOverlay = ({ comments = [], onSend }) => {
   const visibleComments = useMemo(() => comments.slice(-30), [comments]);
 
   /* ==============================
-   * AUTO SCROLL (TikTok style)
+   * DETECT SCROLL POSITION
    * ============================== */
-  useEffect(() => {
-    if (!commentsHidden) {
-      bottomRef.current?.scrollIntoView({
-        behavior: "smooth",
-        block: "end",
-      });
-    }
-  }, [visibleComments, commentsHidden]);
+  const handleScroll = () => {
+    const el = listRef.current;
+    if (!el) return;
+
+    const threshold = 20;
+    isAtBottomRef.current =
+      el.scrollHeight - el.scrollTop - el.clientHeight < threshold;
+  };
 
   /* ==============================
-   * AUTO FOCUS (mobile only)
+   * AUTO SCROLL (NO JUMP)
    * ============================== */
   useEffect(() => {
-    if (!commentsHidden && isMobile) {
-      setTimeout(() => inputRef.current?.focus(), 120);
+    const el = listRef.current;
+    if (!el || commentsHidden) return;
+
+    // ⭐ Solo hace scroll si el usuario ya estaba abajo
+    if (isAtBottomRef.current) {
+      el.scrollTop = el.scrollHeight;
     }
-  }, [commentsHidden, isMobile]);
+  }, [visibleComments, commentsHidden]);
 
   /* ==============================
    * SEND MESSAGE
@@ -59,12 +64,15 @@ const LiveCommentsOverlay = ({ comments = [], onSend }) => {
     if (!message.trim() || cooldown) return;
 
     const tempMessage = message.trim();
-    setMessage(""); // 🔥 limpia ANTES
+    setMessage("");
 
     onSend(tempMessage);
 
     setCooldown(true);
     setTimeout(() => setCooldown(false), 2200);
+
+    // ⭐ Mantiene foco SIN mover viewport
+    inputRef.current?.focus({ preventScroll: true });
   }, [message, cooldown, onSend]);
 
   const handleKeyDown = useCallback(
@@ -102,9 +110,6 @@ const LiveCommentsOverlay = ({ comments = [], onSend }) => {
         }}
       >
         <IconButton
-          aria-label={
-            commentsHidden ? "Mostrar comentarios" : "Ocultar comentarios"
-          }
           onClick={() => setCommentsHidden((prev) => !prev)}
           sx={{
             width: 38,
@@ -112,9 +117,6 @@ const LiveCommentsOverlay = ({ comments = [], onSend }) => {
             background: "rgba(0,0,0,0.5)",
             backdropFilter: "blur(10px)",
             color: "#FFF",
-            "&:hover": {
-              background: "rgba(0,0,0,0.7)",
-            },
           }}
         >
           {commentsHidden ? (
@@ -135,12 +137,16 @@ const LiveCommentsOverlay = ({ comments = [], onSend }) => {
             transition={{ duration: 0.25 }}
           >
             <Box
+              ref={listRef} // ⭐
+              onScroll={handleScroll} // ⭐
               sx={{
-                maxHeight: { xs: 150, md: 220 },
+                maxHeight: { xs: 180, md: 120 },
                 overflowY: "auto",
                 mb: 2,
                 pointerEvents: "auto",
                 pr: 1,
+
+                overflowAnchor: "none", // ⭐ CLAVE ANTI-SALTO
 
                 scrollbarWidth: "none",
                 "&::-webkit-scrollbar": { width: "2px" },
@@ -154,9 +160,9 @@ const LiveCommentsOverlay = ({ comments = [], onSend }) => {
               <AnimatePresence>
                 {visibleComments.map((c, index) => (
                   <motion.div
-                    key={c.id || `${c.user_id}-${c.created_at}-${index}`}
-                    initial={{ opacity: 0, x: -8 }}
-                    animate={{ opacity: 1, x: 0 }}
+                    key={c.id || `${index}`}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
                     transition={{ duration: 0.2 }}
                   >
@@ -184,7 +190,6 @@ const LiveCommentsOverlay = ({ comments = [], onSend }) => {
                       <Typography
                         sx={{
                           fontSize: "0.85rem",
-                          lineHeight: 1.35,
                           color: "rgba(255,255,255,0.95)",
                           wordBreak: "break-word",
                         }}
@@ -195,8 +200,6 @@ const LiveCommentsOverlay = ({ comments = [], onSend }) => {
                   </motion.div>
                 ))}
               </AnimatePresence>
-
-              <div ref={bottomRef} />
             </Box>
           </motion.div>
         )}
@@ -214,8 +217,6 @@ const LiveCommentsOverlay = ({ comments = [], onSend }) => {
           borderRadius: "999px",
           px: 2,
           py: 1,
-          mb: isFocused ? "env(safe-area-inset-bottom)" : 0,
-          transition: "all 0.25s ease",
           border: isFocused
             ? "1px solid rgba(254,44,85,0.4)"
             : "1px solid transparent",
@@ -233,26 +234,12 @@ const LiveCommentsOverlay = ({ comments = [], onSend }) => {
           onKeyDown={handleKeyDown}
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
-          InputProps={{
-            disableUnderline: true,
-          }}
+          InputProps={{ disableUnderline: true }}
           disabled={cooldown}
         />
 
-        <IconButton
-          aria-label='Enviar comentario'
-          onClick={handleSend}
-          disabled={cooldown || !message.trim()}
-          sx={{
-            transform: message.trim() ? "scale(1.05)" : "scale(1)",
-            transition: "transform 0.15s ease",
-          }}
-        >
-          <SendIcon
-            sx={{
-              color: cooldown ? "rgba(0,0,0,0.25)" : "#FE2C55",
-            }}
-          />
+        <IconButton onClick={handleSend} disabled={cooldown || !message.trim()}>
+          <SendIcon sx={{ color: "#FE2C55" }} />
         </IconButton>
       </Box>
     </Box>

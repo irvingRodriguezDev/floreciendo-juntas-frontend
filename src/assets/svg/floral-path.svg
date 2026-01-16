@@ -7,9 +7,9 @@
            C180 1560 70 1680 130 1800
            C190 1920 130 2000 130 2000"
         stroke="#e88fb8"
-        stroke-width="4"
-        stroke-linecap="round"
-        stroke-dasharray="12 12"
+        strokeWidth="4"
+        strokeLinecap="round"
+        strokeDasharray="12 12"
         fill="none"
         opacity="0.6"
   />
