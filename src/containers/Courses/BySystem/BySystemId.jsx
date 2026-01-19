@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import Layout from "../../../components/Layout/Layout";
-import { Grid } from "@mui/material";
+import { Grid, Typography } from "@mui/material";
 import SystemBanner from "../../../components/Banner/SystemBanner";
 import { useParams } from "react-router-dom";
 import MethodGet from "../../../config/Service";
@@ -58,10 +58,10 @@ const BySystemId = () => {
 
   return (
     <Layout>
-      <VideoFull />
+      {/* <VideoFull /> */}
 
       <Grid container spacing={2} sx={{ padding: "20px" }}>
-        <Grid size={12} sx={{ marginTop: 12 }}>
+        <Grid size={12}>
           <SystemBanner
             systemName={system ? system.name.trim("") : ""}
             description={system ? system.description.trim("") : ""}
@@ -97,8 +97,17 @@ const BySystemId = () => {
                 </Grid>
               ))
             ) : (
-              <Grid size={12} style={{ textAlign: "center" }}>
-                <p>No se encontraron cursos.</p>
+              <Grid size={12} sx={{ textAlign: "center", py: 6 }}>
+                <Typography
+                  sx={{
+                    color: "#D82E7A",
+                    fontWeight: 500,
+                    fontSize: "1.05rem",
+                  }}
+                >
+                  Cada proceso florece a su tiempo 🌷 Por ahora no hay cursos
+                  disponibles en esta etapa pero pronto habrá nuevos caminos.
+                </Typography>
               </Grid>
             )}
           </Grid>

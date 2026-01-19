@@ -75,9 +75,16 @@ const Events = () => {
                 </Grid>
               ))
             ) : (
-              <Grid size={12} sx={{ textAlign: "center" }}>
-                <Typography variant='body1' color='text.secondary'>
-                  No se encontraron eventos en próximas fechas 🥺
+              <Grid size={12} sx={{ textAlign: "center", py: 6 }}>
+                <Typography
+                  sx={{
+                    color: "#D81B60",
+                    fontWeight: 500,
+                    fontSize: "1.05rem",
+                  }}
+                >
+                  Cada encuentro florece en su momento 🌷 Pronto compartiremos
+                  nuevas experiencias contigo.
                 </Typography>
               </Grid>
             )}

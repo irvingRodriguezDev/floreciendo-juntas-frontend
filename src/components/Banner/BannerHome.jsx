@@ -23,7 +23,7 @@ import firmacaro from "../../assets/images/LOGOTIPO FLORECIENDO JUNTAS negro.png
 const BannerHome = () => {
   const theme = useTheme();
   const videoSource =
-    "https://floreciendojuntas1.s3.us-east-2.amazonaws.com/local/Statics/FLORECIENDO+PLATAFORMA.mov";
+    "https://floreciendojuntas1.s3.us-east-2.amazonaws.com/production/statics/Floreciendo+Juntas+Plataforma+(1).mov";
 
   return (
     <Box

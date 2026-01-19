@@ -337,7 +337,11 @@ linear-gradient(181deg,rgba(255, 223, 239, 1) 0%, rgba(255, 255, 255, 1) 100%);
                           objectFit: "contain",
                         }}
                       >
-                        <Typography variant='h2' fontWeight='bold'>
+                        <Typography
+                          variant='h2'
+                          fontWeight='bold'
+                          color='#E53888'
+                        >
                           {index + 1}
                         </Typography>
                       </Box>

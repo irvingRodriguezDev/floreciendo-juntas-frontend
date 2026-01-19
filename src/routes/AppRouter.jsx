@@ -34,6 +34,7 @@ import Store from "../containers/Store/Store";
 import Subscription from "../containers/Subscription/Subscription";
 import NewHome from "../containers/NewHome";
 import Community from "../containers/Community/Community";
+import SubscriptionScreen from "../containers/SubscriptionScreen";
 function AppRouter() {
   const { autenticado, usuarioAutenticado, cargando } = useContext(AuthContext);
   useEffect(() => {
@@ -68,6 +69,7 @@ function AppRouter() {
     { path: "/detalle-orden/:id", element: <DetailOrders /> },
     { path: "/checkout", element: <Checkout /> },
     { path: "/new-home", element: <NewHome /> },
+    { path: "/suscribirme", element: <SubscriptionScreen /> },
   ];
 
   // Rutas públicas solo para no autenticados

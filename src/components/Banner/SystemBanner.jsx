@@ -1,99 +1,144 @@
 import React from "react";
-import { Box, Typography, styled } from "@mui/material";
-import LocalFloristIcon from "@mui/icons-material/LocalFlorist"; // Ícono para la temática
+import { Box, Typography, Container, Stack } from "@mui/material";
+import { motion } from "framer-motion";
+import underline from "../../assets/svg/underline.svg";
 
-// Paleta de colores ajustada:
-const PRIMARY_PINK = "#FBECEC"; // Rosa Pastel de Fondo (Más claro)
-const ACCENT_BERRY = "#D81B60"; // Rosa Fuerte para decoraciones y texto
-const TEXT_COLOR = "#4A148C"; // Morado oscuro para alto contraste
-
-// --- Estilos personalizados para el Banner (Más grande y decorado) ---
-const StyledBanner = styled(Box)(({ theme }) => ({
-  // Dimensiones y fondo
-  backgroundColor: PRIMARY_PINK,
-  borderRadius: theme.shape.borderRadius * 2, // Bordes más redondeados
-  padding: theme.spacing(6), // Más padding para hacerlo más grande
-  display: "flex",
-  flexDirection: "column",
-  alignItems: "center",
-  textAlign: "center",
-  position: "relative",
-  overflow: "hidden",
-  boxShadow: "0 8px 15px rgba(216, 27, 96, 0.2)", // Sombra sutil
-  width: "100%",
-  marginTop: { md: "350px" },
-
-  // Decoración Superior-Derecha: Círculo vacío y grande (como en tu imagen)
-  "&::before": {
-    content: '""',
-    position: "absolute",
-    top: "15%",
-    right: "5%",
-    width: 60,
-    height: 60,
-    border: `4px solid ${ACCENT_BERRY}`,
-    borderRadius: "50%",
-    opacity: 0.6,
-  },
-
-  // Decoración Inferior-Izquierda: Patrón de puntos (como en tu imagen)
-  "&::after": {
-    content: '""',
-    position: "absolute",
-    bottom: "10%",
-    left: "5%",
-    width: 30,
-    height: 30,
-    background: `radial-gradient(circle, ${ACCENT_BERRY} 40%, transparent 0)`,
-    backgroundSize: "15px 15px",
-    opacity: 0.4,
-    transform: "rotate(-15deg)", // Ligera inclinación para dinamismo
-  },
-
-  // Decoración Superior-Izquierda: Patrón de rombos/enlaces
-  "& > .decoration-top-left": {
-    position: "absolute",
-    top: "10%",
-    left: "5%",
-    width: 80,
-    height: 20,
-    // Usamos un clip-path para simular una cadena de rombos
-    clipPath:
-      "polygon(0% 50%, 25% 0%, 50% 50%, 75% 0%, 100% 50%, 75% 100%, 50% 50%, 25% 100%)",
-    backgroundColor: ACCENT_BERRY,
-    opacity: 0.3,
-  },
-}));
-
-// --- Componente principal ---
 const SystemBanner = ({ systemName, description }) => {
   return (
-    <StyledBanner>
-      {/* Elemento decorativo extra (Rombos/Enlaces) */}
-      <Box className='decoration-top-left' />
+    <Box
+      component={motion.section}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.8 }}
+      sx={{
+        minHeight: {
+          xs: "28vh",
+          sm: "34vh",
+          md: "30vh",
+        },
+        display: "flex",
+        alignItems: "center",
+        position: "relative",
+        overflow: "hidden",
+        mt: { xs: 5, lg: 2 },
+        background: `
+#FFF4FA
+        `,
+      }}
+    >
+      {/* 🌿 Glow decorativo */}
+      <Box
+        component={motion.div}
+        animate={{ y: [0, -16, 0] }}
+        transition={{ duration: 10, repeat: Infinity }}
+        sx={{
+          position: "absolute",
+          top: "12%",
+          left: "8%",
+          width: 140,
+          height: 140,
+          borderRadius: "50%",
+          bgcolor: "rgba(214, 51, 132, 0.18)",
+          filter: "blur(45px)",
+        }}
+      />
 
-      {/* Título Principal */}
-      <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
-        <Typography
-          variant='h3' // Más grande
-          component='h1'
-          sx={{
-            fontWeight: 800,
-            color: "#000",
-            mr: 1,
-          }}
-        >
-          {systemName}
-        </Typography>
-        {/* Ícono de flor más elegante */}
-        <LocalFloristIcon sx={{ color: ACCENT_BERRY, fontSize: 40 }} />
-      </Box>
+      <Box
+        component={motion.div}
+        animate={{ y: [0, 22, 0] }}
+        transition={{ duration: 12, repeat: Infinity }}
+        sx={{
+          position: "absolute",
+          bottom: "10%",
+          right: "10%",
+          width: 180,
+          height: 180,
+          borderRadius: "50%",
+          bgcolor: "rgba(255, 205, 220, 0.45)",
+          filter: "blur(55px)",
+        }}
+      />
 
-      {/* Subtítulo / Lema */}
-      <Typography variant='h6' sx={{ color: "#000", mt: 1 }}>
-        {description}
-      </Typography>
-    </StyledBanner>
+      {/* 🌸 Contenido */}
+      <Container maxWidth='lg' sx={{ zIndex: 2 }}>
+        <Stack alignItems='center' spacing={2}>
+          {/* Título principal */}
+          <Typography
+            component={motion.h1}
+            initial={{ opacity: 0, scale: 0.92 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.4, duration: 0.6 }}
+            sx={{
+              fontWeight: 900,
+              textAlign: "center",
+              color: "#D82E7A",
+              lineHeight: 1.15,
+              fontSize: {
+                xs: "2.1rem", // 📱 mobile first
+                sm: "2.8rem",
+                md: "3.6rem",
+              },
+              maxWidth: 900,
+            }}
+          >
+            {systemName}
+            <Box
+              component='span'
+              sx={{
+                display: "inline-block",
+                position: "relative",
+                px: 1,
+              }}
+            >
+              <Box
+                component='span'
+                sx={{
+                  position: "absolute",
+                  left: 0,
+                  bottom: -10,
+                  width: "100%",
+                  height: 16,
+                  backgroundImage: `url(${underline})`,
+                  backgroundRepeat: "no-repeat",
+                  backgroundSize: "contain",
+                }}
+              />
+            </Box>
+          </Typography>
+
+          {/* Línea decorativa inferior */}
+          <Box
+            component={motion.div}
+            initial={{ scaleX: 0 }}
+            animate={{ scaleX: 1 }}
+            transition={{ delay: 0.7, duration: 0.5 }}
+            sx={{
+              width: 90,
+              height: 4,
+              bgcolor: "#d63384",
+              borderRadius: 10,
+              mt: 3,
+            }}
+          />
+          {/* Overline */}
+          <Typography
+            component={motion.p}
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2, duration: 0.5 }}
+            sx={{
+              color: "#d63384",
+              fontWeight: 600,
+              fontSize: { xs: "0.9rem", sm: "1.05rem" },
+              letterSpacing: 3,
+              textAlign: "center",
+            }}
+          >
+            {description}
+          </Typography>
+        </Stack>
+      </Container>
+    </Box>
   );
 };
 

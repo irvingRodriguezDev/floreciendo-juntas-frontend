@@ -239,38 +239,40 @@ const LiveDetalle = () => {
           </Grid>
 
           {/* INFO */}
-          <Grid size={{ xs: 12, md: 4 }}>
-            <Card
-              sx={{
-                borderRadius: 4,
-                p: { xs: 2.5, md: 4 },
-                background: "#FFF7FA",
-              }}
-            >
-              <CardContent>
-                <Typography
-                  sx={{
-                    fontWeight: 700,
-                    color: "#C85A8E",
-                    fontSize: { xs: 20, md: 24 },
-                    mb: 1.5,
-                  }}
-                >
-                  Lo que aprenderás
-                </Typography>
+          {live.status === "live" && (
+            <Grid size={{ xs: 12, md: 4 }}>
+              <Card
+                sx={{
+                  borderRadius: 4,
+                  p: { xs: 2.5, md: 4 },
+                  background: "#FFF7FA",
+                }}
+              >
+                <CardContent>
+                  <Typography
+                    sx={{
+                      fontWeight: 700,
+                      color: "#C85A8E",
+                      fontSize: { xs: 20, md: 24 },
+                      mb: 1.5,
+                    }}
+                  >
+                    Lo que aprenderás
+                  </Typography>
 
-                <Typography
-                  sx={{
-                    color: "#5A4A57",
-                    fontSize: { xs: 14, md: 16 },
-                    lineHeight: 1.7,
-                  }}
-                >
-                  {live.description}
-                </Typography>
-              </CardContent>
-            </Card>
-          </Grid>
+                  <Typography
+                    sx={{
+                      color: "#5A4A57",
+                      fontSize: { xs: 14, md: 16 },
+                      lineHeight: 1.7,
+                    }}
+                  >
+                    {live.description}
+                  </Typography>
+                </CardContent>
+              </Card>
+            </Grid>
+          )}
         </Grid>
       </Box>
     </Layout>

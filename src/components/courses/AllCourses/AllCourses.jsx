@@ -60,25 +60,18 @@ const AllCourses = ({ courses }) => {
           {/* Título */}
           <Typography
             sx={{
-              fontWeight: 700,
+              fontWeight: "bold",
               fontSize: "1rem",
               lineHeight: 1.4,
-              color: "#2E2E2E",
+              color: "#D82E7A",
               mb: 0.5,
+              textTransform: "uppercase",
             }}
           >
             {courses.title}
           </Typography>
 
           {/* Meta info */}
-          <Typography
-            sx={{
-              fontSize: "0.8rem",
-              color: "#888",
-            }}
-          >
-            Curso • Nivel {courses.level}
-          </Typography>
         </CardContent>
       </Card>
     </Link>
