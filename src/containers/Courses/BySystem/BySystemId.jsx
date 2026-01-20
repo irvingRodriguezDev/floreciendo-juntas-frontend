@@ -31,7 +31,7 @@ const BySystemId = () => {
       .catch((error) => {
         console.log(
           error,
-          "ocurrio un error al obtener la informacion del sistema"
+          "ocurrio un error al obtener la informacion del sistema",
         );
       });
   }, [id]);
@@ -58,7 +58,7 @@ const BySystemId = () => {
 
   return (
     <Layout>
-      {/* <VideoFull /> */}
+      {system && <VideoFull url={system.system_icon} />}
 
       <Grid container spacing={2} sx={{ padding: "20px" }}>
         <Grid size={12}>
