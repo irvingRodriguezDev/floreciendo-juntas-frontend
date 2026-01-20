@@ -1,6 +1,8 @@
 import React, { useContext, useState } from "react";
 import { Button, CircularProgress, Snackbar, Alert } from "@mui/material";
 import { ShopifyCartContext } from "../../context/ShopifyCart/ShopifyCartContext";
+import AuthContext from "../../context/Auth/AuthContext";
+import { Link } from "react-router-dom";
 
 export default function ShopifyAddToCartButton({
   allQuantities,
@@ -8,7 +10,7 @@ export default function ShopifyAddToCartButton({
 }) {
   const { addToCart, loadingAdd } = useContext(ShopifyCartContext);
   const [open, setOpen] = useState(false);
-
+  const { usuario, autenticado } = useContext(AuthContext);
   const handleAddSelection = async () => {
     // 1. Filtramos y preparamos el array para la nueva lógica del Contexto
     const itemsToAdd = productVariants
@@ -28,37 +30,48 @@ export default function ShopifyAddToCartButton({
 
   return (
     <>
-      <Button
-        fullWidth
-        onClick={handleAddSelection}
-        disabled={
-          loadingAdd ||
-          !productVariants.some((v) => allQuantities[v.node.id] > 0)
-        }
-        sx={{
-          py: 1.5,
-          borderRadius: 999,
-          textTransform: "none",
-          fontWeight: 600,
-          background: "linear-gradient(135deg, #F4C2D7 0%, #E8A1C4 100%)",
-          color: "#4A2C3A",
-          boxShadow: "0 4px 12px rgba(232,161,196,0.3)",
-          "&:hover": {
-            background: "linear-gradient(135deg, #E8A1C4 0%, #DE8CB6 100%)",
-            boxShadow: "0 6px 16px rgba(232,161,196,0.4)",
-          },
-          "&:disabled": {
-            background: "#f5f5f5",
-            color: "#bdbdbd",
-          },
-        }}
-      >
-        {loadingAdd ? (
-          <CircularProgress size={24} sx={{ color: "#4A2C3A" }} />
-        ) : (
-          "Añadir selección al carrito 🌷"
-        )}
-      </Button>
+      {autenticado ? (
+        <Button
+          fullWidth
+          onClick={handleAddSelection}
+          disabled={
+            loadingAdd ||
+            !productVariants.some((v) => allQuantities[v.node.id] > 0)
+          }
+          sx={{
+            py: 1.5,
+            borderRadius: 999,
+            textTransform: "none",
+            fontWeight: 600,
+            background: "linear-gradient(135deg, #F4C2D7 0%, #E8A1C4 100%)",
+            color: "#4A2C3A",
+            boxShadow: "0 4px 12px rgba(232,161,196,0.3)",
+            "&:hover": {
+              background: "linear-gradient(135deg, #E8A1C4 0%, #DE8CB6 100%)",
+              boxShadow: "0 6px 16px rgba(232,161,196,0.4)",
+            },
+            "&:disabled": {
+              background: "#f5f5f5",
+              color: "#bdbdbd",
+            },
+          }}
+        >
+          {loadingAdd ? (
+            <CircularProgress size={24} sx={{ color: "#4A2C3A" }} />
+          ) : (
+            "Añadir selección al carrito 🌷"
+          )}
+        </Button>
+      ) : (
+        <Link to={"/iniciar-sesion"}>
+          <Button
+            variant='contained'
+            sx={{ borderRadius: "12px", bgcolor: "#e53888" }}
+          >
+            Inicia sesión para comprar
+          </Button>
+        </Link>
+      )}
 
       <Snackbar
         open={open}

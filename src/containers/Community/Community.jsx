@@ -26,7 +26,7 @@ const Community = () => {
   const { autenticado, usuario } = useContext(AuthContext);
   const { community_posts, getFeed, totalPages } = useContext(CommunityContext);
   const [openWritePost, setOpenWritePost] = useState(false);
-  const isSuscribed = usuario ? usuario.isSuscribed : null;
+  const isSuscribed = usuario ? usuario.isSubscribed : null;
   const handleClickOpenWritePost = () => setOpenWritePost(true);
   const handleCloseWritePost = () => setOpenWritePost(false);
 
@@ -41,6 +41,9 @@ const Community = () => {
   useEffect(() => {
     getFeed(page, rowsPerPage);
   }, [page, rowsPerPage]);
+
+  const isAuthorized = autenticado && isSuscribed;
+  const isNotAuthorized = !isAuthorized;
 
   return (
     <Layout>
@@ -79,7 +82,7 @@ const Community = () => {
         }}
       >
         {/* BLOQUEO */}
-        {!autenticado && isSuscribed === null && (
+        {!isAuthorized && (
           <Backdrop
             open
             sx={{
@@ -111,17 +114,34 @@ const Community = () => {
               <Typography variant='body1' sx={{ color: "#555" }}>
                 Para ver y participar en la comunidad necesitas
                 <br />
-                <strong>iniciar sesión</strong> y tener una
-                <strong> suscripción activa</strong>.
+                {!autenticado && <strong> iniciar sesión</strong>}
+                {autenticado && !isSuscribed && (
+                  <>
+                    {" "}
+                    una<strong> suscripción activa</strong>
+                  </>
+                )}
               </Typography>
-              <Link to={`/iniciar-sesion`}>
-                <Button
-                  variant='contained'
-                  sx={{ bgcolor: "#D82E7A", borderRadius: "12px", mt: 2 }}
-                >
-                  Iniciar sesión
-                </Button>
-              </Link>
+
+              {!autenticado ? (
+                <Link to='/iniciar-sesion'>
+                  <Button
+                    variant='contained'
+                    sx={{ bgcolor: "#D82E7A", borderRadius: "12px", mt: 2 }}
+                  >
+                    Iniciar sesión
+                  </Button>
+                </Link>
+              ) : (
+                <Link to='/suscribirme'>
+                  <Button
+                    variant='contained'
+                    sx={{ bgcolor: "#D82E7A", borderRadius: "12px", mt: 2 }}
+                  >
+                    Suscribirme
+                  </Button>
+                </Link>
+              )}
             </Paper>
           </Backdrop>
         )}
@@ -173,7 +193,7 @@ const Community = () => {
       />
 
       {/* FEED */}
-      {autenticado && (
+      {autenticado && isSuscribed && (
         <Box
           sx={{
             maxWidth: 640,

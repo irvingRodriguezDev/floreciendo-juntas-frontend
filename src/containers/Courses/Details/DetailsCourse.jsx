@@ -36,23 +36,30 @@ const CourseDetailScreen = () => {
 
   const isSubscribed = usuario && usuario.isSubscribed;
   const userId = usuario?.id;
-
+  const isAuthorized = autenticado && isSubscribed;
   const tabsData = [
     {
       label: "Preguntas y comentarios",
       content: (
         <Box sx={{ position: "relative", zIndex: 1, mt: 2 }}>
-          {autenticado && isSubscribed ? (
+          {isAuthorized ? (
             <Wall
               courseId={id}
               isAuthenticating={autenticado}
               isSubscribed={isSubscribed}
             />
           ) : (
-            <Typography textAlign='center' fontSize='20px' color='#EC4899'>
-              Debes iniciar sesión y contar con una suscripcion activa para
-              acceder a los comentarios
-            </Typography>
+            <Box textAlign='center' sx={{ mt: 3 }}>
+              <Typography fontSize='20px' color='#EC4899' fontWeight='bold'>
+                Acceso restringido
+              </Typography>
+
+              <Typography sx={{ mt: 1, color: "#555" }}>
+                {!autenticado
+                  ? "Debes iniciar sesión para acceder a los comentarios."
+                  : "Necesitas una suscripción activa para acceder a los comentarios."}
+              </Typography>
+            </Box>
           )}
         </Box>
       ),

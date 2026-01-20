@@ -1,8 +1,9 @@
-import React from "react";
+import React, { useContext } from "react";
 import { Box, Grid, Typography, Container, styled } from "@mui/material";
 import LocalFloristIcon from "@mui/icons-material/LocalFlorist";
 import SubscriptionForm from "../components/Payment/SubscriptionButton";
 import Layout from "../components/Layout/Layout";
+import AuthContext from "../context/Auth/AuthContext";
 
 // 🌸 Paleta Floreciendo Juntas
 const COLORS = {
@@ -67,6 +68,7 @@ const CardWrapper = styled(Box)(({ theme }) => ({
 
 // 🌺 Pantalla principal
 const SubscriptionScreen = ({ children }) => {
+  const { usuario } = useContext(AuthContext);
   return (
     <Layout>
       <Background>
@@ -122,7 +124,7 @@ const SubscriptionScreen = ({ children }) => {
               {/* 🌷 Aquí va TU componente de suscripción */}
               <Grid item xs={12}>
                 {children}
-                <SubscriptionForm />
+                <SubscriptionForm userId={usuario ? usuario.id : null} />
               </Grid>
 
               {/* 🌸 Mensaje inferior de contención */}
