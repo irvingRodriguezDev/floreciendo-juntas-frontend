@@ -20,6 +20,7 @@ import CommunityContext from "../../context/Community/CommunityContext";
 import Pagination from "../../components/Pagination/Pagination";
 import { Link } from "react-router-dom";
 import WritePostIcon from "../../components/icons/WritePostIcon";
+import CommunityRulesAccordion from "./CommunityRulesAccordeon";
 // Mock inicial
 
 const Community = () => {
@@ -145,7 +146,9 @@ const Community = () => {
             </Paper>
           </Backdrop>
         )}
-
+        <Grid size={12} sx={{ display: "flex", justifyContent: "center" }}>
+          <CommunityRulesAccordion />
+        </Grid>
         {/* CAJA CREAR POST */}
         <Grid size={12} sx={{ display: "flex", justifyContent: "center" }}>
           <Box sx={{ width: "100%", maxWidth: 640 }}>
