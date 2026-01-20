@@ -58,7 +58,7 @@ const BySystemId = () => {
 
   return (
     <Layout>
-      {system && <VideoFull url={system.system_icon} />}
+      {system && system.system_icon && <VideoFull url={system.system_icon} />}
 
       <Grid container spacing={2} sx={{ padding: "20px" }}>
         <Grid size={12}>
