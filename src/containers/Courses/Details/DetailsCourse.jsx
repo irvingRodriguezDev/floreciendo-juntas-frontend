@@ -146,6 +146,7 @@ const CourseDetailScreen = () => {
                         userId={userId}
                         usuario={usuario}
                         title={course.title}
+                        hasCertificate={course.hasCertificate}
                       />
                     ) : (
                       <VideoBlocker userId={userId} title={course.title} />

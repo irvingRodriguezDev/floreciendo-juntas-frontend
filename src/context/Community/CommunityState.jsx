@@ -64,15 +64,20 @@ const CommunityState = ({ children }) => {
   }, [usuarioId]);
 
   // 📡 FEED
-  const getFeed = (page = 1, limit = 10) => {
-    MethodGet(`/posts?page=${page}&limit=${limit}`)
+  const getFeed = (page, limit, search = "") => {
+    let url = `/posts?page=${page}&limit=${limit}`;
+    if (search.trim() !== "") {
+      url += `&search=${encodeURIComponent(search)}`;
+    }
+
+    MethodGet(url)
       .then((res) => {
         dispatch({
           type: GET_POSTS_COMMUNITY,
           payload: {
             community_posts: res.data.data,
-            currentPage: res.data.pagination.page,
-            totalPages: res.data.pagination.totalPages,
+            currentPage: res.data.pagination?.page,
+            totalPages: res.data.pagination?.totalPages,
           },
         });
       })
@@ -141,19 +146,35 @@ const CommunityState = ({ children }) => {
       })),
     };
 
+    // 🚀 Optimistic UI
     dispatch({
       type: CREATE_COMMENT_POST_COMMUNITY,
       payload: { postId, comment: optimisticComment },
+    });
+
+    // 🔄 Swal loading
+    Swal.fire({
+      title: "Publicando comentario",
+      text: "Por favor espera…",
+      allowOutsideClick: false,
+      allowEscapeKey: false,
+      didOpen: () => {
+        Swal.showLoading();
+      },
     });
 
     try {
       const res = await clienteAxios.post(
         `/posts/${postId}/comments`,
         formData,
-        { headers: { "Content-Type": "multipart/form-data" } }
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+        },
       );
 
       optimisticComment.media?.forEach((m) => URL.revokeObjectURL(m.url));
+
+      Swal.close(); // ✅ cerrar spinner
 
       dispatch({
         type: CREATE_COMMENT_POST_COMMUNITY,
@@ -163,7 +184,16 @@ const CommunityState = ({ children }) => {
           replaceTemp: tempId,
         },
       });
+      Swal.fire({
+        title: "Publicado",
+        text: "El comentario, se ha publicado exitosamente!",
+        icon: "success",
+        timer: 2000,
+        showConfirmButton: false,
+      });
     } catch (error) {
+      Swal.close(); // ✅ cerrar spinner incluso si falla
+
       dispatch({
         type: REMOVE_OPTIMISTIC_COMMENT,
         payload: { postId, tempId },

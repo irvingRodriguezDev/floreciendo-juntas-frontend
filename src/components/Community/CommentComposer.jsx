@@ -12,6 +12,8 @@ import CloseIcon from "@mui/icons-material/Close";
 import { useContext, useRef, useState } from "react";
 import AuthContext from "../../context/Auth/AuthContext";
 import CommunityContext from "../../context/Community/CommunityContext";
+import MediaPreviewItem from "./MediaPreviewItem";
+import heic2any from "heic2any";
 
 const MAX_FILES = 4;
 
@@ -22,13 +24,40 @@ const CommentComposer = ({ post_id }) => {
   const [content, setContent] = useState("");
   const [files, setFiles] = useState([]);
   const fileInputRef = useRef(null);
+  const convertHeicToJpeg = async (file) => {
+    const convertedBlob = await heic2any({
+      blob: file,
+      toType: "image/jpeg",
+      quality: 0.9,
+    });
 
-  const handleFiles = (e) => {
+    return new File([convertedBlob], file.name.replace(/\.heic$/i, ".jpg"), {
+      type: "image/jpeg",
+    });
+  };
+  const handleFiles = async (e) => {
     const selected = Array.from(e.target.files || []);
     const availableSlots = MAX_FILES - files.length;
-    const newFiles = selected.slice(0, availableSlots);
 
-    setFiles((prev) => [...prev, ...newFiles]);
+    const processedFiles = [];
+
+    for (const file of selected.slice(0, availableSlots)) {
+      if (
+        file.type === "image/heic" ||
+        file.name.toLowerCase().endsWith(".heic")
+      ) {
+        try {
+          const converted = await convertHeicToJpeg(file);
+          processedFiles.push(converted);
+        } catch (err) {
+          console.error("Error convirtiendo HEIC:", err);
+        }
+      } else {
+        processedFiles.push(file);
+      }
+    }
+
+    setFiles((prev) => [...prev, ...processedFiles]);
     e.target.value = "";
   };
 
@@ -78,59 +107,13 @@ const CommentComposer = ({ post_id }) => {
 
           {files.length > 0 && (
             <Stack direction='row' spacing={1} mt={1} flexWrap='wrap'>
-              {files.map((file, index) => {
-                const isVideo = file.type.startsWith("video");
-                const url = URL.createObjectURL(file);
-
-                return (
-                  <Box
-                    key={index}
-                    sx={{
-                      width: 72,
-                      height: 72,
-                      borderRadius: "12px",
-                      overflow: "hidden",
-                      position: "relative",
-                      backgroundColor: "#eee",
-                    }}
-                  >
-                    {isVideo ? (
-                      <video
-                        src={url}
-                        style={{
-                          width: "100%",
-                          height: "100%",
-                          objectFit: "cover",
-                        }}
-                      />
-                    ) : (
-                      <img
-                        src={url}
-                        alt=''
-                        style={{
-                          width: "100%",
-                          height: "100%",
-                          objectFit: "cover",
-                        }}
-                      />
-                    )}
-
-                    <IconButton
-                      size='small'
-                      onClick={() => removeFile(index)}
-                      sx={{
-                        position: "absolute",
-                        top: 2,
-                        right: 2,
-                        backgroundColor: "rgba(0,0,0,0.5)",
-                        color: "#fff",
-                      }}
-                    >
-                      <CloseIcon fontSize='inherit' />
-                    </IconButton>
-                  </Box>
-                );
-              })}
+              {files.map((file, index) => (
+                <MediaPreviewItem
+                  key={index}
+                  file={file}
+                  onRemove={() => removeFile(index)}
+                />
+              ))}
             </Stack>
           )}
 

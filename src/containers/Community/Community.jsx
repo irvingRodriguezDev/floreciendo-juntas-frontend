@@ -21,16 +21,21 @@ import Pagination from "../../components/Pagination/Pagination";
 import { Link } from "react-router-dom";
 import WritePostIcon from "../../components/icons/WritePostIcon";
 import CommunityRulesAccordion from "./CommunityRulesAccordeon";
+import SearchCourse from "../../components/courses/SearchCourses";
+import { useDebounce } from "use-debounce";
+import PinkSpinner from "../../components/Loading/PinkSpinner";
 // Mock inicial
 
 const Community = () => {
   const { autenticado, usuario } = useContext(AuthContext);
   const { community_posts, getFeed, totalPages } = useContext(CommunityContext);
   const [openWritePost, setOpenWritePost] = useState(false);
+  const [search, setSearch] = useState("");
   const isSuscribed = usuario ? usuario.isSubscribed : null;
   const handleClickOpenWritePost = () => setOpenWritePost(true);
   const handleCloseWritePost = () => setOpenWritePost(false);
-
+  const [debounceSearch] = useDebounce(search, 600);
+  const [loading, setLoading] = useState(false);
   //paginacion
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(15);
@@ -40,8 +45,15 @@ const Community = () => {
     }
   };
   useEffect(() => {
-    getFeed(page, rowsPerPage);
-  }, [page, rowsPerPage]);
+    setLoading(true);
+    if (debounceSearch.trim() === "") {
+      getFeed(page, rowsPerPage);
+    } else {
+      getFeed(undefined, undefined, debounceSearch);
+    }
+    const timer = setTimeout(() => setLoading(false), 600);
+    return () => clearTimeout(timer);
+  }, [page, rowsPerPage, debounceSearch]);
 
   const isAuthorized = autenticado && isSuscribed;
   const isNotAuthorized = !isAuthorized;
@@ -146,11 +158,17 @@ const Community = () => {
             </Paper>
           </Backdrop>
         )}
-        <Grid size={12} sx={{ display: "flex", justifyContent: "center" }}>
+        <Grid
+          size={12}
+          sx={{ display: "flex", justifyContent: "center", mt: -5 }}
+        >
           <CommunityRulesAccordion />
         </Grid>
         {/* CAJA CREAR POST */}
-        <Grid size={12} sx={{ display: "flex", justifyContent: "center" }}>
+        <Grid
+          size={12}
+          sx={{ display: "flex", justifyContent: "center", mt: -3 }}
+        >
           <Box sx={{ width: "100%", maxWidth: 640 }}>
             <Paper
               onClick={handleClickOpenWritePost}
@@ -194,27 +212,51 @@ const Community = () => {
         open={openWritePost}
         handleClose={handleCloseWritePost}
       />
-
-      {/* FEED */}
-      {autenticado && isSuscribed && (
+      {isAuthorized && (
         <Box
           sx={{
-            maxWidth: 640,
+            maxWidth: 980,
             mx: "auto",
-            px: 2,
-            pb: 6,
+            px: 1,
+            pb: 1,
+            mt: -5,
           }}
         >
-          <Stack spacing={4}>
-            {community_posts.map((post) => (
-              <PostCard key={post.id} post={post} />
-            ))}
-          </Stack>
+          <SearchCourse
+            setSearch={setSearch}
+            // title='Buscar publicación'
+            placeholder={
+              "Escribe para buscar por titulo o contenido de publicación"
+            }
+          />
         </Box>
+      )}
+      {/* FEED */}
+      {loading ? (
+        <PinkSpinner label='Cargando posts' />
+      ) : (
+        <>
+          {autenticado && isSuscribed && (
+            <Box
+              sx={{
+                maxWidth: 640,
+                mx: "auto",
+                px: 2,
+                pb: 6,
+              }}
+            >
+              <Stack spacing={4}>
+                {community_posts.map((post) => (
+                  <PostCard key={post.id} post={post} />
+                ))}
+              </Stack>
+            </Box>
+          )}
+        </>
       )}
 
       {/* FAB MOBILE */}
-      {autenticado && (
+      {autenticado && isSuscribed && (
         <>
           <Fab
             onClick={handleClickOpenWritePost}

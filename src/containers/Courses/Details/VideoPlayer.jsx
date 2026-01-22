@@ -12,7 +12,15 @@ import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import PauseIcon from "@mui/icons-material/Pause";
 import MethodGet, { MethodPost } from "../../../config/Service";
 import CoursesContext from "../../../context/Courses/CoursesContext";
-const VideoPlayer = ({ userId, courseId, src, poster, usuario, title }) => {
+const VideoPlayer = ({
+  userId,
+  courseId,
+  src,
+  poster,
+  usuario,
+  title,
+  hasCertificate,
+}) => {
   const { downloadCertificate } = useContext(CoursesContext);
   const videoRef = useRef(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -62,7 +70,7 @@ const VideoPlayer = ({ userId, courseId, src, poster, usuario, title }) => {
     const fetchProgress = async () => {
       try {
         const { data } = await MethodGet(
-          `/progress-video/${userId}/${courseId}`
+          `/progress-video/${userId}/${courseId}`,
         );
 
         // Convertir string a número
@@ -108,7 +116,7 @@ const VideoPlayer = ({ userId, courseId, src, poster, usuario, title }) => {
 
       const newProgressPercent = durationToPercent(
         video.currentTime,
-        video.duration
+        video.duration,
       );
 
       // Solo actualizar si avanzó
@@ -281,26 +289,28 @@ const VideoPlayer = ({ userId, courseId, src, poster, usuario, title }) => {
           <Typography sx={{ mt: 1, color: "text.secondary" }}>
             Completaste este curso y diste un paso más en tu crecimiento.
           </Typography>
-          <Button
-            variant='contained'
-            fullWidth
-            sx={{
-              mt: 2,
-              py: 1.2,
-              backgroundColor: "#F7CDD9",
-              color: "#DC4485",
-              borderRadius: "14px",
-              fontWeight: 600,
-              textTransform: "none",
-              "&:hover": {
-                backgroundColor: "#F5BCCC",
-              },
-            }}
-            onClick={() => downloadCertificate(courseId, usuario.name)}
-            disabled={loading}
-          >
-            {loading ? "Generando certificado..." : "Descargar certificado"}
-          </Button>
+          {hasCertificate && (
+            <Button
+              variant='contained'
+              fullWidth
+              sx={{
+                mt: 2,
+                py: 1.2,
+                backgroundColor: "#F7CDD9",
+                color: "#DC4485",
+                borderRadius: "14px",
+                fontWeight: 600,
+                textTransform: "none",
+                "&:hover": {
+                  backgroundColor: "#F5BCCC",
+                },
+              }}
+              onClick={() => downloadCertificate(courseId, usuario.name)}
+              disabled={loading}
+            >
+              {loading ? "Generando certificado..." : "Descargar certificado"}
+            </Button>
+          )}
         </Box>
       )}
     </Box>

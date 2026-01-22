@@ -26,6 +26,9 @@ const CommunityRulesAccordion = () => {
         <AccordionSummary expandIcon={<ExpandMoreIcon />}>
           <Typography variant='h6' fontWeight='bold' color='#D82E7A'>
             🌸 Bienvenida a la Comunidad Floreciendo Juntas
+            <Typography variant='subtitle1' sx={{ color: "gray" }}>
+              📌 Haz click aqui para conocer las reglas de la comunidad
+            </Typography>
           </Typography>
         </AccordionSummary>
 

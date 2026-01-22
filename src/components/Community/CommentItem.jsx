@@ -29,7 +29,15 @@ const CommentItem = ({ comment }) => {
 
         {/* Media del comentario */}
         {comment.media && comment.media.length > 0 && (
-          <Box sx={{ mt: 1 }}>
+          <Box
+            sx={{
+              mt: 1,
+              width: "100%",
+              maxWidth: { xs: "260px", sm: "280px" },
+              borderRadius: 2,
+              overflow: "hidden",
+            }}
+          >
             <PostMediaSwiper media={comment.media} />
           </Box>
         )}

@@ -12,7 +12,9 @@ import {
   CUSTOMER_CREATE_MUTATION,
 } from "./grapql/auth";
 import { shopifyFetch } from "../../containers/Store/ShopifyClient";
+import { useNavigate } from "react-router-dom";
 const AuthState = (props) => {
+  const navigate = useNavigate();
   const initialState = {
     token: localStorage.getItem("token"),
     autenticado: false,
@@ -117,7 +119,7 @@ const AuthState = (props) => {
 
         const shopifyResponse = await shopifyFetch(
           CUSTOMER_LOGIN_MUTATION,
-          shopifyVariables
+          shopifyVariables,
         );
 
         const authData = shopifyResponse?.data?.customerAccessTokenCreate;
@@ -125,7 +127,7 @@ const AuthState = (props) => {
         if (authData?.customerAccessToken) {
           localStorage.setItem(
             "customerAccessToken",
-            authData.customerAccessToken.accessToken
+            authData.customerAccessToken.accessToken,
           );
         } else if (authData?.customerUserErrors?.length) {
           console.warn("Shopify:", authData.customerUserErrors[0].message);
@@ -178,7 +180,7 @@ const AuthState = (props) => {
 
         const shopifyResponse = await shopifyFetch(
           CUSTOMER_CREATE_MUTATION,
-          shopifyVariables
+          shopifyVariables,
         );
 
         const createData = shopifyResponse?.data?.customerCreate;
@@ -281,7 +283,7 @@ const AuthState = (props) => {
         formData,
         {
           headers: { "Content-Type": "multipart/form-data" },
-        }
+        },
       );
 
       const profileImageUrl = getProfileImageUrl(res.data.profileImage);
@@ -318,7 +320,7 @@ const AuthState = (props) => {
   /**
    * 🔹 Cerrar sesión
    */
-  const cerrarSesion = (navigate) => {
+  const cerrarSesion = () => {
     localStorage.removeItem("user_id");
     localStorage.removeItem("token");
     localStorage.removeItem("customerAccessToken");

@@ -43,7 +43,7 @@ const Header = () => {
   const [open, setOpen] = useState(false);
   const [openCart, setOpenCart] = useState(false);
   const [openCartShopify, setOpenCartShopify] = useState(false);
-  const { autenticado } = useContext(AuthContext);
+  const { autenticado, cerrarSesion } = useContext(AuthContext);
   const { cart, guest_cart, getUserCart } = useContext(CartContext);
 
   const isMobile = useMediaQuery("(max-width:1100px)");
@@ -71,6 +71,10 @@ const Header = () => {
     if (item.auth === false && !autenticado) return true;
     return false;
   });
+  const handleClickLogout = () => {
+    setOpen(false);
+    cerrarSesion();
+  };
 
   return (
     <Box sx={{ flexGrow: 1 }}>
@@ -473,8 +477,8 @@ const Header = () => {
                             Mi Perfil
                           </Button>
                           <Button
-                            component={Link}
                             variant='outlined'
+                            onClick={() => handleClickLogout()}
                             sx={{
                               borderColor: "#E53888",
                               color: "#E53888",
