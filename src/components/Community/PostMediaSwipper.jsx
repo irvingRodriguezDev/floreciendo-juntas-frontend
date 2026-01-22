@@ -1,7 +1,7 @@
 import { Box, GlobalStyles } from "@mui/material";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Pagination } from "swiper/modules";
-import { useEffect, useState } from "react";
+import { useState, useMemo } from "react";
 
 import "swiper/css";
 import "swiper/css/pagination";
@@ -11,10 +11,20 @@ const PostMediaSwiper = ({ media = [] }) => {
   if (!media.length) return null;
 
   const sortedMedia = [...media].sort((a, b) => a.order - b.order);
+  const [activeIndex, setActiveIndex] = useState(0);
+
+  // 🔥 Detectar si todos los medios son imágenes
+  const hasOnlyImages = useMemo(() => {
+    return sortedMedia.every((item) => item.type === "image");
+  }, [sortedMedia]);
+
+  // 🔥 Detectar si hay al menos un video
+  const hasVideo = useMemo(() => {
+    return sortedMedia.some((item) => item.type === "video");
+  }, [sortedMedia]);
 
   return (
     <>
-      {/* 🌿 Transición suave de altura */}
       <GlobalStyles
         styles={{
           ".post-media-swiper .swiper-wrapper": {
@@ -40,19 +50,15 @@ const PostMediaSwiper = ({ media = [] }) => {
           pagination={{ clickable: true, dynamicBullets: true }}
           slidesPerView={1}
           spaceBetween={0}
-          autoHeight
-          loop
+          autoHeight={hasOnlyImages} // ✅ Solo si todas son imágenes
+          style={hasVideo ? { minHeight: "300px" } : {}} // ✅ Altura mínima solo si hay videos
           onSlideChange={(swiper) => {
-            window.dispatchEvent(
-              new CustomEvent("slideChange", {
-                detail: swiper.realIndex,
-              }),
-            );
+            setActiveIndex(swiper.realIndex);
           }}
         >
           {sortedMedia.map((item, index) => (
             <SwiperSlide key={item.id}>
-              <MediaItem item={item} index={index} />
+              <MediaItem item={item} isActive={activeIndex === index} />
             </SwiperSlide>
           ))}
         </Swiper>
