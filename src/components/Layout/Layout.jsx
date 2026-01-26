@@ -6,11 +6,11 @@ import Header from "./Header";
 import SalonCartDrawer from "../Layout/CartSidebar";
 import AuthContext from "../../context/Auth/AuthContext";
 import CartContext from "../../context/Cart/CartContext";
-
+import { requestNotificationPermission } from "../../utils/requestNotificationPermission";
 const Layout = ({ children }) => {
   // Estado para el carrito del salón
   const [openSalonCart, setOpenSalonCart] = useState(false);
-  const { autenticado } = useContext(AuthContext);
+  const { autenticado, usuario } = useContext(AuthContext);
   const { cart, guest_cart, getUserCart } = useContext(CartContext);
   useEffect(() => {
     if (autenticado) getUserCart();
@@ -19,6 +19,14 @@ const Layout = ({ children }) => {
   const cartCount = autenticado
     ? cart?.items?.reduce((acc, item) => acc + item.quantity, 0) || 0
     : guest_cart?.items?.reduce((acc, item) => acc + item.quantity, 0) || 0;
+  useEffect(() => {
+    if (!autenticado || !usuario) return;
+
+    const token = localStorage.getItem("token");
+    if (token) {
+      requestNotificationPermission(token);
+    }
+  }, [autenticado]);
   return (
     <Box display='flex' flexDirection='column' minHeight='100vh'>
       {/* HEADER */}

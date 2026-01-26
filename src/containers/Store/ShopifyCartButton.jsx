@@ -16,7 +16,7 @@ export default function ShopifyCartButton({ onClick }) {
         {loadingCart ? (
           <CircularProgress size={20} color='inherit' />
         ) : (
-          <CartIcon width={50} />
+          <CartIcon width={28} />
         )}
       </Badge>
     </IconButton>

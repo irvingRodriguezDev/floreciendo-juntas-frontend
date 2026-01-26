@@ -1,4 +1,4 @@
-import React, { useEffect, useReducer, useContext } from "react";
+import React, { useEffect, useReducer, useContext, use } from "react";
 import CommunityContext from "./CommunityContext";
 import CommunityReducer from "./CommunityReducer";
 import MethodGet, { MethodPost } from "../../config/Service";
@@ -13,10 +13,12 @@ import clienteAxios from "../../config/Axios";
 import { getSocket } from "../../socket";
 import Swal from "sweetalert2";
 import AuthContext from "../Auth/AuthContext";
-
+import { useSound } from "../../hooks/useSound";
+import notificationSound from "../../assets/sounds/A soft, bubbly pop sound for a notification popping up..wav";
 const CommunityState = ({ children }) => {
   const initialState = {
     community_posts: [],
+    post: {},
     totalPages: 0,
     currentPage: 1,
   };
@@ -101,7 +103,7 @@ const CommunityState = ({ children }) => {
       allowOutsideClick: false,
       didOpen: () => Swal.showLoading(),
     });
-
+    const playSound = useSound(notificationSound);
     try {
       const res = await clienteAxios.post("/posts", data, {
         headers: { "Content-Type": "multipart/form-data" },
@@ -113,7 +115,7 @@ const CommunityState = ({ children }) => {
         timer: 2000,
         showConfirmButton: false,
       });
-
+      playSound();
       dispatch({
         type: CREATE_POST_COMMUNITY,
         payload: res.data.post,
@@ -131,7 +133,7 @@ const CommunityState = ({ children }) => {
     if (data.files?.length) {
       data.files.forEach((file) => formData.append("files", file));
     }
-
+    const playSound = useSound(notificationSound);
     const tempId = `temp-${Date.now()}`;
 
     const optimisticComment = {
@@ -191,6 +193,7 @@ const CommunityState = ({ children }) => {
         timer: 2000,
         showConfirmButton: false,
       });
+      playSound();
     } catch (error) {
       Swal.close(); // ✅ cerrar spinner incluso si falla
 
@@ -205,6 +208,7 @@ const CommunityState = ({ children }) => {
 
   // ❤️ TOGGLE REACTION
   const createToogleReaction = async (postId) => {
+    const playSound = useSound(notificationSound);
     dispatch({
       type: TOOGLE_REACTION_POST_COMMUNITY,
       payload: { postId },
@@ -212,6 +216,7 @@ const CommunityState = ({ children }) => {
 
     try {
       await MethodPost(`/posts/${postId}/reaction`);
+      playSound();
     } catch (error) {
       console.error(error);
       // rollback

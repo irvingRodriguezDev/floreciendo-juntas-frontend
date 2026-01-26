@@ -35,6 +35,7 @@ import Subscription from "../containers/Subscription/Subscription";
 import NewHome from "../containers/NewHome";
 import Community from "../containers/Community/Community";
 import SubscriptionScreen from "../containers/SubscriptionScreen";
+import ShowPost from "../containers/Community/showPost/ShowPost";
 function AppRouter() {
   const { autenticado, usuarioAutenticado, cargando } = useContext(AuthContext);
   useEffect(() => {
@@ -50,6 +51,7 @@ function AppRouter() {
     { path: "/", element: <Home /> },
     { path: "/cursos", element: <Courses /> },
     { path: "/comunidad", element: <Community /> },
+    { path: "/comunidad/:postId", element: <ShowPost /> },
     { path: "/certificaciones", element: <Certifications /> },
     { path: "/eventos", element: <Events /> },
     { path: "/detalle-evento/:id", element: <DetailEvent /> },

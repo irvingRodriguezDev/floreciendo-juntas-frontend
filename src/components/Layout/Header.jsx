@@ -15,6 +15,7 @@ import {
   Badge,
   GlobalStyles,
   useTheme,
+  ListItemIcon,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import { Link } from "react-router-dom";
@@ -27,6 +28,7 @@ import BadgeBox from "../ui/BadgeBox";
 import ShopifyCartButton from "../../containers/Store/ShopifyCartButton";
 import ShopifyCartDrawer from "../../containers/Store/ShopifyCartDrawer";
 import FornitureIcon from "../icons/FornitureIcon";
+import NotificationsBell from "../Notifications/NotificationsBell";
 /* Menu items (igual que antes) */
 const menuItems = [
   { name: "Comunidad", path: "/comunidad", auth: "both" },
@@ -216,7 +218,7 @@ const Header = () => {
               src={Logo}
               alt='Logo Floreciendo Juntas'
               sx={{
-                width: { xs: 190, md: 220 },
+                width: { xs: 180, sm: 180, md: 180 },
                 height: "auto",
                 transition: "transform 0.35s ease, box-shadow 0.35s ease",
                 transformOrigin: "left center",
@@ -234,9 +236,8 @@ const Header = () => {
             <Box
               sx={{
                 display: "flex",
-                gap: 3,
+                gap: 1,
                 justifyContent: "center",
-                flexGrow: 1,
               }}
             >
               {filteredMenu.map((item) => (
@@ -290,8 +291,14 @@ const Header = () => {
 
           {/* BOTONES DE ACCIÓN */}
           {!isMobile && (
-            <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
-              {/* CART */}
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                gap: 1.5,
+              }}
+            >
+              {/* 🪑 Carrito Salón */}
               <BadgeBox
                 count={cartCount}
                 anchor
@@ -299,58 +306,86 @@ const Header = () => {
                 right='6px'
                 size='md'
               >
-                <IconButton onClick={() => setOpenCart(true)}>
-                  <FornitureIcon width={50} />
+                <IconButton
+                  onClick={() => setOpenCart(true)}
+                  sx={{
+                    borderRadius: "12px",
+                    transition: "all 0.25s ease",
+                    "&:hover": {
+                      backgroundColor: "rgba(229,56,136,0.08)",
+                    },
+                  }}
+                >
+                  <FornitureIcon width={42} />
                 </IconButton>
               </BadgeBox>
+
+              {/* 🛍️ Carrito Tienda (Shopify) */}
+              {/* <IconButton
+                onClick={() => setOpenCartShopify(true)}
+                sx={{
+                  borderRadius: "12px",
+                  transition: "all 0.25s ease",
+                  "&:hover": {
+                    backgroundColor: "rgba(229,56,136,0.08)",
+                  },
+                }}
+              > */}
               <ShopifyCartButton onClick={() => setOpenCartShopify(true)} />
+              {/* </IconButton> */}
+
               <ShopifyCartDrawer
                 open={openCartShopify}
                 onClose={() => setOpenCartShopify(false)}
               />
-              {/* Auth */}
+
+              {/* 🔐 Auth */}
               {!autenticado ? (
                 <Button
                   component={Link}
-                  to={"/iniciar-sesion"}
+                  to='/iniciar-sesion'
                   variant='outlined'
                   size='large'
                   sx={{
-                    color: scrolled ? "#E53888" : "#E53888",
-                    borderColor: scrolled ? "#E53888" : "#E53888",
+                    color: "#E53888",
+                    borderColor: "#E53888",
                     borderRadius: "10px",
                     px: 2.2,
                     py: 1,
                     transition: "all 0.25s ease",
                     "&:hover": {
-                      backgroundColor: scrolled
-                        ? "rgba(229,56,136,0.09)"
-                        : "rgba(255,255,255,0.06)",
+                      backgroundColor: "rgba(229,56,136,0.09)",
                     },
                   }}
                 >
                   Iniciar
                 </Button>
               ) : (
-                <Button
-                  component={Link}
-                  to={"/mi-perfil"}
-                  variant='contained'
-                  size='large'
-                  sx={{
-                    color: "#fff",
-                    backgroundColor: "#E53888",
-                    borderRadius: "10px",
-                    px: 2.2,
-                    py: 1,
-                    boxShadow: scrolled
-                      ? "0 8px 20px rgba(229,83,140,0.12)"
-                      : "0 6px 14px rgba(229,83,140,0.10)",
-                    "&:hover": { backgroundColor: "#d82e7a" },
-                  }}
-                >
-                  Mi Perfil
-                </Button>
+                <>
+                  <NotificationsBell />
+
+                  <Button
+                    component={Link}
+                    to='/mi-perfil'
+                    variant='contained'
+                    size='large'
+                    sx={{
+                      color: "#fff",
+                      backgroundColor: "#E53888",
+                      borderRadius: "10px",
+                      px: 2.2,
+                      py: 1,
+                      boxShadow: scrolled
+                        ? "0 8px 20px rgba(229,83,140,0.12)"
+                        : "0 6px 14px rgba(229,83,140,0.10)",
+                      "&:hover": {
+                        backgroundColor: "#d82e7a",
+                      },
+                    }}
+                  >
+                    Perfil
+                  </Button>
+                </>
               )}
             </Box>
           )}
@@ -358,23 +393,7 @@ const Header = () => {
           {/* MOBILE */}
           {isMobile && (
             <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-              <BadgeBox
-                count={cartCount}
-                anchor
-                top='6px'
-                right='6px'
-                size='md'
-              >
-                <IconButton onClick={() => setOpenCart(true)}>
-                  <FornitureIcon width={50} />
-                </IconButton>
-              </BadgeBox>
-              <ShopifyCartButton onClick={() => setOpenCartShopify(true)} />
-              <ShopifyCartDrawer
-                open={openCartShopify}
-                onClose={() => setOpenCartShopify(false)}
-              />
-
+              <NotificationsBell />
               <IconButton
                 edge='start'
                 sx={{
@@ -430,6 +449,50 @@ const Header = () => {
                           </Link>
                         </ListItem>
                       ))}
+                      {/* 🪑 Carrito Salón */}
+                      <ListItem disablePadding>
+                        <ListItemButton
+                          onClick={() => {
+                            setOpen(false);
+                            setOpenCart(true);
+                          }}
+                          sx={{ borderRadius: "12px" }}
+                        >
+                          <ListItemIcon sx={{ minWidth: 40 }}>
+                            <FornitureIcon width={28} />
+                          </ListItemIcon>
+
+                          <ListItemText
+                            primary='Carrito (Salón)'
+                            sx={{ color: "#E53888", fontWeight: "bold" }}
+                          />
+                        </ListItemButton>
+                      </ListItem>
+
+                      {/* 🛍️ Carrito Tienda (Shopify) */}
+                      <ListItem disablePadding>
+                        <ListItemButton
+                          onClick={() => {
+                            setOpen(false);
+                            setOpenCartShopify(true);
+                          }}
+                          sx={{ borderRadius: "12px" }}
+                        >
+                          <ListItemIcon sx={{ minWidth: 40 }}>
+                            <ShopifyCartButton />
+                          </ListItemIcon>
+
+                          <ListItemText
+                            primary='Carrito (Tienda)'
+                            sx={{ color: "#E53888", fontWeight: "bold" }}
+                          />
+                        </ListItemButton>
+
+                        <ShopifyCartDrawer
+                          open={openCartShopify}
+                          onClose={() => setOpenCartShopify(false)}
+                        />
+                      </ListItem>
                     </List>
                     <Box
                       sx={{ display: "flex", flexDirection: "column", gap: 1 }}

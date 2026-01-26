@@ -15,8 +15,8 @@ import InstagramIcon from "../icons/InstagramIcon";
 import TiktokIcon from "../icons/TiktokIcon";
 import { Link } from "react-router-dom";
 
-const MotionCard = motion(Card);
-const MotionStack = motion(Stack);
+const MotionCard = motion.create(Card);
+const MotionStack = motion.create(Stack);
 
 const socialData = [
   {
