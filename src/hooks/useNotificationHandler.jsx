@@ -1,29 +1,49 @@
 // src/hooks/useNotificationHandler.js
 import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { messaging } from "../firebase";
 import { onMessage } from "firebase/messaging";
+import { messaging } from "../firebase";
+import { useNavigate } from "react-router-dom";
+import { useToast } from "../components/Toast/useToast";
 
 export const useNotificationHandler = () => {
   const navigate = useNavigate();
+  const toast = useToast();
 
   useEffect(() => {
+    if (!messaging) {
+      console.warn("⚠️ Firebase Messaging no disponible (foreground)");
+      return;
+    }
+
+    /**
+     * 🔔 Mensajes SOLO cuando la app está en foreground
+     */
     const unsubscribe = onMessage(messaging, (payload) => {
-      console.log("🔔 Notificación recibida:", payload);
+      const data = payload.data || {};
+      const title = data.title;
+      const body = data.body;
 
-      const url = payload?.data?.url;
-      const commentId = payload?.data?.commentId;
+      if (!title || !body) return;
 
-      if (!url) return;
-
-      // 👇 si viene comentario, lo pasamos como query
-      if (commentId) {
-        navigate(`${url}?commentId=${commentId}`);
-      } else {
-        navigate(url);
-      }
+      toast.show({
+        title,
+        message: body,
+        variant: "info",
+        actionLabel: "Ver",
+        onAction: () => {
+          if (data.url) {
+            navigate(
+              data.commentId
+                ? `${data.url}?commentId=${data.commentId}`
+                : data.url,
+            );
+          }
+        },
+      });
     });
 
-    return () => unsubscribe();
-  }, [navigate]);
+    return () => {
+      unsubscribe();
+    };
+  }, [toast, navigate]);
 };

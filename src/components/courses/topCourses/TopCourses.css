@@ -12,10 +12,8 @@
   top: 80%;
   left: -80px;
   transform: translateY(-50%);
-  font-size: 12rem;
-  font-weight: 900;
-  color: rgba(249, 113, 175, 0.61);
-  -webkit-text-stroke: 8px #e83c91; /* color outline rosado */
+  color: #fff;
+  -webkit-text-stroke: 8px #fff; /* color outline rosado */
   opacity: 0.9;
   z-index: 3;
   pointer-events: none;

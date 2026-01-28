@@ -41,6 +41,9 @@ const NotificationsBell = () => {
             maxHeight: 500,
             borderRadius: "12px",
             overflowY: "auto",
+            background: "rgba(255, 255, 255, 0.37)",
+            boxShadow: " 0 4px 30px rgba(0, 0, 0, 0.1)",
+            backdropFilter: "blur(6.5px)",
           },
         }}
       >

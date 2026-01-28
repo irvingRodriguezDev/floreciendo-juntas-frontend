@@ -5,6 +5,13 @@ import { getBrowserName } from "./getBrowserName";
 
 export const requestNotificationPermission = async (tokenAuth) => {
   try {
+    if (!messaging) {
+      console.warn(
+        "⚠️ Firebase Messaging no está disponible en este navegador",
+      );
+      return;
+    }
+
     console.log("🔔 Solicitando permiso de notificaciones...");
 
     const permission = await Notification.requestPermission();
@@ -13,15 +20,29 @@ export const requestNotificationPermission = async (tokenAuth) => {
       return;
     }
 
-    // 🧠 ID único por navegador
+    /**
+     * 🧠 ID único por navegador
+     */
     let browserId = localStorage.getItem("browser_id");
     if (!browserId) {
       browserId = crypto.randomUUID();
       localStorage.setItem("browser_id", browserId);
     }
 
+    /**
+     * 🔧 Registro EXPLÍCITO del Service Worker
+     * (esto es lo que normalmente rompe FCM)
+     */
+    const registration = await navigator.serviceWorker.register(
+      "/firebase-messaging-sw.js",
+    );
+
+    /**
+     * 🔑 Obtener token FCM
+     */
     const currentToken = await getToken(messaging, {
       vapidKey: import.meta.env.VITE_FIREBASE_VAPID_KEY,
+      serviceWorkerRegistration: registration,
     });
 
     if (!currentToken) {
@@ -32,7 +53,9 @@ export const requestNotificationPermission = async (tokenAuth) => {
     const storedToken = localStorage.getItem("fcm_token");
     const device = getBrowserName();
 
-    // 🛑 CLAVE: solo enviar si CAMBIÓ
+    /**
+     * 🛑 Solo enviar si el token cambió
+     */
     if (currentToken === storedToken) {
       console.log("🔁 Token sin cambios, no se envía");
       return;

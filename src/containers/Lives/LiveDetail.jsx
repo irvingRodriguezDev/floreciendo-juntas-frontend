@@ -137,7 +137,42 @@ const LiveDetalle = () => {
         </MotionBox>
         {/* CONTENIDO */}
         {live.status === "scheduled" && (
-          <LiveCountdown startTime={live.start_time} />
+          <Grid container spacing={2}>
+            <Grid size={{ xs: 12, md: 8 }}>
+              <LiveCountdown startTime={live.start_time} />
+            </Grid>
+            <Grid size={{ xs: 12, md: 4 }}>
+              <Card
+                sx={{
+                  borderRadius: 4,
+                  p: { xs: 2.5, md: 4 },
+                  background: "#FFF7FA",
+                }}
+              >
+                <CardContent>
+                  <Typography
+                    sx={{
+                      fontWeight: 700,
+                      color: "#C85A8E",
+                      fontSize: { xs: 20, md: 24 },
+                      mb: 1.5,
+                    }}
+                  >
+                    Lo que necesitas y aprenderas
+                  </Typography>
+
+                  <Box
+                    sx={{
+                      color: "#4a3a50",
+                      lineHeight: 1.7,
+                      "& p": { mb: 1.5 },
+                    }}
+                    dangerouslySetInnerHTML={{ __html: live.description }}
+                  />
+                </CardContent>
+              </Card>
+            </Grid>
+          </Grid>
         )}
         <Grid container spacing={{ xs: 3, md: 6 }}>
           {/* PLAYER */}
@@ -257,18 +292,17 @@ const LiveDetalle = () => {
                       mb: 1.5,
                     }}
                   >
-                    Lo que aprenderás
+                    Lo que necesitas y aprenderas
                   </Typography>
 
-                  <Typography
+                  <Box
                     sx={{
-                      color: "#5A4A57",
-                      fontSize: { xs: 14, md: 16 },
+                      color: "#4a3a50",
                       lineHeight: 1.7,
+                      "& p": { mb: 1.5 },
                     }}
-                  >
-                    {live.description}
-                  </Typography>
+                    dangerouslySetInnerHTML={{ __html: live.description }}
+                  />
                 </CardContent>
               </Card>
             </Grid>

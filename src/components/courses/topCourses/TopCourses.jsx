@@ -106,49 +106,39 @@ linear-gradient(181deg,rgba(255, 223, 239, 1) 0%, rgba(255, 255, 255, 1) 100%);
         }}
       >
         {topCourses.map((course, index) => (
-          <Grid
-            size={{ xs: 12, sm: 6, md: 4, lg: 3, xl: 3 }}
-            key={index}
-            sx={{ marginTop: -10 }}
-          >
+          <Grid size={{ xs: 12, sm: 6, md: 4, lg: 3, xl: 3 }} key={index}>
             <Link
               to={`/detalle-curso/${course.courseId}`}
               style={{ textDecoration: "none" }}
             >
-              <Box
-                className='nf-card-container'
-                sx={{
-                  position: "relative",
-                  borderRadius: "12px",
-                  overflow: "hidden",
-                  // boxShadow: "0px 4px 12px rgba(0,0,0,0.1)",
-                  background: "transparent",
-                }}
-              >
-                <Grid container spacing={2}>
-                  <Grid size={4} sx={{ backgroundColor: "transparent" }}>
+              <Grid container spacing={2}>
+                <Box
+                  className='nf-card-container'
+                  sx={{
+                    position: "relative",
+                    borderRadius: "12px",
+                    overflow: "hidden",
+                    // boxShadow: "0px 4px 12px rgba(0,0,0,0.1)",
+                    background: "transparent",
+                  }}
+                >
+                  <Grid size={12} sx={{ backgroundColor: "transparent" }}>
                     <Box
                       className='nf-number'
                       sx={{
                         position: "absolute",
-                        top: "50%",
-                        left: { xs: -90, sm: -70, md: -60, lg: -50, xl: -90 },
-                        background: "transparent",
+                        top: "15%",
+                        background: "rgba(255, 255, 255, 0.23)",
+                        backdropFilter: "blur(18.5px)",
                         color: "transparent",
-                        width: "100%",
-                        height: "100%",
+                        width: { xs: "70px", md: "100px" },
+                        height: { xs: "70px", md: "100px" },
+                        left: "0%",
                         borderRadius: "50%",
                         display: "flex",
                         justifyContent: "center",
                         alignItems: "center",
-                        fontWeight: "bold",
-                        fontSize: {
-                          xs: "190px",
-                          sm: "160px",
-                          md: "170px",
-                          lg: "185px",
-                          xl: "200px",
-                        },
+                        fontSize: { xs: "50px", sm: "60px", md: "70px" },
                         zIndex: 2,
                         transition: "transform 0.3s",
                         "&:hover": {
@@ -158,29 +148,14 @@ linear-gradient(181deg,rgba(255, 223, 239, 1) 0%, rgba(255, 255, 255, 1) 100%);
                     >
                       {index + 1}
                     </Box>
-                  </Grid>
-                  <Grid
-                    size={8}
-                    sx={{
-                      zIndex: 2,
-                      borderRadius: "16px",
-                      display: "flex",
-                      justifyContent: "center",
-                      justifyItems: "center",
-                    }}
-                  >
+
                     <CardMedia
                       component='img'
                       image={course.cover_image_url}
                       alt={course.title}
                       sx={{
                         width: "100%",
-                        aspectRatio: {
-                          xs: "5 / 4",
-                          sm: "4 / 3",
-                          md: "3 / 2",
-                          lg: "1 / 1",
-                        },
+                        aspectRatio: "1 / 1",
                         objectFit: "cover",
                         borderRadius: { xs: "16px", lg: "12px" },
                         backgroundColor: "#f5f5f5",
@@ -200,8 +175,8 @@ linear-gradient(181deg,rgba(255, 223, 239, 1) 0%, rgba(255, 255, 255, 1) 100%);
                   >
                     <Typography fontWeight='bold'>{course.title}</Typography>
                   </Grid>
-                </Grid>
-              </Box>
+                </Box>
+              </Grid>
             </Link>
           </Grid>
         ))}

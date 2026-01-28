@@ -13,7 +13,7 @@ const NotificationsList = ({ notifications, onClose }) => {
   }
 
   return (
-    <Box>
+    <Box sx={{ padding: 1 }}>
       {notifications.map((n) => (
         <NotificationsItem key={n.id} notification={n} onClick={onClose} />
       ))}

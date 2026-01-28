@@ -46,26 +46,23 @@ const NotificationsState = ({ children }) => {
       });
   };
 
-  const makeAsReadNotification = (id) => {
-    let url = `/notifications/${id}/read`;
-    MethodPut(url)
-      .then((res) => {
-        dispatch({
-          type: MAKE_READ_NOTIFICATION,
-          payload: id,
-        });
-        getAllNotifications();
-        console.log("se marca como leida, la notificacion");
-      })
+  const makeAsReadNotification = async (id) => {
+    try {
+      await MethodPut(`/notifications/${id}/read`);
 
-      .catch((error) => {
-        console.log(
-          error,
-          "Ocurrio un error al marcar como leida la notificacion",
-        );
+      dispatch({
+        type: MAKE_READ_NOTIFICATION,
+        payload: id,
       });
-  };
 
+      getUnreadNotifications(); // 🔄 sincroniza
+    } catch (error) {
+      console.log(
+        error,
+        "Ocurrió un error al marcar como leída la notificación",
+      );
+    }
+  };
   return (
     <NotificationsContext.Provider
       value={{

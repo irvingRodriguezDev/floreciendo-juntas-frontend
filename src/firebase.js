@@ -10,4 +10,14 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
-export const messaging = getMessaging(app);
+
+let messaging = null;
+
+/**
+ * 🔐 Inicializa Firebase Messaging SOLO si el navegador lo soporta
+ */
+if ("serviceWorker" in navigator) {
+  messaging = getMessaging(app);
+}
+
+export { messaging };

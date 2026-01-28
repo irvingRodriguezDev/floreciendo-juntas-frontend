@@ -1,4 +1,3 @@
-import React from "react";
 import {
   COUNT_UNREAD_NOTIFICATIONS,
   GET_ALL_NOTIFICATIONS,
@@ -12,18 +11,24 @@ export default function NotificationsReducer(state, action) {
         ...state,
         notifications: action.payload,
       };
+
     case COUNT_UNREAD_NOTIFICATIONS:
       return {
         ...state,
         notifications_unread: action.payload,
       };
+
     case MAKE_READ_NOTIFICATION:
       return {
         ...state,
-        notifications: state.notifications.filter(
-          (n) => n.id !== action.payload,
+        notifications: state.notifications.map((n) =>
+          n.id === action.payload
+            ? { ...n, readAt: new Date().toISOString() }
+            : n,
         ),
+        notifications_unread: Math.max(state.notifications_unread - 1, 0),
       };
+
     default:
       return state;
   }
