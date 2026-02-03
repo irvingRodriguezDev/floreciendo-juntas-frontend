@@ -10,8 +10,10 @@ import NotificationsIcon from "@mui/icons-material/Notifications";
 import { useContext, useEffect, useState } from "react";
 import NotificationsList from "./NotificationsList";
 import NotificationsContext from "../../context/Notifications/NotificationsContext";
-
+import AuthContext from "../../context/Auth/AuthContext";
 const NotificationsBell = () => {
+  const { autenticado } = useContext(AuthContext);
+
   const [anchorEl, setAnchorEl] = useState(null);
   const {
     notifications,
@@ -20,9 +22,11 @@ const NotificationsBell = () => {
     notifications_unread,
   } = useContext(NotificationsContext);
   useEffect(() => {
-    getAllNotifications();
-    getUnreadNotifications();
-  }, []);
+    if (autenticado) {
+      getAllNotifications();
+      getUnreadNotifications();
+    }
+  }, [autenticado]);
   return (
     <>
       <IconButton onClick={(e) => setAnchorEl(e.currentTarget)}>

@@ -1,7 +1,7 @@
 // pages/PostShowPage.jsx
 import { useEffect } from "react";
 import { Box, Typography, Grid, Button, Stack, Paper } from "@mui/material";
-import { Link, useParams, useSearchParams } from "react-router-dom";
+import { Link, Navigate, useParams, useSearchParams } from "react-router-dom";
 
 import Layout from "../../../components/Layout/Layout";
 import PostCard from "../../../components/Community/PostCard";
@@ -36,24 +36,19 @@ const ShowPost = () => {
     );
   }
 
-  // ❌ Error
-  if (error) {
+  if (error && error.status !== 404) {
     return (
       <Layout>
-        <Typography color='error' textAlign='center'>
-          Ocurrió un error al cargar la publicación 😥
+        <Typography textAlign='center'>
+          Ocurrió un error al cargar la publicación 😕
         </Typography>
       </Layout>
     );
   }
 
-  // 🚫 No encontrado
-  if (!post) {
-    return (
-      <Layout>
-        <Typography textAlign='center'>Publicación no encontrada</Typography>
-      </Layout>
-    );
+  // 🚫 Post no encontrado (404 real)
+  if (!post && error?.status === 404) {
+    return <Navigate to='/not-found' replace />;
   }
 
   return (

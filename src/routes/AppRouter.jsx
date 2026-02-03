@@ -36,6 +36,7 @@ import NewHome from "../containers/NewHome";
 import Community from "../containers/Community/Community";
 import SubscriptionScreen from "../containers/SubscriptionScreen";
 import ShowPost from "../containers/Community/showPost/ShowPost";
+import NotFound from "../containers/NotFound/Page404";
 function AppRouter() {
   const { autenticado, usuarioAutenticado, cargando } = useContext(AuthContext);
   useEffect(() => {
@@ -70,8 +71,8 @@ function AppRouter() {
     { path: "/detalle-producto/:id", element: <ProductDetailPage /> },
     { path: "/detalle-orden/:id", element: <DetailOrders /> },
     { path: "/checkout", element: <Checkout /> },
-    { path: "/new-home", element: <NewHome /> },
     { path: "/suscribirme", element: <SubscriptionScreen /> },
+    { path: "/notFound", element: <NotFound /> },
   ];
 
   // Rutas públicas solo para no autenticados
@@ -79,12 +80,10 @@ function AppRouter() {
     { path: "/iniciar-sesion", element: <Login /> },
     { path: "/registro", element: <Register /> },
     { path: "/recuperar-contraseña", element: <ForgotPassword /> },
-    { path: "/new-home", element: <NewHome /> },
   ];
 
   // Rutas privadas solo para autenticados
   const privateRoutes = [{ path: "/mi-perfil", element: <Profile /> }];
-
   return (
     <Routes>
       {/* Rutas públicas solo si NO está autenticado */}
@@ -113,7 +112,7 @@ function AppRouter() {
       ))}
 
       {/* Ruta por defecto */}
-      <Route path='*' element={<Navigate to='/' replace />} />
+      <Route path='*' element={<Navigate to='/notFound' replace />} />
     </Routes>
   );
 }

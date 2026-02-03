@@ -4,7 +4,7 @@ import NotificationsContext from "../../context/Notifications/NotificationsConte
 import { useContext } from "react";
 import relativeTime from "dayjs/plugin/relativeTime";
 import dayjs from "dayjs";
-
+import CheckIcon from "../icons/CheckIcon";
 dayjs.extend(relativeTime);
 dayjs.locale("es");
 
@@ -89,15 +89,21 @@ const NotificationItem = ({ notification, onClick }) => {
         >
           {notification.body}
         </Typography>
-
-        <Typography
-          variant='caption'
-          color='text.secondary'
-          textAlign='right'
-          sx={{ mr: "6px" }}
-        >
-          {dayjs(notification.createdAt).fromNow()}
-        </Typography>
+        <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+          <Typography
+            variant='caption'
+            color='text.secondary'
+            textAlign='right'
+            sx={{ mr: "6px" }}
+          >
+            {dayjs(notification.createdAt).fromNow()}
+          </Typography>
+          {notification.readAt !== null && (
+            <Typography>
+              <CheckIcon width={25} />
+            </Typography>
+          )}
+        </Box>
       </Box>
     </Box>
   );

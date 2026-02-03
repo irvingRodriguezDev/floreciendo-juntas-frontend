@@ -430,7 +430,7 @@ const ProfileMain = () => {
             <CancelSubscriptionDialog
               open={open}
               onClose={() => setOpen(false)}
-              userId={usuario.id}
+              userId={usuario ? usuario.id : null}
               loading={loading}
               setLoading={setLoading}
               handleCancelSubscription={handleCancelSubscription}
