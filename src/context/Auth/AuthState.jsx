@@ -3,7 +3,7 @@ import AuthContext from "./AuthContext";
 import AuthReducer from "./AuthReducer";
 import MethodGet, { MethodPost } from "../../config/Service";
 import tokenAuth from "../../config/TokenAuth";
-import { initSocket } from "../../socket";
+import { disconnectSocket, initSocket } from "../../socket";
 import { SHOW_ERRORS_API, types } from "../../types";
 import Swal from "sweetalert2";
 import clienteAxios from "../../config/Axios";
@@ -105,10 +105,14 @@ const AuthState = (props) => {
       const res = await MethodPost("/auth/login", datos);
       const token = res.data.token;
 
+      if (!token) {
+        throw new Error("Token no recibido");
+      }
+
       localStorage.setItem("token", token);
       tokenAuth(token);
 
-      // 2️⃣ Login silencioso en Shopify
+      // 2️⃣ Login silencioso en Shopify (NO debe romper login principal)
       try {
         const shopifyVariables = {
           input: {
@@ -133,7 +137,7 @@ const AuthState = (props) => {
           console.warn("Shopify:", authData.customerUserErrors[0].message);
         }
       } catch (err) {
-        console.error("Shopify login failed:", err);
+        console.warn("⚠️ Shopify login falló (no bloqueante):", err);
       }
 
       // 3️⃣ Estado global
@@ -142,14 +146,26 @@ const AuthState = (props) => {
         payload: res.data,
       });
 
+      // 4️⃣ Socket: cerrar y crear nuevo
+      disconnectSocket();
+      initSocket(token);
+
+      // 5️⃣ Obtener usuario autenticado
       await usuarioAutenticado();
+
       return true;
     } catch (error) {
+      console.error("❌ Error en iniciarSesion:", error);
+
       Swal.fire({
         title: "Error",
-        text: error.response?.data?.msg || "Credenciales incorrectas",
+        text:
+          error.response?.data?.msg ||
+          error.message ||
+          "Error al iniciar sesión",
         icon: "error",
       });
+
       return false;
     }
   };
@@ -324,6 +340,8 @@ const AuthState = (props) => {
     localStorage.removeItem("user_id");
     localStorage.removeItem("token");
     localStorage.removeItem("customerAccessToken");
+    disconnectSocket();
+
     dispatch({ type: types.CERRAR_SESION });
     navigate("/", { replace: true });
   };

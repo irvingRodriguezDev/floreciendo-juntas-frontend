@@ -17,9 +17,6 @@ export default (state, action) => {
       };
 
     case CREATE_POST_COMMUNITY:
-      if (state.community_posts.some((p) => p.id === action.payload.id))
-        return state;
-
       return {
         ...state,
         community_posts: [action.payload, ...state.community_posts],
@@ -30,69 +27,76 @@ export default (state, action) => {
         community_posts: state.community_posts.map((post) => {
           if (post.id !== action.payload.postId) return post;
 
-          const likedByMe = !post.likedByMe;
+          // Si viene 'liked' en el payload (desde socket), usamos ese valor.
+          // Si NO viene (clic optimista), invertimos el que ya tenemos.
+          const isSocketUpdate = typeof action.payload.liked !== "undefined";
+          const newLikedByMe = isSocketUpdate
+            ? action.payload.liked
+            : !post.likedByMe;
+
+          // Solo sumamos/restamos si el estado realmente cambió
+          if (newLikedByMe === post.likedByMe && isSocketUpdate) return post;
 
           return {
             ...post,
-            likedByMe,
-            likesCount: likedByMe
-              ? (post.likesCount || 0) + 1
-              : Math.max((post.likesCount || 1) - 1, 0),
+            likedByMe: newLikedByMe,
+            likesCount: newLikedByMe
+              ? (post.likesCount || 0) +
+                (isSocketUpdate && post.likedByMe ? 0 : 1)
+              : Math.max(
+                  (post.likesCount || 0) -
+                    (isSocketUpdate && !post.likedByMe ? 0 : 1),
+                  0,
+                ),
           };
         }),
       };
-
-    case CREATE_COMMENT_POST_COMMUNITY: {
-      const { postId, comment, replaceTemp } = action.payload;
-
+    case CREATE_COMMENT_POST_COMMUNITY:
       return {
         ...state,
         community_posts: state.community_posts.map((post) => {
-          if (post.id !== postId) return post;
+          if (post.id !== action.payload.postId) return post;
 
-          let comments = post.comments || [];
-          let commentsCount = post.commentsCount || 0;
-
-          // 🔁 Reemplazo de comentario optimista
-          if (replaceTemp) {
-            comments = comments.filter((c) => c.id !== replaceTemp);
-            // ❗ NO sumamos contador aquí
+          let newComments;
+          if (action.payload.replaceTemp) {
+            // Reemplazar comentario temporal con el real de la DB
+            newComments = post.comments.map((c) =>
+              c.id === action.payload.replaceTemp ? action.payload.comment : c,
+            );
           } else {
-            // 🆕 Comentario nuevo real-time u optimistic
-            commentsCount += 1;
-          }
-
-          // ⛔ Evitar duplicados
-          if (comments.some((c) => c.id === comment.id)) {
-            return post;
+            // Evitar duplicados si el socket llega antes que la respuesta de la API
+            const exists = post.comments?.find(
+              (c) => c.id === action.payload.comment.id,
+            );
+            newComments = exists
+              ? post.comments
+              : [...(post.comments || []), action.payload.comment];
           }
 
           return {
             ...post,
-            comments: [...comments, comment],
-            commentsCount,
+            comments: newComments,
+            commentsCount: action.payload.replaceTemp
+              ? post.commentsCount
+              : (post.commentsCount || 0) + 1,
           };
         }),
       };
-    }
 
     case REMOVE_OPTIMISTIC_COMMENT:
       return {
         ...state,
-        community_posts: state.community_posts.map((post) =>
-          post.id === action.payload.postId
-            ? {
-                ...post,
-                comments: post.comments.filter(
-                  (c) => c.id !== action.payload.tempId
-                ),
-                commentsCount:
-                  post.commentsCount > 0 ? post.commentsCount - 1 : 0,
-              }
-            : post
-        ),
+        community_posts: state.community_posts.map((post) => {
+          if (post.id !== action.payload.postId) return post;
+          return {
+            ...post,
+            comments: post.comments.filter(
+              (c) => c.id !== action.payload.tempId,
+            ),
+            commentsCount: Math.max((post.commentsCount || 1) - 1, 0),
+          };
+        }),
       };
-
     default:
       return state;
   }

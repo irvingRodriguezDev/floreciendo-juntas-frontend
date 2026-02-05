@@ -28,25 +28,29 @@ const LivesState = ({ children }) => {
     const socket = getSocket();
     if (!socket) return;
 
-    socket.on("live_started", ({ liveId, status }) => {
+    const onLiveStarted = ({ liveId, status }) => {
       dispatch({
         type: LIVE_STATUS_UPDATE,
         payload: { id: liveId, status },
       });
-    });
+    };
 
-    socket.on("live_ended", ({ liveId }) => {
+    const onLiveEnded = ({ liveId }) => {
       dispatch({
         type: LIVE_STATUS_UPDATE,
         payload: { id: liveId, status: "ended" },
       });
-    });
+    };
+
+    socket.on("live_started", onLiveStarted);
+    socket.on("live_ended", onLiveEnded);
 
     return () => {
-      socket.off("live_started");
-      socket.off("live_ended");
+      socket.off("live_started", onLiveStarted);
+      socket.off("live_ended", onLiveEnded);
     };
   }, []);
+
   // 📡 REST (sin cambios)
   const getAllLives = (page, limit, search = "") => {
     let url = `/lives?page=${page}&limit=${limit}`;

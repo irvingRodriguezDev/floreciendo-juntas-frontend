@@ -45,15 +45,28 @@ const Community = () => {
     }
   };
   useEffect(() => {
+    // 1. Si no hay usuario, no disparamos la petición
+    if (!autenticado) {
+      setLoading(false); // Aseguramos que no se quede cargando eternamente
+      return;
+    }
+
     setLoading(true);
+
     if (debounceSearch.trim() === "") {
       getFeed(page, rowsPerPage);
     } else {
       getFeed(undefined, undefined, debounceSearch);
     }
+
+    // Usamos un timer para evitar parpadeos rápidos si la red es muy veloz
     const timer = setTimeout(() => setLoading(false), 600);
+
     return () => clearTimeout(timer);
-  }, [page, rowsPerPage, debounceSearch]);
+
+    // Incluimos autenticado para que, en cuanto el login sea exitoso,
+    // este efecto se dispare automáticamente.
+  }, [page, rowsPerPage, debounceSearch, autenticado]);
 
   const isAuthorized = autenticado && isSuscribed;
   const isNotAuthorized = !isAuthorized;

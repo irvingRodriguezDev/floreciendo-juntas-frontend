@@ -1,314 +1,162 @@
-import { useContext, useEffect, useState } from "react";
-import {
-  Box,
-  Typography,
-  Card,
-  CardContent,
-  Backdrop,
-  Button,
-  Grid,
-  Chip,
-} from "@mui/material";
-import LockIcon from "@mui/icons-material/Lock";
-import FavoriteIcon from "@mui/icons-material/Favorite";
-import { motion } from "framer-motion";
-import { Link, useParams, useNavigate } from "react-router-dom";
+import React, { useContext, useEffect, useState } from "react";
+import { Box, Container, useMediaQuery, useTheme } from "@mui/material";
+import { motion, AnimatePresence } from "framer-motion";
+import { useParams, useNavigate } from "react-router-dom";
 
+// Contexts & Hooks
 import AuthContext from "../../context/Auth/AuthContext";
 import LivesContext from "../../context/Lives/LivesContext";
-import Layout from "../../components/Layout/Layout";
-import PinkSpinner from "../../components/Loading/PinkSpinner";
-import SubscriptionForm from "../../components/Payment/SubscriptionButton";
-import PlayerCliente from "./PlayerClient";
-import LogoFJ from "../../assets/images/LOGOTIPO FLORECIENDO JUNTAS rosa.png";
-import LiveCountdown from "../../components/lives/Counter";
-import LiveEndedOverlay from "../../components/lives/LiveEndedOverlay";
 import { useLiveComments } from "../../hooks/useLiveComments";
 
-const MotionBox = motion(Box);
+// Components
+import Layout from "../../components/Layout/Layout";
+import PinkSpinner from "../../components/Loading/PinkSpinner";
+import PlayerCliente from "./PlayerClient";
+import LiveCountdown from "../../components/lives/Counter";
+import LiveEndedOverlay from "../../components/lives/LiveEndedOverlay";
+import LiveHeader from "../../components/lives/LiveHeader";
+import LiveInfoCard from "../../components/lives/LiveInfoCard";
+import LiveBlocked from "../../components/lives/LiveBlocked";
 
-/* 🎬 TikTok-style animation */
 const videoVariants = {
-  live: {
-    scale: 1,
-    filter: "blur(0px) brightness(1)",
-  },
+  live: { scale: 1, filter: "blur(0px)" },
   ending: {
-    scale: 1.06,
-    filter: "blur(12px) brightness(0.65)",
-    transition: {
-      duration: 0.9,
-      ease: [0.22, 1, 0.36, 1],
-    },
+    scale: 1.05,
+    filter: "blur(15px) brightness(0.7)",
+    transition: { duration: 0.8 },
+  },
+  ended: {
+    scale: 1.05,
+    filter: "blur(20px) brightness(0.5)",
   },
 };
 
 const LiveDetalle = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   const { getLiveById, live } = useContext(LivesContext);
   const { usuario, isAuthenticating, autenticado } = useContext(AuthContext);
 
-  const liveId = live?.id ?? null;
-
-  // ✅ SOLO comentarios
-  useLiveComments(liveId);
-
   const [livePhase, setLivePhase] = useState("live");
-  // live | ending | ended
 
-  /* 📥 Obtener live */
   useEffect(() => {
-    getLiveById(id);
+    if (id) getLiveById(id);
   }, [id]);
 
-  /* 🔴 Reaccionar cuando el live termine (GLOBAL) */
   useEffect(() => {
-    if (!live) return;
-
-    if (live.status === "ended") {
+    // Si el live pasa a ended, iniciamos la secuencia de cierre
+    if (live?.status === "ended") {
       setLivePhase("ending");
-
-      const t = setTimeout(() => {
-        setLivePhase("ended");
-      }, 900);
-
-      return () => clearTimeout(t);
+      const timer = setTimeout(() => setLivePhase("ended"), 900);
+      return () => clearTimeout(timer);
+    } else if (live?.status === "live") {
+      setLivePhase("live");
     }
   }, [live?.status]);
 
-  /* 🟣 LOADING */
+  useLiveComments(live?.id);
+
   if (isAuthenticating || !live) {
     return (
       <PinkSpinner
-        label={
-          isAuthenticating
-            ? "Verificando tu acceso…"
-            : "Cargando información del live…"
-        }
+        label={isAuthenticating ? "Verificando acceso..." : "Cargando live..."}
       />
     );
   }
 
   const isSubscribed = Boolean(usuario?.isSubscribed);
+
   return (
     <Layout>
-      <Box
-        sx={{
-          minHeight: "100vh",
-          background: "#FFF7FA",
-          pt: { xs: 8, md: 14 },
-          pb: 10,
-          px: { xs: 1.5, sm: 4, md: 8 },
-        }}
+      <Container
+        maxWidth='lg'
+        disableGutters={isMobile}
+        sx={{ py: { xs: 0, sm: 2 } }}
       >
-        {/* HEADER */}
-        <MotionBox
-          initial={{ opacity: 0, y: 24 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          textAlign='center'
-          mb={{ xs: 3, md: 6 }}
+        {/* 1. Header */}
+        <Box sx={{ px: isMobile ? 2 : 0, mt: isMobile ? 2 : 0 }}>
+          <LiveHeader live={live} />
+        </Box>
+
+        <Box
+          sx={{
+            mt: isMobile ? 2 : 3,
+            position: "relative",
+            width: "100%",
+            borderRadius: isMobile ? 0 : 4,
+            overflow: "hidden",
+            bgcolor: "#transparent", // Fondo negro base
+          }}
         >
-          <Chip
-            icon={<FavoriteIcon sx={{ color: "#E43888" }} />}
-            label='Live exclusivo'
-            sx={{
-              mb: 2,
-              background: "#F8C1D9",
-              color: "#8A2C5D",
-              fontWeight: 600,
-            }}
-          />
-
-          <Typography
-            sx={{
-              fontWeight: 700,
-              color: "#C85A8E",
-              fontSize:
-                live.status === "live"
-                  ? { xs: 22, md: 32 }
-                  : { xs: 28, md: 42 },
-            }}
-          >
-            {live.title}
-          </Typography>
-        </MotionBox>
-        {/* CONTENIDO */}
-        {live.status === "scheduled" && (
-          <Grid container spacing={2}>
-            <Grid size={{ xs: 12, md: 8 }}>
+          {/* ESTADO: PROGRAMADO */}
+          {live.status === "scheduled" && (
+            <Box sx={{ py: 8, display: "flex", justifyContent: "center" }}>
               <LiveCountdown startTime={live.start_time} />
-            </Grid>
-            <Grid size={{ xs: 12, md: 4 }}>
-              <Card
-                sx={{
-                  borderRadius: 4,
-                  p: { xs: 2.5, md: 4 },
-                  background: "#FFF7FA",
-                }}
-              >
-                <CardContent>
-                  <Typography
-                    sx={{
-                      fontWeight: 700,
-                      color: "#C85A8E",
-                      fontSize: { xs: 20, md: 24 },
-                      mb: 1.5,
-                    }}
-                  >
-                    Lo que necesitas y aprenderas
-                  </Typography>
+            </Box>
+          )}
 
-                  <Box
-                    sx={{
-                      color: "#4a3a50",
-                      lineHeight: 1.7,
-                      "& p": { mb: 1.5 },
-                    }}
-                    dangerouslySetInnerHTML={{ __html: live.description }}
-                  />
-                </CardContent>
-              </Card>
-            </Grid>
-          </Grid>
-        )}
-        <Grid container spacing={{ xs: 3, md: 6 }}>
-          {/* PLAYER */}
-          <Grid size={{ xs: 12, md: 8 }}>
-            {/* 🔴 EN VIVO */}
-            {live.status === "live" && livePhase === "live" && (
-              <Box
-                sx={{
-                  position: "absolute",
-                  top: 16,
-                  left: 16,
-                  px: 2,
-                  py: "6px",
-                  borderRadius: 20,
-                  fontSize: 12,
-                  fontWeight: 800,
-                  background: "linear-gradient(90deg,#E53888,#FF8FB3)",
-                  color: "#fff",
-                  zIndex: 6,
-                }}
+          {/* ESTADO: EN VIVO O FINALIZADO (Mantenemos el bloque vivo para el Overlay) */}
+          {(live.status === "live" || live.status === "ended") && (
+            <Box
+              sx={{
+                position: "relative",
+                width: "100%",
+              }}
+            >
+              {/* PLAYER SIEMPRE MONTADO */}
+              <motion.div
+                animate={livePhase}
+                variants={videoVariants}
+                style={{ position: "relative", width: "100%" }}
               >
-                🔴 EN VIVO
-              </Box>
-            )}
+                <PlayerCliente
+                  usuario={usuario}
+                  liveId={live.id}
+                  playbackUrl={live.aws_playback_url}
+                />
+              </motion.div>
 
-            {/* PLAYER + ANIMACIÓN */}
-            {live.status === "live" &&
-              live.aws_playback_url &&
-              isSubscribed && (
-                <motion.div animate={livePhase} variants={videoVariants}>
-                  <PlayerCliente
-                    usuario={usuario}
-                    liveId={live.id}
-                    playbackUrl={live.aws_playback_url}
-                    posterImage={LogoFJ}
-                  />
-                </motion.div>
+              {/* BLOQUEADOR */}
+              {live.status === "live" && (!autenticado || !isSubscribed) && (
+                <LiveBlocked autenticado={autenticado} usuario={usuario} />
               )}
 
-            {/* 🔒 BLOQUEO */}
-            {live.status === "live" && !isSubscribed && (
-              <Backdrop
-                open
-                sx={{
-                  position: "absolute",
-                  inset: 0,
-                  zIndex: 5,
-                  background: "rgba(255,240,247,0.75)",
-                  backdropFilter: "blur(8px)",
-                }}
-              >
-                <Card
-                  sx={{
-                    p: { xs: 2.5, md: 4 },
-                    borderRadius: 4,
-                    textAlign: "center",
-                    maxWidth: 420,
-                    mx: "auto",
-                  }}
-                >
-                  <LockIcon sx={{ fontSize: 52, color: "#E53888" }} />
-                  <Typography
-                    sx={{
-                      mt: 2,
-                      fontWeight: 700,
-                      color: "#E53888",
-                      fontSize: 22,
+              {/* OVERLAY FINAL */}
+              <AnimatePresence>
+                {(livePhase === "ended" || livePhase === "ending") && (
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    style={{
+                      position: "absolute",
+                      inset: 0,
+                      zIndex: 10000,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      backgroundColor: "rgba(0,0,0,0.6)",
                     }}
                   >
-                    Contenido exclusivo
-                  </Typography>
-
-                  {autenticado ? (
-                    <SubscriptionForm userId={usuario.id} />
-                  ) : (
-                    <Button
-                      component={Link}
-                      to='/iniciar-sesion'
-                      fullWidth
-                      sx={{
-                        mt: 2,
-                        background: "#C85A8E",
-                        py: 1.3,
-                        borderRadius: 3,
-                        color: "#fff",
-                      }}
-                    >
-                      Inicia sesión
-                    </Button>
-                  )}
-                </Card>
-              </Backdrop>
-            )}
-
-            {/* 🧠 LIVE FINALIZADO */}
-            {livePhase === "ended" && (
-              <LiveEndedOverlay onGoHome={() => navigate("/lives")} />
-            )}
-          </Grid>
-
-          {/* INFO */}
-          {live.status === "live" && (
-            <Grid size={{ xs: 12, md: 4 }}>
-              <Card
-                sx={{
-                  borderRadius: 4,
-                  p: { xs: 2.5, md: 4 },
-                  background: "#FFF7FA",
-                }}
-              >
-                <CardContent>
-                  <Typography
-                    sx={{
-                      fontWeight: 700,
-                      color: "#C85A8E",
-                      fontSize: { xs: 20, md: 24 },
-                      mb: 1.5,
-                    }}
-                  >
-                    Lo que necesitas y aprenderas
-                  </Typography>
-
-                  <Box
-                    sx={{
-                      color: "#4a3a50",
-                      lineHeight: 1.7,
-                      "& p": { mb: 1.5 },
-                    }}
-                    dangerouslySetInnerHTML={{ __html: live.description }}
-                  />
-                </CardContent>
-              </Card>
-            </Grid>
+                    <LiveEndedOverlay onGoHome={() => navigate("/lives")} />
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </Box>
           )}
-        </Grid>
-      </Box>
+        </Box>
+
+        {/* INFORMACIÓN EXTRA */}
+        <Box sx={{ mt: 4, px: isMobile ? 2 : 0, pb: 4 }}>
+          <LiveInfoCard
+            title='Qué aprenderás en este live'
+            html={live.description}
+          />
+        </Box>
+      </Container>
     </Layout>
   );
 };

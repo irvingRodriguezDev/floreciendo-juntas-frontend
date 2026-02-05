@@ -104,15 +104,6 @@ const SubscriptionForm = ({ userId }) => {
       }}
     >
       {/* TÍTULO */}
-      <Typography
-        variant='h5'
-        fontWeight='bold'
-        textAlign='center'
-        color={PRIMARY_PINK}
-        sx={{ mb: 1 }}
-      >
-        Elige tu camino para florecer
-      </Typography>
 
       {/* PRECIO */}
       <Typography
@@ -205,7 +196,7 @@ const SubscriptionForm = ({ userId }) => {
             "&:hover": { bgcolor: HOVER_PINK },
           }}
         >
-          {loading ? "Procesando Pago..." : "Continuar con el Pago"}
+          {loading ? "Procesando Pago..." : "Unirme a Floreciendo Juntas"}
         </Button>
       ) : (
         <Link to='/iniciar-sesion'>

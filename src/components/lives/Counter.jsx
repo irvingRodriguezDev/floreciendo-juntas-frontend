@@ -41,7 +41,7 @@ const LiveCountdown = ({ startTime }) => {
         px: { xs: 3, sm: 5, md: 7 },
         py: { xs: 4, md: 6 },
         borderRadius: "28px",
-        background: "#fff7fa",
+        background: "#FFF4FA",
         backdropFilter: "blur(14px)",
         textAlign: "center",
       }}

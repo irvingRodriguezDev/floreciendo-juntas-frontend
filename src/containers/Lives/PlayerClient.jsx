@@ -1,226 +1,200 @@
-import React, { useEffect, useRef, useState, useCallback } from "react";
-import { Box, useMediaQuery, Fade } from "@mui/material";
-import { motion, AnimatePresence } from "framer-motion";
-
+import React, { useEffect, useRef, useState } from "react";
+import Plyr from "plyr";
+import "plyr/dist/plyr.css";
+import {
+  Box,
+  CircularProgress,
+  IconButton,
+  useMediaQuery,
+  useTheme,
+} from "@mui/material";
+import FullscreenIcon from "@mui/icons-material/Fullscreen";
+import FullscreenExitIcon from "@mui/icons-material/FullscreenExit";
 import LiveCommentsOverlay from "./LiveCommentsOverlay";
-import LivePlayerOverlay from "./LivePlayerOverlay";
-import LiveWatermark from "./LiveWatermark";
-import { useLiveComments } from "../../hooks/useLiveComments";
-import MethodGet from "../../config/Service";
 
-const TOKEN_REFRESH_INTERVAL = 4 * 60 * 1000; // 4 min
-
-const IVSPlayerComponent = ({ playbackUrl, liveId, usuario }) => {
+const PlayerCliente = ({ playbackUrl, liveId }) => {
   const videoRef = useRef(null);
-  const playerRef = useRef(null);
-  const refreshTimerRef = useRef(null);
+  const containerRef = useRef(null);
+  const [loading, setLoading] = useState(true);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [videoOrientation, setVideoOrientation] = useState("landscape");
 
-  const isMobile = useMediaQuery("(max-width:768px)");
-
-  const [uiState, setUiState] = useState("loading"); // loading | playing | reconnecting
-  const [tokenIvs, setTokenIvs] = useState(null);
-  const [isReady, setIsReady] = useState(false);
-  const [error, setError] = useState(null);
-
-  const { comments, sendComment } = useLiveComments(liveId);
-
-  // ==========================
-  // 1️⃣ Obtener token
-  // ==========================
-  const fetchToken = useCallback(async () => {
-    const res = await MethodGet("/generate-token-ivs");
-    return res.data.token;
-  }, []);
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   useEffect(() => {
-    fetchToken()
-      .then(setTokenIvs)
-      .catch(() => setError("No pudimos validar tu acceso al live 😔"));
-  }, [fetchToken]);
+    let ivsPlayer = null;
+    let plyrPlayer = null;
 
-  // ==========================
-  // 2️⃣ Refresh silencioso
-  // ==========================
-  useEffect(() => {
-    if (!tokenIvs) return;
+    const initPlayer = () => {
+      if (!window.IVSPlayer || !videoRef.current) return;
 
-    refreshTimerRef.current = setInterval(async () => {
       try {
-        setUiState("reconnecting");
-        const newToken = await fetchToken();
-        setTokenIvs(newToken);
+        ivsPlayer = window.IVSPlayer.create();
+        ivsPlayer.attachHTMLVideoElement(videoRef.current);
+        ivsPlayer.load(playbackUrl);
+        ivsPlayer.play();
+        ivsPlayer.setVolume(1.0);
 
-        playerRef.current?.load(`${playbackUrl}?token=${newToken}`);
-      } catch {
-        setError("Se perdió la conexión con el live");
-      }
-    }, TOKEN_REFRESH_INTERVAL);
+        ivsPlayer.addEventListener(
+          window.IVSPlayer.PlayerEventType.INITIALIZED,
+          () => {
+            const quality = ivsPlayer.getQuality();
+            // Si el alto es mayor al ancho, es vertical
+            setVideoOrientation(
+              quality.height > quality.width ? "portrait" : "landscape",
+            );
+          },
+        );
 
-    return () => clearInterval(refreshTimerRef.current);
-  }, [tokenIvs, fetchToken, playbackUrl]);
+        plyrPlayer = new Plyr(videoRef.current, {
+          controls: [],
+          autoplay: true,
+          clickToPlay: false,
+        });
 
-  // ==========================
-  // 3️⃣ Esperar SDK IVS
-  // ==========================
-  useEffect(() => {
-    const checkSDK = () => {
-      if (window.IVSPlayer?.isPlayerSupported) {
-        setIsReady(true);
-      } else {
-        setTimeout(checkSDK, 100);
+        setLoading(false);
+      } catch (err) {
+        console.error(err);
       }
     };
-    checkSDK();
-  }, []);
 
-  // ==========================
-  // 4️⃣ Inicializar Player
-  // ==========================
-  useEffect(() => {
-    if (!isReady || !tokenIvs || playerRef.current) return;
+    const handleFSChange = () => {
+      setIsFullscreen(
+        !!(document.fullscreenElement || document.webkitFullscreenElement),
+      );
+    };
 
-    setUiState("loading");
-
-    const player = window.IVSPlayer.create();
-    playerRef.current = player;
-    player.attachHTMLVideoElement(videoRef.current);
-
-    player.addEventListener(window.IVSPlayer.PlayerEventType.PLAYING, () =>
-      setUiState("playing")
-    );
-
-    player.addEventListener(window.IVSPlayer.PlayerEventType.BUFFERING, () =>
-      setUiState("reconnecting")
-    );
-
-    player.addEventListener(window.IVSPlayer.PlayerEventType.ERROR, () =>
-      setError("Ocurrió un problema con la transmisión")
-    );
-
-    player.load(`${playbackUrl}?token=${tokenIvs}`);
-    player.play();
+    document.addEventListener("fullscreenchange", handleFSChange);
+    document.addEventListener("webkitfullscreenchange", handleFSChange);
+    const timer = setTimeout(initPlayer, 500);
 
     return () => {
-      player.pause();
-      player.delete();
-      playerRef.current = null;
+      clearTimeout(timer);
+      document.removeEventListener("fullscreenchange", handleFSChange);
+      document.removeEventListener("webkitfullscreenchange", handleFSChange);
+      if (plyrPlayer) plyrPlayer.destroy();
+      if (ivsPlayer) {
+        ivsPlayer.pause();
+        ivsPlayer.delete();
+      }
     };
-  }, [isReady, tokenIvs, playbackUrl]);
+  }, [playbackUrl]);
 
-  // ==========================
-  // 5️⃣ Eventos reales del <video>
-  // ==========================
-  useEffect(() => {
-    const video = videoRef.current;
-    if (!video) return;
+  const toggleFullscreen = (e) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    const elem = isMobile ? videoRef.current : containerRef.current;
+    if (!elem) return;
+    if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+      if (elem.requestFullscreen) elem.requestFullscreen();
+      else if (elem.webkitEnterFullscreen) elem.webkitEnterFullscreen();
+    } else {
+      document.exitFullscreen
+        ? document.exitFullscreen()
+        : document.webkitExitFullscreen();
+    }
+  };
 
-    const onPlaying = () => setUiState("playing");
-    const onWaiting = () => setUiState("reconnecting");
-    const onLoadStart = () => setUiState("loading");
+  const isPortraitMobile = isMobile && videoOrientation === "portrait";
+  const isChatBelow =
+    isMobile && videoOrientation === "landscape" && !isFullscreen;
 
-    video.addEventListener("playing", onPlaying);
-    video.addEventListener("waiting", onWaiting);
-    video.addEventListener("loadstart", onLoadStart);
-
-    return () => {
-      video.removeEventListener("playing", onPlaying);
-      video.removeEventListener("waiting", onWaiting);
-      video.removeEventListener("loadstart", onLoadStart);
-    };
-  }, []);
-
-  // ==========================
-  // Render
-  // ==========================
   return (
     <Box
       sx={{
-        position: "relative",
+        display: "flex",
+        flexDirection: "column",
         width: "100%",
-        height: isMobile ? "100vh" : "auto",
-        background: "#000",
-        overflow: "hidden",
-        borderRadius: { xs: 0, md: 4 },
+        bgcolor: "#000",
+        // Si es vertical, forzamos que el fondo sea negro total para que no se note corte
+        minHeight: isPortraitMobile ? "60vh" : "auto",
       }}
     >
-      {/* 🎥 OVERLAY ESTADO */}
-      <AnimatePresence>
-        {uiState !== "playing" && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            style={{
+      <Box
+        ref={containerRef}
+        sx={{
+          position: "relative",
+          width: "100%",
+          // CLAVE: Si es vertical, eliminamos el aspecto 16/9 y usamos 9/16 o automático
+          aspectRatio: isPortraitMobile ? "9/16" : "16/9",
+          bgcolor: "#000",
+          overflow: "hidden",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        {!loading && (
+          <IconButton
+            onClick={toggleFullscreen}
+            sx={{
               position: "absolute",
-              inset: 0,
-              zIndex: 20,
+              top: 10,
+              right: 10,
+              zIndex: 1200,
+              color: "white",
+              bgcolor: "rgba(0,0,0,0.5)",
             }}
           >
-            <LivePlayerOverlay
-              status={uiState}
-              message={
-                error ||
-                (uiState === "loading"
-                  ? "Conectando al live…"
-                  : "Reconectando transmisión…")
-              }
-            />
-          </motion.div>
+            {isFullscreen ? <FullscreenExitIcon /> : <FullscreenIcon />}
+          </IconButton>
         )}
-      </AnimatePresence>
 
-      {/* 🎬 VIDEO */}
-      <video
-        ref={videoRef}
-        playsInline
-        controls={!isMobile}
-        style={{
-          width: "100%",
-          height: isMobile ? "100vh" : "auto",
-          objectFit: isMobile ? "cover" : "contain",
-          backgroundColor: "#000",
-        }}
-      />
+        <div key={playbackUrl} style={{ width: "100%", height: "100%" }}>
+          <video
+            ref={videoRef}
+            playsInline
+            autoPlay
+            style={{
+              width: "100%",
+              height: "100%",
+              // 'cover' asegura que NO haya barras negras laterales en vertical
+              objectFit: isPortraitMobile ? "cover" : "contain",
+              transform:
+                videoOrientation === "portrait" ? "scale(1.7)" : "scale(1)",
+              backgroundColor: "black",
+            }}
+          />
+        </div>
 
-      {/* 📱 TIP MOBILE */}
-      {isMobile && (
-        <Fade in>
+        {/* Overlay para Vertical o Web */}
+        {!loading && (!isChatBelow || isFullscreen) && (
           <Box
             sx={{
               position: "absolute",
-              top: 14,
-              left: "50%",
-              transform: "translateX(-50%)",
-              px: 2.5,
-              py: 0.7,
-              borderRadius: 999,
-              background: "rgba(0,0,0,0.6)",
-              backdropFilter: "blur(6px)",
-              color: "#fff",
-              fontSize: "0.75rem",
-              zIndex: 30,
+              inset: 0,
+              zIndex: 10,
+              pointerEvents: "none",
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "flex-end",
+              pb: isPortraitMobile ? 4 : 0,
             }}
           >
-            ⛶ Pantalla completa recomendada
+            <LiveCommentsOverlay liveId={liveId} isMobile={isMobile} />
           </Box>
-        </Fade>
-      )}
-
-      {/* 💧 WATERMARK */}
-
-      {/* 💬 COMENTARIOS */}
-      <Box
-        sx={{
-          position: "absolute",
-          inset: 0,
-          zIndex: 15,
-          pointerEvents: "none",
-        }}
-      >
-        <LiveCommentsOverlay comments={comments} onSend={sendComment} />
+        )}
       </Box>
+
+      {/* Espacio para chat cuando el video es horizontal (YouTube style) */}
+      {isChatBelow && !loading && (
+        <Box
+          sx={{
+            flexGrow: 1,
+            mt: -20,
+            height: "33vh",
+            bgcolor: "transparent",
+            position: "relative",
+          }}
+        >
+          <LiveCommentsOverlay liveId={liveId} isMobile={true} />
+        </Box>
+      )}
     </Box>
   );
 };
 
-export default IVSPlayerComponent;
+export default PlayerCliente;

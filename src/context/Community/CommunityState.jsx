@@ -22,9 +22,8 @@ const CommunityState = ({ children }) => {
     totalPages: 0,
     currentPage: 1,
   };
-
+  const playSound = useSound(notificationSound);
   const [state, dispatch] = useReducer(CommunityReducer, initialState);
-
   const { usuario } = useContext(AuthContext);
   const usuarioId = usuario?.id;
 
@@ -68,9 +67,7 @@ const CommunityState = ({ children }) => {
   // 📡 FEED
   const getFeed = (page, limit, search = "") => {
     let url = `/posts?page=${page}&limit=${limit}`;
-    if (search.trim() !== "") {
-      url += `&search=${encodeURIComponent(search)}`;
-    }
+    if (search.trim() !== "") url += `&search=${encodeURIComponent(search)}`;
 
     MethodGet(url)
       .then((res) => {
@@ -83,17 +80,7 @@ const CommunityState = ({ children }) => {
           },
         });
       })
-      .catch((error) => {
-        Swal.fire({
-          title: "Cuidado",
-          text: `Ocurrió un error al obtener publicaciones: ${
-            error.response?.data?.message || "Error desconocido"
-          }`,
-          icon: "error",
-          showConfirmButton: false,
-          timer: 3500,
-        });
-      });
+      .catch((error) => console.error(error));
   };
 
   // 📝 CREAR POST
@@ -103,7 +90,6 @@ const CommunityState = ({ children }) => {
       allowOutsideClick: false,
       didOpen: () => Swal.showLoading(),
     });
-    const playSound = useSound(notificationSound);
     try {
       const res = await clienteAxios.post("/posts", data, {
         headers: { "Content-Type": "multipart/form-data" },
@@ -133,7 +119,6 @@ const CommunityState = ({ children }) => {
     if (data.files?.length) {
       data.files.forEach((file) => formData.append("files", file));
     }
-    const playSound = useSound(notificationSound);
     const tempId = `temp-${Date.now()}`;
 
     const optimisticComment = {
@@ -208,31 +193,31 @@ const CommunityState = ({ children }) => {
 
   // ❤️ TOGGLE REACTION
   const createToogleReaction = async (postId) => {
-    const playSound = useSound(notificationSound);
+    // UI Optimista inmediata
     dispatch({
       type: TOOGLE_REACTION_POST_COMMUNITY,
       payload: { postId },
     });
 
     try {
-      await MethodPost(`/posts/${postId}/reaction`);
+      const res = await MethodPost(`/posts/${postId}/reaction`);
+      // Si el server nos confirma el estado, podrías usar res.data.liked
+      // pero por ahora solo activamos sonido si todo sale bien
       playSound();
     } catch (error) {
-      console.error(error);
-      // rollback
+      // Rollback si falla la red
       dispatch({
         type: TOOGLE_REACTION_POST_COMMUNITY,
         payload: { postId },
       });
+      console.error("Error toggling reaction", error);
     }
   };
 
   return (
     <CommunityContext.Provider
       value={{
-        community_posts: state.community_posts,
-        totalPages: state.totalPages,
-        currentPage: state.currentPage,
+        ...state,
         getFeed,
         createPostCommunity,
         createCommentPostCommunity,

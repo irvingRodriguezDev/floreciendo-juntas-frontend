@@ -1,89 +1,26 @@
-import React, {
-  useState,
-  useRef,
-  useEffect,
-  useMemo,
-  useCallback,
-} from "react";
-import { Box, Typography, TextField, IconButton } from "@mui/material";
-import SendIcon from "@mui/icons-material/Send";
-import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
-import ChatBubbleOutlineIcon from "@mui/icons-material/ChatBubbleOutline";
-import { motion, AnimatePresence } from "framer-motion";
+import React, { useState, useRef, useEffect } from "react";
+import { Box, TextField, IconButton } from "@mui/material";
+import { Send, Visibility, VisibilityOff } from "@mui/icons-material";
+import { useLiveComments } from "../../hooks/useLiveComments";
 
-/**
- * LiveCommentsOverlay
- * TikTok Live Style | Mobile-first | NO SCROLL JUMP
- */
-const LiveCommentsOverlay = ({ comments = [], onSend }) => {
+const LiveCommentsOverlay = ({ liveId, isMobile }) => {
   const [message, setMessage] = useState("");
-  const [isFocused, setIsFocused] = useState(false);
-  const [commentsHidden, setCommentsHidden] = useState(false);
-  const [cooldown, setCooldown] = useState(false);
+  const [isHidden, setIsHidden] = useState(false);
+  const { comments, sendComment } = useLiveComments(liveId);
+  const scrollRef = useRef(null);
 
-  const listRef = useRef(null);
-  const inputRef = useRef(null);
-  const isAtBottomRef = useRef(true); // ⭐
-
-  const isMobile = window.innerWidth < 768;
-
-  /* ==============================
-   * PERFORMANCE
-   * ============================== */
-  const visibleComments = useMemo(() => comments.slice(-30), [comments]);
-
-  /* ==============================
-   * DETECT SCROLL POSITION
-   * ============================== */
-  const handleScroll = () => {
-    const el = listRef.current;
-    if (!el) return;
-
-    const threshold = 20;
-    isAtBottomRef.current =
-      el.scrollHeight - el.scrollTop - el.clientHeight < threshold;
-  };
-
-  /* ==============================
-   * AUTO SCROLL (NO JUMP)
-   * ============================== */
+  // Auto-scroll al recibir mensajes nuevos
   useEffect(() => {
-    const el = listRef.current;
-    if (!el || commentsHidden) return;
-
-    // ⭐ Solo hace scroll si el usuario ya estaba abajo
-    if (isAtBottomRef.current) {
-      el.scrollTop = el.scrollHeight;
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
-  }, [visibleComments, commentsHidden]);
+  }, [comments]);
 
-  /* ==============================
-   * SEND MESSAGE
-   * ============================== */
-  const handleSend = useCallback(() => {
-    if (!message.trim() || cooldown) return;
-
-    const tempMessage = message.trim();
+  const handleSend = () => {
+    if (!message.trim()) return;
+    sendComment(message.trim());
     setMessage("");
-
-    onSend(tempMessage);
-
-    setCooldown(true);
-    setTimeout(() => setCooldown(false), 2200);
-
-    // ⭐ Mantiene foco SIN mover viewport
-    inputRef.current?.focus({ preventScroll: true });
-  }, [message, cooldown, onSend]);
-
-  const handleKeyDown = useCallback(
-    (e) => {
-      if (e.key === "Enter" && !e.shiftKey) {
-        e.preventDefault();
-        handleSend();
-      }
-    },
-    [handleSend]
-  );
+  };
 
   return (
     <Box
@@ -93,157 +30,97 @@ const LiveCommentsOverlay = ({ comments = [], onSend }) => {
         display: "flex",
         flexDirection: "column",
         justifyContent: "flex-end",
-        p: 2,
-        pb: "env(safe-area-inset-bottom)",
-        zIndex: 20,
-        pointerEvents: "none",
+        pointerEvents: "none", // El contenedor base no bloquea
       }}
     >
-      {/* TOGGLE CHAT */}
-      <Box
-        sx={{
-          position: "absolute",
-          top: 14,
-          right: 14,
-          zIndex: 30,
-          pointerEvents: "auto",
-        }}
-      >
-        <IconButton
-          onClick={() => setCommentsHidden((prev) => !prev)}
+      {!isHidden && (
+        <Box
+          ref={scrollRef}
           sx={{
-            width: 38,
-            height: 38,
-            background: "rgba(0,0,0,0.5)",
-            backdropFilter: "blur(10px)",
-            color: "#FFF",
+            p: 2,
+            // Altura máxima para que el scroll se active
+            maxHeight: isMobile ? "60%" : "250px",
+            overflowY: "auto",
+            display: "flex",
+            flexDirection: "column",
+            gap: 1,
+            pointerEvents: "auto", // IMPORTANTE: Esto reactiva el scroll táctil
+            WebkitOverflowScrolling: "touch", // Suavidad en iOS
+            "&::-webkit-scrollbar": { display: "none" }, // Ocultar barra fea
           }}
         >
-          {commentsHidden ? (
-            <ChatBubbleOutlineIcon fontSize='small' />
-          ) : (
-            <VisibilityOffIcon fontSize='small' />
-          )}
-        </IconButton>
-      </Box>
-
-      {/* COMMENTS LIST */}
-      <AnimatePresence>
-        {!commentsHidden && (
-          <motion.div
-            initial={{ opacity: 0, y: 18 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 18 }}
-            transition={{ duration: 0.25 }}
-          >
+          {comments?.map((c, i) => (
             <Box
-              ref={listRef} // ⭐
-              onScroll={handleScroll} // ⭐
+              key={i}
               sx={{
-                maxHeight: { xs: 180, md: 120 },
-                overflowY: "auto",
-                mb: 2,
-                pointerEvents: "auto",
-                pr: 1,
-
-                overflowAnchor: "none", // ⭐ CLAVE ANTI-SALTO
-
-                scrollbarWidth: "none",
-                "&::-webkit-scrollbar": { width: "2px" },
-
-                maskImage:
-                  "linear-gradient(to bottom, transparent 0%, black 12%, black 88%, transparent 100%)",
-                WebkitMaskImage:
-                  "linear-gradient(to bottom, transparent 0%, black 12%, black 88%, transparent 100%)",
+                bgcolor: "rgba(0,0,0,0.15)",
+                p: "8px 12px",
+                borderRadius: "15px",
+                width: "fit-content",
+                maxWidth: "90%",
+                boxShadow: "0 2px 5px rgba(0,0,0,0.2)",
               }}
             >
-              <AnimatePresence>
-                {visibleComments.map((c, index) => (
-                  <motion.div
-                    key={c.id || `${index}`}
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 0.2 }}
-                  >
-                    <Box
-                      sx={{
-                        mb: 0.8,
-                        px: 2,
-                        py: 1,
-                        borderRadius: "14px",
-                        backdropFilter: "blur(6px)",
-                        background:
-                          "linear-gradient(135deg, rgba(0,0,0,0.45), rgba(0,0,0,0.2))",
-                      }}
-                    >
-                      <Typography
-                        sx={{
-                          fontWeight: 600,
-                          fontSize: "0.78rem",
-                          color: "rgba(255,255,255,0.9)",
-                        }}
-                      >
-                        {c.user_name}
-                      </Typography>
-
-                      <Typography
-                        sx={{
-                          fontSize: "0.85rem",
-                          color: "rgba(255,255,255,0.95)",
-                          wordBreak: "break-word",
-                        }}
-                      >
-                        {c.message}
-                      </Typography>
-                    </Box>
-                  </motion.div>
-                ))}
-              </AnimatePresence>
+              <span
+                style={{
+                  color: "#e53888",
+                  fontWeight: "bold",
+                  fontSize: isMobile ? "0.8rem" : "1.2rem",
+                  display: "block",
+                }}
+              >
+                {c.user_name}
+              </span>
+              <span
+                style={{
+                  color: "white",
+                  fontSize: isMobile ? "0.9rem" : "1.3rem",
+                  wordBreak: "break-word",
+                }}
+              >
+                {c.message}
+              </span>
             </Box>
-          </motion.div>
-        )}
-      </AnimatePresence>
+          ))}
+        </Box>
+      )}
 
-      {/* INPUT */}
-      <Box
-        sx={{
-          display: "flex",
-          alignItems: "center",
-          gap: 1,
-          pointerEvents: "auto",
-          backdropFilter: "blur(16px)",
-          background: "rgba(255,255,255,0.92)",
-          borderRadius: "999px",
-          px: 2,
-          py: 1,
-          border: isFocused
-            ? "1px solid rgba(254,44,85,0.4)"
-            : "1px solid transparent",
-        }}
-      >
-        <TextField
-          inputRef={inputRef}
-          fullWidth
-          variant='standard'
-          placeholder={
-            cooldown ? "Espera un momento…" : "Escribe un comentario…"
-          }
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
-          onKeyDown={handleKeyDown}
-          onFocus={() => setIsFocused(true)}
-          onBlur={() => setIsFocused(false)}
-          InputProps={{ disableUnderline: true }}
-          disabled={cooldown}
-        />
-
-        <IconButton onClick={handleSend} disabled={cooldown || !message.trim()}>
-          <SendIcon sx={{ color: "#FE2C55" }} />
+      {/* Input de mensajes */}
+      <Box sx={{ p: 2, display: "flex", gap: 1, pointerEvents: "auto" }}>
+        <IconButton
+          onClick={() => setIsHidden(!isHidden)}
+          sx={{ color: "white", bgcolor: "rgba(0,0,0,0.4)" }}
+        >
+          {isHidden ? <Visibility /> : <VisibilityOff />}
         </IconButton>
+
+        <Box
+          sx={{
+            display: "flex",
+            flexGrow: 1,
+            bgcolor: "rgba(255,255,255,0.15)",
+            borderRadius: "25px",
+            px: 2,
+            alignItems: "center",
+            backdropFilter: "blur(10px)",
+          }}
+        >
+          <TextField
+            fullWidth
+            variant='standard'
+            placeholder='Comentar...'
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && handleSend()}
+            InputProps={{ disableUnderline: true, sx: { color: "white" } }}
+          />
+          <IconButton onClick={handleSend} sx={{ color: "#e53888" }}>
+            <Send />
+          </IconButton>
+        </Box>
       </Box>
     </Box>
   );
 };
 
-export default React.memo(LiveCommentsOverlay);
+export default LiveCommentsOverlay;

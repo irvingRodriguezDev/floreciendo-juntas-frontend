@@ -1,28 +1,35 @@
-import { Box, Typography, CircularProgress } from "@mui/material";
+import { Box, Typography, CircularProgress, Fade } from "@mui/material";
 
-const LivePlayerOverlay = ({ status, message }) => {
-  return (
-    <Box
+const LivePlayerOverlay = ({ status, message }) => (
+  <Box
+    sx={{
+      position: "absolute",
+      inset: 0,
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+      justifyContent: "center",
+      bgcolor: "rgba(0,0,0,0.7)",
+      backdropFilter: "blur(8px)",
+      color: "#fff",
+      zIndex: 10,
+    }}
+  >
+    <Fade in={status === "loading"}>
+      <CircularProgress color='inherit' size={50} thickness={2} />
+    </Fade>
+    <Typography
       sx={{
-        inset: 0,
-        zIndex: 5,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        background: "rgba(0,0,0,0.55)",
-        backdropFilter: "blur(6px)",
-        borderRadius: 2,
-        color: "#fff",
-        textAlign: "center",
-        px: 2,
+        mt: 3,
+        fontSize: 14,
+        fontWeight: 300,
+        letterSpacing: 1,
+        textTransform: "uppercase",
       }}
     >
-      {status === "loading" && <CircularProgress color='inherit' />}
-      <Typography sx={{ mt: 2, fontSize: 16, fontWeight: 500 }}>
-        {message}
-      </Typography>
-    </Box>
-  );
-};
+      {message}
+    </Typography>
+  </Box>
+);
 
 export default LivePlayerOverlay;
