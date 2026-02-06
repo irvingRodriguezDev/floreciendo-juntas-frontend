@@ -37,7 +37,7 @@ const menuItems = [
   // { name: "Cursos", path: "/cursos", auth: "both" },
   { name: "Salón", path: "/el-salon-de-tus-sueños", auth: "both" },
   { name: "Eventos", path: "/eventos", auth: "both" },
-  { name: "Tienda", path: "/tienda", auth: "both" },
+  // { name: "Tienda", path: "/tienda", auth: "both" },
 ];
 
 const Header = () => {

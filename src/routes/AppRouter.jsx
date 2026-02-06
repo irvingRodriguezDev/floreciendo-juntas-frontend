@@ -59,7 +59,7 @@ function AppRouter() {
     { path: "/secretos", element: <Secrets /> },
     { path: "/lives", element: <Lives /> },
     { path: "/detalle-live/:id", element: <LiveDetail /> },
-    { path: "/tienda", element: <Store /> },
+    // { path: "/tienda", element: <Store /> },
     { path: "/subscripcion", element: <Subscription /> },
     { path: "/el-salon-de-tus-sueños", element: <Saloon /> },
     { path: "/detalle-curso/:id", element: <DetailsCourse /> },
