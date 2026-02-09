@@ -1,7 +1,13 @@
-import React, { useCallback, useEffect, useReducer, useContext } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useReducer,
+  useContext,
+  useState,
+} from "react";
 import AuthContext from "./AuthContext";
 import AuthReducer from "./AuthReducer";
-import MethodGet, { MethodPost } from "../../config/Service";
+import MethodGet, { MethodPost, MethodPut } from "../../config/Service";
 import tokenAuth from "../../config/TokenAuth";
 import { disconnectSocket, initSocket } from "../../socket";
 import { SHOW_ERRORS_API, types } from "../../types";
@@ -261,20 +267,21 @@ const AuthState = (props) => {
    * 🔹 Actualizar información de usuario
    */
   const UpdateUser = async (data) => {
-    const id_user = localStorage.getItem("user_id");
     try {
-      const res = await MethodPost(`updateClient/${id_user}`, data);
-      dispatch({ type: types.UPDATE_USER, payload: res.data.data });
+      const res = await MethodPut("/auth/user/update", data);
+
+      dispatch({
+        type: types.UPDATE_USER,
+        payload: res.data.user,
+      });
 
       Swal.fire({
         icon: "success",
         title: "Actualizada",
-        text: "La información de usuario se ha actualizado correctamente!",
+        text: "La información de usuario se ha actualizado correctamente",
         showConfirmButton: false,
         timer: 1700,
       });
-
-      await usuarioAutenticado();
     } catch (error) {
       Swal.fire({
         icon: "error",

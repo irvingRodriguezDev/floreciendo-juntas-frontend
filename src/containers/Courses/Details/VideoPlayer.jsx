@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef, useContext } from "react";
 import Hls from "hls.js";
-import axios from "axios";
 import {
   Box,
   Typography,
@@ -12,6 +11,7 @@ import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import PauseIcon from "@mui/icons-material/Pause";
 import MethodGet, { MethodPost } from "../../../config/Service";
 import CoursesContext from "../../../context/Courses/CoursesContext";
+
 const VideoPlayer = ({
   userId,
   courseId,
@@ -23,32 +23,34 @@ const VideoPlayer = ({
 }) => {
   const { downloadCertificate } = useContext(CoursesContext);
   const videoRef = useRef(null);
+
   const [isPlaying, setIsPlaying] = useState(false);
-  const progressRef = useRef(0);
-  const completedRef = useRef(false);
-
   const [progress, setProgress] = useState(0);
-  const [completed, setCompleted] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const handleTogglePlay = () => {
-    const video = videoRef.current;
-    if (!video) return;
+  const [certificateEnabled, setCertificateEnabled] = useState(false);
 
-    if (isPlaying) {
-      video.pause();
-      setIsPlaying(false);
-    } else {
-      video.play();
-      setIsPlaying(true);
-    }
+  // 🔒 evita múltiples requests
+  const alreadySentRef = useRef(false);
+
+  const LOCAL_KEY = `video-progress-${userId}-${courseId}`;
+
+  /* ==============================
+     localStorage helpers
+  ============================== */
+  const saveLocalProgress = (seconds) => {
+    localStorage.setItem(LOCAL_KEY, seconds);
   };
-  const handlePause = () => {
-    setIsPlaying(false);
-    if (videoRef.current) {
-      saveProgress(videoRef.current.currentTime);
-    }
+
+  const getLocalProgress = () => {
+    return Number(localStorage.getItem(LOCAL_KEY) || 0);
   };
-  // 🔹 Inicializar HLS
+
+  const clearLocalProgress = () => {
+    localStorage.removeItem(LOCAL_KEY);
+  };
+
+  /* ==============================
+     HLS Init
+  ============================== */
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
@@ -60,12 +62,12 @@ const VideoPlayer = ({
       hls.loadSource(src);
       hls.attachMedia(video);
       return () => hls.destroy();
-    } else {
-      console.error("Tu navegador no soporta HLS");
     }
   }, [src]);
 
-  // 🔹 Obtener progreso inicial desde el backend
+  /* ==============================
+     Get backend state (solo 1 vez)
+  ============================== */
   useEffect(() => {
     const fetchProgress = async () => {
       try {
@@ -73,181 +75,150 @@ const VideoPlayer = ({
           `/progress-video/${userId}/${courseId}`,
         );
 
-        // Convertir string a número
-        const percent = parseFloat(data.progress || 0);
-
-        // Completado si existe completedAt o percent >= 100
-        const isCompleted = !!data.completed || percent >= 100;
-
-        setProgress(percent);
-        setCompleted(isCompleted);
-        progressRef.current = data.lastWatchedSeconds || 0;
-        completedRef.current = isCompleted;
-
-        // Reanudar video desde donde quedó
-        if (videoRef.current && progressRef.current >= 5) {
-          saveProgress(videoRef.current.currentTime);
+        if (data?.certificate_enabled) {
+          setCertificateEnabled(true);
+          alreadySentRef.current = true;
+          setProgress(100);
+          clearLocalProgress();
         }
       } catch (error) {
-        console.error("Error al cargar progreso:", error);
+        console.error("Error obteniendo progreso:", error);
       }
     };
+
     fetchProgress();
   }, [userId, courseId]);
 
-  // 🔹 Guardar progreso automáticamente
-  const saveProgress = async (secondsWatched) => {
-    try {
-      const duration = videoRef.current?.duration || 0;
-      await MethodPost(`/progress-video/${userId}/${courseId}`, {
-        secondsWatched,
-        totalSeconds: duration,
-      });
-    } catch (error) {
-      console.error("Error al guardar progreso:", error);
-    }
-  };
+  /* ==============================
+     Restore local progress
+  ============================== */
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video || certificateEnabled) return;
 
-  // 🔹 Actualizar progreso cada segundo
+    const localSeconds = getLocalProgress();
+    if (localSeconds > 5) {
+      video.currentTime = localSeconds;
+    }
+  }, [certificateEnabled]);
+
+  /* ==============================
+     UI progress updater + threshold
+  ============================== */
   useEffect(() => {
     const interval = setInterval(() => {
       const video = videoRef.current;
-      if (!video || completedRef.current) return;
+      if (!video || certificateEnabled || !video.duration) return;
 
-      const newProgressPercent = durationToPercent(
-        video.currentTime,
-        video.duration,
-      );
+      const percent = Math.floor((video.currentTime / video.duration) * 100);
 
-      // Solo actualizar si avanzó
-      if (video.currentTime > progressRef.current) {
-        setProgress(newProgressPercent);
-        progressRef.current = video.currentTime;
-        saveProgress(video.currentTime);
-      }
+      setProgress(percent);
+      saveLocalProgress(video.currentTime);
 
-      // Marcar completado
-      if (newProgressPercent >= 100 && !completedRef.current) {
-        setCompleted(true);
-        completedRef.current = true;
-        saveProgress(video.duration);
+      // 🎯 Cruza el 80% → UNA SOLA PETICIÓN
+      if (percent >= 80 && !alreadySentRef.current) {
+        unlockCertificate(video);
       }
     }, 1000);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [certificateEnabled]);
 
-  // 🔹 Función para calcular porcentaje
-  const durationToPercent = (secondsWatched, totalSeconds) => {
-    if (!totalSeconds || totalSeconds === 0) return 0;
-    return Math.floor((secondsWatched / totalSeconds) * 100);
+  /* ==============================
+     Backend call (única)
+  ============================== */
+  const unlockCertificate = async (video) => {
+    alreadySentRef.current = true;
+    setCertificateEnabled(true);
+    clearLocalProgress();
+
+    try {
+      await MethodPost(`/progress-video/${userId}/${courseId}`, {
+        secondsWatched: video.currentTime,
+        totalSeconds: video.duration,
+        progress: Math.floor((video.currentTime / video.duration) * 100),
+        certificate_enabled: true,
+      });
+    } catch (error) {
+      console.error("Error habilitando certificado:", error);
+    }
   };
-  useEffect(() => {
+
+  /* ==============================
+     Video ended (fallback)
+  ============================== */
+  const handleEnded = () => {
     const video = videoRef.current;
     if (!video) return;
 
-    const handleSeeking = () => {
-      if (video.currentTime > progressRef.current) {
-        video.currentTime = progressRef.current;
-      }
-    };
+    setProgress(100);
 
-    video.addEventListener("seeking", handleSeeking);
-    return () => video.removeEventListener("seeking", handleSeeking);
-  }, []);
+    if (!alreadySentRef.current) {
+      unlockCertificate(video);
+    }
+  };
 
+  /* ==============================
+     Play / Pause overlay
+  ============================== */
+  const handlePlayPause = () => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    video.paused ? video.play() : video.pause();
+  };
+
+  /* ==============================
+     UI
+  ============================== */
   return (
-    <Box
-      sx={{
-        maxWidth: 900,
-        mx: "auto",
-        mt: { xs: 2, md: 4 },
-        px: { xs: 1.5, md: 0 },
-      }}
-    >
+    <Box sx={{ maxWidth: 900, mx: "auto", mt: 4 }}>
       <Box
         sx={{
           position: "relative",
-          width: "100%",
-          borderRadius: { xs: "18px", md: "20px" },
+          borderRadius: 2,
           overflow: "hidden",
           backgroundColor: "#000",
-          boxShadow: {
-            xs: "0 8px 20px rgba(229,56,136,0.18)",
-            md: "0 12px 30px rgba(229,56,136,0.15)",
-          },
         }}
       >
-        {/* 🎬 Video */}
         <video
           ref={videoRef}
           controls
           controlsList='nodownload noremoteplayback'
           disablePictureInPicture
-          onPlay={() => setIsPlaying(true)}
-          onPause={handlePause}
-          onEnded={() => setIsPlaying(false)}
           poster={poster}
-          style={{
-            width: "100%",
-            aspectRatio: "16 / 9",
-            objectFit: "contain",
+          onPlay={() => setIsPlaying(true)}
+          onPause={() => setIsPlaying(false)}
+          onEnded={handleEnded}
+          style={{ width: "100%", aspectRatio: "16/9" }}
+        />
+
+        {/* 🎬 Overlay Play / Pause */}
+        <IconButton
+          onClick={handlePlayPause}
+          sx={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            backgroundColor: "rgba(255,255,255,0.9)",
+            "&:hover": {
+              backgroundColor: "#fff",
+            },
           }}
         >
-          <source src={src} type='video/mp4' />
-          Tu navegador no soporta el video.
-        </video>
-
-        {/* ▶️ / ⏸️ Botón Play-Pause centrado */}
-        {!isPlaying && !completed && (
-          <IconButton
-            onClick={handleTogglePlay}
-            sx={{
-              position: "absolute",
-              top: "50%",
-              left: "50%",
-              transform: "translate(-50%, -50%)",
-              backgroundColor: "rgba(255,255,255,0.9)",
-              width: { xs: 64, md: 80 },
-              height: { xs: 64, md: 80 },
-              "&:hover": {
-                backgroundColor: "#fff",
-              },
-            }}
-          >
-            <PlayArrowIcon sx={{ fontSize: 48, color: "#E53888" }} />
-          </IconButton>
-        )}
+          {isPlaying ? (
+            <PauseIcon sx={{ fontSize: 42, color: "#E53888" }} />
+          ) : (
+            <PlayArrowIcon sx={{ fontSize: 42, color: "#E53888" }} />
+          )}
+        </IconButton>
       </Box>
 
-      {/* Barra de progreso */}
-      <Box
-        sx={{
-          mt: 3,
-          p: { xs: 2, md: 2.5 },
-          mb: 1,
-          borderRadius: "16px",
-          backgroundColor: "#FFF6F9",
-        }}
-      >
-        <Typography
-          sx={{
-            fontWeight: 700,
-            fontSize: { xs: "1rem", md: "1.2rem" },
-            mb: 0.5,
-          }}
-        >
-          {title}
-        </Typography>
-
-        <Typography
-          sx={{
-            fontSize: "0.85rem",
-            color: "#DC4485",
-            mb: 1.2,
-          }}
-        >
-          Has avanzado un {progress}% 🌸
+      <Box sx={{ mt: 3, p: 2, borderRadius: 2, backgroundColor: "#FFF6F9" }}>
+        <Typography fontWeight={700}>{title}</Typography>
+        <Typography fontSize='0.85rem' color='#DC4485'>
+          Has avanzado un {progress}%
         </Typography>
 
         <LinearProgress
@@ -257,60 +228,38 @@ const VideoPlayer = ({
             height: 6,
             borderRadius: 10,
             backgroundColor: "#F3D6DF",
-            "& .MuiLinearProgress-bar": {
-              backgroundColor: "#E53888",
-            },
+            "& .MuiLinearProgress-bar": { backgroundColor: "#E53888" },
           }}
         />
       </Box>
 
-      {/* Certificado */}
-      {completed && (
+      {certificateEnabled && hasCertificate && usuario?.name && (
         <Box
           sx={{
             mt: 4,
-            p: { xs: 2.5, md: 3 },
-            borderRadius: "18px",
+            p: 3,
+            borderRadius: 2,
             backgroundColor: "#F8FFF9",
             textAlign: "center",
-            animation: "fadeIn 0.6s ease-out",
           }}
         >
-          <Typography
-            sx={{
-              fontSize: { xs: "1.6rem", md: "2rem" },
-              fontWeight: 700,
-              color: "#4CAF50",
-            }}
-          >
-            ¡Has florecido! 🌸
+          <Typography fontSize='1.8rem' fontWeight={700} color='#4CAF50'>
+            ¡Certificado disponible! 🌸
           </Typography>
 
-          <Typography sx={{ mt: 1, color: "text.secondary" }}>
-            Completaste este curso y diste un paso más en tu crecimiento.
-          </Typography>
-          {hasCertificate && (
-            <Button
-              variant='contained'
-              fullWidth
-              sx={{
-                mt: 2,
-                py: 1.2,
-                backgroundColor: "#F7CDD9",
-                color: "#DC4485",
-                borderRadius: "14px",
-                fontWeight: 600,
-                textTransform: "none",
-                "&:hover": {
-                  backgroundColor: "#F5BCCC",
-                },
-              }}
-              onClick={() => downloadCertificate(courseId, usuario.name)}
-              disabled={loading}
-            >
-              {loading ? "Generando certificado..." : "Descargar certificado"}
-            </Button>
-          )}
+          <Button
+            fullWidth
+            sx={{
+              mt: 2,
+              backgroundColor: "#F7CDD9",
+              color: "#DC4485",
+              fontWeight: 600,
+              textTransform: "none",
+            }}
+            onClick={() => downloadCertificate(courseId, usuario?.name || "")}
+          >
+            Descargar certificado
+          </Button>
         </Box>
       )}
     </Box>

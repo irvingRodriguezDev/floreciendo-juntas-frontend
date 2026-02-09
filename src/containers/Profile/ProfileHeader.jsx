@@ -17,6 +17,7 @@ import CancelSubscriptionDialog from "./CancelSubscriptionDialog";
 import CancelingSubscription from "../../CancelingSubscription";
 import { MethodPost } from "../../config/Service";
 import Swal from "sweetalert2";
+import ModalUpdateUser from "./ModalUpdateInformation";
 
 const PRIMARY_PINK = "#E53888";
 const TEXT_COLOR = "#4A4A4A";
@@ -25,6 +26,7 @@ const ProfileMain = () => {
   const { ChangePhoto, usuario } = useContext(AuthContext);
   const fileInputRef = useRef(null);
   const [open, setOpen] = useState(false);
+  const [openUpdateUser, setOpenUpdateUser] = useState(false);
   const [cancelType, setCancelType] = useState("period_end"); // 'immediate' o 'period_end'
   const [loading, setLoading] = useState(false);
   const [canceling, setCanceling] = useState(false);
@@ -190,6 +192,15 @@ const ProfileMain = () => {
                 size={{ xs: 12, md: 8 }}
                 sx={{ display: "flex", flexDirection: "column", gap: 1.2 }}
               >
+                <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
+                  <Button
+                    onClick={() => setOpenUpdateUser(true)}
+                    variant='contained'
+                    sx={{ bgcolor: "#D82F7A", borderRadius: "13px" }}
+                  >
+                    Editar información
+                  </Button>
+                </Box>
                 <Box
                   sx={{
                     display: "inline-block",
@@ -434,6 +445,10 @@ const ProfileMain = () => {
               loading={loading}
               setLoading={setLoading}
               handleCancelSubscription={handleCancelSubscription}
+            />
+            <ModalUpdateUser
+              open={openUpdateUser}
+              onClose={() => setOpenUpdateUser(false)}
             />
           </Box>
         </motion.div>

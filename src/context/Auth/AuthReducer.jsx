@@ -30,6 +30,12 @@ export default (state, action) => {
         token: action.payload.token,
       };
     case types.RESET_PASSWORD:
+    case types.UPDATE_USER:
+      return {
+        ...state,
+        autenticado: true,
+        usuario: action.payload,
+      };
     case types.OBTENER_USUARIO:
       return {
         ...state,

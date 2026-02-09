@@ -1,46 +1,47 @@
 import React, { useEffect, useRef, useState } from "react";
 import Plyr from "plyr";
 import "plyr/dist/plyr.css";
-import {
-  Box,
-  CircularProgress,
-  IconButton,
-  useMediaQuery,
-  useTheme,
-} from "@mui/material";
+import { Box, IconButton, useMediaQuery, useTheme } from "@mui/material";
 import FullscreenIcon from "@mui/icons-material/Fullscreen";
 import FullscreenExitIcon from "@mui/icons-material/FullscreenExit";
+import VolumeOffIcon from "@mui/icons-material/VolumeOff";
+import VolumeUpIcon from "@mui/icons-material/VolumeUp";
 import LiveCommentsOverlay from "./LiveCommentsOverlay";
 
 const PlayerCliente = ({ playbackUrl, liveId }) => {
   const videoRef = useRef(null);
   const containerRef = useRef(null);
+  const ivsPlayerRef = useRef(null);
+
   const [loading, setLoading] = useState(true);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [videoOrientation, setVideoOrientation] = useState("landscape");
+  const [muted, setMuted] = useState(false);
 
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   useEffect(() => {
-    let ivsPlayer = null;
     let plyrPlayer = null;
 
     const initPlayer = () => {
       if (!window.IVSPlayer || !videoRef.current) return;
 
       try {
-        ivsPlayer = window.IVSPlayer.create();
+        const ivsPlayer = window.IVSPlayer.create();
+        ivsPlayerRef.current = ivsPlayer;
+
         ivsPlayer.attachHTMLVideoElement(videoRef.current);
         ivsPlayer.load(playbackUrl);
-        ivsPlayer.play();
+
+        ivsPlayer.setMuted(false); // 🔊 audio activo
         ivsPlayer.setVolume(1.0);
+        ivsPlayer.play();
 
         ivsPlayer.addEventListener(
           window.IVSPlayer.PlayerEventType.INITIALIZED,
           () => {
             const quality = ivsPlayer.getQuality();
-            // Si el alto es mayor al ancho, es vertical
             setVideoOrientation(
               quality.height > quality.width ? "portrait" : "landscape",
             );
@@ -67,6 +68,7 @@ const PlayerCliente = ({ playbackUrl, liveId }) => {
 
     document.addEventListener("fullscreenchange", handleFSChange);
     document.addEventListener("webkitfullscreenchange", handleFSChange);
+
     const timer = setTimeout(initPlayer, 500);
 
     return () => {
@@ -74,12 +76,20 @@ const PlayerCliente = ({ playbackUrl, liveId }) => {
       document.removeEventListener("fullscreenchange", handleFSChange);
       document.removeEventListener("webkitfullscreenchange", handleFSChange);
       if (plyrPlayer) plyrPlayer.destroy();
-      if (ivsPlayer) {
-        ivsPlayer.pause();
-        ivsPlayer.delete();
+      if (ivsPlayerRef.current) {
+        ivsPlayerRef.current.pause();
+        ivsPlayerRef.current.delete();
       }
     };
   }, [playbackUrl]);
+
+  const toggleMute = () => {
+    const ivsPlayer = ivsPlayerRef.current;
+    if (!ivsPlayer) return;
+
+    ivsPlayer.setMuted(!muted);
+    setMuted(!muted);
+  };
 
   const toggleFullscreen = (e) => {
     if (e) {
@@ -88,9 +98,11 @@ const PlayerCliente = ({ playbackUrl, liveId }) => {
     }
     const elem = isMobile ? videoRef.current : containerRef.current;
     if (!elem) return;
+
     if (!document.fullscreenElement && !document.webkitFullscreenElement) {
-      if (elem.requestFullscreen) elem.requestFullscreen();
-      else if (elem.webkitEnterFullscreen) elem.webkitEnterFullscreen();
+      elem.requestFullscreen
+        ? elem.requestFullscreen()
+        : elem.webkitEnterFullscreen();
     } else {
       document.exitFullscreen
         ? document.exitFullscreen()
@@ -109,8 +121,6 @@ const PlayerCliente = ({ playbackUrl, liveId }) => {
         flexDirection: "column",
         width: "100%",
         bgcolor: "#000",
-        // Si es vertical, forzamos que el fondo sea negro total para que no se note corte
-        minHeight: isPortraitMobile ? "60vh" : "auto",
       }}
     >
       <Box
@@ -118,7 +128,6 @@ const PlayerCliente = ({ playbackUrl, liveId }) => {
         sx={{
           position: "relative",
           width: "100%",
-          // CLAVE: Si es vertical, eliminamos el aspecto 16/9 y usamos 9/16 o automático
           aspectRatio: isPortraitMobile ? "9/16" : "16/9",
           bgcolor: "#000",
           overflow: "hidden",
@@ -128,19 +137,35 @@ const PlayerCliente = ({ playbackUrl, liveId }) => {
         }}
       >
         {!loading && (
-          <IconButton
-            onClick={toggleFullscreen}
-            sx={{
-              position: "absolute",
-              top: 10,
-              right: 10,
-              zIndex: 1200,
-              color: "white",
-              bgcolor: "rgba(0,0,0,0.5)",
-            }}
-          >
-            {isFullscreen ? <FullscreenExitIcon /> : <FullscreenIcon />}
-          </IconButton>
+          <>
+            <IconButton
+              onClick={toggleFullscreen}
+              sx={{
+                position: "absolute",
+                top: 10,
+                right: 10,
+                zIndex: 1200,
+                color: "white",
+                bgcolor: "rgba(0,0,0,0.5)",
+              }}
+            >
+              {isFullscreen ? <FullscreenExitIcon /> : <FullscreenIcon />}
+            </IconButton>
+
+            <IconButton
+              onClick={toggleMute}
+              sx={{
+                position: "absolute",
+                top: 10,
+                left: 10,
+                zIndex: 1200,
+                color: "white",
+                bgcolor: "rgba(0,0,0,0.5)",
+              }}
+            >
+              {muted ? <VolumeOffIcon /> : <VolumeUpIcon />}
+            </IconButton>
+          </>
         )}
 
         <div key={playbackUrl} style={{ width: "100%", height: "100%" }}>
@@ -151,7 +176,6 @@ const PlayerCliente = ({ playbackUrl, liveId }) => {
             style={{
               width: "100%",
               height: "100%",
-              // 'cover' asegura que NO haya barras negras laterales en vertical
               objectFit: isPortraitMobile ? "cover" : "contain",
               transform:
                 videoOrientation === "portrait" ? "scale(1.7)" : "scale(1)",
@@ -160,7 +184,6 @@ const PlayerCliente = ({ playbackUrl, liveId }) => {
           />
         </div>
 
-        {/* Overlay para Vertical o Web */}
         {!loading && (!isChatBelow || isFullscreen) && (
           <Box
             sx={{
@@ -179,18 +202,9 @@ const PlayerCliente = ({ playbackUrl, liveId }) => {
         )}
       </Box>
 
-      {/* Espacio para chat cuando el video es horizontal (YouTube style) */}
       {isChatBelow && !loading && (
-        <Box
-          sx={{
-            flexGrow: 1,
-            mt: -20,
-            height: "33vh",
-            bgcolor: "transparent",
-            position: "relative",
-          }}
-        >
-          <LiveCommentsOverlay liveId={liveId} isMobile={true} />
+        <Box sx={{ height: "33vh", position: "relative" }}>
+          <LiveCommentsOverlay liveId={liveId} isMobile />
         </Box>
       )}
     </Box>

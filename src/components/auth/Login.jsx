@@ -13,9 +13,10 @@ import { Link } from "react-router-dom";
 import * as Yup from "yup";
 import svg from "../../assets/svg/undraw_secure-login_m11a.svg";
 import AuthContext from "../../context/Auth/AuthContext";
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import { Formik, Form } from "formik";
 import CartContext from "../../context/Cart/CartContext";
+import Swal from "sweetalert2";
 const LoginSchema = Yup.object().shape({
   email: Yup.string()
     .email("Correo inválido")
@@ -65,6 +66,23 @@ const inputStyles = {
 const Login = () => {
   const { iniciarSesion } = useContext(AuthContext);
   const { syncGuestToServer, getUserCart } = useContext(CartContext);
+  useEffect(() => {
+    const reason = sessionStorage.getItem("session_expired_reason");
+
+    if (reason === "multiple_session") {
+      Swal.fire({
+        icon: "warning",
+        title: "Sesión cerrada",
+        text: "Tu sesión se cerró porque iniciaste sesión en otro dispositivo.",
+        showConfirmButton: false,
+        timer: 3500,
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+      }).then(() => {
+        sessionStorage.removeItem("session_expired_reason");
+      });
+    }
+  }, []);
   const handleLogin = async (credentials) => {
     await iniciarSesion(credentials); // espera a que el token esté listo
     // Ahora sincronizamos guest cart (si existe)

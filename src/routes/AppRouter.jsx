@@ -1,6 +1,6 @@
 import { Routes, Route, Navigate } from "react-router-dom";
-import { useContext, useEffect } from "react";
-import { Box, Grid } from "@mui/material";
+import { useContext, useEffect, useState } from "react";
+import { Box } from "@mui/material";
 
 import AuthContext from "../context/Auth/AuthContext";
 
@@ -13,7 +13,6 @@ import Certifications from "../containers/Certificationes/Certifications";
 import Events from "../containers/Events/Events";
 import Saloon from "../containers/Saloon/Salon";
 import Secrets from "../containers/Secrets/Secrets";
-
 import Profile from "../containers/Profile/Profile";
 import DetailEvent from "../containers/Events/EventDetail/DetailEvent";
 import Home from "../containers/Home/Home";
@@ -30,90 +29,110 @@ import useLastPath from "../hooks/useLastPath";
 import Checkout from "../containers/Checkout/Checkout";
 import Lives from "../containers/Lives/Lives";
 import LiveDetail from "../containers/Lives/LiveDetail";
-import Store from "../containers/Store/Store";
 import Subscription from "../containers/Subscription/Subscription";
-import NewHome from "../containers/NewHome";
 import Community from "../containers/Community/Community";
 import SubscriptionScreen from "../containers/SubscriptionScreen";
 import ShowPost from "../containers/Community/showPost/ShowPost";
 import NotFound from "../containers/NotFound/Page404";
+
 function AppRouter() {
   const { autenticado, usuarioAutenticado, cargando } = useContext(AuthContext);
+
+  const [alert, setAlert] = useState("");
+
+  useLastPath();
+
   useEffect(() => {
     usuarioAutenticado();
   }, []);
-  useLastPath();
+
+  useEffect(() => {
+    const reason = localStorage.getItem("session_expired_reason");
+
+    if (reason) {
+      const messages = {
+        multiple_session:
+          "Tu sesión se cerró porque iniciaste sesión en otro dispositivo.",
+        token_expired: "Tu sesión expiró. Por favor inicia sesión nuevamente.",
+        default: "Tu sesión fue cerrada por seguridad.",
+      };
+
+      setAlert(messages[reason] || messages.default);
+      localStorage.removeItem("session_expired_reason");
+    }
+  }, []);
+
   if (cargando) {
     return <PinkSpinner label='Cargando' />;
   }
 
-  // Rutas siempre accesibles
-  const alwaysRoutes = [
-    { path: "/", element: <Home /> },
-    { path: "/cursos", element: <Courses /> },
-    { path: "/comunidad", element: <Community /> },
-    { path: "/comunidad/:postId", element: <ShowPost /> },
-    { path: "/certificaciones", element: <Certifications /> },
-    { path: "/eventos", element: <Events /> },
-    { path: "/detalle-evento/:id", element: <DetailEvent /> },
-    { path: "/secretos", element: <Secrets /> },
-    { path: "/lives", element: <Lives /> },
-    { path: "/detalle-live/:id", element: <LiveDetail /> },
-    // { path: "/tienda", element: <Store /> },
-    { path: "/subscripcion", element: <Subscription /> },
-    { path: "/el-salon-de-tus-sueños", element: <Saloon /> },
-    { path: "/detalle-curso/:id", element: <DetailsCourse /> },
-    { path: "/cursos/bysystem/:id", element: <BySystemId /> },
-    { path: "/success-payment-tickets", element: <Success /> },
-    { path: "/success-payment-partial", element: <SuccessSalonPayment /> },
-    { path: "/success-payment-subscription", element: <SuccessSubscription /> },
-    { path: "/error", element: <Error /> },
-    { path: "/detalle-producto/:id", element: <ProductDetailPage /> },
-    { path: "/detalle-orden/:id", element: <DetailOrders /> },
-    { path: "/checkout", element: <Checkout /> },
-    { path: "/suscribirme", element: <SubscriptionScreen /> },
-    { path: "/notFound", element: <NotFound /> },
-  ];
-
-  // Rutas públicas solo para no autenticados
-  const publicOnlyRoutes = [
-    { path: "/iniciar-sesion", element: <Login /> },
-    { path: "/registro", element: <Register /> },
-    { path: "/recuperar-contraseña", element: <ForgotPassword /> },
-  ];
-
-  // Rutas privadas solo para autenticados
-  const privateRoutes = [{ path: "/mi-perfil", element: <Profile /> }];
   return (
-    <Routes>
-      {/* Rutas públicas solo si NO está autenticado */}
-      {publicOnlyRoutes.map(({ path, element }) => (
+    <>
+      {/* 🔔 ALERTA GLOBAL */}
+
+      <Routes>
+        {/* Rutas públicas solo si NO está autenticado */}
         <Route
-          key={path}
-          path={path}
-          element={autenticado ? <Navigate to='/' replace /> : element}
+          path='/iniciar-sesion'
+          element={autenticado ? <Navigate to='/' replace /> : <Login />}
         />
-      ))}
-
-      {/* Rutas siempre accesibles */}
-      {alwaysRoutes.map(({ path, element }) => (
-        <Route key={path} path={path} element={element} />
-      ))}
-
-      {/* Rutas privadas solo si está autenticado */}
-      {privateRoutes.map(({ path, element }) => (
         <Route
-          key={path}
-          path={path}
+          path='/registro'
+          element={autenticado ? <Navigate to='/' replace /> : <Register />}
+        />
+        <Route
+          path='/recuperar-contraseña'
           element={
-            autenticado ? element : <Navigate to='/iniciar-sesion' replace />
+            autenticado ? <Navigate to='/' replace /> : <ForgotPassword />
           }
         />
-      ))}
 
-      {/* Ruta por defecto */}
-      <Route path='*' element={<Navigate to='/notFound' replace />} />
-    </Routes>
+        {/* Rutas siempre accesibles */}
+        <Route path='/' element={<Home />} />
+        <Route path='/cursos' element={<Courses />} />
+        <Route path='/comunidad' element={<Community />} />
+        <Route path='/comunidad/:postId' element={<ShowPost />} />
+        <Route path='/certificaciones' element={<Certifications />} />
+        <Route path='/eventos' element={<Events />} />
+        <Route path='/detalle-evento/:id' element={<DetailEvent />} />
+        <Route path='/secretos' element={<Secrets />} />
+        <Route path='/lives' element={<Lives />} />
+        <Route path='/detalle-live/:id' element={<LiveDetail />} />
+        <Route path='/subscripcion' element={<Subscription />} />
+        <Route path='/el-salon-de-tus-sueños' element={<Saloon />} />
+        <Route path='/detalle-curso/:id' element={<DetailsCourse />} />
+        <Route path='/cursos/bysystem/:id' element={<BySystemId />} />
+        <Route path='/success-payment-tickets' element={<Success />} />
+        <Route
+          path='/success-payment-partial'
+          element={<SuccessSalonPayment />}
+        />
+        <Route
+          path='/success-payment-subscription'
+          element={<SuccessSubscription />}
+        />
+        <Route path='/error' element={<Error />} />
+        <Route path='/detalle-producto/:id' element={<ProductDetailPage />} />
+        <Route path='/detalle-orden/:id' element={<DetailOrders />} />
+        <Route path='/checkout' element={<Checkout />} />
+        <Route path='/suscribirme' element={<SubscriptionScreen />} />
+
+        {/* Ruta privada */}
+        <Route
+          path='/mi-perfil'
+          element={
+            autenticado ? (
+              <Profile />
+            ) : (
+              <Navigate to='/iniciar-sesion' replace />
+            )
+          }
+        />
+
+        {/* 404 */}
+        <Route path='*' element={<Navigate to='/notFound' replace />} />
+      </Routes>
+    </>
   );
 }
 
