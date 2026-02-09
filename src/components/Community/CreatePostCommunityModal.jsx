@@ -23,7 +23,7 @@ export default function CreatePostModal({ open, handleClose }) {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [media, setMedia] = useState([]);
-
+  const MAX_CONTENT = 1500;
   /* 📎 Manejo de archivos (máx 4) */
   const handleFiles = (e) => {
     const files = Array.from(e.target.files);
@@ -47,7 +47,16 @@ export default function CreatePostModal({ open, handleClose }) {
 
     setMedia((prev) => [...prev, ...previews]);
   };
-
+  const getTitleCounterColor = (length) => {
+    if (length < 80) return "success.main";
+    if (length <= 100) return "warning.main";
+    return "error.main";
+  };
+  const getContentCounterColor = (length) => {
+    if (length < 1100) return "success.main";
+    if (length <= 1350) return "warning.main";
+    return "error.main";
+  };
   const removeMedia = (index) => {
     setMedia((prev) => prev.filter((_, i) => i !== index));
   };
@@ -64,7 +73,27 @@ export default function CreatePostModal({ open, handleClose }) {
       });
       return;
     }
+    if (title.length > 120) {
+      Swal.fire({
+        icon: "warning",
+        title: "Título muy largo",
+        text: "El título no puede superar los 120 caracteres",
+        timer: 2500,
+        showConfirmButton: false,
+      });
+      return;
+    }
 
+    if (content.length > 3000) {
+      Swal.fire({
+        icon: "warning",
+        title: "Contenido muy largo",
+        text: "El contenido no puede superar los 3000 caracteres",
+        timer: 2500,
+        showConfirmButton: false,
+      });
+      return;
+    }
     const formData = new FormData();
     formData.append("title", title);
     formData.append("content", content);
@@ -131,10 +160,27 @@ export default function CreatePostModal({ open, handleClose }) {
             variant='standard'
             fullWidth
             value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            InputProps={{ disableUnderline: true }}
-            sx={{ mb: 1 }}
+            onChange={(e) => setTitle(e.target.value.slice(0, 120))}
+            inputProps={{ maxLength: 120 }}
+            InputProps={{
+              disableUnderline: true,
+              sx: {
+                color: title.length > 100 ? "error.main" : "text.primary",
+              },
+            }}
+            sx={{ mb: 0.5 }}
           />
+          <Typography
+            variant='caption'
+            sx={{
+              mt: -1,
+              color: getTitleCounterColor(title.length),
+              fontWeight: 600,
+              transition: "color 0.2s ease",
+            }}
+          >
+            {title.length}/120
+          </Typography>
 
           {/* ✍️ Contenido */}
           <TextField
@@ -144,9 +190,21 @@ export default function CreatePostModal({ open, handleClose }) {
             variant='standard'
             fullWidth
             value={content}
-            onChange={(e) => setContent(e.target.value)}
+            onChange={(e) => setContent(e.target.value.slice(0, MAX_CONTENT))}
+            inputProps={{ maxLength: MAX_CONTENT }}
             InputProps={{ disableUnderline: true }}
           />
+
+          <Typography
+            variant='caption'
+            sx={{
+              color: getContentCounterColor(title.length),
+              fontWeight: 600,
+              transition: "color 0.2s ease",
+            }}
+          >
+            {content.length}/{MAX_CONTENT}
+          </Typography>
 
           {/* 🖼 Preview media */}
           {media.length > 0 && (

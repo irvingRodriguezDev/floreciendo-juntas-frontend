@@ -331,7 +331,7 @@ const Header = () => {
                   },
                 }}
               > */}
-              <ShopifyCartButton onClick={() => setOpenCartShopify(true)} />
+              {/* <ShopifyCartButton onClick={() => setOpenCartShopify(true)} /> */}
               {/* </IconButton> */}
 
               <ShopifyCartDrawer
@@ -470,7 +470,7 @@ const Header = () => {
                       </ListItem>
 
                       {/* 🛍️ Carrito Tienda (Shopify) */}
-                      <ListItem disablePadding>
+                      {/* <ListItem disablePadding>
                         <ListItemButton
                           onClick={() => {
                             setOpen(false);
@@ -492,7 +492,7 @@ const Header = () => {
                           open={openCartShopify}
                           onClose={() => setOpenCartShopify(false)}
                         />
-                      </ListItem>
+                      </ListItem> */}
                     </List>
                     <Box
                       sx={{ display: "flex", flexDirection: "column", gap: 1 }}

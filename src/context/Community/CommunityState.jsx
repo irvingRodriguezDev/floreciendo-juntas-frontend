@@ -90,6 +90,7 @@ const CommunityState = ({ children }) => {
       allowOutsideClick: false,
       didOpen: () => Swal.showLoading(),
     });
+
     try {
       const res = await clienteAxios.post("/posts", data, {
         headers: { "Content-Type": "multipart/form-data" },
@@ -101,13 +102,24 @@ const CommunityState = ({ children }) => {
         timer: 2000,
         showConfirmButton: false,
       });
+
       playSound();
+
       dispatch({
         type: CREATE_POST_COMMUNITY,
         payload: res.data.post,
       });
     } catch (error) {
-      Swal.fire("Error", "No se pudo publicar", "error");
+      Swal.close();
+
+      const message =
+        error.response?.data?.message || "No se pudo publicar el post";
+
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: message,
+      });
     }
   };
 

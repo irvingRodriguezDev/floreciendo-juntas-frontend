@@ -72,9 +72,9 @@ const MobileAppNavigation = ({ cartCount, onOpenSalonCart }) => {
       <IconButton onClick={() => navigate("/eventos")}>
         <TicketsIcon width={30} />
       </IconButton>
-      <IconButton onClick={() => navigate("/tienda")}>
+      {/* <IconButton onClick={() => navigate("/tienda")}>
         <ShopIcon width={30} />
-      </IconButton>
+      </IconButton> */}
     </Paper>
   );
 };
