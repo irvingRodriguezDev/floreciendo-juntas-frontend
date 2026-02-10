@@ -11,7 +11,7 @@ import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import PauseIcon from "@mui/icons-material/Pause";
 import MethodGet, { MethodPost } from "../../../config/Service";
 import CoursesContext from "../../../context/Courses/CoursesContext";
-
+import SimCardDownloadIcon from "@mui/icons-material/SimCardDownload";
 const VideoPlayer = ({
   userId,
   courseId,
@@ -22,22 +22,23 @@ const VideoPlayer = ({
   hasCertificate,
 }) => {
   const { downloadCertificate } = useContext(CoursesContext);
+
   const videoRef = useRef(null);
+  const hlsRef = useRef(null);
+  const intervalRef = useRef(null);
+  const alreadySentRef = useRef(false);
 
   const [isPlaying, setIsPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
   const [certificateEnabled, setCertificateEnabled] = useState(false);
 
-  // 🔒 evita múltiples requests
-  const alreadySentRef = useRef(false);
-
   const LOCAL_KEY = `video-progress-${userId}-${courseId}`;
 
   /* ==============================
-     localStorage helpers
+     LocalStorage helpers
   ============================== */
   const saveLocalProgress = (seconds) => {
-    localStorage.setItem(LOCAL_KEY, seconds);
+    localStorage.setItem(LOCAL_KEY, String(seconds));
   };
 
   const getLocalProgress = () => {
@@ -49,24 +50,43 @@ const VideoPlayer = ({
   };
 
   /* ==============================
-     HLS Init
+     Init HLS (OPTIMIZADO)
   ============================== */
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
 
+    // Safari (HLS nativo)
     if (video.canPlayType("application/vnd.apple.mpegurl")) {
       video.src = src;
-    } else if (Hls.isSupported()) {
-      const hls = new Hls();
+      return;
+    }
+
+    // Otros navegadores
+    if (Hls.isSupported()) {
+      const hls = new Hls({
+        enableWorker: true,
+        lowLatencyMode: false,
+        backBufferLength: 30, // 🔥 reduce consumo
+        maxBufferLength: 60, // 🔥 evita cache gigante
+        maxMaxBufferLength: 120,
+      });
+
       hls.loadSource(src);
       hls.attachMedia(video);
-      return () => hls.destroy();
+      hlsRef.current = hls;
     }
+
+    return () => {
+      if (hlsRef.current) {
+        hlsRef.current.destroy();
+        hlsRef.current = null;
+      }
+    };
   }, [src]);
 
   /* ==============================
-     Get backend state (solo 1 vez)
+     Obtener estado backend (1 vez)
   ============================== */
   useEffect(() => {
     const fetchProgress = async () => {
@@ -77,8 +97,8 @@ const VideoPlayer = ({
 
         if (data?.certificate_enabled) {
           setCertificateEnabled(true);
-          alreadySentRef.current = true;
           setProgress(100);
+          alreadySentRef.current = true;
           clearLocalProgress();
         }
       } catch (error) {
@@ -90,53 +110,59 @@ const VideoPlayer = ({
   }, [userId, courseId]);
 
   /* ==============================
-     Restore local progress
+     Restaurar progreso local
   ============================== */
   useEffect(() => {
     const video = videoRef.current;
     if (!video || certificateEnabled) return;
 
-    const localSeconds = getLocalProgress();
-    if (localSeconds > 5) {
-      video.currentTime = localSeconds;
+    const seconds = getLocalProgress();
+    if (seconds > 5) {
+      video.currentTime = seconds;
     }
   }, [certificateEnabled]);
 
   /* ==============================
-     UI progress updater + threshold
+     Progreso (cada 5s 🔥)
   ============================== */
   useEffect(() => {
-    const interval = setInterval(() => {
+    if (certificateEnabled) return;
+
+    intervalRef.current = setInterval(() => {
       const video = videoRef.current;
-      if (!video || certificateEnabled || !video.duration) return;
+      if (!video || !video.duration) return;
 
       const percent = Math.floor((video.currentTime / video.duration) * 100);
 
       setProgress(percent);
       saveLocalProgress(video.currentTime);
 
-      // 🎯 Cruza el 80% → UNA SOLA PETICIÓN
       if (percent >= 80 && !alreadySentRef.current) {
         unlockCertificate(video);
       }
-    }, 1000);
+    }, 5000); // ⬅️ antes era 1000ms
 
-    return () => clearInterval(interval);
+    return () => {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    };
   }, [certificateEnabled]);
 
   /* ==============================
-     Backend call (única)
+     Backend call (UNA sola vez)
   ============================== */
   const unlockCertificate = async (video) => {
+    if (alreadySentRef.current) return;
+
     alreadySentRef.current = true;
     setCertificateEnabled(true);
     clearLocalProgress();
 
     try {
       await MethodPost(`/progress-video/${userId}/${courseId}`, {
-        secondsWatched: video.currentTime,
-        totalSeconds: video.duration,
-        progress: Math.floor((video.currentTime / video.duration) * 100),
+        secondsWatched: Math.floor(video.currentTime),
+        totalSeconds: Math.floor(video.duration),
+        progress: 100,
         certificate_enabled: true,
       });
     } catch (error) {
@@ -152,7 +178,6 @@ const VideoPlayer = ({
     if (!video) return;
 
     setProgress(100);
-
     if (!alreadySentRef.current) {
       unlockCertificate(video);
     }
@@ -183,6 +208,7 @@ const VideoPlayer = ({
       >
         <video
           ref={videoRef}
+          preload='metadata' // 🔥 CLAVE
           controls
           controlsList='nodownload noremoteplayback'
           disablePictureInPicture
@@ -193,7 +219,6 @@ const VideoPlayer = ({
           style={{ width: "100%", aspectRatio: "16/9" }}
         />
 
-        {/* 🎬 Overlay Play / Pause */}
         <IconButton
           onClick={handlePlayPause}
           sx={{
@@ -202,9 +227,7 @@ const VideoPlayer = ({
             left: "50%",
             transform: "translate(-50%, -50%)",
             backgroundColor: "rgba(255,255,255,0.9)",
-            "&:hover": {
-              backgroundColor: "#fff",
-            },
+            "&:hover": { backgroundColor: "#fff" },
           }}
         >
           {isPlaying ? (
@@ -239,11 +262,11 @@ const VideoPlayer = ({
             mt: 4,
             p: 3,
             borderRadius: 2,
-            backgroundColor: "#F8FFF9",
+            backgroundColor: "#FFF6F9",
             textAlign: "center",
           }}
         >
-          <Typography fontSize='1.8rem' fontWeight={700} color='#4CAF50'>
+          <Typography fontSize='1.8rem' fontWeight={700} color='#e53888'>
             ¡Certificado disponible! 🌸
           </Typography>
 
@@ -251,14 +274,16 @@ const VideoPlayer = ({
             fullWidth
             sx={{
               mt: 2,
-              backgroundColor: "#F7CDD9",
-              color: "#DC4485",
+              width: "50%",
+              backgroundColor: "#DC4485",
+              color: "#fff",
               fontWeight: 600,
-              textTransform: "none",
+              textTransform: "uppercase",
+              borderRadius: "18px",
             }}
             onClick={() => downloadCertificate(courseId, usuario?.name || "")}
           >
-            Descargar certificado
+            Descargar certificado <SimCardDownloadIcon />
           </Button>
         </Box>
       )}

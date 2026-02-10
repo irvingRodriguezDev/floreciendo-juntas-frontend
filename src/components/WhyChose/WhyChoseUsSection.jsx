@@ -14,7 +14,7 @@ import SchoolIcon from "@mui/icons-material/School";
 import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
 import PlayCircleFilledIcon from "@mui/icons-material/PlayCircleFilled";
 import CloseIcon from "@mui/icons-material/Close";
-import image from "../../assets/images/Captura de pantalla 2025-11-24 a la(s) 1.26.37 p.m..png";
+// import image from "../../assets/images/Captura de pantalla 2025-11-24 a la(s) 1.26.37 p.m..png";
 // Datos de las características
 const features = [
   {
@@ -262,13 +262,13 @@ const WhyChooseUsSection = () => {
                 border: `10px solid #F971AF`,
               }}
             >
-              <Box
+              {/* <Box
                 component='img'
                 src={image}
                 alt='Estudiantes aprendiendo'
                 loading='lazy'
                 sx={{ width: "100%", height: "100%", objectFit: "cover" }}
-              />
+              /> */}
 
               {/* Botón Play */}
               <Box

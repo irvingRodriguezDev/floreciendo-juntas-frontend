@@ -1,25 +1,6 @@
-import React from "react";
-import {
-  Box,
-  Button,
-  Typography,
-  Avatar,
-  Stack,
-  useTheme,
-  IconButton,
-  Tooltip,
-  Chip,
-} from "@mui/material";
-import PlayArrowIcon from "@mui/icons-material/PlayArrow";
-import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
+import { Box, Typography, useTheme } from "@mui/material";
+
 import VideoModal from "./VideoModal";
-import image from "../../assets/images/caro.jpg";
-import GerberaImg from "../../assets/images/Gerbera Daisy -7.png";
-import GerberaImg2 from "../../assets/images/FLOR ROSA 2.png";
-import GerberaImg3 from "../../assets/images/GERBERA MAGENTA.png";
-import GerberaImg4 from "../../assets/images/GERBERA MAGENTA desenfoque.png";
-import GerberaImg5 from "../../assets/images/FLOR ROSA CONVEN.png";
-import firmacaro from "../../assets/images/LOGOTIPO FLORECIENDO JUNTAS negro.png";
 const BannerHome = () => {
   const theme = useTheme();
   const videoSource =
@@ -213,7 +194,7 @@ const BannerHome = () => {
           right: "5%",
           width: 200,
           height: 200,
-          backgroundImage: `url(${GerberaImg})`,
+          backgroundImage: `url(${"https://cdn.floreciendojuntas.com/production/statics/Gerbera+Daisy+-7.png"})`,
           backgroundSize: "cover",
           backgroundRepeat: "no-repeat",
           // backgroundColor: "#F971AF",
@@ -232,7 +213,7 @@ const BannerHome = () => {
           transform: "translate(-50%, -50%) rotate(35deg)",
           width: "350px",
           height: "350px",
-          backgroundImage: `url(${GerberaImg5})`,
+          backgroundImage: `url(${"https://cdn.floreciendojuntas.com/production/statics/FLOR+ROSA+CONVEN.png"})`,
           backgroundSize: "cover",
           backgroundRepeat: "no-repeat",
           // backgroundColor: "#F971AF",
@@ -248,7 +229,7 @@ const BannerHome = () => {
           transform: "translate(-50%, -50%) rotate(15deg)",
           width: "350px",
           height: "350px",
-          backgroundImage: `url(${GerberaImg2})`,
+          backgroundImage: `url(${"https://cdn.floreciendojuntas.com/production/statics/FLOR+ROSA+2.png"})`,
           backgroundSize: "cover",
           backgroundRepeat: "no-repeat",
           // backgroundColor: "#F971AF",
@@ -264,7 +245,7 @@ const BannerHome = () => {
           transform: "translate(-50%, -50%) rotate(15deg)",
           width: "350px",
           height: "350px",
-          backgroundImage: `url(${GerberaImg3})`,
+          backgroundImage: `url(${"https://cdn.floreciendojuntas.com/production/statics/GERBERA+MAGENTA.png"})`,
           backgroundSize: "cover",
           backgroundRepeat: "no-repeat",
           // backgroundColor: "#F971AF",
@@ -280,7 +261,7 @@ const BannerHome = () => {
           transform: "translate(-50%, -50%) rotate(15deg)",
           width: "350px",
           height: "350px",
-          backgroundImage: `url(${GerberaImg4})`,
+          backgroundImage: `url(${"https://cdn.floreciendojuntas.com/production/statics/GERBERA+MAGENTA+desenfoque.png"})`,
           backgroundSize: "cover",
           backgroundRepeat: "no-repeat",
           // backgroundColor: "#F971AF",
@@ -401,7 +382,7 @@ const BannerHome = () => {
       >
         <Box
           component='img'
-          src={image}
+          src={"https://cdn.floreciendojuntas.com/production/statics/caro.jpg"}
           alt='caro'
           sx={{
             width: "100%",
@@ -416,35 +397,6 @@ const BannerHome = () => {
         <Box position='absolute' sx={{ zIndex: 10 }}>
           <VideoModal buttonText='Ver nuestro video' videoUrl={videoSource} />
         </Box>
-        {/* Floating Card */}
-        {/* <Box
-          sx={{
-            position: "absolute",
-            top: { xs: "-60px", md: "10px" },
-            right: { xs: "30px", md: "20px" },
-            backgroundColor: "white",
-            borderRadius: "12px",
-            padding: theme.spacing(1.5, 2),
-            boxShadow: theme.shadows[3],
-            display: { xs: "none", md: "none", lg: "flex" },
-            alignItems: "center",
-            gap: theme.spacing(1),
-            zIndex: 2,
-            border: "1px solid #e0e0e0",
-          }}
-        >
-          <Avatar sx={{ bgcolor: "#F971AF", width: 32, height: 32 }}>
-            <CheckCircleOutlineIcon sx={{ fontSize: 18 }} />
-          </Avatar>
-          <Box>
-            <Typography variant='h6' sx={{ fontWeight: 700, lineHeight: 1 }}>
-              +25K
-            </Typography>
-            <Typography variant='caption' color='text.secondary'>
-              Mujeres Empoderadas
-            </Typography>
-          </Box>
-        </Box> */}
       </Box>
     </Box>
   );

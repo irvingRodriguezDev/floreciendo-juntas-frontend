@@ -21,7 +21,6 @@ import MenuIcon from "@mui/icons-material/Menu";
 import { Link } from "react-router-dom";
 import AuthContext from "../../context/Auth/AuthContext";
 import CartContext from "../../context/Cart/CartContext";
-import Logo from "../../assets/images/LOGOTIPO FLORECIENDO JUNTAS negro.png";
 import CartButton from "./CartButton";
 import CartSidebar from "./CartSidebar";
 import BadgeBox from "../ui/BadgeBox";
@@ -215,7 +214,9 @@ const Header = () => {
           >
             <Box
               component='img'
-              src={Logo}
+              src={
+                "https://cdn.floreciendojuntas.com/production/statics/LOGOTIPO+FLORECIENDO+JUNTAS+negro.png"
+              }
               alt='Logo Floreciendo Juntas'
               sx={{
                 width: { xs: 180, sm: 180, md: 180 },
@@ -427,7 +428,13 @@ const Header = () => {
                         variant='h6'
                         sx={{ color: "#E53888", fontWeight: "bold", mb: 2 }}
                       >
-                        <img src={Logo} width='90%' height={70} />
+                        <img
+                          src={
+                            "https://cdn.floreciendojuntas.com/production/statics/LOGOTIPO+FLORECIENDO+JUNTAS+negro.png"
+                          }
+                          width='90%'
+                          height={70}
+                        />
                       </Typography>
                     </Link>
                     <List>

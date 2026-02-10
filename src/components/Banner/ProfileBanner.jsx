@@ -2,9 +2,6 @@ import React from "react";
 import { Box, Typography } from "@mui/material";
 import { motion } from "framer-motion";
 
-import gerberaSoft from "../../assets/images/GERBERA MAGENTA desenfoque.png";
-import gerberaDetail from "../../assets/images/GERBERA MAGENTA.png";
-
 const ProfileBanner = () => {
   return (
     <Box
@@ -26,7 +23,9 @@ const ProfileBanner = () => {
       {/* 🌸 Halo floral suave */}
       <Box
         component='img'
-        src={gerberaSoft}
+        src={
+          "https://cdn.floreciendojuntas.com/production/statics/GERBERA+MAGENTA+desenfoque.png"
+        }
         alt=''
         aria-hidden
         sx={{
@@ -43,7 +42,9 @@ const ProfileBanner = () => {
       {/* 🌷 Flor detalle */}
       <Box
         component={motion.img}
-        src={gerberaDetail}
+        src={
+          "https://cdn.floreciendojuntas.com/production/statics/GERBERA+MAGENTA.png"
+        }
         alt=''
         aria-hidden
         initial={{ opacity: 0, scale: 0.96 }}
