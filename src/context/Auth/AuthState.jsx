@@ -357,24 +357,30 @@ const AuthState = (props) => {
    * 🔹 Resetear contraseña
    */
   const resetPassword = async (data) => {
-    try {
-      await MethodPost("/auth/reset-password", data);
-      Swal.fire({
-        title: "Actualizada!",
-        text: "La contraseña se ha restablecido correctamente!",
-        icon: "success",
-        timer: 2500,
-        showConfirmButton: false,
-      }).then(() => (window.location = "/iniciar-sesion"));
-    } catch (error) {
-      Swal.fire({
-        title: "Error",
-        text: "Ocurrió un error al recuperar la contraseña, intenta más tarde!",
-        icon: "error",
-        timer: 2000,
-        showConfirmButton: false,
+    let url = "/auth/reset-password";
+    MethodPost(url, data)
+      .then((res) => {
+        Swal.fire({
+          title: "Actualizada!",
+          text: "La contraseña se ha restablecido correctamente!",
+          icon: "success",
+          timer: 2500,
+          showConfirmButton: false,
+        }).then(() => (window.location = "/iniciar-sesion"));
+      })
+      .catch((error) => {
+        console.log(error, "el error 372");
+
+        Swal.fire({
+          title: "Error",
+          text:
+            error.response.data.message ||
+            "Ocurrió un error al recuperar la contraseña, intenta más tarde!",
+          icon: "error",
+          timer: 2000,
+          showConfirmButton: false,
+        });
       });
-    }
   };
   const logoutGlobal = () => {
     localStorage.clear();
