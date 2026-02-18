@@ -150,17 +150,19 @@ const CourseDetailScreen = () => {
                   }}
                 >
                   <Box sx={{ position: "relative" }}>
-                    <VideoPlayer
-                      src={videoSrc}
-                      poster={course.cover_image_url}
-                      courseId={id}
-                      userId={userId}
-                      usuario={usuario}
-                      title={course.title}
-                      hasCertificate={course.hasCertificate}
-                      disabled={!isSubscribed}
-                      workbookUrl={course ? course.workbook_url : null}
-                    />
+                    {usuario && (
+                      <VideoPlayer
+                        src={videoSrc}
+                        poster={course.cover_image_url}
+                        courseId={id}
+                        userId={userId}
+                        usuario={usuario}
+                        title={course.title}
+                        hasCertificate={course.hasCertificate}
+                        disabled={!isSubscribed}
+                        workbookUrl={course?.workbook_url}
+                      />
+                    )}
 
                     {/* Overlay sin desmontar video */}
                     {!isSubscribed && (

@@ -198,6 +198,7 @@ const VideoPlayer = ({
   /* ==============================
      UI
   ============================== */
+  const safeUserName = usuario?.name ?? "";
   return (
     <Box sx={{ maxWidth: 900, mx: "auto", mt: 4 }}>
       <Box
@@ -273,7 +274,7 @@ const VideoPlayer = ({
         </Box>
       )}
 
-      {certificateEnabled && hasCertificate && usuario?.name && (
+      {certificateEnabled && hasCertificate && safeUserName && (
         <Box
           sx={{
             mt: 4,
@@ -298,7 +299,7 @@ const VideoPlayer = ({
               textTransform: "uppercase",
               borderRadius: "18px",
             }}
-            onClick={() => downloadCertificate(courseId, usuario?.name || "")}
+            onClick={() => downloadCertificate(courseId, safeUserName || "")}
           >
             Descargar certificado <SimCardDownloadIcon />
           </Button>
