@@ -33,7 +33,9 @@ import Subscription from "../containers/Subscription/Subscription";
 import Community from "../containers/Community/Community";
 import SubscriptionScreen from "../containers/SubscriptionScreen";
 import ShowPost from "../containers/Community/showPost/ShowPost";
+import CertificationDetail from "../components/Certifications/Details/CertificationDetail";
 import NotFound from "../containers/NotFound/Page404";
+import ModuleDetail from "../components/Certifications/Modules/ModuleDetail";
 
 function AppRouter() {
   const { autenticado, usuarioAutenticado, cargando } = useContext(AuthContext);
@@ -116,6 +118,11 @@ function AppRouter() {
         <Route path='/detalle-orden/:id' element={<DetailOrders />} />
         <Route path='/checkout' element={<Checkout />} />
         <Route path='/suscribirme' element={<SubscriptionScreen />} />
+        <Route
+          path='/detalle-certificacion/:id'
+          element={<CertificationDetail />}
+        />
+        <Route path='/detalle-modulo/:idModule' element={<ModuleDetail />} />
 
         {/* Ruta privada */}
         <Route

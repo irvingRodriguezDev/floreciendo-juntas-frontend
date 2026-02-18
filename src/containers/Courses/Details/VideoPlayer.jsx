@@ -12,6 +12,7 @@ import PauseIcon from "@mui/icons-material/Pause";
 import MethodGet, { MethodPost } from "../../../config/Service";
 import CoursesContext from "../../../context/Courses/CoursesContext";
 import SimCardDownloadIcon from "@mui/icons-material/SimCardDownload";
+import { Link } from "react-router-dom";
 const VideoPlayer = ({
   userId,
   courseId,
@@ -20,6 +21,7 @@ const VideoPlayer = ({
   usuario,
   title,
   hasCertificate,
+  workbookUrl,
 }) => {
   const { downloadCertificate } = useContext(CoursesContext);
 
@@ -255,6 +257,21 @@ const VideoPlayer = ({
           }}
         />
       </Box>
+      {workbookUrl !== null && (
+        <Box sx={{ mt: 3, p: 2, borderRadius: 2, backgroundColor: "#FFF6F9" }}>
+          <Typography fontSize='0.85rem' color='#DC4485'>
+            Este curso contiene un material de trabajo
+          </Typography>
+          <Link to={workbookUrl} target='__blank'>
+            <Button
+              variant='contained'
+              sx={{ borderRadius: "12px", bgcolor: "#e43888", mt: 2 }}
+            >
+              Consiguelo aquí
+            </Button>
+          </Link>
+        </Box>
+      )}
 
       {certificateEnabled && hasCertificate && usuario?.name && (
         <Box

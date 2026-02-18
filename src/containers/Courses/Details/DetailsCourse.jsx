@@ -159,6 +159,7 @@ const CourseDetailScreen = () => {
                       title={course.title}
                       hasCertificate={course.hasCertificate}
                       disabled={!isSubscribed}
+                      workbookUrl={course ? course.workbook_url : null}
                     />
 
                     {/* Overlay sin desmontar video */}

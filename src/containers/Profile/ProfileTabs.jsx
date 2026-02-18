@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { Box, Tabs, Tab, Typography, Paper } from "@mui/material";
 import { motion, AnimatePresence } from "framer-motion";
 import ProfileMain from "./ProfileHeader";
@@ -8,7 +8,8 @@ import CertificatesSection from "./CertificatesSection";
 import DreamSalonSection from "./DreamSalonSection";
 import AddressSection from "./AddressSection";
 import OrdersShopifySection from "./OrdersShopifySection";
-
+import Certifications from "../../components/Certifications/Certifications";
+import AuthContext from "../../context/Auth/AuthContext";
 // Paleta Floreciendo Juntas 🌸
 const colors = {
   background: "#FFF6F9",
@@ -21,7 +22,7 @@ const colors = {
 
 export default function ProfileTabs() {
   const [value, setValue] = useState(0);
-
+  const { usuario } = useContext(AuthContext);
   const handleChange = (e, newValue) => {
     setValue(newValue);
   };
@@ -83,7 +84,8 @@ export default function ProfileTabs() {
           <Tab label='Mis Tickets' />
           <Tab label='Mi Salón' />
           <Tab label='Mis Direcciones' />
-          <Tab label='Mis pedidos(tienda)' />
+          {usuario && usuario.isSubscribed && <Tab label='Certificaciones' />}
+          {/* <Tab label='Mis pedidos(tienda)' /> */}
         </Tabs>
       </Paper>
 
@@ -128,10 +130,14 @@ export default function ProfileTabs() {
               <AddressSection />
             </motion.div>
           )}
-          {value === 5 && (
-            <motion.div key='t4' {...animation}>
-              <OrdersShopifySection />
-            </motion.div>
+          {usuario && usuario.isSubscribed && (
+            <>
+              {value === 5 && (
+                <motion.div key='t4' {...animation}>
+                  <Certifications />
+                </motion.div>
+              )}
+            </>
           )}
         </AnimatePresence>
       </Box>

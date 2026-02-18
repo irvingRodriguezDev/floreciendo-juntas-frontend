@@ -17,6 +17,7 @@ import ScrollTop from "./utils/ScrollTop";
 import CommunityState from "./context/Community/CommunityState";
 import { useNotificationHandler } from "./hooks/useNotificationHandler";
 import NotificationsState from "./context/Notifications/NotificationsState";
+import CertificationsState from "./context/Certifications/CertificationsState";
 // Carga asíncrona de la clave pública
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_KEY);
 
@@ -37,8 +38,10 @@ function App() {
                           <OrdersState>
                             <LivesState>
                               <ShopifyCartState>
-                                <ScrollTop />
-                                <AppRouter />
+                                <CertificationsState>
+                                  <ScrollTop />
+                                  <AppRouter />
+                                </CertificationsState>
                               </ShopifyCartState>
                             </LivesState>
                           </OrdersState>
