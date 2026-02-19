@@ -7,6 +7,8 @@ import {
   Grid,
   IconButton,
   Divider,
+  Alert,
+  AlertTitle,
 } from "@mui/material";
 import { motion } from "framer-motion";
 import CloseIcon from "@mui/icons-material/Close";
@@ -168,6 +170,23 @@ const UploadDeliverableModal = ({ open, onClose, moduleId, module }) => {
             <CloseIcon sx={{ color: "#D82F7A" }} />
           </IconButton>
         </Box>
+        <Alert
+          severity='warning'
+          sx={{
+            mt: 2,
+            borderRadius: "16px",
+            backgroundColor: "#fff4f8",
+            border: "1px solid #ffd1e6",
+            color: "#9c2c63",
+            "& .MuiAlert-icon": {
+              color: "#E53888",
+            },
+          }}
+        >
+          <AlertTitle sx={{ fontWeight: 600 }}>Aviso importante</AlertTitle>
+          Una vez enviada tu tarea, las imágenes no podrán modificarse.
+          Revísalas cuidadosamente antes de confirmar tu envío.
+        </Alert>
 
         <Typography sx={{ mt: 1, color: "#666" }}>
           Sube las tres fotografías requeridas para evaluar tu progreso.

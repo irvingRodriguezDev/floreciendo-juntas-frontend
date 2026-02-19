@@ -65,7 +65,7 @@ const ModuleDetail = () => {
   const totalObtained = evaluationScores.reduce((sum, s) => sum + s.score, 0);
 
   const maxScore =
-    detail && detail.criteria.reduce((sum, c) => sum + c.max_score, 0);
+    detail?.criteria?.reduce((sum, c) => sum + c.max_score, 0) ?? 0;
 
   const progressPercentage =
     maxScore === 0 ? 0 : Math.round((totalObtained / maxScore) * 100);
@@ -102,7 +102,14 @@ const ModuleDetail = () => {
                   Detalle del módulo
                 </Typography>
 
-                <Typography variant='h3' fontWeight='700' sx={{ mt: 1 }}>
+                <Typography
+                  variant='h3'
+                  fontWeight='700'
+                  sx={{
+                    mt: 1,
+                    wordBreak: "break-word",
+                  }}
+                >
                   {detail.title}
                 </Typography>
               </Box>
@@ -134,8 +141,11 @@ const ModuleDetail = () => {
               </Stack>
               <Stack direction='row' justifyContent='space-between' mt={1.5}>
                 <Typography variant='body2' color='text.secondary'>
-                  FeedBack
+                  FeedBack:
                 </Typography>
+                <br />
+              </Stack>
+              <Stack direction='row' justifyContent='space-between' mt={1.5}>
                 <Typography variant='body2' fontWeight='600'>
                   {detail && detail.evaluation?.general_feedback}
                 </Typography>
@@ -195,7 +205,7 @@ const ModuleDetail = () => {
                     </Typography>
                   </Stack>
 
-                  {index !== detail.criteria.length - 1 && (
+                  {index !== (detail.criteria?.length ?? 0) - 1 && (
                     <Divider sx={{ opacity: 0.4 }} />
                   )}
                 </Box>

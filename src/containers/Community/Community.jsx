@@ -275,8 +275,8 @@ const Community = () => {
             onClick={handleClickOpenWritePost}
             sx={{
               position: "fixed",
-              bottom: 100,
-              right: 20,
+              bottom: 110,
+              right: 340,
               background: "#D82E7A",
               color: "#fff",
               "&:hover": {
@@ -290,7 +290,7 @@ const Community = () => {
             </Tooltip>
           </Fab>
           {totalPages > 1 && (
-            <Grid container justifyContent='center' sx={{ mt: 3, pb: 2 }}>
+            <Grid container justifyContent='center' sx={{ mt: 3, pb: 12 }}>
               <Pagination
                 totalPages={totalPages}
                 currentPage={page}

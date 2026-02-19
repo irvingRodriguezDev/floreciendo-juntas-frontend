@@ -40,7 +40,9 @@ const CertificationDetail = () => {
           sx={{
             position: "relative",
             height: { xs: 300, md: 420 },
-            backgroundImage: `url(${certification.image})`,
+            backgroundImage: certification.image
+              ? `url(${certification.image})`
+              : "none",
             backgroundSize: "cover",
             backgroundPosition: "center",
             display: "flex",
@@ -85,7 +87,12 @@ const CertificationDetail = () => {
               Una experiencia diseñada para tu crecimiento 🌷
             </Typography>
 
-            <Box mt={3}>
+            <Box
+              mt={3}
+              display='flex'
+              justifyContent='center'
+              sx={{ mb: { xs: 13, md: 2 } }}
+            >
               <Chip
                 label={`Disponible del ${FormatDate(
                   certification.start_date,
@@ -96,6 +103,20 @@ const CertificationDetail = () => {
                   color: "#E53888",
                   backdropFilter: "blur(10px)",
                   textTransform: "uppercase",
+
+                  height: "auto",
+                  "& .MuiChip-label": {
+                    whiteSpace: "normal",
+                    display: "block",
+                    textAlign: "center",
+                    py: 1,
+                  },
+
+                  maxWidth: {
+                    xs: "100%",
+                    sm: "80%",
+                    md: "fit-content",
+                  },
                 }}
               />
             </Box>
@@ -162,10 +183,14 @@ const CertificationDetail = () => {
               >
                 Camino de aprendizaje 🌿
               </Typography>
-
-              {certification.modules?.map((module, index) => {
-                return <ModulesCard module={module} index={index} />;
-              })}
+              {certification.modules?.map((module, index, array) => (
+                <ModulesCard
+                  key={module.id}
+                  module={module}
+                  index={index}
+                  total={array.length}
+                />
+              ))}
             </Paper>
           </Grid>
         </Grid>

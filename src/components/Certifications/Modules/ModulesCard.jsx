@@ -2,10 +2,10 @@ import { Box, Button, Chip, Typography } from "@mui/material";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 
-const ModulesCard = ({ module, index }) => {
+const ModulesCard = ({ module, index, total }) => {
+  if (!module) return null;
   return (
     <Box
-      key={index}
       component={motion.div}
       initial={{ opacity: 0, y: 30 }}
       animate={{ opacity: 1, y: 0 }}
@@ -18,7 +18,7 @@ const ModulesCard = ({ module, index }) => {
       }}
     >
       {/* Línea vertical elegante */}
-      {index !== module.length - 1 && (
+      {index !== total - 1 && (
         <Box
           sx={{
             position: "absolute",
@@ -69,6 +69,7 @@ const ModulesCard = ({ module, index }) => {
               fontSize: "18px",
               fontWeight: 700,
               color: "#111",
+              wordBreak: "break-word",
             }}
           >
             {module.title}
