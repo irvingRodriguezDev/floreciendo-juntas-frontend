@@ -10,6 +10,7 @@ import {
 import clienteAxios from "../../config/Axios";
 import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
+import fileDownload from "js-file-download";
 const CertificationsState = ({ children }) => {
   const initialState = {
     certifications: [],
@@ -105,6 +106,41 @@ const CertificationsState = ({ children }) => {
     }
   };
 
+  //Obtener Certificado
+  const DownloadCertificate = async (id, name) => {
+    console.log(id, name, "los datos que llegan");
+
+    let url = `/certifications/download-certificate?certificationId=${id}`;
+    Swal.fire({
+      title: "Construyendo certificado...",
+      text: "Por favor espera un momento.",
+      allowOutsideClick: false,
+      allowEscapeKey: false,
+      didOpen: () => {
+        Swal.showLoading();
+      },
+    });
+    try {
+      const res = await clienteAxios.get(url, { responseType: "blob" });
+      fileDownload(res.data, `Certificado-${name}.PDF`);
+      Swal.fire({
+        icon: "success",
+        title: "¡Certificado generado correctamente!",
+        text: "Tu certificado ha sido descargado con éxito.",
+        confirmButtonText: "Aceptar",
+      });
+    } catch (error) {
+      console.error("Ocurrió un error al descargar el certificado:", error);
+
+      Swal.fire({
+        icon: "error",
+        title: "Error al generar el certificado",
+        text: "Ocurrió un problema al descargar el certificado. Intenta nuevamente.",
+        confirmButtonText: "Cerrar",
+      });
+    }
+  };
+
   return (
     <CertificationsContext.Provider
       value={{
@@ -113,6 +149,7 @@ const CertificationsState = ({ children }) => {
         getAllCertificationsAvailable,
         detailsCertificationById,
         sendEntregable,
+        DownloadCertificate,
       }}
     >
       {children}

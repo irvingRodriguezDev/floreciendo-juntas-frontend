@@ -1,6 +1,6 @@
 import { useContext, useEffect } from "react";
 import Layout from "../../Layout/Layout";
-import { Grid, Typography, Box, Chip, Paper } from "@mui/material";
+import { Grid, Typography, Box, Chip, Paper, Button } from "@mui/material";
 import { motion } from "framer-motion";
 import { useParams } from "react-router-dom";
 import CertificationsContext from "../../../context/Certifications/CertificationsContext";
@@ -10,9 +10,8 @@ import ModulesCard from "../Modules/ModulesCard";
 
 const CertificationDetail = () => {
   const { id } = useParams();
-  const { detailsCertificationById, certification } = useContext(
-    CertificationsContext,
-  );
+  const { detailsCertificationById, certification, DownloadCertificate } =
+    useContext(CertificationsContext);
   //modal entregable
 
   useEffect(() => {
@@ -39,12 +38,12 @@ const CertificationDetail = () => {
         <Box
           sx={{
             position: "relative",
-            height: { xs: 300, md: 420 },
+            height: { xs: 300, md: 820 },
             backgroundImage: certification.image
               ? `url(${certification.image})`
               : "none",
             backgroundSize: "cover",
-            backgroundPosition: "center",
+            backgroundPosition: "top",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
@@ -129,7 +128,7 @@ const CertificationDetail = () => {
           spacing={6}
           sx={{
             px: { xs: 3, md: 10 },
-            mt: -8,
+            mt: { xs: -10, md: -38 },
             position: "relative",
             zIndex: 2,
             display: "flex",
@@ -150,6 +149,26 @@ const CertificationDetail = () => {
                 boxShadow: "0 20px 60px rgba(216,47,122,0.08)",
               }}
             >
+              {certification.total_points > certification.min_passing_score &&
+                certification.evaluated_modules ===
+                  certification.total_modules &&
+                certification.certificate !== null && (
+                  <Box sx={{ display: "flex", justifyContent: "end" }}>
+                    <Button
+                      onClick={() =>
+                        DownloadCertificate(
+                          certification.id,
+                          certification.name,
+                        )
+                      }
+                      variant='contained'
+                      size='large'
+                      sx={{ bgcolor: "#DA327C", borderRadius: "12px" }}
+                    >
+                      Obtener Certificado
+                    </Button>
+                  </Box>
+                )}
               <Typography sx={{ fontWeight: 500 }}>
                 Para completar esta certificación necesitas alcanzar{" "}
                 <strong>{certification.min_passing_score} puntos.</strong>

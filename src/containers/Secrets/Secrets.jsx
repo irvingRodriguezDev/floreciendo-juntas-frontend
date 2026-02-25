@@ -22,7 +22,6 @@ const cardVariants = {
 
 const Secrets = () => {
   const { systems, getAllSystems } = useContext(SystemContext);
-  // const secretos = [
   //   {
   //     num: 1,
   //     title: "Capacitación Constante",
@@ -98,22 +97,19 @@ const Secrets = () => {
           position: "relative",
           width: "100%",
           padding: { xs: "30px 0", md: "80px 0" },
-          // Fondo femenino muy suave (Blanco a Rosa Pastel muy claro)
-          // background: "linear-gradient(to bottom, #fefefe 0%, #fff0f5 100%)",
           overflow: "hidden",
         }}
       >
         {/* 🪷 CAMINO FLORAL - Animación discreta en el fondo */}
         <Box
-          // Usa la sintaxis responsiva de MUI aquí para controlar el display
           sx={{
-            display: { xs: "none", md: "block" }, // Oculto en 'xs' (móviles), visible a partir de 'md'
-            position: "absolute", // Necesario para que la imagen dentro pueda posicionarse correctamente
+            display: { xs: "none", md: "block" },
+            position: "absolute",
             top: 0,
             left: 0,
             width: "100%",
             height: "100%",
-            pointerEvents: "none", // Asegura que no interfiera con los clics
+            pointerEvents: "none",
             zIndex: 1,
           }}
         >
@@ -121,29 +117,22 @@ const Secrets = () => {
             src={floralPath}
             alt='floral path'
             style={{
-              // Mantenemos solo las propiedades de estilo que controlan el aspecto y la animación
               position: "absolute",
               marginTop: 140,
               left: "42%",
               transform: "translateX(-50%)",
               width: "300px",
               height: "75%",
-              opacity: 0.9, // Ajustado a 0.15 como en la versión anterior (más sutil)
+              opacity: 0.9,
             }}
             animate={{ y: [0, -10, 0] }}
             transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
           />
         </Box>
-        {/* LISTADO: ESTRUCTURA CUADRADA 2x5 RESPONSIVA */}
         <Container maxWidth='lg' sx={{ position: "relative", zIndex: 2 }}>
           <Grid container spacing={{ xs: 4, md: 5 }} justifyContent='center'>
             {systems.map((item, index) => (
-              <Grid
-                key={item.num}
-                size={{ xs: 12, md: 6 }}
-                // xs={12} md={6} si prefieres que se rompa en 600px
-              >
-                {/* 💎 TARJETA (SOFT NEUMORPHISM / GLASSMOPHISM) */}
+              <Grid key={index} size={{ xs: 12, md: 6 }}>
                 <motion.div
                   variants={cardVariants}
                   initial='hidden'
@@ -152,13 +141,11 @@ const Secrets = () => {
                   style={{
                     display: "flex",
                     alignItems: "flex-start",
-                    height: "100%", // Asegura que la tarjeta se estire
-                    // Estilo base de la tarjeta
+                    height: "100%",
                     background: "rgba(255, 255, 255, 0.9)",
                     borderRadius: "18px",
                     padding: "20px",
                     border: "1px solid rgba(255, 255, 255, 0.9)",
-                    // Sombra femenina y sutil (neumorfismo suave)
                     boxShadow:
                       "5px 5px 15px rgba(220, 160, 180, 0.4), -5px -5px 15px rgba(255, 255, 255, 0.8)",
                   }}
@@ -177,7 +164,6 @@ const Secrets = () => {
                       fontWeight: 900,
                       fontSize: { xs: "1.8rem", sm: "2.2rem" },
                       color: "#fff",
-                      // Fondo del número: degradado rosa fuerte
                       background:
                         "linear-gradient(45deg, #d63384 30%, #ff69b4 90%)",
                       boxShadow: "0 5px 15px rgba(214,51,132,0.4)",

@@ -120,91 +120,47 @@ const CourseDetailScreen = () => {
 
   return (
     <Layout>
-      <Box sx={{ bgcolor: "#fafafa", minHeight: "100vh" }}>
-        <Grid
-          container
-          spacing={{ xs: 2, md: 4 }}
-          sx={{
-            maxWidth: 1280,
-            mx: "auto",
-            p: { xs: 2, md: 4 },
-          }}
-        >
-          <Grid size={12}>
-            <Stack spacing={{ xs: 3, md: 4 }}>
-              {/* ==============================
-                  VIDEO (NO SE DESMONTA)
-              ============================== */}
-              <motion.div
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6 }}
-              >
-                <Paper
-                  elevation={3}
-                  sx={{
-                    borderRadius: 4,
-                    overflow: "hidden",
-                    backgroundColor: "#fff",
-                    p: { xs: 0, md: 2 },
-                  }}
-                >
-                  <Box sx={{ position: "relative" }}>
-                    {usuario && (
-                      <VideoPlayer
-                        src={videoSrc}
-                        poster={course.cover_image_url}
-                        courseId={id}
-                        userId={userId}
-                        usuario={usuario}
-                        title={course.title}
-                        hasCertificate={course.hasCertificate}
-                        disabled={!isSubscribed}
-                        workbookUrl={course?.workbook_url}
-                      />
-                    )}
-
-                    {/* Overlay sin desmontar video */}
-                    {!isSubscribed && (
-                      <Box
-                        sx={{
-                          position: "absolute",
-                          inset: 0,
-                          zIndex: 10,
-                        }}
-                      >
-                        <VideoBlocker userId={userId} title={course.title} />
-                      </Box>
-                    )}
-                  </Box>
-                </Paper>
-              </motion.div>
-
-              <Divider sx={{ borderColor: "rgba(0,0,0,0.1)" }} />
-
-              {/* ==============================
-                  TABS
-              ============================== */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.2 }}
-              >
-                <Paper
-                  elevation={2}
-                  sx={{
-                    borderRadius: 3,
-                    p: { xs: 2, md: 4 },
-                    backgroundColor: "#fff",
-                  }}
-                >
-                  <CustomTabs tabs={tabsData} />
-                </Paper>
-              </motion.div>
-            </Stack>
-          </Grid>
+      <Grid
+        container
+        spacing={2}
+        sx={{ display: "flex", justifyContent: "center", padding: "30px" }}
+      >
+        <Grid size={{ xs: 12, sm: 12, md: 10, lg: 10 }}>
+          {isAuthorized ? (
+            <VideoPlayer
+              src={videoSrc}
+              poster={course.cover_image_url}
+              courseId={id}
+              userId={userId}
+              usuario={usuario}
+              title={course.title}
+              hasCertificate={course.hasCertificate}
+              disabled={!isSubscribed}
+              workbookUrl={course?.workbookUrl}
+            />
+          ) : (
+            <VideoBlocker userId={userId ?? null} title={course.title} />
+          )}
         </Grid>
-      </Box>
+        <Grid size={{ xs: 12, sm: 12, md: 10, lg: 10 }}>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+          >
+            <Paper
+              elevation={2}
+              sx={{
+                borderRadius: 3,
+                p: { xs: 2, md: 4 },
+                backgroundColor: "#fff",
+              }}
+            >
+              <CustomTabs tabs={tabsData} />
+            </Paper>
+          </motion.div>
+        </Grid>
+      </Grid>
     </Layout>
   );
 };

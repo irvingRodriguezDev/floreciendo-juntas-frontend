@@ -19,6 +19,14 @@ const PremiumWhatsApp = ({
     )}`;
     window.open(url, "_blank");
   };
+  const now = new Date();
+  const day = now.getDay(); // 0 = Domingo, 1 = Lunes...
+  const hour = now.getHours();
+
+  const isWorkingDay = day >= 1 && day <= 6; // Lunes a Sábado
+  const isWorkingHour = hour >= 9 && hour < 17; // 9AM - 5PM
+
+  const isOpen = isWorkingDay && isWorkingHour;
 
   return (
     <>
@@ -116,7 +124,15 @@ const PremiumWhatsApp = ({
             <Box>
               <Typography fontWeight={600}>{accountName}</Typography>
               <Typography variant='caption'>
-                En línea • Responde en minutos
+                {isOpen ? "🟢 Disponible ahora" : "🔴 No disponible"}
+              </Typography>
+
+              <Typography
+                variant='caption'
+                display='block'
+                sx={{ opacity: 0.8 }}
+              >
+                Lunes a Sábado 9AM – 5PM
               </Typography>
             </Box>
           </Box>
@@ -142,7 +158,11 @@ const PremiumWhatsApp = ({
               <Box
                 onClick={handleSend}
                 sx={{
-                  background: "linear-gradient(135deg,#25D366,#1ebe5d)",
+                  background: isOpen
+                    ? "linear-gradient(135deg,#25D366,#1ebe5d)"
+                    : "linear-gradient(135deg,#9e9e9e,#757575)",
+                  pointerEvents: isOpen ? "auto" : "none",
+                  opacity: isOpen ? 1 : 0.7,
                   color: "#fff",
                   textAlign: "center",
                   py: 1.4,

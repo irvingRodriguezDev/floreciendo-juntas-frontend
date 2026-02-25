@@ -120,7 +120,7 @@ const PostItem = ({ post }) => {
               variant='subtitle1'
               sx={{ fontWeight: 600, color: "#333" }}
             >
-              {post.author.name}
+              {post.author?.name || "Anónimo"}
             </Typography>
             <Typography variant='caption' color='text.secondary'>
               {dayjs(post.createdAt).fromNow()}

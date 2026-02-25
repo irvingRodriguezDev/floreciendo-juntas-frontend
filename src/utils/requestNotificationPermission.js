@@ -12,8 +12,6 @@ export const requestNotificationPermission = async (tokenAuth) => {
       return;
     }
 
-    console.log("🔔 Solicitando permiso de notificaciones...");
-
     const permission = await Notification.requestPermission();
     if (permission !== "granted") {
       console.log("❌ Permiso denegado");
@@ -56,10 +54,7 @@ export const requestNotificationPermission = async (tokenAuth) => {
     /**
      * 🛑 Solo enviar si el token cambió
      */
-    if (currentToken === storedToken) {
-      console.log("🔁 Token sin cambios, no se envía");
-      return;
-    }
+    if (currentToken === storedToken) return;
 
     await MethodPost(`/save-notification-token`, {
       headers: {
@@ -72,7 +67,6 @@ export const requestNotificationPermission = async (tokenAuth) => {
     });
 
     localStorage.setItem("fcm_token", currentToken);
-    console.log("✅ Token FCM enviado y guardado correctamente");
   } catch (error) {
     console.error("🔥 Error en requestNotificationPermission:", error);
   }
