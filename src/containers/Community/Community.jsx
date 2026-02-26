@@ -11,7 +11,6 @@ import {
   Button,
   Tooltip,
 } from "@mui/material";
-import AddIcon from "@mui/icons-material/Add";
 import Layout from "../../components/Layout/Layout";
 import AuthContext from "../../context/Auth/AuthContext";
 import CreatePostModal from "../../components/Community/CreatePostCommunityModal";
@@ -24,7 +23,6 @@ import CommunityRulesAccordion from "./CommunityRulesAccordeon";
 import SearchCourse from "../../components/courses/SearchCourses";
 import { useDebounce } from "use-debounce";
 import PinkSpinner from "../../components/Loading/PinkSpinner";
-// Mock inicial
 
 const Community = () => {
   const { autenticado, usuario } = useContext(AuthContext);
@@ -36,40 +34,50 @@ const Community = () => {
   const handleCloseWritePost = () => setOpenWritePost(false);
   const [debounceSearch] = useDebounce(search, 600);
   const [loading, setLoading] = useState(false);
-  //paginacion
+
+  // Paginación
   const [page, setPage] = useState(1);
-  const [rowsPerPage, setRowsPerPage] = useState(30);
+  const [rowsPerPage, setRowsPerPage] = useState(15);
+
   const handlePageChange = (newPage) => {
     if (newPage >= 1 && newPage <= totalPages && newPage !== page) {
       setPage(newPage);
     }
   };
+
   useEffect(() => {
-    // 1. Si no hay usuario, no disparamos la petición
+    // 1. Si no hay usuario autenticado, cancelamos cualquier intento de carga
     if (!autenticado) {
-      setLoading(false); // Aseguramos que no se quede cargando eternamente
+      setLoading(false);
       return;
     }
 
-    setLoading(true);
+    // 2. Definimos la función de carga de forma asíncrona
+    const fetchCommunityData = async () => {
+      setLoading(true);
+      try {
+        if (debounceSearch.trim() === "") {
+          await getFeed(page, rowsPerPage);
+        } else {
+          // Si hay búsqueda, reseteamos a página 1 implícitamente en el context
+          await getFeed(undefined, undefined, debounceSearch);
+        }
+      } catch (error) {
+        // El interceptor de Axios manejará el 401, aquí solo evitamos que la app rompa
+        console.error("Error al obtener el feed de la comunidad:", error);
+      } finally {
+        // Solo quitamos el loading si el componente sigue montado
+        setLoading(false);
+      }
+    };
 
-    if (debounceSearch.trim() === "") {
-      getFeed(page, rowsPerPage);
-    } else {
-      getFeed(undefined, undefined, debounceSearch);
-    }
+    fetchCommunityData();
 
-    // Usamos un timer para evitar parpadeos rápidos si la red es muy veloz
-    const timer = setTimeout(() => setLoading(false), 600);
-
-    return () => clearTimeout(timer);
-
-    // Incluimos autenticado para que, en cuanto el login sea exitoso,
-    // este efecto se dispare automáticamente.
+    // Nota: Eliminamos el timer de 600ms manual para que la UI responda
+    // a la velocidad real del servidor, evitando estados de carga fantasma.
   }, [page, rowsPerPage, debounceSearch, autenticado]);
 
   const isAuthorized = autenticado && isSuscribed;
-  const isNotAuthorized = !isAuthorized;
 
   return (
     <Layout>
@@ -172,14 +180,16 @@ const Community = () => {
           </Backdrop>
         )}
         <Grid
-          size={12}
+          item
+          xs={12}
           sx={{ display: "flex", justifyContent: "center", mt: -5 }}
         >
           <CommunityRulesAccordion />
         </Grid>
         {/* CAJA CREAR POST */}
         <Grid
-          size={12}
+          item
+          xs={12}
           sx={{ display: "flex", justifyContent: "center", mt: -3 }}
         >
           <Box sx={{ width: "100%", maxWidth: 640 }}>
@@ -237,13 +247,13 @@ const Community = () => {
         >
           <SearchCourse
             setSearch={setSearch}
-            // title='Buscar publicación'
             placeholder={
               "Escribe para buscar por titulo o contenido de publicación"
             }
           />
         </Box>
       )}
+
       {/* FEED */}
       {loading ? (
         <PinkSpinner label='Cargando posts' />
@@ -268,7 +278,7 @@ const Community = () => {
         </>
       )}
 
-      {/* FAB MOBILE */}
+      {/* FAB MOBILE & PAGINATION */}
       {autenticado && isSuscribed && (
         <>
           <Fab
@@ -276,7 +286,7 @@ const Community = () => {
             sx={{
               position: "fixed",
               bottom: 110,
-              right: 340,
+              right: { xs: 20, sm: 340 }, // Ajustado para que se vea en móvil
               background: "#D82E7A",
               color: "#fff",
               "&:hover": {

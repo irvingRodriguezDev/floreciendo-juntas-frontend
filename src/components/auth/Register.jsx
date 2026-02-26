@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import Layout from "../Layout/Layout";
 import {
   Button,
@@ -10,23 +10,31 @@ import {
   Divider,
   Chip,
   Box,
+  CircularProgress,
 } from "@mui/material";
 import { Link } from "react-router-dom";
 import { Formik, Form } from "formik";
 import * as Yup from "yup";
 import AuthContext from "../../context/Auth/AuthContext";
-import svg from "../../assets/svg/undraw_access-account_aydp.svg";
 import CartContext from "../../context/Cart/CartContext";
+import Swal from "sweetalert2";
 
+// Esquema de validación optimizado
 const RegisterSchema = Yup.object().shape({
   name: Yup.string().required("El nombre es requerido"),
   username: Yup.string().required(
-    "El nombre para tus reconocimientos es requerido"
+    "El nombre para tus reconocimientos es requerido",
   ),
-  phone: Yup.string().required("El teléfono es requerido"),
+  phone: Yup.string()
+    .required("El teléfono es requerido")
+    .matches(
+      /^[0-9]{10}$/,
+      "El teléfono debe tener exactamente 10 dígitos numéricos",
+    ),
   email: Yup.string()
     .email("Correo inválido")
-    .required("El correo es obligatorio"),
+    .required("El correo es obligatorio")
+    .trim(), // Evita espacios accidentales
   password: Yup.string()
     .min(6, "Mínimo 6 caracteres")
     .required("La contraseña es obligatoria"),
@@ -51,16 +59,39 @@ const inputStyles = {
 const Register = () => {
   const { registerUser } = useContext(AuthContext);
   const { syncGuestToServer, getUserCart } = useContext(CartContext);
+  const [loading, setLoading] = useState(false);
+
   const handleRegister = async (credentials) => {
-    await registerUser(credentials); // espera a que el token esté listo
-    // Ahora sincronizamos guest cart (si existe)
+    setLoading(true);
     try {
-      await syncGuestToServer();
-    } catch (e) {
-      console.error("No se pudo sincronizar el carrito", e);
+      await registerUser(credentials);
+
+      // Sincronización de carrito post-registro
+      try {
+        await syncGuestToServer();
+        await getUserCart();
+      } catch (cartError) {
+        console.error("Error al sincronizar carrito:", cartError);
+      }
+
+      Swal.fire({
+        icon: "success",
+        title: "¡Bienvenida!",
+        text: "Tu cuenta ha sido creada correctamente.",
+        confirmButtonColor: "#D82E7A",
+      });
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: "Error al registrarse",
+        text:
+          error.response?.data?.msg ||
+          "Ocurrió un problema con el registro. Inténtalo de nuevo.",
+        confirmButtonColor: "#D82E7A",
+      });
+    } finally {
+      setLoading(false);
     }
-    // Finalmente, recargamos carrito desde servidor para asegurar consistencia
-    await getUserCart();
   };
 
   return (
@@ -68,7 +99,6 @@ const Register = () => {
       <Box
         sx={{
           minHeight: "100vh",
-          // Fondo con un degradado sutil y un brillo radial
           background: "linear-gradient(135deg, #fce4ec 0%, #f8bbd9 100%)",
           position: "relative",
           overflow: "hidden",
@@ -84,11 +114,7 @@ const Register = () => {
           },
         }}
       >
-        {/* ========================================================= */}
-        {/* ELEMENTOS DECORATIVOS DE FONDO (Iguales al Login)            */}
-        {/* ========================================================= */}
-
-        {/* Gran Círculo Superior (Rosa Oscuro, Baja Opacidad) */}
+        {/* ELEMENTOS DECORATIVOS */}
         <Box
           sx={{
             position: "absolute",
@@ -102,14 +128,11 @@ const Register = () => {
             zIndex: 0,
           }}
         />
-        {/* Círculo Intermedio (Rosa Vivo) */}
         <Box
           sx={{
             position: "absolute",
             top: { xs: "50%", md: "-5%" },
-            right: { xs: "0", md: "unset" },
             left: { xs: "unset", md: "5%" },
-            transform: { xs: "translateY(-50%)", md: "none" },
             width: { xs: 300, md: 600 },
             height: { xs: 300, md: 600 },
             borderRadius: "50%",
@@ -118,7 +141,6 @@ const Register = () => {
             zIndex: 0,
           }}
         />
-        {/* Cuadrado Pequeño Rotado (Esquina Inferior Derecha) */}
         <Box
           sx={{
             position: "absolute",
@@ -134,9 +156,6 @@ const Register = () => {
           }}
         />
 
-        {/* ========================================================= */}
-        {/* CONTENEDOR PRINCIPAL Y FORMULARIO (Centrado)            */}
-        {/* ========================================================= */}
         <Grid
           container
           justifyContent='center'
@@ -149,14 +168,9 @@ const Register = () => {
             mt: { xs: 15, md: 8 },
           }}
         >
-          {/* Formulario */}
           <Grid
-            item
             size={{ xs: 12, sm: 10, md: 8, lg: 6 }}
-            sx={{
-              display: "flex",
-              justifyContent: "center",
-            }}
+            sx={{ display: "flex", justifyContent: "center" }}
           >
             <Paper
               elevation={12}
@@ -164,33 +178,25 @@ const Register = () => {
                 padding: { xs: "30px", sm: "40px", md: "50px" },
                 borderRadius: "30px",
                 width: "100%",
-                // Glassmorphism Pink
-                background: "rgba(255, 255, 255, 0.00)",
+                background: "rgba(255, 255, 255, 0.7)",
                 backdropFilter: "blur(5.5px)",
                 border: "1px solid rgba(255, 255, 255, 0.3)",
                 boxShadow: "0 4px 30px rgba(0, 0, 0, 0.1)",
                 position: "relative",
                 overflow: "hidden",
-                "&::before": {
-                  content: '""',
-                  position: "absolute",
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  height: "6px",
-                },
               }}
             >
               <Formik
                 initialValues={{
                   name: "",
+                  username: "",
                   email: "",
                   password: "",
                   password_confirmation: "",
                   phone: "",
                 }}
                 validationSchema={RegisterSchema}
-                onSubmit={(values) => handleRegister(values)}
+                onSubmit={handleRegister}
               >
                 {({ values, errors, touched, handleChange, handleBlur }) => (
                   <Form>
@@ -202,143 +208,135 @@ const Register = () => {
                       sx={{
                         background: "linear-gradient(135deg, #ff69b4, #d82e7a)",
                         backgroundClip: "text",
-                        textFillColor: "transparent",
                         WebkitBackgroundClip: "text",
                         WebkitTextFillColor: "transparent",
-                        fontSize: { xs: "36px", sm: "42px" },
+                        fontSize: { xs: "30px", sm: "42px" },
                       }}
                     >
                       ¡Únete a la comunidad!
                     </Typography>
 
-                    <Grid container spacing={3}>
-                      {/* Nombre */}
+                    <Grid container spacing={2}>
                       <Grid size={12}>
-                        <FormControl fullWidth>
-                          <TextField
-                            label='Nombre completo'
-                            name='name'
-                            placeholder='Nombre y Apellido'
-                            autoComplete='off'
-                            value={values.name}
-                            onChange={handleChange}
-                            onBlur={handleBlur}
-                            error={touched.name && Boolean(errors.name)}
-                            helperText={touched.name && errors.name}
-                            variant='outlined'
-                            sx={inputStyles}
-                          />
-                        </FormControl>
+                        <TextField
+                          label='Nombre completo'
+                          name='name'
+                          fullWidth
+                          autoComplete='off'
+                          value={values.name}
+                          onChange={handleChange}
+                          onBlur={handleBlur}
+                          error={touched.name && Boolean(errors.name)}
+                          helperText={touched.name && errors.name}
+                          sx={inputStyles}
+                          disabled={loading}
+                        />
                       </Grid>
+
                       <Grid size={12}>
-                        <FormControl fullWidth>
-                          <TextField
-                            label='Nombre de usuario'
-                            name='username'
-                            placeholder='Captura tu nombre para tus reconocimientos'
-                            autoComplete='off'
-                            value={values.username}
-                            onChange={handleChange}
-                            onBlur={handleBlur}
-                            error={touched.username && Boolean(errors.username)}
-                            helperText={touched.username && errors.username}
-                            variant='outlined'
-                            sx={inputStyles}
-                          />
-                        </FormControl>
+                        <TextField
+                          label='Nombre para reconocimientos'
+                          name='username'
+                          fullWidth
+                          autoComplete='off'
+                          value={values.username}
+                          onChange={handleChange}
+                          onBlur={handleBlur}
+                          error={touched.username && Boolean(errors.username)}
+                          helperText={touched.username && errors.username}
+                          sx={inputStyles}
+                          disabled={loading}
+                        />
                       </Grid>
 
-                      {/* Correo */}
-                      <Grid size={{ xs: 12, lg: 6 }}>
-                        <FormControl fullWidth>
-                          <TextField
-                            label='Correo Electrónico'
-                            type='email'
-                            name='email'
-                            autoComplete='off'
-                            placeholder='tu.correo@ejemplo.com'
-                            value={values.email}
-                            onChange={handleChange}
-                            onBlur={handleBlur}
-                            error={touched.email && Boolean(errors.email)}
-                            helperText={touched.email && errors.email}
-                            variant='outlined'
-                            sx={inputStyles}
-                          />
-                        </FormControl>
+                      <Grid size={{ xs: 12, md: 6 }}>
+                        <TextField
+                          label='Correo Electrónico'
+                          type='email'
+                          name='email'
+                          fullWidth
+                          autoComplete='off'
+                          value={values.email}
+                          onChange={handleChange}
+                          onBlur={handleBlur}
+                          error={touched.email && Boolean(errors.email)}
+                          helperText={touched.email && errors.email}
+                          sx={inputStyles}
+                          disabled={loading}
+                        />
                       </Grid>
 
-                      {/* Teléfono */}
-                      <Grid size={{ xs: 12, lg: 6 }}>
-                        <FormControl fullWidth>
-                          <TextField
-                            label='Teléfono'
-                            name='phone'
-                            autoComplete='off'
-                            placeholder='Ej: 722 123 4567'
-                            value={values.phone}
-                            onChange={handleChange}
-                            onBlur={handleBlur}
-                            error={touched.phone && Boolean(errors.phone)}
-                            helperText={touched.phone && errors.phone}
-                            variant='outlined'
-                            sx={inputStyles}
-                          />
-                        </FormControl>
-                      </Grid>
-                      {/* Contraseña */}
-                      <Grid size={{ xs: 12, lg: 6 }}>
-                        <FormControl fullWidth>
-                          <TextField
-                            label='Contraseña'
-                            type='password'
-                            name='password'
-                            autoComplete='off'
-                            placeholder='**********'
-                            value={values.password}
-                            onChange={handleChange}
-                            onBlur={handleBlur}
-                            error={touched.password && Boolean(errors.password)}
-                            helperText={touched.password && errors.password}
-                            variant='outlined'
-                            sx={inputStyles}
-                          />
-                        </FormControl>
+                      <Grid size={{ xs: 12, md: 6 }}>
+                        <TextField
+                          label='Teléfono (10 dígitos)'
+                          name='phone'
+                          fullWidth
+                          autoComplete='off'
+                          value={values.phone}
+                          onChange={(e) => {
+                            // Solo permite números y máximo 10 caracteres
+                            const val = e.target.value
+                              .replace(/\D/g, "")
+                              .slice(0, 10);
+                            handleChange({
+                              target: { name: "phone", value: val },
+                            });
+                          }}
+                          onBlur={handleBlur}
+                          error={touched.phone && Boolean(errors.phone)}
+                          helperText={touched.phone && errors.phone}
+                          sx={inputStyles}
+                          disabled={loading}
+                        />
                       </Grid>
 
-                      {/* Confirmación */}
-                      <Grid size={{ xs: 12, lg: 6 }}>
-                        <FormControl fullWidth>
-                          <TextField
-                            label='Confirma tu contraseña'
-                            type='password'
-                            autoComplete='off'
-                            name='password_confirmation'
-                            placeholder='**********'
-                            value={values.password_confirmation}
-                            onChange={handleChange}
-                            onBlur={handleBlur}
-                            error={
-                              touched.password_confirmation &&
-                              Boolean(errors.password_confirmation)
-                            }
-                            helperText={
-                              touched.password_confirmation &&
-                              errors.password_confirmation
-                            }
-                            variant='outlined'
-                            sx={inputStyles}
-                          />
-                        </FormControl>
+                      <Grid size={{ xs: 12, md: 6 }}>
+                        <TextField
+                          label='Contraseña'
+                          type='password'
+                          name='password'
+                          fullWidth
+                          autoComplete='off'
+                          value={values.password}
+                          onChange={handleChange}
+                          onBlur={handleBlur}
+                          error={touched.password && Boolean(errors.password)}
+                          helperText={touched.password && errors.password}
+                          sx={inputStyles}
+                          disabled={loading}
+                        />
                       </Grid>
 
-                      {/* Botón Registrarse */}
+                      <Grid size={{ xs: 12, md: 6 }}>
+                        <TextField
+                          label='Confirmar Contraseña'
+                          type='password'
+                          name='password_confirmation'
+                          fullWidth
+                          autoComplete='off'
+                          value={values.password_confirmation}
+                          onChange={handleChange}
+                          onBlur={handleBlur}
+                          error={
+                            touched.password_confirmation &&
+                            Boolean(errors.password_confirmation)
+                          }
+                          helperText={
+                            touched.password_confirmation &&
+                            errors.password_confirmation
+                          }
+                          sx={inputStyles}
+                          disabled={loading}
+                        />
+                      </Grid>
+
                       <Grid size={12}>
                         <Button
                           variant='contained'
                           fullWidth
                           type='submit'
                           size='large'
+                          disabled={loading}
                           sx={{
                             borderRadius: "18px",
                             background:
@@ -347,41 +345,33 @@ const Register = () => {
                             fontWeight: "bold",
                             py: 2,
                             fontSize: "18px",
-                            textTransform: "uppercase",
-                            letterSpacing: "0.5px",
                             transition: "all 0.3s ease",
                             "&:hover": {
                               transform: "translateY(-3px)",
                               boxShadow: "0 15px 30px rgba(216,46,136,0.5)",
-                              background:
-                                "linear-gradient(135deg, #ff59a4, #c8256a)",
-                            },
-                            "&:active": {
-                              transform: "translateY(0)",
                             },
                           }}
                         >
-                          Registrarme
+                          {loading ? (
+                            <CircularProgress size={26} color='inherit' />
+                          ) : (
+                            "Registrarme"
+                          )}
                         </Button>
                       </Grid>
 
-                      {/* Divider */}
                       <Grid size={12}>
-                        <Divider sx={{ my: 2 }}>
+                        <Divider sx={{ my: 1 }}>
                           <Chip
                             sx={{
-                              bgcolor: "transparent",
                               color: "#D82E7A",
                               border: "1px solid #D82E7A",
-                              fontWeight: "500",
-                              fontSize: "14px",
                             }}
-                            label='¿Ya eres parte de la comunidad?'
+                            label='¿Ya eres parte?'
                           />
                         </Divider>
                       </Grid>
 
-                      {/* Link a login */}
                       <Grid size={12}>
                         <Link
                           to='/iniciar-sesion'
@@ -394,21 +384,9 @@ const Register = () => {
                             sx={{
                               borderRadius: "18px",
                               borderColor: "#D82E7A",
-                              borderWidth: "2px",
                               color: "#D82E7A",
                               fontWeight: "bold",
                               py: 2,
-                              fontSize: "18px",
-                              textTransform: "uppercase",
-                              letterSpacing: "0.5px",
-                              transition: "all 0.3s ease",
-                              "&:hover": {
-                                borderColor: "#bf2369",
-                                color: "#bf2369",
-                                bgcolor: "rgba(216, 46, 122, 0.08)",
-                                transform: "translateY(-3px)",
-                                boxShadow: "0 8px 20px rgba(216,46,136,0.2)",
-                              },
                             }}
                           >
                             Iniciar sesión

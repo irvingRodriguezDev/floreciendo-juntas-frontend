@@ -18,12 +18,11 @@ clienteAxios.interceptors.request.use((config) => {
 
   return config;
 });
-
+let isRedirecting = false;
 // 🚨 Response: detectar sesión expirada o sesión múltiple
 clienteAxios.interceptors.response.use(
   (response) => response,
   (error) => {
-    // 🛑 Protección total
     if (!error.response) {
       return Promise.reject(error);
     }
@@ -31,15 +30,25 @@ clienteAxios.interceptors.response.use(
     const { status, data } = error.response;
 
     if (status === 401) {
-      if (data?.reason) {
-        sessionStorage.setItem("session_expired_reason", data.reason);
-        console.log("se guarda en sessionStorage");
+      // 1. Extraer la razón antes de limpiar nada
+      const reason = data?.reason || "expired";
+
+      // 2. Solo ejecutar la lógica de salida si no estamos ya en proceso de redirección
+      if (!isRedirecting) {
+        isRedirecting = true;
+
+        // Guardar razón para mostrar un mensaje amigable en el Login
+        sessionStorage.setItem("session_expired_reason", reason);
+
+        // Limpiar credenciales
+        localStorage.removeItem("token");
+
+        // 3. Pequeño delay de seguridad antes del redireccionamiento
+        // Esto permite que otras promesas pendientes fallen sin disparar más reloads
+        setTimeout(() => {
+          window.location.replace("/iniciar-sesion");
+        }, 100);
       }
-
-      localStorage.removeItem("token");
-
-      // ⚠️ usar replace para evitar back
-      window.location.replace("/iniciar-sesion");
     }
 
     return Promise.reject(error);
