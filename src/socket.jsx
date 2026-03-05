@@ -1,44 +1,44 @@
-// src/socket.js
 import { io } from "socket.io-client";
 
 const SOCKET_URL = import.meta.env.VITE_SOCKET_URL;
-
 let socket = null;
 
-export const initSocket = (token) => {
-  // 🔥 SIEMPRE crea uno nuevo en ECS
+export const initSocket = (token, usuario = null) => {
+  if (!token) {
+    disconnectSocket();
+    return null;
+  }
+
+  // 1. Si ya existe el socket y está conectado, solo actualizamos el token
+  if (socket?.connected) {
+    socket.auth = { token, userId: usuario?.id };
+    return socket;
+  }
+
+  // 2. Si existe pero está desconectado, lo limpiamos para crear uno fresco
   if (socket) {
-    socket.removeAllListeners();
     socket.disconnect();
-    socket = null;
   }
 
   socket = io(SOCKET_URL, {
     path: "/socket.io",
     transports: ["websocket"],
-    forceNew: true, // ⭐ CLAVE
+    // Quitamos forceNew para permitir que la librería gestione la eficiencia
     auth: { token },
     autoConnect: true,
     reconnection: true,
-    reconnectionAttempts: Infinity, // ⭐
-    reconnectionDelay: 1000,
-    timeout: 20000,
+    reconnectionAttempts: 10,
+    timeout: 10000, // Bajamos un poco el timeout para fallar rápido
   });
 
-  socket.on("connect", () => {
-    console.log("🟢 Socket conectado limpio:", socket.id);
-  });
-
-  socket.on("disconnect", (reason) => {
-    console.warn("🟡 Socket desconectado:", reason);
-  });
+  // Listeners básicos
+  socket.on("connect", () => console.log("🟢 Conectado:", socket.id));
 
   socket.on("connect_error", (err) => {
-    console.error("🔴 connect_error:", err.message);
-
-    // 🔁 Auth inválida → reconectar con token nuevo
-    if (err.data?.type === "AuthError") {
-      socket.disconnect();
+    console.error("🔴 Error:", err.message);
+    if (err.message.includes("AuthError") || err.message.includes("token")) {
+      disconnectSocket();
+      window.dispatchEvent(new CustomEvent("socket-auth-error"));
     }
   });
 
@@ -49,9 +49,8 @@ export const getSocket = () => socket;
 
 export const disconnectSocket = () => {
   if (socket) {
-    socket.removeAllListeners();
+    socket.off(); // Es más limpio que removeAllListeners()
     socket.disconnect();
     socket = null;
-    console.log("❌ Socket destruido");
   }
 };

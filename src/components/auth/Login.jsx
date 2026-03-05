@@ -18,6 +18,7 @@ import { Formik, Form } from "formik";
 import CartContext from "../../context/Cart/CartContext";
 import Swal from "sweetalert2";
 
+import { useCaptcha } from "../../hooks/useCaptcha";
 const LoginSchema = Yup.object().shape({
   email: Yup.string()
     .email("Correo inválido")
@@ -66,6 +67,7 @@ const inputStyles = {
 
 const Login = () => {
   const { iniciarSesion } = useContext(AuthContext);
+  const { getCaptchaToken } = useCaptcha();
   const { syncGuestToServer, getUserCart } = useContext(CartContext);
   const [loading, setLoading] = useState(false); // 👈 Estado de carga
 
@@ -91,7 +93,8 @@ const Login = () => {
   const handleLogin = async (credentials) => {
     setLoading(true);
     try {
-      await iniciarSesion(credentials);
+      const token = await getCaptchaToken("login");
+      await iniciarSesion(credentials, token);
 
       // Sincronización post-login
       try {

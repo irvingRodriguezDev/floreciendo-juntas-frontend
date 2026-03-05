@@ -33,6 +33,13 @@ export default function LivesReducer(state, action) {
     case LIVE_STATUS_UPDATE:
       return {
         ...state,
+        // Actualizamos la lista
+        lives: state.lives.map((live) =>
+          live.id === action.payload.id
+            ? { ...live, status: action.payload.status }
+            : live,
+        ),
+        // ⚠️ MUY IMPORTANTE: Actualizar también el live individual si es el que estamos viendo
         live:
           state.live?.id === action.payload.id
             ? { ...state.live, status: action.payload.status }

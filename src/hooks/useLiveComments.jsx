@@ -1,40 +1,53 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { getSocket } from "../socket";
 
 export const useLiveComments = (liveId) => {
   const [comments, setComments] = useState([]);
-  const joinedRef = useRef(false);
 
   useEffect(() => {
     const socket = getSocket();
-    if (!socket || !liveId || joinedRef.current) return;
+    if (!socket || !liveId) return;
 
-    // 🔗 Unirse al live (una sola vez)
+    // 🔗 Unirse al live
+    // Quitamos joinedRef porque si el socket se reconecta,
+    // NECESITAMOS volver a emitir "join-live" para que el servidor nos meta en la room.
     socket.emit("join-live", liveId);
-    joinedRef.current = true;
 
-    // 📥 Historial inicial
     const handleLoad = (initialComments = []) => {
+      // Tomamos los últimos 14
       setComments(initialComments.slice(-14));
     };
 
-    // 💬 Nuevo comentario
     const handleNew = (comment) => {
-      setComments((prev) => [...prev.slice(-13), comment]);
+      setComments((prev) => {
+        // Evitar duplicados por ID (por si el socket re-emite)
+        const exists = prev.some((c) => c.id === comment.id);
+        if (exists) return prev;
+
+        const next = [...prev, comment];
+        return next.slice(-14); // Mantenemos la ventana de 14
+      });
     };
 
+    // Escuchar eventos
     socket.on("load_comments", handleLoad);
     socket.on("new_comment", handleNew);
+
+    // 🔄 Manejo de reconexión automática
+    const handleReconnect = () => {
+      socket.emit("join-live", liveId);
+    };
+    socket.on("connect", handleReconnect);
 
     return () => {
       socket.emit("leave-live", liveId);
       socket.off("load_comments", handleLoad);
       socket.off("new_comment", handleNew);
-      joinedRef.current = false;
+      socket.off("connect", handleReconnect);
     };
-  }, [liveId]);
+    // getSocket() en dependencias asegura que si la instancia cambia, el hook se refresca
+  }, [liveId, getSocket()]);
 
-  // ✉️ Enviar comentario
   const sendComment = (message) => {
     const socket = getSocket();
     if (!socket || !message?.trim()) return;
@@ -46,8 +59,5 @@ export const useLiveComments = (liveId) => {
     });
   };
 
-  return {
-    comments,
-    sendComment,
-  };
+  return { comments, sendComment };
 };

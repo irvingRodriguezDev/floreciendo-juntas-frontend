@@ -14,6 +14,7 @@ import svg from "../../assets/svg/undraw_forgot-password_nttj.svg";
 import { Formik, Form } from "formik";
 import * as Yup from "yup";
 import AuthContext from "../../context/Auth/AuthContext";
+import { useCaptcha } from "../../hooks/useCaptcha";
 const inputStyles = {
   mb: 2,
   "& .MuiOutlinedInput-root": {
@@ -38,7 +39,46 @@ const ResetSchema = Yup.object().shape({
     .required("Confirma la contraseña"),
 });
 const ForgotPassword = () => {
+  const { getCaptchaToken } = useCaptcha();
   const { resetPassword } = useContext(AuthContext);
+  const [loading, setLoading] = React.useState(false);
+  const handleResetSubmit = async (values) => {
+    setLoading(true);
+    try {
+      // 🛡️ Generamos el token JUSTO antes de enviar
+      const captchaToken = await getCaptchaToken("reset_password");
+
+      if (!captchaToken) {
+        throw new Error("No se pudo verificar el captcha. Reintenta.");
+      }
+      const data = {
+        email: values.email,
+        password: values.password,
+        passwordConfirmation: values.passwordConfirmation,
+        captchaToken: captchaToken,
+      };
+      // Enviamos el token junto con los valores
+      await resetPassword(data);
+
+      Swal.fire({
+        icon: "success",
+        title: "¡Éxito!",
+        text: "Si el correo existe, recibirás instrucciones pronto.",
+        confirmButtonColor: "#D82E7A",
+      });
+    } catch (error) {
+      console.error(error);
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: error.response?.data?.msg || "Ocurrió un error inesperado",
+        confirmButtonColor: "#D82E7A",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <Layout>
       <Box
@@ -151,12 +191,10 @@ const ForgotPassword = () => {
                 initialValues={{
                   email: "",
                   password: "",
-                  password_confirmation: "",
+                  passwordConfirmation: "",
                 }}
                 validationSchema={ResetSchema}
-                onSubmit={(values) => {
-                  resetPassword(values);
-                }}
+                onSubmit={handleResetSubmit}
               >
                 {({ values, errors, touched, handleChange, handleBlur }) => (
                   <Form>
@@ -260,6 +298,7 @@ const ForgotPassword = () => {
                       fullWidth
                       size='large'
                       type='submit'
+                      disabled={loading}
                       sx={{
                         borderRadius: "18px",
                         background: "linear-gradient(135deg, #ff69b4, #d82e7a)",

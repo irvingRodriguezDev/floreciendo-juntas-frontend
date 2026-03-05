@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useCallback } from "react";
 import { initSocket, getSocket, disconnectSocket } from "../socket";
 
 const useSocket = ({
@@ -10,39 +10,50 @@ const useSocket = ({
   const socketRef = useRef(null);
 
   useEffect(() => {
-    // Inicializa socket (envía token si existe)
-    socketRef.current = initSocket(token);
+    // 1. Inicialización
+    if (token) {
+      socketRef.current = initSocket(token);
+    }
 
     const s = socketRef.current;
     if (!s) return;
 
-    if (onPostCreated) s.on("postCreated", onPostCreated);
-    if (onCommentCreated) s.on("commentCreated", onCommentCreated);
-    if (onReactionUpdated) s.on("reactionUpdated", onReactionUpdated);
+    // 2. Registro de eventos (usando los nombres que coinciden con tu backend)
+    // Nota: Asegúrate que los nombres sean los mismos que emite el server
+    if (onPostCreated) s.on("postCommunityCreated", onPostCreated);
+    if (onCommentCreated) s.on("createCommentPostCommunity", onCommentCreated);
+    if (onReactionUpdated) s.on("postLikeToggled", onReactionUpdated);
 
-    // opcionales: reconexión, estado, errores
-    s.on("connect", () => console.log("socket connect:", s.id));
-    s.on("disconnect", (reason) => console.log("socket disconnect:", reason));
-    s.on("reconnect_attempt", (n) => console.log("reconnect attempt:", n));
+    s.on("connect", () => console.log("🟢 Socket conectado:", s.id));
+    s.on("connect_error", (err) => {
+      console.error("🔴 Socket Error:", err.message);
+      // Si el error es de Auth, initSocket ya debería manejar el disconnect
+    });
 
+    // 3. Limpieza (Cleanup)
     return () => {
-      if (onPostCreated) s.off("postCreated", onPostCreated);
-      if (onCommentCreated) s.off("commentCreated", onCommentCreated);
-      if (onReactionUpdated) s.off("reactionUpdated", onReactionUpdated);
-      // NOT disconnect here if you want socket global across app.
-      // If you want to cleanup completely when component unmounts:
-      // disconnectSocket();
+      if (s) {
+        s.off("postCommunityCreated", onPostCreated);
+        s.off("createCommentPostCommunity", onCommentCreated);
+        s.off("postLikeToggled", onReactionUpdated);
+        s.off("connect");
+        s.off("connect_error");
+        // No desconectamos aquí para que el socket persista entre navegaciones
+      }
     };
-  }, [onPostCreated, onCommentCreated, onReactionUpdated, token]);
+    // 💡 IMPORTANTE: Si onPostCreated no viene de un useCallback,
+    // este efecto se ejecutará en CADA render.
+  }, [token, onPostCreated, onCommentCreated, onReactionUpdated]);
 
-  const emit = (event, payload) => {
+  // 4. Emitir usando useCallback para que la función sea estable
+  const emit = useCallback((event, payload) => {
     const s = getSocket();
-    if (!s || !s.connected) {
-      console.warn("Socket no conectado, evento no emitido:", event);
-      return;
+    if (s?.connected) {
+      s.emit(event, payload);
+    } else {
+      console.warn("⚠️ Socket no conectado, no se pudo emitir:", event);
     }
-    s.emit(event, payload);
-  };
+  }, []);
 
   return { emit, socket: socketRef.current };
 };

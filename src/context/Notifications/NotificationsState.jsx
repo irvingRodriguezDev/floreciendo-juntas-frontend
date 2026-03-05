@@ -1,4 +1,4 @@
-import { useReducer, useEffect } from "react";
+import { useReducer, useEffect, useContext } from "react";
 import MethodGet, { MethodPut } from "../../config/Service";
 import NotificationsReducer from "./NotificationsReducer";
 import NotificationsContext from "./NotificationsContext";
@@ -9,7 +9,7 @@ import {
   MAKE_READ_NOTIFICATION,
   PUSH_NOTIFICATION,
 } from "../../types";
-
+import AuthContext from "../Auth/AuthContext";
 const NotificationsState = ({ children }) => {
   const initialState = {
     notifications: [],
@@ -18,22 +18,36 @@ const NotificationsState = ({ children }) => {
 
   const [state, dispatch] = useReducer(NotificationsReducer, initialState);
 
-  // 🔌 SOCKET: tiempo real
+  // 1. Extraemos 'autenticado' del AuthContext
+  const { autenticado } = useContext(AuthContext);
+
   useEffect(() => {
+    // 2. Solo intentamos registrar si el usuario está autenticado
+    if (!autenticado) return;
+
     const socket = getSocket();
+
+    // 3. Si el socket aún no está listo, el render provocado por AuthContext lo atrapará
     if (!socket) return;
 
-    socket.on("notification:new", (notification) => {
+    console.log("🔔 Listener de notificaciones activado");
+
+    const handleNewNotification = (notification) => {
       dispatch({
         type: PUSH_NOTIFICATION,
         payload: notification,
       });
-    });
+    };
+
+    socket.on("notification:new", handleNewNotification);
 
     return () => {
-      socket.off("notification:new");
+      // 4. Limpieza específica para evitar duplicados
+      socket.off("notification:new", handleNewNotification);
     };
-  }, []);
+
+    // 💡 Depender de 'autenticado' es la clave para la sincronía
+  }, [autenticado]);
 
   // 📡 REST
   const getAllNotifications = async () => {

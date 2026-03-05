@@ -1,4 +1,4 @@
-import { useReducer, useEffect } from "react";
+import { useReducer, useEffect, useContext } from "react";
 import LivesReducer from "./LivesReducer";
 import LivesContext from "./LivesContext";
 import MethodGet from "../../config/Service";
@@ -10,6 +10,7 @@ import {
   GET_LIVE_BY_ID,
   LIVE_STATUS_UPDATE,
 } from "../../types";
+import AuthContext from "../Auth/AuthContext";
 
 const LivesState = ({ children }) => {
   const initialState = {
@@ -22,23 +23,33 @@ const LivesState = ({ children }) => {
   };
 
   const [state, dispatch] = useReducer(LivesReducer, initialState);
+  const { autenticado } = useContext(AuthContext);
 
-  // 🔌 SOCKET GLOBAL (una sola vez)
   useEffect(() => {
+    // 2. Si no está autenticado, ni nos molestamos en buscar el socket
+    if (!autenticado) return;
+
     const socket = getSocket();
+
+    // 3. Si por un microsegundo el socket no está listo (aunque esté autenticado)
+    // Simplemente no registramos nada y esperamos al siguiente render
     if (!socket) return;
 
-    const onLiveStarted = ({ liveId, status }) => {
+    console.log(
+      "🔌 Socket listo y usuario autenticado. Registrando eventos...",
+    );
+
+    const onLiveStarted = (data) => {
       dispatch({
         type: LIVE_STATUS_UPDATE,
-        payload: { id: liveId, status },
+        payload: { id: data.liveId, status: "live" },
       });
     };
 
-    const onLiveEnded = ({ liveId }) => {
+    const onLiveEnded = (data) => {
       dispatch({
         type: LIVE_STATUS_UPDATE,
-        payload: { id: liveId, status: "ended" },
+        payload: { id: data.liveId, status: "ended" },
       });
     };
 
@@ -49,7 +60,10 @@ const LivesState = ({ children }) => {
       socket.off("live_started", onLiveStarted);
       socket.off("live_ended", onLiveEnded);
     };
-  }, []);
+
+    // 💡 ESTA es la clave:
+    // Cada vez que 'autenticado' pase de false a true, este efecto se ejecuta.
+  }, [autenticado]);
 
   // 📡 REST (sin cambios)
   const getAllLives = (page, limit, search = "") => {

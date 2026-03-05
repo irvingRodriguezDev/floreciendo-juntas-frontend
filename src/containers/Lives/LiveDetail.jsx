@@ -40,22 +40,39 @@ const LiveDetalle = () => {
   const { getLiveById, live } = useContext(LivesContext);
   const { usuario, isAuthenticating, autenticado } = useContext(AuthContext);
 
-  const [livePhase, setLivePhase] = useState("live");
+  const [livePhase, setLivePhase] = useState("scheduled");
 
   useEffect(() => {
-    if (id) getLiveById(id);
-  }, [id]);
+    // Solo pedimos a la API si NO tenemos el live o si el ID es distinto
+    // Esto evita llamadas innecesarias que limpian el estado del socket
+    if (id && (!live || live.id !== id)) {
+      getLiveById(id);
+    }
+  }, [id, live?.id]);
 
   useEffect(() => {
-    // Si el live pasa a ended, iniciamos la secuencia de cierre
-    if (live?.status === "ended") {
-      setLivePhase("ending");
-      const timer = setTimeout(() => setLivePhase("ended"), 900);
-      return () => clearTimeout(timer);
-    } else if (live?.status === "live") {
+    // 1. Si no hay live todavía, no hacemos nada
+    if (!live?.status) return;
+
+    // 2. Sincronización inicial o cambio a "live"
+    if (live.status === "live" && livePhase !== "live") {
       setLivePhase("live");
     }
-  }, [live?.status]);
+
+    // 3. Manejo de la transición de cierre (solo si no estamos ya en ended/ending)
+    else if (live.status === "ended" && livePhase === "live") {
+      setLivePhase("ending");
+      const timer = setTimeout(() => {
+        setLivePhase("ended");
+      }, 900);
+      return () => clearTimeout(timer);
+    }
+
+    // 4. Si el live ya viene como ended desde el principio (ej: refrescas la página)
+    else if (live.status === "ended" && livePhase === "scheduled") {
+      setLivePhase("ended");
+    }
+  }, [live?.status, livePhase]); // Agregamos livePhase para comparar
 
   useLiveComments(live?.id);
 
@@ -68,7 +85,8 @@ const LiveDetalle = () => {
   }
 
   const isSubscribed = Boolean(usuario?.isSubscribed);
-
+  const isScheduled = live.status === "scheduled";
+  const showPlayer = live.status === "live" || live.status === "ended";
   return (
     <Layout>
       <Container
@@ -92,7 +110,7 @@ const LiveDetalle = () => {
           }}
         >
           {/* ESTADO: PROGRAMADO */}
-          {live.status === "scheduled" && (
+          {isScheduled && (
             <Box sx={{ py: 8, display: "flex", justifyContent: "center" }}>
               <LiveCountdown startTime={live.start_time} />
             </Box>

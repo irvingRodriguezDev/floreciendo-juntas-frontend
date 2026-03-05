@@ -18,7 +18,7 @@ import * as Yup from "yup";
 import AuthContext from "../../context/Auth/AuthContext";
 import CartContext from "../../context/Cart/CartContext";
 import Swal from "sweetalert2";
-
+import { useCaptcha } from "../../hooks/useCaptcha";
 // Esquema de validación optimizado
 const RegisterSchema = Yup.object().shape({
   name: Yup.string().required("El nombre es requerido"),
@@ -58,40 +58,31 @@ const inputStyles = {
 
 const Register = () => {
   const { registerUser } = useContext(AuthContext);
+  const { getCaptchaToken } = useCaptcha();
   const { syncGuestToServer, getUserCart } = useContext(CartContext);
   const [loading, setLoading] = useState(false);
 
   const handleRegister = async (credentials) => {
     setLoading(true);
+    const token = await getCaptchaToken("registro");
+    const data = {
+      password: credentials.password,
+      email: credentials.email,
+      name: credentials.name,
+      phone: credentials.phone,
+      username: credentials.username,
+      captchaToken: token,
+    };
+    await registerUser(data);
+
+    // Sincronización de carrito post-registro
     try {
-      await registerUser(credentials);
-
-      // Sincronización de carrito post-registro
-      try {
-        await syncGuestToServer();
-        await getUserCart();
-      } catch (cartError) {
-        console.error("Error al sincronizar carrito:", cartError);
-      }
-
-      Swal.fire({
-        icon: "success",
-        title: "¡Bienvenida!",
-        text: "Tu cuenta ha sido creada correctamente.",
-        confirmButtonColor: "#D82E7A",
-      });
-    } catch (error) {
-      Swal.fire({
-        icon: "error",
-        title: "Error al registrarse",
-        text:
-          error.response?.data?.msg ||
-          "Ocurrió un problema con el registro. Inténtalo de nuevo.",
-        confirmButtonColor: "#D82E7A",
-      });
-    } finally {
-      setLoading(false);
+      await syncGuestToServer();
+      await getUserCart();
+    } catch (cartError) {
+      console.error("Error al sincronizar carrito:", cartError);
     }
+    setLoading(false);
   };
 
   return (

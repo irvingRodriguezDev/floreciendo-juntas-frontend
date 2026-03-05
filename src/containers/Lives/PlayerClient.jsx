@@ -1,18 +1,25 @@
 import React, { useEffect, useRef, useState } from "react";
 import Plyr from "plyr";
 import "plyr/dist/plyr.css";
-import { Box, IconButton, useMediaQuery, useTheme } from "@mui/material";
+import {
+  Box,
+  IconButton,
+  Typography,
+  useMediaQuery,
+  useTheme,
+} from "@mui/material";
 import FullscreenIcon from "@mui/icons-material/Fullscreen";
 import FullscreenExitIcon from "@mui/icons-material/FullscreenExit";
 import VolumeOffIcon from "@mui/icons-material/VolumeOff";
 import VolumeUpIcon from "@mui/icons-material/VolumeUp";
 import LiveCommentsOverlay from "./LiveCommentsOverlay";
-
+import { getSocket } from "../../socket";
+import PeopleIcon from "@mui/icons-material/People";
 const PlayerCliente = ({ playbackUrl, liveId }) => {
   const videoRef = useRef(null);
   const containerRef = useRef(null);
   const ivsPlayerRef = useRef(null);
-
+  const [viewerCount, setViewerCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [videoOrientation, setVideoOrientation] = useState("landscape");
@@ -23,14 +30,18 @@ const PlayerCliente = ({ playbackUrl, liveId }) => {
 
   useEffect(() => {
     let plyrPlayer = null;
-
+    const socket = getSocket();
     const initPlayer = () => {
       if (!window.IVSPlayer || !videoRef.current) return;
 
       try {
         const ivsPlayer = window.IVSPlayer.create();
         ivsPlayerRef.current = ivsPlayer;
-
+        if (socket) {
+          socket.on("live_viewer_count", (count) => {
+            setViewerCount(count);
+          });
+        }
         ivsPlayer.attachHTMLVideoElement(videoRef.current);
         ivsPlayer.load(playbackUrl);
 
@@ -75,6 +86,9 @@ const PlayerCliente = ({ playbackUrl, liveId }) => {
       clearTimeout(timer);
       document.removeEventListener("fullscreenchange", handleFSChange);
       document.removeEventListener("webkitfullscreenchange", handleFSChange);
+      if (socket) {
+        socket.off("live_viewer_count"); // Dejar de escuchar al salir
+      }
       if (plyrPlayer) plyrPlayer.destroy();
       if (ivsPlayerRef.current) {
         ivsPlayerRef.current.pause();
@@ -138,6 +152,47 @@ const PlayerCliente = ({ playbackUrl, liveId }) => {
       >
         {!loading && (
           <>
+            <Box
+              sx={{
+                position: "absolute",
+                top: 10,
+                right: 70, // Ajustado según tu layout
+                zIndex: 1250,
+                display: "flex",
+                alignItems: "center",
+                gap: 1,
+                px: 1.5,
+                py: 0.5,
+                borderRadius: "20px", // Bordes redondeados tipo píldora
+                bgcolor: "rgba(0, 0, 0, 0.5)",
+                backdropFilter: "blur(8px)", // Efecto de desenfoque de fondo
+                border: "1px solid rgba(255, 255, 255, 0.2)", // Borde sutil
+                boxShadow: "0px 4px 10px rgba(0,0,0,0.3)",
+                transition: "all 0.3s ease",
+              }}
+            >
+              <PeopleIcon
+                sx={{
+                  fontSize: 28,
+                  opacity: 0.5,
+                  color: "#fff", // Rojo vibrante para resaltar el "Vivo"
+                }}
+              />
+
+              <Typography
+                sx={{
+                  color: "white",
+                  fontSize: "0.85rem",
+                  fontWeight: "700",
+                  fontFamily: "Roboto, sans-serif",
+                  letterSpacing: "0.5px",
+                  lineHeight: 1,
+                  opacity: 0.5,
+                }}
+              >
+                {viewerCount.toLocaleString()}
+              </Typography>
+            </Box>
             <IconButton
               onClick={toggleFullscreen}
               sx={{

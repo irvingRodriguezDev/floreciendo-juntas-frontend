@@ -24,15 +24,24 @@ const CommunityState = ({ children }) => {
   };
   const playSound = useSound(notificationSound);
   const [state, dispatch] = useReducer(CommunityReducer, initialState);
-  const { usuario } = useContext(AuthContext);
+  const { autenticado, usuario } = useContext(AuthContext);
   const usuarioId = usuario?.id;
 
   // 👂 SOCKET EVENTS (SIN MANEJAR CONEXIÓN)
+
   useEffect(() => {
+    // Solo intentamos conectar si el usuario está autenticado
+    if (!autenticado || !usuarioId) return;
+
     const socket = getSocket();
-    if (!socket || !usuarioId) return;
+
+    // Si por un microsegundo no hay socket, el siguiente render lo atrapará
+    if (!socket) return;
+
+    console.log("📝 Socket vinculado a la Comunidad");
 
     const onPostCreated = (post) => {
+      // Si el post lo creé yo, mi reducer ya lo gestionó localmente (optimistic update)
       if (post.userId === usuarioId) return;
       dispatch({ type: CREATE_POST_COMMUNITY, payload: post });
     };
@@ -53,16 +62,21 @@ const CommunityState = ({ children }) => {
       });
     };
 
+    // Registrar eventos
     socket.on("postCommunityCreated", onPostCreated);
     socket.on("createCommentPostCommunity", onCommentCreated);
     socket.on("postLikeToggled", onReactionToggled);
 
+    // Limpieza
     return () => {
       socket.off("postCommunityCreated", onPostCreated);
       socket.off("createCommentPostCommunity", onCommentCreated);
       socket.off("postLikeToggled", onReactionToggled);
     };
-  }, [usuarioId]);
+
+    // 💡 Depender de 'autenticado' asegura que cuando el login se complete,
+    // este efecto se ejecute con el socket ya inicializado.
+  }, [autenticado, usuarioId]);
 
   // 📡 FEED
   const getFeed = (page, limit, search = "") => {
@@ -199,7 +213,15 @@ const CommunityState = ({ children }) => {
         payload: { postId, tempId },
       });
 
-      Swal.fire("Error", "No se pudo publicar el comentario", "error");
+      Swal.fire({
+        title: "Error",
+        text:
+          error.response.data.message ||
+          "Ocurrio un problema al publicar el comentario",
+        icon: "error",
+        timer: 2500,
+        showConfirmButton: false,
+      });
     }
   };
 

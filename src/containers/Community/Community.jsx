@@ -180,16 +180,14 @@ const Community = () => {
           </Backdrop>
         )}
         <Grid
-          item
-          xs={12}
+          size={12}
           sx={{ display: "flex", justifyContent: "center", mt: -5 }}
         >
           <CommunityRulesAccordion />
         </Grid>
         {/* CAJA CREAR POST */}
         <Grid
-          item
-          xs={12}
+          size={12}
           sx={{ display: "flex", justifyContent: "center", mt: -3 }}
         >
           <Box sx={{ width: "100%", maxWidth: 640 }}>

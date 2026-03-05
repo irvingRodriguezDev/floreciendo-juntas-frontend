@@ -9,7 +9,7 @@ import AuthContext from "./AuthContext";
 import AuthReducer from "./AuthReducer";
 import MethodGet, { MethodPost, MethodPut } from "../../config/Service";
 import tokenAuth from "../../config/TokenAuth";
-import { disconnectSocket, initSocket } from "../../socket";
+import { disconnectSocket, getSocket, initSocket } from "../../socket";
 import { SHOW_ERRORS_API, types } from "../../types";
 import Swal from "sweetalert2";
 import clienteAxios from "../../config/Axios";
@@ -39,8 +39,18 @@ const AuthState = (props) => {
 
   const [state, dispatch] = useReducer(AuthReducer, initialState);
 
-  const token = localStorage.getItem("token");
-  const socket = initSocket(token);
+  var token = "";
+  // ✅ USAR UN USEEFFECT PARA EL SOCKET
+  useEffect(() => {
+    token = localStorage.getItem("token");
+    if (token) {
+      initSocket(token);
+    }
+
+    return () => {
+      disconnectSocket(); // Limpiar al desmontar
+    };
+  }, []);
 
   /**
    * 🔹 Forzar recarga de imagen para evitar cache del navegador
@@ -53,6 +63,7 @@ const AuthState = (props) => {
 
   // 🔹 Escuchar evento de actualización de imagen
   useEffect(() => {
+    const socket = getSocket(); // Usa el getter en lugar de la variable del cuerpo
     if (!socket || !state.usuario) return;
 
     const handleProfileImageUpdated = (data) => {
@@ -65,11 +76,8 @@ const AuthState = (props) => {
     };
 
     socket.on("profileImageUpdated", handleProfileImageUpdated);
-
-    return () => {
-      socket.off("profileImageUpdated", handleProfileImageUpdated);
-    };
-  }, [socket, state.usuario]);
+    return () => socket.off("profileImageUpdated", handleProfileImageUpdated);
+  }, [state.usuario]); // Solo depende del usuario
 
   /**
    * 🔹 Obtener usuario autenticado
@@ -105,10 +113,14 @@ const AuthState = (props) => {
   /**
    * 🔹 Iniciar sesión
    */
-  const iniciarSesion = async (datos) => {
+  const iniciarSesion = async (datos, tokenCaptcha) => {
     try {
       // 1️⃣ Login en TU backend
-      const res = await MethodPost("/auth/login", datos);
+      const res = await MethodPost("/auth/login", {
+        email: datos.email,
+        password: datos.password,
+        captchaToken: tokenCaptcha,
+      });
       const token = res.data.token;
 
       if (!token) {
@@ -153,8 +165,7 @@ const AuthState = (props) => {
       });
 
       // 4️⃣ Socket: cerrar y crear nuevo
-      disconnectSocket();
-      initSocket(token);
+      initSocket(token, res.data?.usuario);
 
       // 5️⃣ Obtener usuario autenticado
       await usuarioAutenticado();
@@ -226,6 +237,7 @@ const AuthState = (props) => {
 
       Swal.fire({
         title: "¡Bienvenid@!",
+        text: "Tu cuenta se ha creado exitosamente!",
         icon: "success",
         timer: 2000,
         showConfirmButton: false,
@@ -384,6 +396,7 @@ const AuthState = (props) => {
   };
   const logoutGlobal = () => {
     localStorage.clear();
+    disconnectSocket();
     dispatch({ type: types.CERRAR_SESION });
 
     Swal.fire({

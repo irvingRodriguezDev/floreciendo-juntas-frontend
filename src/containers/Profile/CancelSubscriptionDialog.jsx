@@ -1,34 +1,36 @@
-// components/CancelSubscriptionDialog.jsx
 import {
   Dialog,
   DialogTitle,
   DialogContent,
   DialogActions,
   Button,
-  FormControlLabel,
-  Radio,
   Typography,
   Box,
+  CircularProgress,
 } from "@mui/material";
-import axios from "axios";
-
+// Sugerencia: Importa una librería de fechas como moment o date-fns si pasas la fecha
+// import moment from 'moment';
+import FormatDate from "../../utils/FormatDate";
 export default function CancelSubscriptionDialog({
   open,
   onClose,
-
   loading,
   handleCancelSubscription,
+  expiryDate, // Nueva prop: fecha en que termina el periodo
 }) {
   return (
     <Dialog
       open={open}
       onClose={onClose}
+      // Evita que el usuario cierre el modal haciendo clic afuera mientras procesa
+      disableEscapeKeyDown={loading}
+      onBackdropClick={loading ? null : onClose}
       PaperProps={{
         sx: {
           borderRadius: 4,
           p: 2,
-          maxWidth: 500,
-          background: "rgba(255, 240, 247, 0.95)",
+          maxWidth: 450,
+          background: "linear-gradient(to bottom, #ffffff, #fff0f7)",
         },
       }}
     >
@@ -37,81 +39,87 @@ export default function CancelSubscriptionDialog({
           color: "#D82E7A",
           fontWeight: "bold",
           textAlign: "center",
+          fontSize: "1.5rem",
         }}
       >
-        Cancelar suscripción
+        ¿Deseas cancelar tu suscripción?
       </DialogTitle>
 
       <DialogContent>
         <Typography
           sx={{
-            mb: 3,
-            color: "#555",
+            mb: 2,
+            color: "#444",
             textAlign: "center",
             lineHeight: 1.6,
           }}
         >
-          Tu suscripción se cancelará
-          <strong> al final de tu periodo actual</strong>. 💗 Podrás seguir
-          disfrutando del contenido hasta esa fecha.
+          Lamentamos mucho que te vayas. Tu suscripción permanecerá
+          <strong>
+            {" "}
+            activa hasta el{" "}
+            {FormatDate(expiryDate) || "final de tu periodo actual"}
+          </strong>
+          . 💗
         </Typography>
 
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "center",
-            mt: 1,
-          }}
+        <Typography
+          variant='body2'
+          sx={{ color: "#777", textAlign: "center", fontStyle: "italic" }}
         >
-          <FormControlLabel
-            control={
-              <Radio
-                checked
-                disabled
-                sx={{
-                  color: "#D82E7A",
-                  "&.Mui-checked": { color: "#D82E7A" },
-                }}
-              />
-            }
-            label='Cancelar al final del periodo'
-          />
-        </Box>
+          Después de esta fecha, no se realizarán más cargos a tu tarjeta.
+        </Typography>
       </DialogContent>
 
       <DialogActions
         sx={{
-          justifyContent: "space-between",
+          flexDirection: "column", // Botones uno sobre otro para mejor UX en móvil
+          gap: 1,
           px: 3,
           pb: 2,
         }}
       >
         <Button
-          onClick={onClose}
-          disabled={loading}
-          sx={{
-            borderRadius: 2,
-            textTransform: "none",
-            color: "#D82E7A",
-            border: "1px solid #D82E7A",
-            "&:hover": { background: "#ffe5f0" },
-          }}
-        >
-          Cancelar
-        </Button>
-
-        <Button
+          fullWidth
           onClick={handleCancelSubscription}
           disabled={loading}
           variant='contained'
           sx={{
-            borderRadius: 2,
+            borderRadius: 3,
+            py: 1.2,
             textTransform: "none",
             bgcolor: "#D82E7A",
+            fontSize: "1rem",
+            fontWeight: "bold",
             "&:hover": { bgcolor: "#c02567" },
+            boxShadow: "0 4px 12px rgba(216, 46, 122, 0.3)",
           }}
         >
-          Confirmar cancelación 💗
+          {loading ? (
+            <CircularProgress size={24} sx={{ color: "white" }} />
+          ) : (
+            "Confirmar cancelación 💗"
+          )}
+        </Button>
+
+        <Button
+          fullWidth
+          onClick={onClose}
+          disabled={loading}
+          variant='contained'
+          sx={{
+            borderRadius: 3,
+            bgcolor: "#FFEEF6",
+            textTransform: "none",
+            color: "#c02567",
+            "&:hover": {
+              background: "#FFEEF6",
+              color: "#c02567",
+              textDecoration: "underline",
+            },
+          }}
+        >
+          No, quiero mantener mi suscripción
         </Button>
       </DialogActions>
     </Dialog>

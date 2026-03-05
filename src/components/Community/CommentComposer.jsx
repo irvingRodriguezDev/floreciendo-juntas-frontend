@@ -14,6 +14,7 @@ import AuthContext from "../../context/Auth/AuthContext";
 import CommunityContext from "../../context/Community/CommunityContext";
 import MediaPreviewItem from "./MediaPreviewItem";
 import heic2any from "heic2any";
+import Swal from "sweetalert2";
 
 const MAX_FILES = 4;
 

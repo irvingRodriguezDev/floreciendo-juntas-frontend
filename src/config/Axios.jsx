@@ -8,46 +8,44 @@ const clienteAxios = axios.create({
   },
 });
 
-// 🔐 Request: agregar token
 clienteAxios.interceptors.request.use((config) => {
   const token = localStorage.getItem("token");
-
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
-
   return config;
 });
+
 let isRedirecting = false;
-// 🚨 Response: detectar sesión expirada o sesión múltiple
+
 clienteAxios.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (!error.response) {
-      return Promise.reject(error);
-    }
+    if (!error.response) return Promise.reject(error);
 
     const { status, data } = error.response;
 
-    if (status === 401) {
-      // 1. Extraer la razón antes de limpiar nada
+    // 🚨 CONDICIÓN CLAVE: No redirigir si el error ocurre intentando iniciar sesión
+    const isLoginRequest = error.config.url.includes("/iniciar-sesion");
+    // Ajusta "/login" según sea el endpoint de tu API
+
+    if (status === 401 && !isLoginRequest) {
       const reason = data?.reason || "expired";
 
-      // 2. Solo ejecutar la lógica de salida si no estamos ya en proceso de redirección
       if (!isRedirecting) {
         isRedirecting = true;
-
-        // Guardar razón para mostrar un mensaje amigable en el Login
         sessionStorage.setItem("session_expired_reason", reason);
-
-        // Limpiar credenciales
         localStorage.removeItem("token");
 
-        // 3. Pequeño delay de seguridad antes del redireccionamiento
-        // Esto permite que otras promesas pendientes fallen sin disparar más reloads
-        setTimeout(() => {
-          window.location.replace("/iniciar-sesion");
-        }, 100);
+        // Solo redirigimos si NO estamos ya en la ruta de login
+        if (window.location.pathname !== "/iniciar-sesion") {
+          setTimeout(() => {
+            window.location.replace("/iniciar-sesion");
+          }, 100);
+        } else {
+          // Si ya estamos en login, reseteamos el flag para futuros intentos
+          isRedirecting = false;
+        }
       }
     }
 

@@ -17,6 +17,15 @@ export default (state, action) => {
       };
 
     case CREATE_POST_COMMUNITY:
+      // 1. Verificamos si el post ya existe en el estado (por ID)
+      const exists = state.community_posts.some(
+        (p) => p.id === action.payload.id,
+      );
+
+      // 2. Si ya existe, no hacemos nada, devolvemos el estado actual
+      if (exists) return state;
+
+      // 3. Si es nuevo, lo agregamos arriba
       return {
         ...state,
         community_posts: [action.payload, ...state.community_posts],
@@ -58,31 +67,33 @@ export default (state, action) => {
           if (post.id !== action.payload.postId) return post;
 
           let newComments;
-          if (action.payload.replaceTemp) {
-            // Reemplazar comentario temporal con el real de la DB
-            newComments = post.comments.map((c) =>
-              c.id === action.payload.replaceTemp ? action.payload.comment : c,
+          const { comment, replaceTemp } = action.payload;
+
+          if (replaceTemp) {
+            // 1. REEMPLAZO: El usuario actual ve su comentario temporal convertirse en real
+            newComments = (post.comments || []).map((c) =>
+              c.id === replaceTemp ? comment : c,
             );
           } else {
-            // Evitar duplicados si el socket llega antes que la respuesta de la API
-            const exists = post.comments?.find(
-              (c) => c.id === action.payload.comment.id,
-            );
-            newComments = exists
-              ? post.comments
-              : [...(post.comments || []), action.payload.comment];
+            // 2. SOCKET / OTROS: Verificamos si ya existe por ID
+            const exists = post.comments?.some((c) => c.id === comment.id);
+            if (exists) return post;
+
+            // 3. ORDEN: Insertamos al principio (o al final, según tu diseño)
+            // Usualmente: [nuevo, ...viejos]
+            newComments = [comment, ...(post.comments || [])];
           }
 
           return {
             ...post,
             comments: newComments,
-            commentsCount: action.payload.replaceTemp
+            // Solo aumentamos el contador si no es un reemplazo de uno que ya sumamos
+            commentsCount: replaceTemp
               ? post.commentsCount
               : (post.commentsCount || 0) + 1,
           };
         }),
       };
-
     case REMOVE_OPTIMISTIC_COMMENT:
       return {
         ...state,
