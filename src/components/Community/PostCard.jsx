@@ -1,5 +1,6 @@
 import {
   Avatar,
+  Box,
   Card,
   CardContent,
   CardHeader,
@@ -17,7 +18,7 @@ import CommentItem from "./CommentItem";
 import MessageIcon from "../icons/MessageIcon";
 import CommentComposer from "./CommentComposer";
 import CommunityContext from "../../context/Community/CommunityContext";
-
+import PushPinIcon from "@mui/icons-material/PushPin";
 dayjs.extend(relativeTime);
 dayjs.locale("es");
 
@@ -30,14 +31,35 @@ const PostCard = ({ post }) => {
       sx={{
         borderRadius: "20px",
         boxShadow: "0 12px 32px rgba(0,0,0,0.08)",
+        position: "relative", // 👈 ESTO ES CLAVE
+        overflow: "hidden",
       }}
     >
+      {post.isPinned && (
+        <Box
+          sx={{
+            position: "absolute",
+            top: 0,
+            right: 0,
+            p: 1,
+            zIndex: 1,
+            transform: "rotate(45deg)",
+            background:
+              "linear-gradient(135deg, rgba(255,255,255,0.8), rgba(255,255,255,0.4))",
+            borderRadius: "0 20px 0 20px",
+          }}
+        >
+          <PushPinIcon sx={{ color: "#D72E7A", fontSize: "24px" }} />
+        </Box>
+      )}
       <CardHeader
         avatar={<Avatar src={post.user?.profileImage} />}
         title={
-          <Typography fontWeight={700} color='#D72E7A'>
-            {post.user.name}
-          </Typography>
+          <>
+            <Typography fontWeight={700} color='#D72E7A'>
+              {post.user.name}
+            </Typography>
+          </>
         }
         subheader={
           <Typography fontSize='0.75rem' color='text.secondary'>

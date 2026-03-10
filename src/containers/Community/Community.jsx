@@ -37,7 +37,7 @@ const Community = () => {
 
   // Paginación
   const [page, setPage] = useState(1);
-  const [rowsPerPage, setRowsPerPage] = useState(15);
+  const [rowsPerPage, setRowsPerPage] = useState(30);
 
   const handlePageChange = (newPage) => {
     if (newPage >= 1 && newPage <= totalPages && newPage !== page) {
@@ -232,6 +232,7 @@ const Community = () => {
       <CreatePostModal
         open={openWritePost}
         handleClose={handleCloseWritePost}
+        usuario={usuario ?? null}
       />
       {isAuthorized && (
         <Box
@@ -283,7 +284,7 @@ const Community = () => {
             onClick={handleClickOpenWritePost}
             sx={{
               position: "fixed",
-              bottom: 110,
+              bottom: 170,
               right: { xs: 20, sm: 340 }, // Ajustado para que se vea en móvil
               background: "#D82E7A",
               color: "#fff",

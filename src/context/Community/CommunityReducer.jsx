@@ -17,18 +17,30 @@ export default (state, action) => {
       };
 
     case CREATE_POST_COMMUNITY:
-      // 1. Verificamos si el post ya existe en el estado (por ID)
       const exists = state.community_posts.some(
         (p) => p.id === action.payload.id,
       );
-
-      // 2. Si ya existe, no hacemos nada, devolvemos el estado actual
       if (exists) return state;
 
-      // 3. Si es nuevo, lo agregamos arriba
+      const newPosts = [action.payload, ...state.community_posts];
+
+      // Ordenamos el estado local igual que en el Backend
+      const sortedPosts = newPosts.sort((a, b) => {
+        // 1. Primero por isPinned (true primero)
+        if (a.isPinned !== b.isPinned) {
+          return a.isPinned ? -1 : 1;
+        }
+        // 2. Si ambos tienen isPinned, ordenamos por pinnedUntil (más reciente primero)
+        if (a.isPinned && b.isPinned) {
+          return new Date(b.pinnedUntil) - new Date(a.pinnedUntil);
+        }
+        // 3. Si ninguno está anclado, ordenamos por createdAt
+        return new Date(b.createdAt) - new Date(a.createdAt);
+      });
+
       return {
         ...state,
-        community_posts: [action.payload, ...state.community_posts],
+        community_posts: sortedPosts,
       };
     case TOOGLE_REACTION_POST_COMMUNITY:
       return {

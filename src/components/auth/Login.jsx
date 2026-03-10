@@ -11,6 +11,8 @@ import {
   Box,
   CircularProgress, // 👈 Añadido para feedback visual
 } from "@mui/material";
+import { Visibility, VisibilityOff } from "@mui/icons-material";
+import { IconButton, InputAdornment } from "@mui/material";
 import { Link } from "react-router-dom";
 import * as Yup from "yup";
 import AuthContext from "../../context/Auth/AuthContext";
@@ -70,7 +72,9 @@ const Login = () => {
   const { getCaptchaToken } = useCaptcha();
   const { syncGuestToServer, getUserCart } = useContext(CartContext);
   const [loading, setLoading] = useState(false); // 👈 Estado de carga
+  const [showPassword, setShowPassword] = useState(false);
 
+  const handleClickShowPassword = () => setShowPassword(!showPassword);
   useEffect(() => {
     const reason = sessionStorage.getItem("session_expired_reason");
 
@@ -233,7 +237,7 @@ const Login = () => {
                       <Grid size={12}>
                         <TextField
                           label='Contraseña'
-                          type='password'
+                          type={showPassword ? "text" : "password"}
                           fullWidth
                           name='password'
                           value={values.password}
@@ -243,6 +247,30 @@ const Login = () => {
                           helperText={touched.password && errors.password}
                           sx={inputStyles}
                           disabled={loading} // 👈 Deshabilitar si carga
+                          slotProps={{
+                            input: {
+                              endAdornment: (
+                                <InputAdornment position='end'>
+                                  <IconButton
+                                    aria-label='toggle password visibility'
+                                    onClick={handleClickShowPassword}
+                                    onMouseDown={(e) => e.preventDefault()} // Evita que el foco se pierda
+                                    edge='end'
+                                    sx={{
+                                      color: "#D82E7A",
+                                      marginRight: "8px",
+                                    }}
+                                  >
+                                    {showPassword ? (
+                                      <VisibilityOff />
+                                    ) : (
+                                      <Visibility />
+                                    )}
+                                  </IconButton>
+                                </InputAdornment>
+                              ),
+                            },
+                          }}
                         />
                       </Grid>
 

@@ -9,6 +9,12 @@ import {
   Button,
   Divider,
   Modal,
+  Grid,
+  FormControl,
+  FormLabel,
+  RadioGroup,
+  FormControlLabel,
+  Radio,
 } from "@mui/material";
 import ImageIcon from "@mui/icons-material/Image";
 import VideocamIcon from "@mui/icons-material/Videocam";
@@ -17,12 +23,18 @@ import CommunityContext from "../../context/Community/CommunityContext";
 import Swal from "sweetalert2";
 import AuthContext from "../../context/Auth/AuthContext";
 import CloseIcons from "../icons/CloseIcons";
+import TimeSelectPinnedPost from "../Selects/TimeSelectPinnedPost";
 export default function CreatePostModal({ open, handleClose }) {
   const { createPostCommunity } = useContext(CommunityContext);
   const { usuario } = useContext(AuthContext);
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [media, setMedia] = useState([]);
+  const [time, setTime] = useState("null");
+  const detectarCambiosTimePinned = (value) => {
+    setTime(value.value);
+  };
+
   const MAX_CONTENT = 1500;
   /* 📎 Manejo de archivos (máx 4) */
   const handleFiles = (e) => {
@@ -59,6 +71,11 @@ export default function CreatePostModal({ open, handleClose }) {
   };
   const removeMedia = (index) => {
     setMedia((prev) => prev.filter((_, i) => i !== index));
+  };
+  const [value, setValue] = useState("no");
+
+  const handleChange = (event) => {
+    setValue(event.target.value);
   };
 
   /* 🚀 Submit */
@@ -97,6 +114,8 @@ export default function CreatePostModal({ open, handleClose }) {
     const formData = new FormData();
     formData.append("title", title);
     formData.append("content", content);
+    formData.append("pinned", value === "yes" ? true : false);
+    formData.append("durationHours", Number(time));
 
     media.forEach((m) => {
       formData.append("files", m.file);
@@ -153,6 +172,62 @@ export default function CreatePostModal({ open, handleClose }) {
               <CloseIcons width={40} />
             </IconButton>
           </Box>
+          {usuario && usuario.roleId === 1 && (
+            <Grid container spacing={2}>
+              <Grid size={{ xs: 12, sm: 6, md: 6 }}>
+                <FormControl>
+                  <Typography
+                    variant='subtitle'
+                    fontWeight='bold'
+                    color='#E33887'
+                  >
+                    Anclar post
+                  </Typography>
+                  <RadioGroup
+                    row
+                    aria-labelledby='demo-row-radio-buttons-group-label'
+                    name='row-radio-buttons-group'
+                    value={value}
+                    onChange={handleChange}
+                  >
+                    <FormControlLabel
+                      value='yes'
+                      control={
+                        <Radio
+                          sx={{
+                            color: "#E33887", // Color cuando no está seleccionado
+                            "&.Mui-checked": {
+                              color: "#E33887", // Color cuando sí está seleccionado
+                            },
+                          }}
+                        />
+                      }
+                      label='Si'
+                    />
+                    <FormControlLabel
+                      value='no'
+                      control={
+                        <Radio
+                          sx={{
+                            color: "#E33887",
+                            "&.Mui-checked": {
+                              color: "#E33887",
+                            },
+                          }}
+                        />
+                      }
+                      label='No'
+                    />
+                  </RadioGroup>
+                </FormControl>
+              </Grid>
+              <Grid size={{ xs: 12, sm: 6, md: 6 }}>
+                <TimeSelectPinnedPost
+                  detectarCambiosTimePinned={detectarCambiosTimePinned}
+                />
+              </Grid>
+            </Grid>
+          )}
 
           {/* 🏷️ Título */}
           <TextField

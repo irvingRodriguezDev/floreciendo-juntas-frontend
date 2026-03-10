@@ -12,6 +12,8 @@ import {
   Box,
   CircularProgress,
 } from "@mui/material";
+import { Visibility, VisibilityOff } from "@mui/icons-material";
+import { IconButton, InputAdornment } from "@mui/material";
 import { Link } from "react-router-dom";
 import { Formik, Form } from "formik";
 import * as Yup from "yup";
@@ -61,7 +63,11 @@ const Register = () => {
   const { getCaptchaToken } = useCaptcha();
   const { syncGuestToServer, getUserCart } = useContext(CartContext);
   const [loading, setLoading] = useState(false);
-
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const handleClickShowPassword = () => setShowPassword(!showPassword);
+  const handleClickShowConfirmPassword = () =>
+    setShowConfirmPassword(!showConfirmPassword);
   const handleRegister = async (credentials) => {
     setLoading(true);
     const token = await getCaptchaToken("registro");
@@ -284,7 +290,7 @@ const Register = () => {
                       <Grid size={{ xs: 12, md: 6 }}>
                         <TextField
                           label='Contraseña'
-                          type='password'
+                          type={showPassword ? "text" : "password"}
                           name='password'
                           fullWidth
                           autoComplete='off'
@@ -295,13 +301,37 @@ const Register = () => {
                           helperText={touched.password && errors.password}
                           sx={inputStyles}
                           disabled={loading}
+                          slotProps={{
+                            input: {
+                              endAdornment: (
+                                <InputAdornment position='end'>
+                                  <IconButton
+                                    aria-label='toggle password visibility'
+                                    onClick={handleClickShowPassword}
+                                    onMouseDown={(e) => e.preventDefault()} // Evita que el foco se pierda
+                                    edge='end'
+                                    sx={{
+                                      color: "#D82E7A",
+                                      marginRight: "8px",
+                                    }}
+                                  >
+                                    {showPassword ? (
+                                      <VisibilityOff />
+                                    ) : (
+                                      <Visibility />
+                                    )}
+                                  </IconButton>
+                                </InputAdornment>
+                              ),
+                            },
+                          }}
                         />
                       </Grid>
 
                       <Grid size={{ xs: 12, md: 6 }}>
                         <TextField
                           label='Confirmar Contraseña'
-                          type='password'
+                          type={showConfirmPassword ? "text" : "password"}
                           name='password_confirmation'
                           fullWidth
                           autoComplete='off'
@@ -318,6 +348,30 @@ const Register = () => {
                           }
                           sx={inputStyles}
                           disabled={loading}
+                          slotProps={{
+                            input: {
+                              endAdornment: (
+                                <InputAdornment position='end'>
+                                  <IconButton
+                                    aria-label='toggle password visibility'
+                                    onClick={handleClickShowConfirmPassword}
+                                    onMouseDown={(e) => e.preventDefault()} // Evita que el foco se pierda
+                                    edge='end'
+                                    sx={{
+                                      color: "#D82E7A",
+                                      marginRight: "8px",
+                                    }}
+                                  >
+                                    {showPassword ? (
+                                      <VisibilityOff />
+                                    ) : (
+                                      <Visibility />
+                                    )}
+                                  </IconButton>
+                                </InputAdornment>
+                              ),
+                            },
+                          }}
                         />
                       </Grid>
 

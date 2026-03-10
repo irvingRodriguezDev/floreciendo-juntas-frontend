@@ -245,7 +245,7 @@ const AuthState = (props) => {
     } catch (error) {
       Swal.fire({
         title: "Error",
-        text: error.response?.data?.error || "Error al registrar",
+        text: error.response?.data?.msg || "Error al registrar",
         icon: "error",
       });
     }

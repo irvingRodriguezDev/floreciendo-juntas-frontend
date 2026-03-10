@@ -90,6 +90,7 @@ const VideoPlayer = ({
   /* ==============================
      Obtener estado backend (1 vez)
   ============================== */
+
   useEffect(() => {
     const fetchProgress = async () => {
       try {

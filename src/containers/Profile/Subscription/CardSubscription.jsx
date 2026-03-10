@@ -83,7 +83,17 @@ const SubscriptionCard = ({
             fontSize: "0.9rem",
           }}
         >
-          {subscription.status === "active" ? "Activa" : "Inactiva"}
+          {subscription.status === "active"
+            ? "Activa"
+            : subscription.status === "past_due"
+              ? "vencida"
+              : subscription.status === "incomplete"
+                ? "incompleto"
+                : subscription.status === "pending"
+                  ? "pendiente"
+                  : subscription.status === "canceled"
+                    ? "Cancelada"
+                    : "Inactiva"}
         </Box>
       </Box>
 

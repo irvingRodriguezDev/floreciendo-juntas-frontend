@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import Layout from "../Layout/Layout";
 import {
   Box,
@@ -15,6 +15,8 @@ import { Formik, Form } from "formik";
 import * as Yup from "yup";
 import AuthContext from "../../context/Auth/AuthContext";
 import { useCaptcha } from "../../hooks/useCaptcha";
+import { Visibility, VisibilityOff } from "@mui/icons-material";
+import { IconButton, InputAdornment } from "@mui/material";
 const inputStyles = {
   mb: 2,
   "& .MuiOutlinedInput-root": {
@@ -41,7 +43,13 @@ const ResetSchema = Yup.object().shape({
 const ForgotPassword = () => {
   const { getCaptchaToken } = useCaptcha();
   const { resetPassword } = useContext(AuthContext);
-  const [loading, setLoading] = React.useState(false);
+  const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const handleClickShowPassword = () => setShowPassword(!showPassword);
+  const handleClickShowConfirmPassword = () =>
+    setShowConfirmPassword(!showConfirmPassword);
+
   const handleResetSubmit = async (values) => {
     setLoading(true);
     try {
@@ -237,7 +245,7 @@ const ForgotPassword = () => {
                     <FormControl fullWidth>
                       <TextField
                         label='Nueva Contraseña'
-                        type='password'
+                        type={showPassword ? "text" : "password"}
                         name='password'
                         fullWidth
                         variant='outlined'
@@ -249,13 +257,37 @@ const ForgotPassword = () => {
                         error={touched.password && Boolean(errors.password)}
                         helperText={touched.password && errors.password}
                         sx={inputStyles}
+                        slotProps={{
+                          input: {
+                            endAdornment: (
+                              <InputAdornment position='end'>
+                                <IconButton
+                                  aria-label='toggle password visibility'
+                                  onClick={handleClickShowPassword}
+                                  onMouseDown={(e) => e.preventDefault()} // Evita que el foco se pierda
+                                  edge='end'
+                                  sx={{
+                                    color: "#D82E7A",
+                                    marginRight: "8px",
+                                  }}
+                                >
+                                  {showPassword ? (
+                                    <VisibilityOff />
+                                  ) : (
+                                    <Visibility />
+                                  )}
+                                </IconButton>
+                              </InputAdornment>
+                            ),
+                          },
+                        }}
                       />
                     </FormControl>
 
                     <FormControl fullWidth>
                       <TextField
                         label='Confirmar Nueva Contraseña'
-                        type='password'
+                        type={showConfirmPassword ? "text" : "password"}
                         name='passwordConfirmation'
                         fullWidth
                         variant='outlined'
@@ -273,6 +305,30 @@ const ForgotPassword = () => {
                           errors.passwordConfirmation
                         }
                         sx={inputStyles}
+                        slotProps={{
+                          input: {
+                            endAdornment: (
+                              <InputAdornment position='end'>
+                                <IconButton
+                                  aria-label='toggle password visibility'
+                                  onClick={handleClickShowConfirmPassword}
+                                  onMouseDown={(e) => e.preventDefault()} // Evita que el foco se pierda
+                                  edge='end'
+                                  sx={{
+                                    color: "#D82E7A",
+                                    marginRight: "8px",
+                                  }}
+                                >
+                                  {showPassword ? (
+                                    <VisibilityOff />
+                                  ) : (
+                                    <Visibility />
+                                  )}
+                                </IconButton>
+                              </InputAdornment>
+                            ),
+                          },
+                        }}
                       />
                     </FormControl>
 
