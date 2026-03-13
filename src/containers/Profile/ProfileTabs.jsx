@@ -81,7 +81,7 @@ export default function ProfileTabs() {
         >
           <Tab label='Información' />
           <Tab label='Insignias' />
-          <Tab label='Mis Tickets' />
+          <Tab label='Mis Boletos' />
           <Tab label='Mi Salón' />
           <Tab label='Mis Direcciones' />
           {usuario && usuario.isSubscribed && <Tab label='Certificaciones' />}

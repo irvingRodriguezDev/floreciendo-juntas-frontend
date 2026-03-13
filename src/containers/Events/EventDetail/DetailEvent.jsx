@@ -221,7 +221,6 @@ const DetailEvent = () => {
                       value={quantity} // 🔑 Cambia defaultValue → value (controlled)
                       inputProps={{
                         min: 1,
-                        max: 10,
                         step: 1,
                       }}
                       sx={inputStyles}
@@ -276,7 +275,7 @@ const DetailEvent = () => {
         <Grid container spacing={3} sx={{ maxWidth: 1200, mx: "auto" }}>
           {similarEvents?.length ? (
             similarEvents.map((e) => (
-              <Grid item xs={12} sm={6} md={4} key={e.id}>
+              <Grid size={{ xs: 12, sm: 6, md: 4, lg: 4 }} key={e.id}>
                 <CardEvent event={e} />
               </Grid>
             ))

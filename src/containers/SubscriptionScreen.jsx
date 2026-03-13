@@ -76,7 +76,7 @@ const SubscriptionScreen = ({ children }) => {
           <CardWrapper>
             <Grid container spacing={4} justifyContent='center'>
               {/* 🌸 Encabezado emocional */}
-              <Grid item xs={12} textAlign='center'>
+              <Grid size={12} textAlign='center'>
                 <Box
                   sx={{
                     width: 64,
@@ -122,13 +122,13 @@ const SubscriptionScreen = ({ children }) => {
               </Grid>
 
               {/* 🌷 Aquí va TU componente de suscripción */}
-              <Grid item xs={12}>
+              <Grid size={12}>
                 {children}
                 <SubscriptionForm userId={usuario ? usuario.id : null} />
               </Grid>
 
               {/* 🌸 Mensaje inferior de contención */}
-              <Grid item xs={12} textAlign='center'>
+              <Grid size={12} textAlign='center'>
                 <Typography
                   sx={{
                     mt: 2,

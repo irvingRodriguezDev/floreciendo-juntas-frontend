@@ -1,8 +1,7 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useState, useCallback } from "react";
 import {
   Box,
   Typography,
-  Paper,
   Button,
   Menu,
   MenuItem,
@@ -12,9 +11,9 @@ import {
   Snackbar,
   Alert,
   Grid,
+  Chip,
 } from "@mui/material";
-
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 
 import UserContext from "../../context/User/UserContext";
 import AuthContext from "../../context/Auth/AuthContext";
@@ -30,15 +29,281 @@ import AppleIcon from "@mui/icons-material/Apple";
 import EmailIcon from "@mui/icons-material/Email";
 import EventAvailableIcon from "@mui/icons-material/EventAvailable";
 import DownloadIcon from "@mui/icons-material/Download";
-import DiamondIcon from "@mui/icons-material/Diamond";
+import LocationOnIcon from "@mui/icons-material/LocationOn";
+import AccessTimeIcon from "@mui/icons-material/AccessTime";
+import LocalActivityIcon from "@mui/icons-material/LocalActivity";
 
 import Pagination from "../../components/Pagination/Pagination";
 
 const PRIMARY_PINK = "#E53888";
+const DARK_PINK = "#C52F75";
+const LIGHT_PINK = "#FFF0F7";
+const BORDER_PINK = "#F9CEDF";
+
+const TicketSkeleton = () => (
+  <Box
+    sx={{
+      borderRadius: "20px",
+      overflow: "hidden",
+      background: "linear-gradient(135deg, #FFF5FA, #FFE3EE)",
+      border: `1px solid ${BORDER_PINK}`,
+      p: 3,
+      height: 220,
+      position: "relative",
+    }}
+  >
+    {[80, 60, 50, 40].map((w, i) => (
+      <Box
+        key={i}
+        sx={{
+          height: 14,
+          width: `${w}%`,
+          borderRadius: 2,
+          bgcolor: "rgba(229,56,136,0.1)",
+          mb: 1.5,
+          animation: "pulse 1.5s ease-in-out infinite",
+          animationDelay: `${i * 0.15}s`,
+          "@keyframes pulse": {
+            "0%, 100%": { opacity: 0.4 },
+            "50%": { opacity: 0.9 },
+          },
+        }}
+      />
+    ))}
+    <Box
+      sx={{
+        position: "absolute",
+        bottom: 24,
+        left: 24,
+        right: 24,
+        display: "flex",
+        gap: 1.5,
+      }}
+    >
+      {[1, 2].map((i) => (
+        <Box
+          key={i}
+          sx={{
+            flex: 1,
+            height: 38,
+            borderRadius: "10px",
+            bgcolor: "rgba(229,56,136,0.12)",
+            animation: "pulse 1.5s ease-in-out infinite",
+            animationDelay: `${i * 0.2}s`,
+            "@keyframes pulse": {
+              "0%, 100%": { opacity: 0.4 },
+              "50%": { opacity: 0.9 },
+            },
+          }}
+        />
+      ))}
+    </Box>
+  </Box>
+);
+
+const TicketCard = ({
+  ticket,
+  usuario,
+  downloadTicket,
+  onCalendarOpen,
+  downloadingId,
+  index,
+}) => {
+  const isDownloading = downloadingId === ticket.id;
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, delay: index * 0.07, ease: "easeOut" }}
+    >
+      <Box
+        sx={{
+          borderRadius: "20px",
+          overflow: "hidden",
+          background: "linear-gradient(145deg, #ffffff 0%, #FFF5FA 100%)",
+          border: `1px solid ${BORDER_PINK}`,
+          boxShadow: "0 4px 20px rgba(229,56,136,0.08)",
+          transition: "box-shadow 0.25s ease, transform 0.25s ease",
+          "&:hover": {
+            boxShadow: "0 10px 32px rgba(229,56,136,0.18)",
+            transform: "translateY(-3px)",
+          },
+          position: "relative",
+          display: "flex",
+          flexDirection: "column",
+        }}
+      >
+        <Box
+          sx={{
+            height: 4,
+            background: `linear-gradient(90deg, ${PRIMARY_PINK}, #F9A8D4, ${PRIMARY_PINK})`,
+            backgroundSize: "200% 100%",
+            animation: "shimmer 3s linear infinite",
+            "@keyframes shimmer": {
+              "0%": { backgroundPosition: "0% 0%" },
+              "100%": { backgroundPosition: "200% 0%" },
+            },
+          }}
+        />
+
+        <Box sx={{ p: 3, flexGrow: 1 }}>
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "flex-start",
+              mb: 2,
+            }}
+          >
+            <Typography
+              sx={{
+                fontWeight: 800,
+                color: "#1a0d13",
+                fontSize: "1.05rem",
+                lineHeight: 1.3,
+                flex: 1,
+                pr: 1,
+              }}
+            >
+              {ticket.Event.title}
+            </Typography>
+            <Chip
+              icon={<LocalActivityIcon sx={{ fontSize: "14px !important" }} />}
+              label='Activo'
+              size='small'
+              sx={{
+                bgcolor: "rgba(229,56,136,0.1)",
+                color: PRIMARY_PINK,
+                fontWeight: 600,
+                fontSize: "10px",
+                height: 24,
+                border: `1px solid ${BORDER_PINK}`,
+                flexShrink: 0,
+              }}
+            />
+          </Box>
+
+          <Box
+            sx={{ display: "flex", flexDirection: "column", gap: 0.8, mb: 2.5 }}
+          >
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+              <AccessTimeIcon
+                sx={{ fontSize: 15, color: PRIMARY_PINK, flexShrink: 0 }}
+              />
+              <Typography sx={{ fontSize: "13px", color: "#5a3a47" }}>
+                {FormatDate(ticket.Event.startDate)}
+              </Typography>
+            </Box>
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+              <LocationOnIcon
+                sx={{ fontSize: 15, color: PRIMARY_PINK, flexShrink: 0 }}
+              />
+              <Typography
+                sx={{ fontSize: "13px", color: "#5a3a47", lineHeight: 1.3 }}
+              >
+                {ticket.Event.location}
+              </Typography>
+            </Box>
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+              <ConfirmationNumberIcon
+                sx={{ fontSize: 15, color: PRIMARY_PINK, flexShrink: 0 }}
+              />
+              <Typography
+                sx={{
+                  fontSize: "12px",
+                  color: "#5a3a47",
+                  fontFamily: "monospace",
+                  fontWeight: 700,
+                  letterSpacing: "0.5px",
+                }}
+              >
+                {ticket.code}
+              </Typography>
+            </Box>
+          </Box>
+
+          <Box
+            sx={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 0.5,
+              bgcolor: "rgba(229,56,136,0.08)",
+              border: `1px solid ${BORDER_PINK}`,
+              borderRadius: "8px",
+              px: 1.5,
+              py: 0.5,
+              mb: 2.5,
+            }}
+          >
+            <Typography
+              sx={{ fontSize: "13px", color: PRIMARY_PINK, fontWeight: 700 }}
+            >
+              {formatMexicanCurrency(Number(ticket.Event.price))}
+            </Typography>
+          </Box>
+
+          <Box sx={{ display: "flex", gap: 1.2 }}>
+            <Button
+              fullWidth
+              variant='contained'
+              size='small'
+              startIcon={
+                isDownloading ? (
+                  <CircularProgress size={14} sx={{ color: "#fff" }} />
+                ) : (
+                  <DownloadIcon />
+                )
+              }
+              disabled={isDownloading}
+              onClick={() => downloadTicket(ticket, usuario)}
+              sx={{
+                bgcolor: PRIMARY_PINK,
+                "&:hover": { bgcolor: DARK_PINK },
+                "&:disabled": {
+                  bgcolor: "rgba(229,56,136,0.4)",
+                  color: "#fff",
+                },
+                textTransform: "none",
+                fontWeight: 600,
+                fontSize: "13px",
+                borderRadius: "10px",
+                boxShadow: "0 4px 12px rgba(229,56,136,0.3)",
+              }}
+            >
+              {isDownloading ? "Generando..." : "Descargar"}
+            </Button>
+
+            <Button
+              fullWidth
+              variant='outlined'
+              size='small'
+              startIcon={<CalendarMonthIcon />}
+              onClick={(e) => onCalendarOpen(e, ticket)}
+              sx={{
+                borderColor: BORDER_PINK,
+                color: PRIMARY_PINK,
+                "&:hover": {
+                  borderColor: PRIMARY_PINK,
+                  bgcolor: "rgba(229,56,136,0.05)",
+                },
+                textTransform: "none",
+                fontWeight: 600,
+                fontSize: "13px",
+                borderRadius: "10px",
+              }}
+            >
+              Calendario
+            </Button>
+          </Box>
+        </Box>
+      </Box>
+    </motion.div>
+  );
+};
 
 const UserTicketsCards = () => {
   const { usuario } = useContext(AuthContext);
-
   const {
     tickets,
     getTicketsByUser,
@@ -49,27 +314,50 @@ const UserTicketsCards = () => {
 
   const [page, setPage] = useState(1);
   const [rowsPerPage] = useState(10);
-
+  const [loading, setLoading] = useState(true);
+  const [downloadingId, setDownloadingId] = useState(null);
+  const [calendarLoadingId, setCalendarLoadingId] = useState(null);
   const [anchorEl, setAnchorEl] = useState(null);
   const [selectedTicket, setSelectedTicket] = useState(null);
-
-  const [loadingCalendar, setLoadingCalendar] = useState(false);
   const [snackbar, setSnackbar] = useState({
     open: false,
     message: "",
     severity: "success",
   });
 
-  // === Obtener boletos ===
   useEffect(() => {
-    if (usuario?.id) {
-      getTicketsByUser(usuario.id, page, rowsPerPage);
-    }
-  }, [usuario, page, rowsPerPage]);
+    if (!usuario?.id) return;
+    const fetchTickets = async () => {
+      setLoading(true);
+      try {
+        await getTicketsByUser(page, rowsPerPage);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchTickets();
+  }, [page, rowsPerPage]);
 
-  // === Manejo del menú ===
-  const handleCalendarMenuOpen = (event, ticket) => {
-    setAnchorEl(event.currentTarget);
+  const handleDownload = useCallback(
+    async (ticket, usuario) => {
+      setDownloadingId(ticket.id);
+      try {
+        await downloadTicket(ticket, usuario);
+      } catch {
+        setSnackbar({
+          open: true,
+          message: "Error al descargar el boleto",
+          severity: "error",
+        });
+      } finally {
+        setDownloadingId(null);
+      }
+    },
+    [downloadTicket],
+  );
+
+  const handleCalendarMenuOpen = (e, ticket) => {
+    setAnchorEl(e.currentTarget);
     setSelectedTicket(ticket);
   };
 
@@ -78,60 +366,43 @@ const UserTicketsCards = () => {
     setSelectedTicket(null);
   };
 
-  // === Añadir al calendario ===
   const handleAddToCalendar = async (provider) => {
     if (!selectedTicket) return;
-
-    setLoadingCalendar(true);
-
+    setCalendarLoadingId(selectedTicket.id);
     try {
       const calendarData = await getCalendarLinks(selectedTicket.id);
-
-      switch (provider) {
-        case "google":
-          window.open(calendarData.google, "_blank");
-          break;
-        case "apple":
-          window.open(calendarData.apple, "_blank");
-          break;
-        case "outlook":
-          window.open(calendarData.outlook, "_blank");
-          break;
-        case "yahoo":
-          window.open(calendarData.yahoo, "_blank");
-          break;
-        case "ics":
-          const link = document.createElement("a");
-          link.href = calendarData.ics;
-          link.download = `evento-${selectedTicket.Event.title
-            .toLowerCase()
-            .replace(/\s+/g, "-")}.ics`;
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link);
-          break;
-        default:
-          break;
+      if (provider === "ics") {
+        const link = document.createElement("a");
+        link.href = calendarData.ics;
+        link.download = `evento-${selectedTicket.Event.title.toLowerCase().replace(/\s+/g, "-")}.ics`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      } else {
+        const urls = {
+          google: calendarData.google,
+          apple: calendarData.apple,
+          outlook: calendarData.outlook,
+          yahoo: calendarData.yahoo,
+        };
+        window.open(urls[provider], "_blank");
       }
-
       setSnackbar({
         open: true,
-        message: "Acción realizada correctamente",
+        message: "¡Evento agregado al calendario!",
         severity: "success",
       });
-    } catch (err) {
+    } catch {
       setSnackbar({
         open: true,
         message: "Error al agregar al calendario",
         severity: "error",
       });
     } finally {
-      setLoadingCalendar(false);
+      setCalendarLoadingId(null);
       handleCalendarMenuClose();
     }
   };
-
-  const handleCloseSnackbar = () => setSnackbar({ ...snackbar, open: false });
 
   const handlePageChange = (newPage) => {
     if (
@@ -140,208 +411,154 @@ const UserTicketsCards = () => {
       newPage !== page
     ) {
       setPage(newPage);
-      window.scrollTo({ top: 1000, behavior: "smooth" });
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
   };
 
-  // === Si no hay tickets ===
+  if (loading) return <PinkSpinner />;
+
   if (!tickets || tickets.length === 0) {
     return (
-      <Typography
-        textAlign='center'
-        variant='h6'
-        sx={{ mt: 4, color: PRIMARY_PINK }}
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
       >
-        No tienes boletos vigentes 🥺
-      </Typography>
+        <Box
+          sx={{
+            textAlign: "center",
+            py: 8,
+            px: 4,
+            borderRadius: "20px",
+            background: "linear-gradient(135deg, #FFF5FA, #FFE3EE)",
+            border: `1px dashed ${BORDER_PINK}`,
+          }}
+        >
+          <Typography sx={{ fontSize: "3rem", mb: 2 }}>🎟️</Typography>
+          <Typography
+            variant='h6'
+            sx={{ color: PRIMARY_PINK, fontWeight: 700, mb: 1 }}
+          >
+            Aún no tienes boletos
+          </Typography>
+          <Typography sx={{ color: "#9a6e7e", fontSize: "14px" }}>
+            Cuando compres un boleto aparecerá aquí para descargarlo cuando
+            quieras.
+          </Typography>
+        </Box>
+      </motion.div>
     );
   }
 
   return (
     <Box>
-      <Typography
-        variant='h5'
-        sx={{ color: PRIMARY_PINK, fontWeight: 600, mb: 3 }}
+      <motion.div
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
       >
-        Cada acceso 🎟️ es una semilla para seguir floreciendo 🌸
-      </Typography>
+        <Box sx={{ mb: 4 }}>
+          <Typography
+            variant='h5'
+            sx={{ color: "#1a0d13", fontWeight: 800, mb: 0.5 }}
+          >
+            Mis boletos 🌸
+          </Typography>
+          <Typography sx={{ color: "#9a6e7e", fontSize: "14px" }}>
+            {ticketsPagination?.totalItems ?? tickets.length} boleto
+            {tickets.length !== 1 ? "s" : ""} activo
+            {tickets.length !== 1 ? "s" : ""}
+          </Typography>
+        </Box>
+      </motion.div>
 
-      <Grid container spacing={3}>
-        {tickets.map((ticket) => (
-          <Grid size={{ xs: 12, sm: 6, lg: 4 }} key={ticket.id}>
-            <Paper
-              component={motion.div}
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.35 }}
-              sx={{
-                p: 3,
-                borderRadius: "18px",
-                background: "linear-gradient(135deg,#FFF5FA,#FFE3EE)",
-                boxShadow: "0 6px 14px rgba(229,56,136,0.15)",
-                display: "flex",
-                flexDirection: { xs: "column", md: "row" },
-                gap: 3,
-                position: "relative",
-              }}
-            >
-              <Grid container spacing={2}>
-                <Grid size={{ xs: 12 }}>
-                  {/* INFORMACIÓN */}
-                  <Box sx={{ flexGrow: 1 }}>
-                    <Typography
-                      sx={{
-                        fontWeight: 700,
-                        color: PRIMARY_PINK,
-                        fontSize: "1.2rem",
-                      }}
-                    >
-                      {ticket.Event.title}
-                    </Typography>
-
-                    <Typography sx={{ color: "#444", mt: 1 }}>
-                      📅 Fecha: <b>{FormatDate(ticket.Event.startDate)}</b>
-                    </Typography>
-
-                    <Typography sx={{ color: "#444" }}>
-                      📍 Ubicación: <b>{ticket.Event.location}</b>
-                    </Typography>
-
-                    <Typography sx={{ color: "#444" }}>
-                      💵 Precio:{" "}
-                      <b>{formatMexicanCurrency(Number(ticket.Event.price))}</b>
-                    </Typography>
-
-                    <Typography
-                      sx={{
-                        color: "#333",
-                        mt: 1,
-                        fontFamily: "monospace",
-                        fontWeight: 700,
-                      }}
-                    >
-                      🎟️ Código: {ticket.code}
-                    </Typography>
-                  </Box>
-                </Grid>
-
-                {/* ACCIONES */}
-                <Grid size={12}>
-                  <Box
-                    sx={{
-                      minWidth: 180,
-                      display: "flex",
-                      flexDirection: "column",
-                      justifyContent: "center",
-                      gap: 1.2,
-                    }}
-                  >
-                    {/* Descargar */}
-                    <Button
-                      variant='contained'
-                      sx={{
-                        bgcolor: PRIMARY_PINK,
-                        "&:hover": { bgcolor: "#C52F75" },
-                        textTransform: "none",
-                      }}
-                      startIcon={<ConfirmationNumberIcon />}
-                      onClick={() => downloadTicket(ticket, usuario)}
-                    >
-                      Descargar
-                    </Button>
-
-                    {/* Calendario */}
-                    <Button
-                      variant='outlined'
-                      sx={{
-                        borderColor: PRIMARY_PINK,
-                        color: PRIMARY_PINK,
-                        "&:hover": {
-                          borderColor: "#C52F75",
-                          bgcolor: "rgba(229,56,136,0.05)",
-                        },
-                        textTransform: "none",
-                      }}
-                      startIcon={
-                        loadingCalendar && selectedTicket?.id === ticket.id ? (
-                          <CircularProgress
-                            size={16}
-                            sx={{ color: PRIMARY_PINK }}
-                          />
-                        ) : (
-                          <CalendarMonthIcon />
-                        )
-                      }
-                      onClick={(e) => handleCalendarMenuOpen(e, ticket)}
-                      disabled={loadingCalendar}
-                    >
-                      Calendario
-                    </Button>
-                  </Box>
-                </Grid>
-              </Grid>
-            </Paper>
-          </Grid>
-        ))}
+      <Grid container spacing={2.5}>
+        <AnimatePresence>
+          {tickets.map((ticket, index) => (
+            <Grid size={{ xs: 12, sm: 6, lg: 4 }} key={ticket.id}>
+              <TicketCard
+                ticket={ticket}
+                usuario={usuario}
+                downloadTicket={handleDownload}
+                onCalendarOpen={handleCalendarMenuOpen}
+                downloadingId={downloadingId}
+                index={index}
+              />
+            </Grid>
+          ))}
+        </AnimatePresence>
       </Grid>
 
-      <Box sx={{ mt: 3, padding: "10px" }}>
-        <Pagination
-          currentPage={ticketsPagination.currentPage}
-          totalPages={ticketsPagination.totalPages}
-          onPageChange={handlePageChange}
-        />
-      </Box>
+      {ticketsPagination?.totalPages > 1 && (
+        <Box sx={{ mt: 4 }}>
+          <Pagination
+            currentPage={ticketsPagination.currentPage}
+            totalPages={ticketsPagination.totalPages}
+            onPageChange={handlePageChange}
+          />
+        </Box>
+      )}
 
-      {/* MENU CALENDAR */}
       <Menu
         anchorEl={anchorEl}
         open={Boolean(anchorEl)}
         onClose={handleCalendarMenuClose}
+        PaperProps={{
+          sx: {
+            borderRadius: "14px",
+            border: `1px solid ${BORDER_PINK}`,
+            boxShadow: "0 8px 24px rgba(229,56,136,0.15)",
+            mt: 1,
+          },
+        }}
       >
-        <MenuItem onClick={() => handleAddToCalendar("google")}>
-          <ListItemIcon>
-            <GoogleIcon />
-          </ListItemIcon>
-          <ListItemText>Google Calendar</ListItemText>
-        </MenuItem>
-
-        <MenuItem onClick={() => handleAddToCalendar("apple")}>
-          <ListItemIcon>
-            <AppleIcon />
-          </ListItemIcon>
-          <ListItemText>Apple Calendar</ListItemText>
-        </MenuItem>
-
-        <MenuItem onClick={() => handleAddToCalendar("outlook")}>
-          <ListItemIcon>
-            <EmailIcon />
-          </ListItemIcon>
-          <ListItemText>Outlook</ListItemText>
-        </MenuItem>
-
-        <MenuItem onClick={() => handleAddToCalendar("yahoo")}>
-          <ListItemIcon>
-            <EventAvailableIcon />
-          </ListItemIcon>
-          <ListItemText>Yahoo Calendar</ListItemText>
-        </MenuItem>
-
-        <MenuItem onClick={() => handleAddToCalendar("ics")}>
-          <ListItemIcon>
-            <DownloadIcon />
-          </ListItemIcon>
-          <ListItemText>Descargar archivo .ics</ListItemText>
-        </MenuItem>
+        {[
+          { key: "google", icon: <GoogleIcon />, label: "Google Calendar" },
+          { key: "apple", icon: <AppleIcon />, label: "Apple Calendar" },
+          { key: "outlook", icon: <EmailIcon />, label: "Outlook" },
+          {
+            key: "yahoo",
+            icon: <EventAvailableIcon />,
+            label: "Yahoo Calendar",
+          },
+          { key: "ics", icon: <DownloadIcon />, label: "Descargar .ics" },
+        ].map(({ key, icon, label }) => (
+          <MenuItem
+            key={key}
+            onClick={() => handleAddToCalendar(key)}
+            disabled={calendarLoadingId === selectedTicket?.id}
+            sx={{
+              "&:hover": { bgcolor: LIGHT_PINK },
+              borderRadius: "8px",
+              mx: 0.5,
+            }}
+          >
+            <ListItemIcon sx={{ color: PRIMARY_PINK, minWidth: 36 }}>
+              {calendarLoadingId === selectedTicket?.id ? (
+                <CircularProgress size={18} sx={{ color: PRIMARY_PINK }} />
+              ) : (
+                icon
+              )}
+            </ListItemIcon>
+            <ListItemText
+              primaryTypographyProps={{ fontSize: "13px", fontWeight: 500 }}
+            >
+              {label}
+            </ListItemText>
+          </MenuItem>
+        ))}
       </Menu>
 
-      {/* SNACKBAR */}
       <Snackbar
         open={snackbar.open}
         autoHideDuration={4000}
-        onClose={handleCloseSnackbar}
+        onClose={() => setSnackbar((s) => ({ ...s, open: false }))}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
       >
-        <Alert severity={snackbar.severity} onClose={handleCloseSnackbar}>
+        <Alert
+          severity={snackbar.severity}
+          onClose={() => setSnackbar((s) => ({ ...s, open: false }))}
+          sx={{ borderRadius: "12px" }}
+        >
           {snackbar.message}
         </Alert>
       </Snackbar>

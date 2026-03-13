@@ -77,8 +77,8 @@ const UserState = ({ children }) => {
       })
       .catch((error) => console.error(error));
   };
-  const getTicketsByUser = (userId, page, limit) => {
-    const url = `/tickets/byUser/${userId}?page=${page}&limit=${limit}`;
+  const getTicketsByUser = (page, limit) => {
+    const url = `/tickets/byUser?page=${page}&limit=${limit}`;
     MethodGet(url)
       .then((res) => {
         dispatch({
@@ -95,17 +95,31 @@ const UserState = ({ children }) => {
       })
       .catch((error) => console.error(error));
   };
-  const downloadTicket = (ticket, usuarioId) => {
-    let url = `/tickets/download?ticketId=${ticket.id}&userId=${usuarioId.id}`;
+  const downloadTicket = async (ticket, usuarioId) => {
+    // Mostrar spinner mientras carga
+    Swal.fire({
+      title: "Preparando tu boleto...",
+      text: "Esto puede tomar unos segundos",
+      allowOutsideClick: false,
+      allowEscapeKey: false,
+      didOpen: () => {
+        Swal.showLoading();
+      },
+    });
 
-    clienteAxios
-      .get(url)
-      .then((res) => {
-        window.open(res.data.downloadUrl, "_blank");
-      })
-      .catch((error) => {
-        console.log(error, "ocurrio un error al descargar el boleto");
+    try {
+      const res = await clienteAxios.get(`/tickets/download/${ticket.id}`);
+      Swal.close();
+      window.open(res.data.downloadUrl, "_blank");
+    } catch (error) {
+      console.error("Error al descargar el boleto:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Error al descargar",
+        text: "No pudimos obtener tu boleto. Intenta de nuevo.",
+        confirmButtonColor: "#ec4899",
       });
+    }
   };
   const getCalendarLinks = async (ticketId) => {
     try {
