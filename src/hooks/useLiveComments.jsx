@@ -15,7 +15,7 @@ export const useLiveComments = (liveId) => {
 
     const handleLoad = (initialComments = []) => {
       // Tomamos los últimos 14
-      setComments(initialComments.slice(-14));
+      setComments(initialComments.slice(-19));
     };
 
     const handleNew = (comment) => {
@@ -25,7 +25,7 @@ export const useLiveComments = (liveId) => {
         if (exists) return prev;
 
         const next = [...prev, comment];
-        return next.slice(-14); // Mantenemos la ventana de 14
+        return next.slice(-19); // Mantenemos la ventana de 14
       });
     };
 
@@ -46,7 +46,7 @@ export const useLiveComments = (liveId) => {
       socket.off("connect", handleReconnect);
     };
     // getSocket() en dependencias asegura que si la instancia cambia, el hook se refresca
-  }, [liveId, getSocket()]);
+  }, [liveId]);
 
   const sendComment = (message) => {
     const socket = getSocket();

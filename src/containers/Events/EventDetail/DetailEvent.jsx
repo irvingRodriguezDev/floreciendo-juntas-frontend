@@ -7,6 +7,7 @@ import {
   Chip,
   Divider,
   Grid,
+  TextField,
   Typography,
 } from "@mui/material";
 import Layout from "../../../components/Layout/Layout";
@@ -18,12 +19,43 @@ import AuthContext from "../../../context/Auth/AuthContext";
 import MethodGet from "../../../config/Service";
 import PinkSpinner from "../../../components/Loading/PinkSpinner";
 import { formatMexicanCurrency } from "../../../utils/FormatCurrency";
-
+const inputStyles = {
+  mb: 2,
+  "& .MuiOutlinedInput-root": {
+    borderRadius: "12px",
+    "& fieldset": { borderColor: "rgba(216,46,136,0.3)" },
+    "&:hover fieldset": { borderColor: "#D82E7A" },
+    "&.Mui-focused fieldset": { borderColor: "#D82E7A" },
+  },
+  "& .MuiInputBase-input": { color: "black" },
+  "& .MuiInputLabel-root": { color: "#D82E7A" },
+  "& .MuiInputLabel-root.Mui-focused": { color: "#D82E7A" },
+};
 const DetailEvent = () => {
   const { id } = useParams();
   const { event, getEventById, buyTicket } = useContext(EventsContext);
   const { usuario, autenticado } = useContext(AuthContext);
   const [similarEvents, setSimilarEvents] = useState(null);
+  // Estado
+  const [quantity, setQuantity] = useState(1);
+
+  // Handler con validación estricta
+  const handleChangeQuantity = (e) => {
+    const value = e.target.value;
+
+    // Permitir campo vacío mientras escribe
+    if (value === "") {
+      setQuantity("");
+      return;
+    }
+
+    const parsed = parseInt(value, 10);
+
+    // Rechazar si no es número entero o está fuera de rango
+    if (isNaN(parsed) || parsed < 1 || parsed > 10) return;
+
+    setQuantity(parsed);
+  };
 
   useEffect(() => {
     getEventById(id);
@@ -40,6 +72,7 @@ const DetailEvent = () => {
         eventId: id,
         buyerName: usuario?.name ?? "",
         buyerEmail: usuario?.email ?? "",
+        quantity: quantity,
       }
     : {};
 
@@ -177,21 +210,39 @@ const DetailEvent = () => {
               </Typography>
 
               {autenticado ? (
-                <Button
-                  fullWidth
-                  onClick={() => buyTicket(data)}
-                  sx={{
-                    bgcolor: "#E53888",
-                    color: "white",
-                    borderRadius: "30px",
-                    py: 1.4,
-                    fontWeight: 700,
-                    textTransform: "none",
-                    "&:hover": { bgcolor: "#d12a74" },
-                  }}
-                >
-                  Comprar boleto
-                </Button>
+                <>
+                  <Box sx={{ padding: "10px" }}>
+                    <TextField
+                      type='number' // 🔑 Cambia a number
+                      onChange={handleChangeQuantity}
+                      fullWidth
+                      variant='outlined'
+                      label='Cantidad de boletos'
+                      value={quantity} // 🔑 Cambia defaultValue → value (controlled)
+                      inputProps={{
+                        min: 1,
+                        max: 10,
+                        step: 1,
+                      }}
+                      sx={inputStyles}
+                    />
+                  </Box>
+                  <Button
+                    fullWidth
+                    onClick={() => buyTicket(data)}
+                    sx={{
+                      bgcolor: "#E53888",
+                      color: "white",
+                      borderRadius: "30px",
+                      py: 1.4,
+                      fontWeight: 700,
+                      textTransform: "none",
+                      "&:hover": { bgcolor: "#d12a74" },
+                    }}
+                  >
+                    Comprar boleto
+                  </Button>
+                </>
               ) : (
                 <Link to='/iniciar-sesion'>
                   <Button

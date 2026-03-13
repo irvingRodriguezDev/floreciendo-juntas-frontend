@@ -7,45 +7,54 @@ import {
   Typography,
   useMediaQuery,
   useTheme,
+  Tooltip,
 } from "@mui/material";
 import FullscreenIcon from "@mui/icons-material/Fullscreen";
 import FullscreenExitIcon from "@mui/icons-material/FullscreenExit";
 import VolumeOffIcon from "@mui/icons-material/VolumeOff";
 import VolumeUpIcon from "@mui/icons-material/VolumeUp";
-import LiveCommentsOverlay from "./LiveCommentsOverlay";
-import { getSocket } from "../../socket";
 import PeopleIcon from "@mui/icons-material/People";
-const PlayerCliente = ({ playbackUrl, liveId }) => {
+import ChatBubbleOutlineIcon from "@mui/icons-material/ChatBubbleOutline";
+import ChatBubbleIcon from "@mui/icons-material/ChatBubble";
+import { getSocket } from "../../socket";
+
+const PlayerCliente = ({
+  playbackUrl,
+  liveId,
+  isFullscreen,
+  onFullscreen,
+  commentsVisible,
+  onToggleComments,
+}) => {
   const videoRef = useRef(null);
-  const containerRef = useRef(null);
   const ivsPlayerRef = useRef(null);
+
   const [viewerCount, setViewerCount] = useState(0);
   const [loading, setLoading] = useState(true);
-  const [isFullscreen, setIsFullscreen] = useState(false);
   const [videoOrientation, setVideoOrientation] = useState("landscape");
   const [muted, setMuted] = useState(false);
 
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
+  // ── IVS + Plyr ──────────────────────────────────────────────────────────
   useEffect(() => {
     let plyrPlayer = null;
     const socket = getSocket();
+
     const initPlayer = () => {
       if (!window.IVSPlayer || !videoRef.current) return;
-
       try {
         const ivsPlayer = window.IVSPlayer.create();
         ivsPlayerRef.current = ivsPlayer;
+
         if (socket) {
-          socket.on("live_viewer_count", (count) => {
-            setViewerCount(count);
-          });
+          socket.on("live_viewer_count", (count) => setViewerCount(count));
         }
+
         ivsPlayer.attachHTMLVideoElement(videoRef.current);
         ivsPlayer.load(playbackUrl);
-
-        ivsPlayer.setMuted(false); // 🔊 audio activo
+        ivsPlayer.setMuted(false);
         ivsPlayer.setVolume(1.0);
         ivsPlayer.play();
 
@@ -67,28 +76,15 @@ const PlayerCliente = ({ playbackUrl, liveId }) => {
 
         setLoading(false);
       } catch (err) {
-        console.error(err);
+        console.error("IVS Player error:", err);
       }
     };
-
-    const handleFSChange = () => {
-      setIsFullscreen(
-        !!(document.fullscreenElement || document.webkitFullscreenElement),
-      );
-    };
-
-    document.addEventListener("fullscreenchange", handleFSChange);
-    document.addEventListener("webkitfullscreenchange", handleFSChange);
 
     const timer = setTimeout(initPlayer, 500);
 
     return () => {
       clearTimeout(timer);
-      document.removeEventListener("fullscreenchange", handleFSChange);
-      document.removeEventListener("webkitfullscreenchange", handleFSChange);
-      if (socket) {
-        socket.off("live_viewer_count"); // Dejar de escuchar al salir
-      }
+      if (socket) socket.off("live_viewer_count");
       if (plyrPlayer) plyrPlayer.destroy();
       if (ivsPlayerRef.current) {
         ivsPlayerRef.current.pause();
@@ -97,170 +93,202 @@ const PlayerCliente = ({ playbackUrl, liveId }) => {
     };
   }, [playbackUrl]);
 
+  // ── Handlers ────────────────────────────────────────────────────────────
   const toggleMute = () => {
-    const ivsPlayer = ivsPlayerRef.current;
-    if (!ivsPlayer) return;
-
-    ivsPlayer.setMuted(!muted);
-    setMuted(!muted);
+    const player = ivsPlayerRef.current;
+    if (!player) return;
+    player.setMuted(!muted);
+    setMuted((prev) => !prev);
   };
 
-  const toggleFullscreen = (e) => {
-    if (e) {
-      e.preventDefault();
-      e.stopPropagation();
+  const handleFullscreen = (e) => {
+    e?.preventDefault();
+    e?.stopPropagation();
+    if (isMobile) {
+      const video = videoRef.current;
+      if (!video) return;
+      if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+        video.requestFullscreen?.() ?? video.webkitEnterFullscreen?.();
+      } else {
+        document.exitFullscreen?.() ?? document.webkitExitFullscreen?.();
+      }
+      return;
     }
-    const elem = isMobile ? videoRef.current : containerRef.current;
-    if (!elem) return;
-
-    if (!document.fullscreenElement && !document.webkitFullscreenElement) {
-      elem.requestFullscreen
-        ? elem.requestFullscreen()
-        : elem.webkitEnterFullscreen();
-    } else {
-      document.exitFullscreen
-        ? document.exitFullscreen()
-        : document.webkitExitFullscreen();
-    }
+    onFullscreen?.();
   };
 
+  // ── Derivados ────────────────────────────────────────────────────────────
   const isPortraitMobile = isMobile && videoOrientation === "portrait";
-  const isChatBelow =
-    isMobile && videoOrientation === "landscape" && !isFullscreen;
+  const isPortraitVideo = videoOrientation === "portrait";
+  const boxAspectRatio = isFullscreen
+    ? "unset"
+    : isPortraitMobile
+      ? "9/16"
+      : "16/9";
 
+  // Cuánto espacio necesita la esquina derecha según lo que está visible
+  // [fullscreen_btn=36] + gap=8 + [viewers_pill~=70] + gap=8 = ~122
+  // Si además hay toggle de comentarios: + 36 + 8 = ~166
+  const rightOffsetViewers = isFullscreen ? 166 : 56;
+
+  // ── Estilos compartidos de los botones HUD ───────────────────────────────
+  const hudBtn = {
+    color: "white",
+    bgcolor: "rgba(0,0,0,0.55)",
+    border: "1px solid rgba(255,255,255,0.15)",
+    "&:hover": { bgcolor: "rgba(0,0,0,0.75)" },
+  };
+
+  // ── Render ───────────────────────────────────────────────────────────────
   return (
     <Box
       sx={{
-        display: "flex",
-        flexDirection: "column",
+        position: "relative",
         width: "100%",
+        aspectRatio: boxAspectRatio,
+        height: isFullscreen ? "100vh" : "auto",
         bgcolor: "#000",
+        overflow: "hidden",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
       }}
     >
-      <Box
-        ref={containerRef}
-        sx={{
-          position: "relative",
-          width: "100%",
-          aspectRatio: isPortraitMobile ? "9/16" : "16/9",
-          bgcolor: "#000",
-          overflow: "hidden",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
-        {!loading && (
-          <>
-            <Box
-              sx={{
-                position: "absolute",
-                top: 10,
-                right: 70, // Ajustado según tu layout
-                zIndex: 1250,
-                display: "flex",
-                alignItems: "center",
-                gap: 1,
-                px: 1.5,
-                py: 0.5,
-                borderRadius: "20px", // Bordes redondeados tipo píldora
-                bgcolor: "rgba(0, 0, 0, 0.5)",
-                backdropFilter: "blur(8px)", // Efecto de desenfoque de fondo
-                border: "1px solid rgba(255, 255, 255, 0.2)", // Borde sutil
-                boxShadow: "0px 4px 10px rgba(0,0,0,0.3)",
-                transition: "all 0.3s ease",
-              }}
-            >
-              <PeopleIcon
-                sx={{
-                  fontSize: 28,
-                  opacity: 0.5,
-                  color: "#fff", // Rojo vibrante para resaltar el "Vivo"
-                }}
-              />
+      {/* Video */}
+      <div key={playbackUrl} style={{ width: "100%", height: "100%" }}>
+        <video
+          ref={videoRef}
+          playsInline
+          autoPlay
+          style={{
+            width: "100%",
+            height: "100%",
+            objectFit: isFullscreen || isPortraitMobile ? "cover" : "contain",
+            transform: isPortraitVideo && isMobile ? "scale(1.7)" : "scale(1)",
+            backgroundColor: "black",
+          }}
+        />
+      </div>
 
-              <Typography
-                sx={{
-                  color: "white",
-                  fontSize: "0.85rem",
-                  fontWeight: "700",
-                  fontFamily: "Roboto, sans-serif",
-                  letterSpacing: "0.5px",
-                  lineHeight: 1,
-                  opacity: 0.5,
-                }}
-              >
-                {viewerCount.toLocaleString()}
-              </Typography>
-            </Box>
-            <IconButton
-              onClick={toggleFullscreen}
-              sx={{
-                position: "absolute",
-                top: 10,
-                right: 10,
-                zIndex: 1200,
-                color: "white",
-                bgcolor: "rgba(0,0,0,0.5)",
-              }}
-            >
-              {isFullscreen ? <FullscreenExitIcon /> : <FullscreenIcon />}
-            </IconButton>
+      {/* ── HUD — solo cuando cargó ── */}
+      {!loading && (
+        <>
+          {/* ── Columna izquierda (top: mute / abajo: toggle comentarios) ── */}
 
+          {/* Mute */}
+          <Tooltip
+            title={muted ? "Activar sonido" : "Silenciar"}
+            placement='right'
+          >
             <IconButton
               onClick={toggleMute}
+              size='small'
               sx={{
+                ...hudBtn,
                 position: "absolute",
                 top: 10,
                 left: 10,
                 zIndex: 1200,
-                color: "white",
-                bgcolor: "rgba(0,0,0,0.5)",
               }}
             >
-              {muted ? <VolumeOffIcon /> : <VolumeUpIcon />}
+              {muted ? (
+                <VolumeOffIcon fontSize='small' />
+              ) : (
+                <VolumeUpIcon fontSize='small' />
+              )}
             </IconButton>
-          </>
-        )}
+          </Tooltip>
 
-        <div key={playbackUrl} style={{ width: "100%", height: "100%" }}>
-          <video
-            ref={videoRef}
-            playsInline
-            autoPlay
-            style={{
-              width: "100%",
-              height: "100%",
-              objectFit: isPortraitMobile ? "cover" : "contain",
-              transform:
-                videoOrientation === "portrait" ? "scale(1.7)" : "scale(1)",
-              backgroundColor: "black",
-            }}
-          />
-        </div>
+          {/* Toggle comentarios — debajo de la bocina, solo fullscreen desktop */}
+          {isFullscreen && !isMobile && (
+            <Tooltip
+              title={
+                commentsVisible ? "Ocultar comentarios" : "Mostrar comentarios"
+              }
+              placement='right'
+            >
+              <IconButton
+                onClick={onToggleComments}
+                size='small'
+                sx={{
+                  ...hudBtn,
+                  position: "absolute",
+                  top: 54, // 10 (top) + 36 (botón) + 8 (gap)
+                  left: 10,
+                  zIndex: 1200,
+                  ...(commentsVisible && {
+                    bgcolor: "rgba(229,56,136,0.25)",
+                    borderColor: "rgba(229,56,136,0.4)",
+                  }),
+                }}
+              >
+                {commentsVisible ? (
+                  <ChatBubbleIcon sx={{ fontSize: 16 }} />
+                ) : (
+                  <ChatBubbleOutlineIcon sx={{ fontSize: 16 }} />
+                )}
+              </IconButton>
+            </Tooltip>
+          )}
 
-        {!loading && (!isChatBelow || isFullscreen) && (
+          {/* ── Columna derecha (viewers + fullscreen) ── */}
+
+          {/* Viewers — esquina superior derecha */}
           <Box
             sx={{
               position: "absolute",
-              inset: 0,
-              zIndex: 10,
-              pointerEvents: "none",
+              top: 10,
+              right: 54, // deja espacio al botón fullscreen (36 + 8 + 10)
+              zIndex: 1250,
               display: "flex",
-              flexDirection: "column",
-              justifyContent: "flex-end",
-              pb: isPortraitMobile ? 4 : 0,
+              alignItems: "center",
+              gap: 0.75,
+              px: 1.5,
+              py: 0.5,
+              borderRadius: "20px",
+              bgcolor: "rgba(0,0,0,0.55)",
+              border: "1px solid rgba(255,255,255,0.15)",
             }}
           >
-            <LiveCommentsOverlay liveId={liveId} isMobile={isMobile} />
+            <PeopleIcon sx={{ fontSize: 15, color: "rgba(255,255,255,0.6)" }} />
+            <Typography
+              sx={{
+                color: "rgba(255,255,255,0.7)",
+                fontSize: "0.78rem",
+                fontWeight: 600,
+                lineHeight: 1,
+              }}
+            >
+              {viewerCount.toLocaleString()}
+            </Typography>
           </Box>
-        )}
-      </Box>
 
-      {isChatBelow && !loading && (
-        <Box sx={{ height: "33vh", position: "relative" }}>
-          <LiveCommentsOverlay liveId={liveId} isMobile />
-        </Box>
+          {/* Fullscreen — esquina superior derecha */}
+          <Tooltip
+            title={
+              isFullscreen ? "Salir de pantalla completa" : "Pantalla completa"
+            }
+            placement='bottom'
+          >
+            <IconButton
+              onClick={handleFullscreen}
+              size='small'
+              sx={{
+                ...hudBtn,
+                position: "absolute",
+                top: 10,
+                right: 10,
+                zIndex: 1200,
+              }}
+            >
+              {isFullscreen ? (
+                <FullscreenExitIcon fontSize='small' />
+              ) : (
+                <FullscreenIcon fontSize='small' />
+              )}
+            </IconButton>
+          </Tooltip>
+        </>
       )}
     </Box>
   );
