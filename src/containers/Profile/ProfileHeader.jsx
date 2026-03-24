@@ -262,7 +262,7 @@ const ProfileMain = () => {
         loading={loading}
         handleCancelSubscription={handleCancelSubscription}
         // Pasamos la fecha para que el modal sea dinámico
-        expiryDate={usuario?.subscriptionDetails?.nextRenewal}
+        expiryDate={usuario?.subscriptionDetails?.next_renewal}
       />
 
       <ModalUpdateUser

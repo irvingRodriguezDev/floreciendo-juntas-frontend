@@ -148,7 +148,7 @@ const LiveDetalle = () => {
   }, []);
 
   // ── Comentarios ──
-  const { comments, sendComment } = useLiveComments(live?.id);
+  const { comments, sendComment, viewers, appViewers } = useLiveComments(id);
 
   // ── Acciones ──
   const handleFullscreen = () => {
@@ -303,6 +303,8 @@ const LiveDetalle = () => {
                     isFullscreen={isFullscreen}
                     onFullscreen={handleFullscreen}
                     onToggleComments={() => setCommentsVisible((prev) => !prev)}
+                    viewers={viewers}
+                    appViewers={appViewers}
                   />
                 </motion.div>
 
@@ -335,6 +337,7 @@ const LiveDetalle = () => {
               </Box>
 
               {/* Columna derecha: comentarios */}
+
               <LiveCommentsSidebar
                 liveId={live.id}
                 comments={comments}

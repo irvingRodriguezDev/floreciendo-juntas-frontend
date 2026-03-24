@@ -17,7 +17,7 @@ import PeopleIcon from "@mui/icons-material/People";
 import ChatBubbleOutlineIcon from "@mui/icons-material/ChatBubbleOutline";
 import ChatBubbleIcon from "@mui/icons-material/ChatBubble";
 import { getSocket } from "../../socket";
-
+import MethodGet from "../../config/Service";
 const PlayerCliente = ({
   playbackUrl,
   liveId,
@@ -25,11 +25,13 @@ const PlayerCliente = ({
   onFullscreen,
   commentsVisible,
   onToggleComments,
+  viewers,
+  appViewers,
 }) => {
   const videoRef = useRef(null);
   const ivsPlayerRef = useRef(null);
 
-  const [viewerCount, setViewerCount] = useState(0);
+  // const [viewerCount, setViewerCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [videoOrientation, setVideoOrientation] = useState("landscape");
   const [muted, setMuted] = useState(false);
@@ -40,17 +42,12 @@ const PlayerCliente = ({
   // ── IVS + Plyr ──────────────────────────────────────────────────────────
   useEffect(() => {
     let plyrPlayer = null;
-    const socket = getSocket();
 
     const initPlayer = () => {
       if (!window.IVSPlayer || !videoRef.current) return;
       try {
         const ivsPlayer = window.IVSPlayer.create();
         ivsPlayerRef.current = ivsPlayer;
-
-        if (socket) {
-          socket.on("live_viewer_count", (count) => setViewerCount(count));
-        }
 
         ivsPlayer.attachHTMLVideoElement(videoRef.current);
         ivsPlayer.load(playbackUrl);
@@ -84,7 +81,6 @@ const PlayerCliente = ({
 
     return () => {
       clearTimeout(timer);
-      if (socket) socket.off("live_viewer_count");
       if (plyrPlayer) plyrPlayer.destroy();
       if (ivsPlayerRef.current) {
         ivsPlayerRef.current.pause();
@@ -234,34 +230,38 @@ const PlayerCliente = ({
           {/* ── Columna derecha (viewers + fullscreen) ── */}
 
           {/* Viewers — esquina superior derecha */}
-          <Box
-            sx={{
-              position: "absolute",
-              top: 10,
-              right: 54, // deja espacio al botón fullscreen (36 + 8 + 10)
-              zIndex: 1250,
-              display: "flex",
-              alignItems: "center",
-              gap: 0.75,
-              px: 1.5,
-              py: 0.5,
-              borderRadius: "20px",
-              bgcolor: "rgba(0,0,0,0.55)",
-              border: "1px solid rgba(255,255,255,0.15)",
-            }}
-          >
-            <PeopleIcon sx={{ fontSize: 15, color: "rgba(255,255,255,0.6)" }} />
-            <Typography
+          {appViewers > 0 && (
+            <Box
               sx={{
-                color: "rgba(255,255,255,0.7)",
-                fontSize: "0.78rem",
-                fontWeight: 600,
-                lineHeight: 1,
+                position: "absolute",
+                top: 10,
+                right: 54, // deja espacio al botón fullscreen (36 + 8 + 10)
+                zIndex: 1250,
+                display: "flex",
+                alignItems: "center",
+                gap: 0.75,
+                px: 1.5,
+                py: 0.5,
+                borderRadius: "20px",
+                bgcolor: "rgba(0,0,0,0.55)",
+                border: "1px solid rgba(255,255,255,0.15)",
               }}
             >
-              {viewerCount.toLocaleString()}
-            </Typography>
-          </Box>
+              <PeopleIcon
+                sx={{ fontSize: 15, color: "rgba(255,255,255,0.6)" }}
+              />
+              <Typography
+                sx={{
+                  color: "rgba(255,255,255,0.7)",
+                  fontSize: "0.78rem",
+                  fontWeight: 600,
+                  lineHeight: 1,
+                }}
+              >
+                {appViewers.toLocaleString()}
+              </Typography>
+            </Box>
+          )}
 
           {/* Fullscreen — esquina superior derecha */}
           <Tooltip

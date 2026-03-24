@@ -52,7 +52,7 @@ const DetailEvent = () => {
     const parsed = parseInt(value, 10);
 
     // Rechazar si no es número entero o está fuera de rango
-    if (isNaN(parsed) || parsed < 1 || parsed > 10) return;
+    if (isNaN(parsed) || parsed < 1 || parsed > 50) return;
 
     setQuantity(parsed);
   };
@@ -88,6 +88,65 @@ const DetailEvent = () => {
         }}
       >
         {/* HERO */}
+        {autenticado ? (
+          <>
+            <Box sx={{ padding: "10px" }}>
+              <TextField
+                type='number' // 🔑 Cambia a number
+                onChange={handleChangeQuantity}
+                fullWidth
+                variant='outlined'
+                label='Cantidad de boletos'
+                value={quantity} // 🔑 Cambia defaultValue → value (controlled)
+                inputProps={{
+                  min: 1,
+                  max: 50,
+                  step: 1,
+                }}
+                sx={inputStyles}
+              />
+            </Box>
+            <Button
+              fullWidth
+              onClick={() => buyTicket(data)}
+              sx={{
+                bgcolor: "#E53888",
+                color: "white",
+                borderRadius: "30px",
+                py: 1.4,
+                mb: "8px",
+                fontWeight: 700,
+                textTransform: "none",
+                "&:hover": { bgcolor: "#d12a74" },
+              }}
+            >
+              Comprar boleto
+            </Button>
+          </>
+        ) : (
+          <Box
+            sx={{
+              padding: "12px",
+              justifyContent: "center",
+            }}
+          >
+            <Link to='/iniciar-sesion'>
+              <Button
+                fullWidth
+                sx={{
+                  bgcolor: "#E53888",
+                  color: "white",
+                  borderRadius: "30px",
+                  py: 1.4,
+                  fontWeight: 700,
+                  textTransform: "none",
+                }}
+              >
+                Iniciar sesión para comprar
+              </Button>
+            </Link>
+          </Box>
+        )}
         <Box sx={{ maxWidth: 1200, mx: "auto", mb: 5 }}>
           <Box
             sx={{
@@ -103,8 +162,8 @@ const DetailEvent = () => {
               alt={event.title}
               sx={{
                 width: "100%",
-                height: { xs: 260, sm: 360, md: 460 },
-                aspectRatio: "16 / 10",
+                height: { xs: "auto", sm: "auto", md: "auto" },
+                // aspectRatio: "16 / 10",
               }}
             />
           </Box>
@@ -130,7 +189,65 @@ const DetailEvent = () => {
               <Chip label={`⏰ ${event.time}`} />
               <Chip label={`📍 ${event.location}`} />
             </Box>
-
+            {autenticado ? (
+              <>
+                <Box sx={{ padding: "10px" }}>
+                  <TextField
+                    type='number' // 🔑 Cambia a number
+                    onChange={handleChangeQuantity}
+                    fullWidth
+                    variant='outlined'
+                    label='Cantidad de boletos'
+                    value={quantity} // 🔑 Cambia defaultValue → value (controlled)
+                    inputProps={{
+                      min: 1,
+                      step: 1,
+                      max: 50,
+                    }}
+                    sx={inputStyles}
+                  />
+                </Box>
+                <Button
+                  fullWidth
+                  onClick={() => buyTicket(data)}
+                  sx={{
+                    bgcolor: "#E53888",
+                    color: "white",
+                    borderRadius: "30px",
+                    py: 1.4,
+                    mb: "8px",
+                    fontWeight: 700,
+                    textTransform: "none",
+                    "&:hover": { bgcolor: "#d12a74" },
+                  }}
+                >
+                  Comprar boleto
+                </Button>
+              </>
+            ) : (
+              <Box
+                sx={{
+                  padding: "12px",
+                  justifyContent: "center",
+                }}
+              >
+                <Link to='/iniciar-sesion'>
+                  <Button
+                    fullWidth
+                    sx={{
+                      bgcolor: "#E53888",
+                      color: "white",
+                      borderRadius: "30px",
+                      py: 1.4,
+                      fontWeight: 700,
+                      textTransform: "none",
+                    }}
+                  >
+                    Iniciar sesión para comprar
+                  </Button>
+                </Link>
+              </Box>
+            )}
             {/* DESCRIPCIÓN */}
             <Card
               sx={{
@@ -222,6 +339,7 @@ const DetailEvent = () => {
                       inputProps={{
                         min: 1,
                         step: 1,
+                        max: 50,
                       }}
                       sx={inputStyles}
                     />

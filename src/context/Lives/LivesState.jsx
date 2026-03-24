@@ -52,13 +52,21 @@ const LivesState = ({ children }) => {
         payload: { id: data.liveId, status: "ended" },
       });
     };
+    const onLiveError = (data) => {
+      dispatch({
+        type: LIVE_STATUS_UPDATE,
+        payload: { id: data.liveId, status: "error" },
+      });
+    };
 
     socket.on("live_started", onLiveStarted);
     socket.on("live_ended", onLiveEnded);
+    socket.on("live_error", onLiveError);
 
     return () => {
       socket.off("live_started", onLiveStarted);
       socket.off("live_ended", onLiveEnded);
+      socket.off("live_error", onLiveError);
     };
 
     // 💡 ESTA es la clave:
