@@ -25,7 +25,7 @@ const menuItems = [
   { name: "Lives", path: "/lives" },
   { name: "Salón", path: "/el-salon-de-tus-sueños" },
   { name: "Eventos", path: "/eventos" },
-  { name: "Tienda", path: "/tienda" },
+  { name: "Distribución", path: "/distribucion" },
 ];
 
 const DesktopNav = () => {

@@ -108,9 +108,49 @@ const CertificationsState = ({ children }) => {
 
   //Obtener Certificado
   const DownloadCertificate = async (id, name) => {
-    console.log(id, name, "los datos que llegan");
+    const { value: nombreCertificado, isConfirmed } = await Swal.fire({
+      title: "Personaliza tu Certificado",
+      text: "Ingresa el nombre que aparecerá (máximo 25 caracteres):",
+      input: "text",
+      inputValue: name.substring(0, 25), // Pre-cargamos el nombre limitado
+      inputPlaceholder: "Nombre y Apellido",
+      showCancelButton: true,
+      confirmButtonText: "Descargar",
+      cancelButtonText: "Cancelar",
+      confirmButtonColor: "#e91e63",
+      inputAttributes: {
+        maxlength: 25,
+        autocomplete: "off",
+        autocapitalize: "words",
+      },
+      // Agregamos el contador de caracteres dinámico
+      footer: '<b id="char-count">25</b> caracteres restantes',
+      didOpen: () => {
+        const input = Swal.getInput();
+        const footer = document.getElementById("char-count");
 
-    let url = `/certifications/download-certificate?certificationId=${id}`;
+        // Actualizar contador al escribir
+        input.addEventListener("input", () => {
+          const remaining = 25 - input.value.length;
+          footer.innerText = remaining;
+        });
+      },
+      // Validación de solo texto y longitud
+      inputValidator: (value) => {
+        if (!value) {
+          return "El nombre es obligatorio";
+        }
+        // Regex para permitir solo letras y espacios (incluye acentos y ñ)
+        const soloLetras = /^[a-zA-ZÀ-ÿ\s]+$/;
+        if (!soloLetras.test(value)) {
+          return "Solo se permiten letras y espacios";
+        }
+      },
+    });
+
+    if (!isConfirmed || !nombreCertificado) return;
+
+    // Iniciamos la carga
     Swal.fire({
       title: "Construyendo certificado...",
       text: "Por favor espera un momento.",
@@ -120,22 +160,95 @@ const CertificationsState = ({ children }) => {
         Swal.showLoading();
       },
     });
+
     try {
+      // Enviamos el nombre validado al backend
+      const url = `/certifications/download-certificate?certificationId=${id}&nameCertification=${encodeURIComponent(nombreCertificado)}`;
+
       const res = await clienteAxios.get(url, { responseType: "blob" });
-      fileDownload(res.data, `Certificado-${name}.PDF`);
+      fileDownload(res.data, `Certificado-${nombreCertificado}.pdf`);
+
       Swal.fire({
         icon: "success",
-        title: "¡Certificado generado correctamente!",
-        text: "Tu certificado ha sido descargado con éxito.",
+        title: "¡Certificado generado!",
+        text: "Se ha descargado correctamente.",
         confirmButtonText: "Aceptar",
+        confirmButtonColor: "#e91e63",
       });
     } catch (error) {
-      console.error("Ocurrió un error al descargar el certificado:", error);
+      console.error("Error al descargar:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "No pudimos generar el archivo. Intenta de nuevo.",
+        confirmButtonText: "Cerrar",
+      });
+    }
+  };
+  const DownloadDiploma = async (id, name) => {
+    const { value: nombreDiploma, isConfirmed } = await Swal.fire({
+      title: "Personaliza tu Diploma",
+      text: "Escribe el nombre tal cual deseas que aparezca impreso:",
+      input: "text",
+      inputValue: name.substring(0, 25),
+      inputPlaceholder: "Ej. María García",
+      showCancelButton: true,
+      confirmButtonText: "Generar ahora",
+      cancelButtonText: "Cancelar",
+      confirmButtonColor: "#e91e63",
+      inputAttributes: {
+        maxlength: 25,
+        autocomplete: "off",
+        autocapitalize: "words",
+      },
+      // Agregamos el contador de caracteres dinámico
+      footer: '<b id="char-count">25</b> caracteres restantes',
+      didOpen: () => {
+        const input = Swal.getInput();
+        const footer = document.getElementById("char-count");
+
+        // Actualizar contador al escribir
+        input.addEventListener("input", () => {
+          const remaining = 25 - input.value.length;
+          footer.innerText = remaining;
+        });
+      },
+    });
+
+    if (!isConfirmed || !nombreDiploma) return;
+
+    Swal.fire({
+      title: "Construyendo diploma...",
+      text: "Por favor espera un momento.",
+      allowOutsideClick: false,
+      allowEscapeKey: false,
+      didOpen: () => {
+        Swal.showLoading();
+      },
+    });
+
+    try {
+      // Usamos nombreDiploma que es el valor final validado
+      const url = `/certifications/download-diploma?certificationId=${id}&nombreDiploma=${encodeURIComponent(nombreDiploma)}`;
+
+      const res = await clienteAxios.get(url, { responseType: "blob" });
+
+      fileDownload(res.data, `diploma-${nombreDiploma}.pdf`);
+
+      Swal.fire({
+        icon: "success",
+        title: "¡Diploma generado correctamente!",
+        text: "Tu diploma ha sido descargado con éxito.",
+        confirmButtonText: "Aceptar",
+        confirmButtonColor: "#e91e63",
+      });
+    } catch (error) {
+      console.error("Ocurrió un error al descargar el diploma:", error);
 
       Swal.fire({
         icon: "error",
-        title: "Error al generar el certificado",
-        text: "Ocurrió un problema al descargar el certificado. Intenta nuevamente.",
+        title: "Error al generar el diploma",
+        text: "Ocurrió un problema al descargar el diploma. Intenta nuevamente.",
         confirmButtonText: "Cerrar",
       });
     }
@@ -150,6 +263,7 @@ const CertificationsState = ({ children }) => {
         detailsCertificationById,
         sendEntregable,
         DownloadCertificate,
+        DownloadDiploma,
       }}
     >
       {children}

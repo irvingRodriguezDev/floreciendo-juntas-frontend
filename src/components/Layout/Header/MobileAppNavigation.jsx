@@ -8,6 +8,7 @@ import FlowerIcon from "../../icons/FlowerIcon";
 import CommunityIcon from "../../icons/CommunityIcon";
 import PersonIcon from "../../icons/PersonIcon";
 import HomeIcon from "../../icons/HomeIcon";
+import DistributionIcon from "../../icons/DistributionIcon";
 const MobileAppNavigation = ({ cartCount, onOpenSalonCart }) => {
   const navigate = useNavigate();
 
@@ -72,9 +73,9 @@ const MobileAppNavigation = ({ cartCount, onOpenSalonCart }) => {
       <IconButton onClick={() => navigate("/eventos")}>
         <TicketsIcon width={30} />
       </IconButton>
-      {/* <IconButton onClick={() => navigate("/tienda")}>
-        <ShopIcon width={30} />
-      </IconButton> */}
+      <IconButton onClick={() => navigate("/distribucion")}>
+        <DistributionIcon width={30} />
+      </IconButton>
     </Paper>
   );
 };

@@ -36,6 +36,7 @@ import ShowPost from "../containers/Community/showPost/ShowPost";
 import CertificationDetail from "../components/Certifications/Details/CertificationDetail";
 import NotFound from "../containers/NotFound/Page404";
 import ModuleDetail from "../components/Certifications/Modules/ModuleDetail";
+import Distribution from "../containers/Distribution/Distribution";
 
 function AppRouter() {
   const { autenticado, usuarioAutenticado, cargando } = useContext(AuthContext);
@@ -105,6 +106,7 @@ function AppRouter() {
         <Route path='/detalle-curso/:id' element={<DetailsCourse />} />
         <Route path='/cursos/bysystem/:id' element={<BySystemId />} />
         <Route path='/success-payment-tickets' element={<Success />} />
+        <Route path='/distribucion' element={<Distribution />} />
         <Route
           path='/success-payment-partial'
           element={<SuccessSalonPayment />}

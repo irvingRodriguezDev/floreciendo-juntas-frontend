@@ -286,7 +286,7 @@ const VideoPlayer = ({
           }}
         >
           <Typography fontSize='1.8rem' fontWeight={700} color='#e53888'>
-            ¡Certificado disponible! 🌸
+            ¡Reconocimiento disponible! 🌸
           </Typography>
 
           <Button
@@ -302,7 +302,7 @@ const VideoPlayer = ({
             }}
             onClick={() => downloadCertificate(courseId, safeUserName || "")}
           >
-            Descargar certificado <SimCardDownloadIcon />
+            Descargar Reconocimiento <SimCardDownloadIcon />
           </Button>
         </Box>
       )}

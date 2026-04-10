@@ -4,12 +4,11 @@ import { motion, AnimatePresence } from "framer-motion";
 import ProfileMain from "./ProfileHeader";
 import BadgesSection from "./BadgesSection";
 import UserTicketsTable from "./UserTicketsTable";
-import CertificatesSection from "./CertificatesSection";
 import DreamSalonSection from "./DreamSalonSection";
 import AddressSection from "./AddressSection";
-import OrdersShopifySection from "./OrdersShopifySection";
 import Certifications from "../../components/Certifications/Certifications";
 import AuthContext from "../../context/Auth/AuthContext";
+import Store from "./Store/Store";
 // Paleta Floreciendo Juntas 🌸
 const colors = {
   background: "#FFF6F9",
@@ -22,11 +21,14 @@ const colors = {
 
 export default function ProfileTabs() {
   const [value, setValue] = useState(0);
+  const [view, setView] = useState("invite");
   const { usuario } = useContext(AuthContext);
   const handleChange = (e, newValue) => {
     setValue(newValue);
   };
-
+  const handleStartRegistration = () => {
+    setView("form"); // Al hacer clic, mostramos el formulario
+  };
   // Animación
   const animation = {
     initial: { opacity: 0, y: 10 },
@@ -85,6 +87,7 @@ export default function ProfileTabs() {
           <Tab label='Mi Salón' />
           <Tab label='Mis Direcciones' />
           {usuario && usuario.isSubscribed && <Tab label='Certificaciones' />}
+          {usuario && usuario.isSubscribed && <Tab label='Mi Tienda' />}
           {/* <Tab label='Mis pedidos(tienda)' /> */}
         </Tabs>
       </Paper>
@@ -130,14 +133,25 @@ export default function ProfileTabs() {
               <AddressSection />
             </motion.div>
           )}
-          {usuario && usuario.isSubscribed && (
-            <>
-              {value === 5 && (
-                <motion.div key='t4' {...animation}>
-                  <Certifications />
-                </motion.div>
-              )}
-            </>
+
+          {value === 5 && usuario?.isSubscribed && (
+            <motion.div
+              key='certifications'
+              {...animation}
+              style={{ width: "100%", position: "relative" }} // 👈 Forzar estilos
+            >
+              <Certifications />
+            </motion.div>
+          )}
+
+          {value === 6 && usuario?.isSubscribed && (
+            <motion.div
+              key='store'
+              {...animation}
+              style={{ width: "100%", position: "relative" }} // 👈 Forzar estilos
+            >
+              <Store />
+            </motion.div>
           )}
         </AnimatePresence>
       </Box>

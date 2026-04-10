@@ -28,7 +28,7 @@ const menuItems = [
   { name: "Lives", path: "/lives", auth: "both" },
   { name: "Salón", path: "/el-salon-de-tus-sueños", auth: "both" },
   { name: "Eventos", path: "/eventos", auth: "both" },
-  { name: "Tienda", path: "/tienda", auth: "both" },
+  { name: "Distribución", path: "/distribucion", auth: "both" },
 ];
 
 const HeaderIntermediate = () => {
