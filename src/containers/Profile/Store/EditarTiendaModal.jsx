@@ -42,6 +42,8 @@ const EditarTiendaDialog = ({ open, handleClose, store }) => {
   const [previewFile, setPreviewFile] = useState(null); // solo para preview visual
   const [newImage, setNewImage] = useState(null); // File binario nuevo
   const [addressInput, setAddressInput] = useState("");
+  const storeId = store.id;
+
   // --- REFS ---
   const autocompleteService = useRef(null);
   const geocoder = useRef(null);
@@ -161,7 +163,7 @@ const EditarTiendaDialog = ({ open, handleClose, store }) => {
 
     setLoading(true);
     try {
-      await updateStoreUser(store.id, patch);
+      await updateStoreUser(storeId, patch);
       handleClose();
     } catch (error) {
       console.error("Error al actualizar la tienda:", error);
@@ -237,16 +239,21 @@ const EditarTiendaDialog = ({ open, handleClose, store }) => {
 
           <MUIAutocomplete
             options={options}
-            getOptionLabel={(o) => o.description || ""}
-            onInputChange={(event, value) => {
-              setAddressInput(value); // controla el input visual
-              handleFetchSuggestions(event, value); // busca sugerencias
+            getOptionLabel={(o) =>
+              typeof o === "string" ? o : o.description || ""
+            }
+            // 1. Usa value para el valor "final" (el objeto o string guardado)
+            value={formData.address || null}
+            // 2. Usa onInputChange solo para actualizar lo que el usuario escribe (búsqueda)
+            onInputChange={(event, newInputValue) => {
+              // Esto permite que el texto cambie visualmente mientras buscas
+              setAddressInput(newInputValue);
+              handleFetchSuggestions(event, newInputValue);
             }}
+            // 3. onChange se dispara cuando el usuario selecciona una opción de la lista
             onChange={(event, selection) => {
               handleSelectPlace(event, selection);
             }}
-            // Muestra la dirección actual como valor inicial
-            inputValue={formData.address || ""}
             renderInput={(params) => (
               <TextField
                 {...params}

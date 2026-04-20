@@ -106,6 +106,8 @@ const StoresState = ({ children }) => {
       });
   };
   const updateStoreUser = (storeId, data) => {
+    console.log(storeId, data, "los datos");
+
     // data ya es FormData con solo los campos modificados
     clienteAxios
       .patch(`/stores/${storeId}`, data, {

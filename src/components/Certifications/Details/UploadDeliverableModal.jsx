@@ -14,6 +14,7 @@ import { motion } from "framer-motion";
 import CloseIcon from "@mui/icons-material/Close";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import CertificationsContext from "../../../context/Certifications/CertificationsContext";
+import { getImagePreview } from "../../../utils/convertHeicPreview";
 
 const style = {
   width: { xs: "94%", sm: "90%", md: 850 },
@@ -28,23 +29,29 @@ const style = {
 
 const UploadDeliverableModal = ({ open, onClose, moduleId, module }) => {
   const { sendEntregable } = useContext(CertificationsContext);
+  const [converting, setConverting] = useState(false);
   const [images, setImages] = useState({
     front: null,
     side: null,
     profile: null,
   });
 
-  const handleImageChange = (e, type) => {
+  const handleImageChange = async (e, type) => {
     const file = e.target.files[0];
     if (!file) return;
 
-    setImages((prev) => ({
-      ...prev,
-      [type]: {
-        file,
-        preview: URL.createObjectURL(file),
-      },
-    }));
+    setConverting(true);
+    try {
+      const preview = await getImagePreview(file);
+      setImages((prev) => ({
+        ...prev,
+        [type]: { file, preview },
+      }));
+    } catch (err) {
+      console.error("Error al previsualizar imagen:", err);
+    } finally {
+      setConverting(false);
+    }
   };
 
   const isValid = images.front && images.side && images.profile;
@@ -116,6 +123,7 @@ const UploadDeliverableModal = ({ open, onClose, moduleId, module }) => {
         <Button
           component='label'
           variant='outlined'
+          disabled={converting}
           sx={{
             textTransform: "none",
             borderRadius: "30px",
@@ -124,11 +132,15 @@ const UploadDeliverableModal = ({ open, onClose, moduleId, module }) => {
             fontWeight: 600,
           }}
         >
-          {images[type] ? "Cambiar imagen" : "Subir imagen"}
+          {converting
+            ? "Procesando..."
+            : images[type]
+              ? "Cambiar imagen"
+              : "Subir imagen"}
           <input
             hidden
             type='file'
-            accept='image/*'
+            accept='image/*,.heic,.heif'
             onChange={(e) => handleImageChange(e, type)}
           />
         </Button>
