@@ -143,11 +143,11 @@ const CardEvent = ({ event }) => {
           </Typography>
         </Stack>
 
-        <Stack direction='row' spacing={1} alignItems='center' mb={2}>
+        {/* <Stack direction='row' spacing={1} alignItems='center' mb={2}>
           <Typography variant='body2' color='text.primary'>
             🎟️ {event.availableTickets} boletos disponibles
           </Typography>
-        </Stack>
+        </Stack> */}
 
         <Link
           to={`/detalle-evento/${event.id}`}

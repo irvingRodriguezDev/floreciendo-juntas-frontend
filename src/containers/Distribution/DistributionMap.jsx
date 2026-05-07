@@ -58,18 +58,34 @@ function DistributionMap() {
   // Al cargar el mapa por primera vez
   useEffect(() => {
     if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (pos) => {
-          const coords = {
-            lat: pos.coords.latitude,
-            lng: pos.coords.longitude,
-          };
-          setUserLocation(coords);
-          setMapCenter(coords);
-          loadStores(coords.lat, coords.lng);
-        },
-        () => loadStores(centerDefault.lat, centerDefault.lng),
-      );
+      const geoOptions = {
+        enableHighAccuracy: true, // Fuerza el uso de GPS si está disponible
+        timeout: 10000, // Espera 10 segundos antes de fallar
+        maximumAge: 0, // No uses ubicaciones viejas en caché
+      };
+
+      const success = (pos) => {
+        const coords = {
+          lat: pos.coords.latitude,
+          lng: pos.coords.longitude,
+        };
+        setUserLocation(coords);
+        setMapCenter(coords);
+        loadStores(coords.lat, coords.lng);
+      };
+
+      const error = (err) => {
+        console.warn(`Error de geolocalización (${err.code}): ${err.message}`);
+        // Si falla (como el error kCLErrorLocationUnknown), usamos el centro por defecto
+        loadStores(centerDefault.lat, centerDefault.lng);
+
+        // Opcional: Notificar al usuario con un pequeño toast o alerta suave
+      };
+
+      navigator.geolocation.getCurrentPosition(success, error, geoOptions);
+    } else {
+      // El navegador ni siquiera soporta geolocalización
+      loadStores(centerDefault.lat, centerDefault.lng);
     }
   }, [loadStores]);
 
@@ -393,7 +409,7 @@ function DistributionMap() {
               >
                 <Grid size={12}>
                   <Link
-                    to={`https://www.google.com/maps/dir/?api=1&destination=${selectedStore.latitude},${selectedStore.longitude}`}
+                    to={`https://www.google.com/search?q=https://www.google.com/maps/search/%3Fapi%3D1%26query%3D${selectedStore.latitude},${selectedStore.longitude}`}
                     target='_blank'
                   >
                     <Button

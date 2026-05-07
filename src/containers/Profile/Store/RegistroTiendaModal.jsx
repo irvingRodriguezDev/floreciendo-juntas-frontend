@@ -13,10 +13,10 @@ import {
   Autocomplete as MUIAutocomplete,
 } from "@mui/material";
 import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate";
-import { motion, AnimatePresence } from "framer-motion";
 import CloseIcons from "../../../components/icons/CloseIcons";
 import { useGoogleMaps } from "../../../context/GoogleMaps/GoogleMapsProvider";
 import StoresContext from "../../../context/Stores/StoresContext";
+
 const inputStyles = {
   mb: 2,
   "& .MuiOutlinedInput-root": {
@@ -29,6 +29,7 @@ const inputStyles = {
   "& .MuiInputLabel-root": { color: "#D82E7A" },
   "& .MuiInputLabel-root.Mui-focused": { color: "#D82E7A" },
 };
+
 const INITIAL_FORM = {
   name: "",
   description: "",
@@ -43,41 +44,36 @@ const RegistroTiendaDialog = ({ open, handleClose }) => {
   const { createStoreUser } = useContext(StoresContext);
   const { isLoaded } = useGoogleMaps();
 
-  // --- ESTADOS ---
   const [formData, setFormData] = useState(INITIAL_FORM);
-  const [options, setOptions] = useState([]); // Sugerencias de Google
+  const [options, setOptions] = useState([]);
   const [inputValue, setInputValue] = useState("");
+  const [preview, setPreview] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [file, setFile] = useState(null);
 
-  // --- REFS ---
   const autocompleteService = useRef(null);
   const geocoder = useRef(null);
 
-  // Inicializar Google Maps Services
   useEffect(() => {
     if (isLoaded && window.google) {
-      if (!autocompleteService.current)
-        autocompleteService.current =
-          new window.google.maps.places.AutocompleteService();
-      if (!geocoder.current)
-        geocoder.current = new window.google.maps.Geocoder();
+      autocompleteService.current =
+        new window.google.maps.places.AutocompleteService();
+      geocoder.current = new window.google.maps.Geocoder();
     }
   }, [isLoaded]);
 
-  // Limpiar formulario al cerrar
   useEffect(() => {
     if (!open) {
       setFormData(INITIAL_FORM);
-      setFile(null);
+      setPreview(null);
       setOptions([]);
       setInputValue("");
     }
   }, [open]);
 
-  // --- HANDLERS GOOGLE MAPS ---
-  const handleFetchSuggestions = (event, value) => {
+  // 🔍 Google Places
+  const handleFetchSuggestions = (_, value) => {
     setInputValue(value);
+
     if (value.length < 4 || !autocompleteService.current) {
       setOptions([]);
       return;
@@ -93,7 +89,7 @@ const RegistroTiendaDialog = ({ open, handleClose }) => {
     );
   };
 
-  const handleSelectPlace = (event, selection) => {
+  const handleSelectPlace = (_, selection) => {
     if (!selection || !geocoder.current) return;
 
     geocoder.current.geocode(
@@ -101,6 +97,7 @@ const RegistroTiendaDialog = ({ open, handleClose }) => {
       (results, status) => {
         if (status === "OK" && results[0]) {
           const { lat, lng } = results[0].geometry.location;
+
           setFormData((prev) => ({
             ...prev,
             address: results[0].formatted_address,
@@ -111,36 +108,41 @@ const RegistroTiendaDialog = ({ open, handleClose }) => {
       },
     );
   };
+
+  // 📸 Imagen
   const handleChangeFile = (e) => {
-    setFile(URL.createObjectURL(e.target.files[0]));
-    setFormData({ ...formData, image: e.target.files[0] });
+    const file = e.target.files[0];
+    if (!file) return;
+
+    setPreview(URL.createObjectURL(file));
+
+    setFormData((prev) => ({
+      ...prev,
+      image: file,
+    }));
   };
 
-  // --- SUBMIT ---
+  // 🚀 Submit
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
 
     try {
-      const data = new FormData();
-      data.append("name", formData.name);
-      data.append("description", formData.description);
-      data.append("address", formData.address);
-      data.append("latitude", formData.latitude);
-      data.append("longitude", formData.longitude);
-      data.append("phone", formData.phone);
-      data.append("image", formData.image); // ← File binario real
-
-      await createStoreUser(data);
+      await createStoreUser(formData); // 👈 enviamos objeto limpio
       handleClose();
     } catch (error) {
-      console.error("Error al crear la tienda:", error);
+      console.error(error);
     } finally {
       setLoading(false);
     }
   };
 
-  const isFormValid = formData.latitude && formData.name && file && !loading;
+  const isFormValid =
+    formData.name &&
+    formData.description &&
+    formData.phone &&
+    formData.latitude &&
+    formData.image;
 
   return (
     <Dialog
@@ -150,16 +152,8 @@ const RegistroTiendaDialog = ({ open, handleClose }) => {
       maxWidth='xs'
       PaperProps={{ sx: { borderRadius: "20px", p: 1 } }}
     >
-      <DialogTitle
-        sx={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-        }}
-      >
-        <Typography variant='subtitle' fontWeight={800}>
-          Nueva Distribuidora
-        </Typography>
+      <DialogTitle sx={{ display: "flex", justifyContent: "space-between" }}>
+        <Typography fontWeight={800}>Nueva Distribuidora</Typography>
         <IconButton onClick={handleClose}>
           <CloseIcons width={25} />
         </IconButton>
@@ -167,36 +161,35 @@ const RegistroTiendaDialog = ({ open, handleClose }) => {
 
       <DialogContent>
         <Stack
-          spacing={2}
           component='form'
+          spacing={2}
           onSubmit={handleSubmit}
           sx={{ mt: 1 }}
         >
           <TextField
             label='Nombre'
-            fullWidth
-            required
             size='small'
+            required
             sx={inputStyles}
             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
           />
+
           <TextField
             label='Descripción'
             multiline
             rows={2}
-            fullWidth
             required
             sx={inputStyles}
             onChange={(e) =>
               setFormData({ ...formData, description: e.target.value })
             }
           />
+
           <TextField
             label='WhatsApp'
-            fullWidth
             required
-            sx={inputStyles}
             placeholder='52...'
+            sx={inputStyles}
             onChange={(e) =>
               setFormData({ ...formData, phone: e.target.value })
             }
@@ -212,14 +205,13 @@ const RegistroTiendaDialog = ({ open, handleClose }) => {
                 {...params}
                 label='Dirección Física'
                 required
-                sx={inputStyles}
                 size='small'
+                sx={inputStyles}
                 helperText='Selecciona de la lista'
               />
             )}
           />
 
-          {/* Subida de Imagen al Final */}
           <Button
             variant='outlined'
             component='label'
@@ -230,16 +222,16 @@ const RegistroTiendaDialog = ({ open, handleClose }) => {
               borderRadius: "12px",
             }}
           >
-            {file ? "Cambiar Imagen" : "Subir Imagen del Negocio"}
+            {preview ? "Cambiar Imagen" : "Subir Imagen del Negocio"}
             <input
-              type='file'
               hidden
+              type='file'
               accept='image/*'
               onChange={handleChangeFile}
             />
           </Button>
 
-          {file !== null && (
+          {preview && (
             <Box
               sx={{
                 width: "100%",
@@ -250,9 +242,9 @@ const RegistroTiendaDialog = ({ open, handleClose }) => {
               }}
             >
               <img
-                src={file}
+                src={preview}
+                alt='preview'
                 style={{ width: "100%", height: "100%", objectFit: "cover" }}
-                alt='Preview'
               />
             </Box>
           )}
@@ -260,7 +252,7 @@ const RegistroTiendaDialog = ({ open, handleClose }) => {
           <Button
             type='submit'
             variant='contained'
-            disabled={!isFormValid}
+            disabled={!isFormValid || loading}
             sx={{
               bgcolor: "#FF4081",
               borderRadius: "12px",

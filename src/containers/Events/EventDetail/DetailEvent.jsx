@@ -317,9 +317,9 @@ const DetailEvent = () => {
                 🎟️ Detalles del evento
               </Typography>
 
-              <Typography sx={{ mb: 1 }}>
+              {/* <Typography sx={{ mb: 1 }}>
                 Boletos disponibles: <strong>{event.availableTickets}</strong>
-              </Typography>
+              </Typography> */}
 
               <Typography sx={{ mb: 3 }}>
                 Precio:{" "}

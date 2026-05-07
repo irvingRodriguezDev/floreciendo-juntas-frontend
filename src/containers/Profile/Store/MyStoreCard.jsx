@@ -19,6 +19,7 @@ const MyStoreCard = ({ store }) => {
   const { deleteStore } = useContext(StoresContext);
   // ── Card con datos ─────────────────────────────────────────────────────────
   const { name, description, address, phone, imageUrl, isActive, id } = store;
+
   const [openEdit, setOpenEdit] = useState(false);
   const [shop, setShop] = useState(null);
   const handleOpenEdit = (infoShop) => {
@@ -173,7 +174,7 @@ const MyStoreCard = ({ store }) => {
         {/* Dar de baja */}
         <Button
           fullWidth
-          onClick={() => deleteStore(id)}
+          onClick={() => deleteStore(store.id)}
           sx={{
             mt: 2,
             fontSize: 13,
