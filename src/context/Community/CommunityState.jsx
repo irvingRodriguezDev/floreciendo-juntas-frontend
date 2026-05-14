@@ -43,6 +43,13 @@ const CommunityState = ({ children }) => {
     const onPostCreated = (post) => {
       // Si el post lo creé yo, mi reducer ya lo gestionó localmente (optimistic update)
       if (post.userId === usuarioId) return;
+      if (post.type !== type) {
+        console.log(
+          `Post ignorado: es de tipo ${post.type} y mi filtro actual es ${type}`,
+        );
+        return;
+      }
+
       dispatch({ type: CREATE_POST_COMMUNITY, payload: post });
     };
 
@@ -79,8 +86,8 @@ const CommunityState = ({ children }) => {
   }, [autenticado, usuarioId]);
 
   // 📡 FEED
-  const getFeed = (page, limit, search = "") => {
-    let url = `/posts?page=${page}&limit=${limit}`;
+  const getFeed = (page, limit, search = "", type) => {
+    let url = `/posts?type=${type}&page=${page}&limit=${limit}`;
     if (search.trim() !== "") url += `&search=${encodeURIComponent(search)}`;
 
     MethodGet(url)
@@ -102,7 +109,14 @@ const CommunityState = ({ children }) => {
     Swal.fire({
       title: "Publicando...",
       allowOutsideClick: false,
-      didOpen: () => Swal.showLoading(),
+      // 🔥 Esto pone la alerta por encima del modal de MUI
+      didOpen: () => {
+        Swal.showLoading();
+        const container = Swal.getContainer();
+        if (container) {
+          container.style.zIndex = "1500";
+        }
+      },
     });
 
     try {
@@ -115,6 +129,9 @@ const CommunityState = ({ children }) => {
         title: "¡Publicado!",
         timer: 2000,
         showConfirmButton: false,
+        didOpen: () => {
+          Swal.getContainer().style.zIndex = "1500";
+        },
       });
 
       playSound();
@@ -124,15 +141,14 @@ const CommunityState = ({ children }) => {
         payload: res.data.post,
       });
     } catch (error) {
-      Swal.close();
-
-      const message =
-        error.response?.data?.message || "No se pudo publicar el post";
-
+      // Si falla, cerramos la carga y mostramos el error arriba también
       Swal.fire({
         icon: "error",
         title: "Error",
-        text: message,
+        text: error.response?.data?.message || "No se pudo publicar",
+        didOpen: () => {
+          Swal.getContainer().style.zIndex = "1500";
+        },
       });
     }
   };

@@ -16,7 +16,6 @@ const CommunityRulesAccordion = () => {
     <Box
       sx={{
         width: "100%",
-        maxWidth: 640,
         mx: "auto",
         my: 4,
         borderRadius: "18px",
