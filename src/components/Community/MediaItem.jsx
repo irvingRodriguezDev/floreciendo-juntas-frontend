@@ -26,12 +26,14 @@ const MediaItem = ({ item, isActive }) => {
             component='img'
             src={item.url}
             alt='Post'
+            loading='lazy'
             sx={{
               width: "100%",
               height: "auto",
               borderRadius: 2,
               cursor: "zoom-in",
               display: "block",
+
               // Aquí no importa el overflow del padre,
               // porque la librería crea un clon de la imagen fuera del Swiper
             }}
