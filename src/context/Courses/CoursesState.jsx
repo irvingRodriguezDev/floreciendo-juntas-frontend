@@ -133,11 +133,62 @@ const CoursesState = ({ children }) => {
   };
 
   const downloadCertificate = async (courseId, userName) => {
-    const url = `/courses/download-certificate?courseId=${courseId}&userName=${userName}`;
+    // ========================================================
+    // 🎨 SWEETALERT DE PERSONALIZACIÓN Y VALIDACIÓN
+    // ========================================================
+    const { value: nombreCertificado, isConfirmed } = await Swal.fire({
+      title: "Personaliza tu Reconocimiento",
+      text: "Ingresa el nombre que aparecerá (máximo 25 caracteres):",
+      input: "text",
+      inputValue: userName.substring(0, 25), // Pre-cargamos el nombre limitado
+      inputPlaceholder: "Nombre y Apellido",
+      showCancelButton: true,
+      confirmButtonText: "Descargar",
+      cancelButtonText: "Cancelar",
+      confirmButtonColor: "#3085d6", // Puedes cambiar el color al que use tu app
+      inputAttributes: {
+        maxlength: 25,
+        autocomplete: "off",
+        autocapitalize: "words",
+      },
+      // Contador de caracteres dinámico en el footer
+      footer: '<b id="char-count">25</b> caracteres restantes',
+      didOpen: () => {
+        const input = Swal.getInput();
+        const footer = document.getElementById("char-count");
 
-    // Mostrar el spinner mientras se genera/descarga el certificado
+        // Inicializar el contador con el valor pre-cargado
+        if (input && footer) {
+          footer.innerText = 25 - input.value.length;
+
+          // Actualizar contador en tiempo real al escribir
+          input.addEventListener("input", () => {
+            const remaining = 25 - input.value.length;
+            footer.innerText = remaining;
+          });
+        }
+      },
+      // Validación estricta antes de permitir el envío
+      inputValidator: (value) => {
+        if (!value || !value.trim()) {
+          return "El nombre es obligatorio";
+        }
+        // Regex para permitir solo letras, espacios y caracteres con acentos/ñ
+        const soloLetras = /^[a-zA-ZÀ-ÿ\s]+$/;
+        if (!soloLetras.test(value)) {
+          return "Solo se permiten letras y espacios";
+        }
+      },
+    });
+
+    // Si el usuario cancela o cierra la alerta, detenemos la ejecución
+    if (!isConfirmed || !nombreCertificado) return;
+
+    // ========================================================
+    // ⏳ PROCESO DE DESCARGA (SPINNER)
+    // ========================================================
     Swal.fire({
-      title: "Generando certificado...",
+      title: "Generando reconocimiento...",
       text: "Por favor espera un momento.",
       allowOutsideClick: false,
       allowEscapeKey: false,
@@ -147,23 +198,29 @@ const CoursesState = ({ children }) => {
     });
 
     try {
+      // Enviamos el "nombreCertificado" ya validado y sanitizado al backend mediante los query params
+      const url = `/courses/download-certificate?courseId=${courseId}&userName=${encodeURIComponent(nombreCertificado.trim())}`;
+
       const res = await clienteAxios.get(url, { responseType: "blob" });
-      // Descargar el archivo PDF
-      fileDownload(res.data, "certificado-curso.pdf");
-      // Mostrar mensaje de éxito
+
+      // Nombramos el archivo dinámicamente con el nombre que el usuario eligió
+      const fileName = `Certificado-${nombreCertificado.trim().replace(/ /g, "_")}.pdf`;
+      fileDownload(res.data, fileName);
+
+      // Mensaje de éxito
       Swal.fire({
         icon: "success",
-        title: "¡Certificado generado correctamente!",
-        text: "Tu certificado ha sido descargado con éxito.",
+        title: "¡Reconocimiento generado correctamente!",
+        text: "Tu reconocimiento ha sido descargado con éxito.",
         confirmButtonText: "Aceptar",
       });
     } catch (error) {
-      console.error("Ocurrió un error al descargar el certificado:", error);
+      console.error("Ocurrió un error al descargar el reconocimiento:", error);
 
       Swal.fire({
         icon: "error",
-        title: "Error al generar el certificado",
-        text: "Ocurrió un problema al descargar el certificado. Intenta nuevamente.",
+        title: "Error al generar el reconocimiento",
+        text: "Ocurrió un problema al descargar el reconocimiento. Intenta nuevamente.",
         confirmButtonText: "Cerrar",
       });
     }
