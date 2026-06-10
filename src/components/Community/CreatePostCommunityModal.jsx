@@ -29,7 +29,8 @@ import TypePostSelect from "../Selects/TypePostSelect";
 const MAX_CONTENT = 1500;
 const MAX_TITLE = 120;
 const MAX_FILES = 4;
-
+const MAX_IMAGE_SIZE = 10 * 1024 * 1024; // 10MB
+const MAX_VIDEO_SIZE = 50 * 1024 * 1024; // 50MB
 export default function CreatePostModal({ open, handleClose }) {
   const { createPostCommunity } = useContext(CommunityContext);
   const { usuario } = useContext(AuthContext);
@@ -58,6 +59,28 @@ export default function CreatePostModal({ open, handleClose }) {
         showConfirmButton: false,
       });
       return;
+    }
+    const validFiles = [];
+    for (const file of files) {
+      const isVideo = file.type.startsWith("video");
+
+      const maxSize = isVideo ? 50 * 1024 * 1024 : 10 * 1024 * 1024;
+
+      if (file.size > maxSize) {
+        Swal.fire({
+          icon: "warning",
+          title: "Archivo demasiado pesado",
+          text: `${file.name} excede el límite permitido`,
+        });
+
+        continue;
+      }
+
+      validFiles.push({
+        file,
+        type: isVideo ? "video" : "image",
+        preview: URL.createObjectURL(file),
+      });
     }
     const previews = files.map((file) => ({
       file,
@@ -326,6 +349,8 @@ export default function CreatePostModal({ open, handleClose }) {
                   <Box
                     component={m.type === "image" ? "img" : "video"}
                     src={m.preview}
+                    muted
+                    preload='metadata'
                     sx={{ width: 120, height: 120, objectFit: "cover" }}
                   />
                   <IconButton

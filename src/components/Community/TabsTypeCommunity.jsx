@@ -9,7 +9,6 @@ import {
   Avatar,
   Fab,
 } from "@mui/material";
-import { motion, AnimatePresence } from "framer-motion";
 import AuthContext from "../../context/Auth/AuthContext";
 import Floreciendo from "../../containers/Community/Categories/FloreciendoJuntas/Floreciendo";
 import CommunityContext from "../../context/Community/CommunityContext";
@@ -37,7 +36,7 @@ export default function TabsTypeCommunity() {
   const { usuario, autenticado } = useContext(AuthContext);
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
-  const [rowsPerPage] = useState(10); // Si no cambia, puedes dejarlo como constante
+  const rowsPerPage = 10; // Si no cambia, puedes dejarlo como constante
 
   const [debounceSearch] = useDebounce(search, 600);
   const [loading, setLoading] = useState(false);
@@ -54,33 +53,38 @@ export default function TabsTypeCommunity() {
 
   // 🔥 Efecto para resetear página cuando se busca
   useEffect(() => {
-    setPage(1);
+    if (page !== 1) {
+      setPage(1);
+    }
   }, [debounceSearch]);
 
   useEffect(() => {
-    if (!autenticado) return;
+    let active = true;
 
     const fetchCommunityData = async () => {
+      if (!autenticado) return;
+
       setLoading(true);
+
       try {
-        // Pasamos siempre los parámetros para mantener consistencia
-        await getFeed(page, rowsPerPage, debounceSearch, type);
+        if (active) {
+          await getFeed(page, rowsPerPage, debounceSearch, type);
+        }
       } catch (error) {
-        console.error("Error al obtener el feed:", error);
+        console.error(error);
       } finally {
-        setLoading(false);
+        if (active) {
+          setLoading(false);
+        }
       }
     };
 
     fetchCommunityData();
-  }, [page, rowsPerPage, debounceSearch, autenticado, type]); // getFeed suele venir de context, asegúrate que sea estable o usa useCallback en el provider
-  // Animación
-  const animation = {
-    initial: { opacity: 0, y: 10 },
-    animate: { opacity: 1, y: 0 },
-    exit: { opacity: 0, y: -10 },
-    transition: { duration: 0.35, ease: "easeOut" },
-  };
+
+    return () => {
+      active = false;
+    };
+  }, [page, debounceSearch, autenticado, type]); // getFeed suele venir de context, asegúrate que sea estable o usa useCallback en el provider
 
   return (
     <Box
@@ -174,55 +178,44 @@ export default function TabsTypeCommunity() {
           position: "relative",
         }}
       >
-        <AnimatePresence mode='wait'>
-          {value === 0 && (
-            <motion.div key='t1' {...animation}>
-              <Floreciendo
-                community_posts={community_posts}
-                setSearch={setSearch}
-                search={search}
-                loading={loading}
-                setLoading={setLoading}
-                debounceSearch={debounceSearch}
-                totalPages={totalPages}
-                page={page}
-                setPage={setPage}
-              />
-            </motion.div>
-          )}
+        {value === 0 && (
+          <Floreciendo
+            community_posts={community_posts}
+            setSearch={setSearch}
+            search={search}
+            loading={loading}
+            debounceSearch={debounceSearch}
+            totalPages={totalPages}
+            page={page}
+            setPage={setPage}
+          />
+        )}
 
-          {value === 1 && (
-            <motion.div key='t2' {...animation}>
-              <Servicios
-                community_posts={community_posts}
-                setSearch={setSearch}
-                search={search}
-                loading={loading}
-                setLoading={setLoading}
-                debounceSearch={debounceSearch}
-                totalPages={totalPages}
-                page={page}
-                setPage={setPage}
-              />
-            </motion.div>
-          )}
+        {value === 1 && (
+          <Servicios
+            community_posts={community_posts}
+            setSearch={setSearch}
+            search={search}
+            loading={loading}
+            debounceSearch={debounceSearch}
+            totalPages={totalPages}
+            page={page}
+            setPage={setPage}
+          />
+        )}
 
-          {value === 2 && (
-            <motion.div key='t3' {...animation}>
-              <Productos
-                community_posts={community_posts}
-                setSearch={setSearch}
-                search={search}
-                loading={loading}
-                setLoading={setLoading}
-                debounceSearch={debounceSearch}
-                totalPages={totalPages}
-                page={page}
-                setPage={setPage}
-              />
-            </motion.div>
-          )}
-        </AnimatePresence>
+        {value === 2 && (
+          <Productos
+            community_posts={community_posts}
+            setSearch={setSearch}
+            search={search}
+            loading={loading}
+            debounceSearch={debounceSearch}
+            totalPages={totalPages}
+            page={page}
+            setPage={setPage}
+          />
+        )}
       </Box>
       {/* BOTÓN FLOTANTE MÓVIL */}
       <Fab

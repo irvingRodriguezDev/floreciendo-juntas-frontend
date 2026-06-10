@@ -9,6 +9,7 @@ import AddressSection from "./AddressSection";
 import Certifications from "../../components/Certifications/Certifications";
 import AuthContext from "../../context/Auth/AuthContext";
 import Store from "./Store/Store";
+import FormationsOnline from "../FormationsOnline/FormationsOnline";
 // Paleta Floreciendo Juntas 🌸
 const colors = {
   background: "#FFF6F9",
@@ -87,6 +88,9 @@ export default function ProfileTabs() {
           <Tab label='Mi Salón' />
           <Tab label='Mis Direcciones' />
           {usuario && usuario.isSubscribed && <Tab label='Certificaciones' />}
+          {usuario && usuario.isSubscribed && (
+            <Tab label='Formaciones Online' />
+          )}
           {usuario && usuario.isSubscribed && <Tab label='Mi Tienda' />}
           {/* <Tab label='Mis pedidos(tienda)' /> */}
         </Tabs>
@@ -143,8 +147,16 @@ export default function ProfileTabs() {
               <Certifications />
             </motion.div>
           )}
-
           {value === 6 && usuario?.isSubscribed && (
+            <motion.div
+              key='formations'
+              {...animation}
+              style={{ width: "100%", position: "relative" }} // 👈 Forzar estilos
+            >
+              <FormationsOnline />
+            </motion.div>
+          )}
+          {value === 7 && usuario?.isSubscribed && (
             <motion.div
               key='store'
               {...animation}
