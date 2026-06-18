@@ -95,80 +95,86 @@ const StoreDiscoveryPanel = ({ onSelectStore }) => {
                   }}
                 >
                   <CardContent sx={{ p: "16px !important" }}>
-                    <Stack direction='row' spacing={2} alignItems='center'>
-                      <Avatar
-                        src={store.imageUrl}
-                        sx={{
-                          width: 56,
-                          height: 56,
-                          bgcolor: "#fce4ec",
-                          color: "#D82E7A",
-                          border: "2px solid #D82E7A",
-                        }}
-                      >
-                        {store.name.charAt(0)}
-                      </Avatar>
-
-                      <Box sx={{ flex: 1 }}>
-                        <Typography variant='subtitle1' fontWeight='700' noWrap>
-                          {store.name}
-                        </Typography>
-
-                        <Stack
-                          direction='row'
-                          alignItems='center'
-                          spacing={0.5}
-                          mb={1}
+                    <Stack spacing={1.5}>
+                      {/* Fila superior */}
+                      <Stack direction="row" spacing={2} alignItems="center">
+                        <Avatar
+                          src={store.imageUrl}
+                          sx={{
+                            width: 56,
+                            height: 56,
+                            bgcolor: "#fce4ec",
+                            color: "#D82E7A",
+                            border: "2px solid #D82E7A",
+                          }}
                         >
-                          <LocationOnIcon
-                            sx={{ fontSize: 14, color: "text.secondary" }}
-                          />
-                          <Typography
-                            variant='caption'
-                            color='text.secondary'
-                            noWrap
-                            sx={{ maxWidth: "150px" }}
-                          >
-                            {store.address}
+                          {store.name.charAt(0)}
+                        </Avatar>
+
+                        <Box sx={{ flex: 1, minWidth: 0 }}>
+                          <Typography variant="subtitle1" fontWeight="700" noWrap>
+                            {store.name}
                           </Typography>
-                        </Stack>
-                        <Stack
-                          direction='row'
-                          alignItems='center'
-                          spacing={0.5}
-                          mb={1}
-                        >
+
+                          <Stack
+                            direction="row"
+                            alignItems="center"
+                            spacing={0.5}
+                            mb={0.5}
+                          >
+                            <LocationOnIcon
+                              sx={{ fontSize: 14, color: "text.secondary" }}
+                            />
+                            <Typography
+                              variant="caption"
+                              color="text.secondary"
+                              noWrap
+                            >
+                              {store.address}
+                            </Typography>
+                          </Stack>
+
                           <Typography
-                            variant='caption'
-                            color='text.secondary'
-                            noWrap
+                            variant="caption"
+                            color="text.secondary"
+                            sx={{
+                              display: "-webkit-box",
+                              WebkitLineClamp: 2,
+                              WebkitBoxOrient: "vertical",
+                              overflow: "hidden",
+                            }}
                           >
                             {store.description}
                           </Typography>
-                        </Stack>
+                        </Box>
+                      </Stack>
 
-                        <Stack
-                          direction='row'
-                          justifyContent='space-between'
-                          alignItems='center'
-                        >
-                          <Chip
-                            label='Activa'
-                            size='small'
-                            sx={{
-                              height: 20,
-                              fontSize: "0.65rem",
-                              bgcolor: "#E8F5E9",
-                              color: "#2E7D32",
-                              fontWeight: "bold",
-                            }}
-                          />
+                      {/* Fila inferior */}
+                      <Stack
+                        direction="row"
+                        justifyContent="space-between"
+                        alignItems="center"
+                        sx={{ pl: "72px" }}
+                      >
+                        <Chip
+                          label="Activa"
+                          size="small"
+                          sx={{
+                            height: 20,
+                            fontSize: "0.65rem",
+                            bgcolor: "#E8F5E9",
+                            color: "#2E7D32",
+                            fontWeight: "bold",
+                          }}
+                        />
+
+                        <Stack direction="row" spacing={0.5}>
                           <IconButton
-                            size='small'
+                            size="small"
                             href={`https://wa.me/${store.phone}?text=${encodeURIComponent(
-                              "Hola, me interesa adquirir productos, ¿puedo acudir ahora?",
+                              "Hola, me interesa adquirir productos, ¿puedo acudir ahora?"
                             )}`}
-                            target='_blank'
+                            target="_blank"
                             sx={{
                               bgcolor: "#25D366",
                               color: "white",
@@ -178,8 +184,22 @@ const StoreDiscoveryPanel = ({ onSelectStore }) => {
                           >
                             <WhatsAppIcon sx={{ fontSize: 18 }} />
                           </IconButton>
+
+                          <IconButton
+                            size="small"
+                            href={`https://www.google.com/maps/search/?api=1&query=${store.latitude},${store.longitude}`}
+                            target="_blank"
+                            sx={{
+                              bgcolor: "#E53888",
+                              color: "white",
+                              "&:hover": { bgcolor: "#bd2f71" },
+                            }}
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            <LocationOnIcon sx={{ fontSize: 18 }} />
+                          </IconButton>
                         </Stack>
-                      </Box>
+                      </Stack>
                     </Stack>
                   </CardContent>
                 </Card>

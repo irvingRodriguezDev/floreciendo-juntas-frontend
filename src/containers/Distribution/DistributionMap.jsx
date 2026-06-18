@@ -409,7 +409,7 @@ function DistributionMap() {
               >
                 <Grid size={12}>
                   <Link
-                    to={`https://www.google.com/search?q=https://www.google.com/maps/search/%3Fapi%3D1%26query%3D${selectedStore.latitude},${selectedStore.longitude}`}
+                    to={`https://www.google.com/maps/search/?api=1&query=${selectedStore.latitude},${selectedStore.longitude}`}
                     target='_blank'
                   >
                     <Button
