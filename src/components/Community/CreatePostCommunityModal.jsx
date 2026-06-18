@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useMemo } from "react";
 import {
   Box,
   Card,
@@ -25,6 +25,21 @@ import AuthContext from "../../context/Auth/AuthContext";
 import CloseIcons from "../icons/CloseIcons";
 import TimeSelectPinnedPost from "../Selects/TimeSelectPinnedPost";
 import TypePostSelect from "../Selects/TypePostSelect";
+import ReactQuill from "react-quill-new";
+import "react-quill-new/dist/quill.snow.css";
+const Link = ReactQuill.Quill.import("formats/link");
+
+class CustomLink extends Link {
+  static create(value) {
+    const node = super.create(value);
+    node.setAttribute("target", "_blank");
+    node.setAttribute("rel", "noopener noreferrer");
+    return node;
+  }
+}
+
+ReactQuill.Quill.register(CustomLink, true);
+
 
 const MAX_CONTENT = 1500;
 const MAX_TITLE = 120;
@@ -47,7 +62,121 @@ export default function CreatePostModal({ open, handleClose }) {
     media.forEach((m) => URL.revokeObjectURL(m.preview));
     setMedia([]);
   };
+  
+  const quillModules = useMemo(
+    () => ({
+      toolbar: [
+        [{ header: [1, 2, 3, false] }],
+        ["bold", "italic", "underline", "strike", "blockquote"],
+        [
+          {
+            color: [
+              "#000000",
+              "#424242",
+              "#636363",
+              "#9c9c9c",
+              "#cecece",
+              "#efefef",
+              "#ffffff",
+              "#e60000",
+              "#ff6600",
+              "#ff9900",
+              "#ffff00",
+              "#008a00",
+              "#0066cc",
+              "#9933ff",
+              "#fa9c9c",
+              "#ffdd99",
+              "#ffff99",
+              "#b3d9b3",
+              "#99ccff",
+              "#cc99ff",
+              "#FF5C93",
+              "#00b8e6",
+              "#00cccc",
+              "#20b2aa",
+              "#1e90ff",
+              "#1f3e7a",
+              "#0a0a2a",
+              "#4b0082",
+              "#800000",
+              "#cc3300",
+              "#996600",
+              "#666600",
+              "#4d4d00",
+              "#330000",
+              "#808000",
+              "#ffc0cb",
+              "#f08080",
+              "#ffa07a",
+              "#ffb6c1",
+              "#f0e68c",
+              "#bdb76b",
+              "#dda0dd",
+            ],
+          },
+          {
+            background: [
+              "#000000",
+              "#424242",
+              "#636363",
+              "#9c9c9c",
+              "#cecece",
+              "#efefef",
+              "#ffffff",
+              "#e60000",
+              "#ff6600",
+              "#ff9900",
+              "#ffff00",
+              "#008a00",
+              "#0066cc",
+              "#9933ff",
+              "#fa9c9c",
+              "#ffdd99",
+              "#ffff99",
+              "#b3d9b3",
+              "#99ccff",
+              "#cc99ff",
+              "#FF5C93",
+              "#00b8e6",
+              "#00cccc",
+              "#20b2aa",
+              "#1e90ff",
+              "#1f3e7a",
+              "#0a0a2a",
+              "#4b0082",
+              "#800000",
+              "#cc3300",
+              "#996600",
+              "#666600",
+              "#4d4d00",
+              "#330000",
+              "#808000",
+              "#ffc0cb",
+              "#f08080",
+              "#ffa07a",
+              "#ffb6c1",
+              "#f0e68c",
+              "#bdb76b",
+              "#dda0dd",
+            ],
+          },
+        ],
+        [{ list: "ordered" }, { list: "bullet" }],
+        [{ align: [] }],
+        ["link", "clean"],
+      ],
+    }),
+    []
+  );
 
+  const plainContent = content
+    .replace(/<(.|\n)*?>/g, "")
+    .replace(/&nbsp;/g, " ")
+    .trim();
+
+  const contentLength = plainContent.length;
+  
   const handleFiles = (e) => {
     const files = Array.from(e.target.files);
     if (media.length + files.length > MAX_FILES) {
@@ -82,12 +211,12 @@ export default function CreatePostModal({ open, handleClose }) {
         preview: URL.createObjectURL(file),
       });
     }
-    const previews = files.map((file) => ({
-      file,
-      type: file.type.startsWith("video") ? "video" : "image",
-      preview: URL.createObjectURL(file),
-    }));
-    setMedia((prev) => [...prev, ...previews]);
+    // const previews = files.map((file) => ({
+    //   file,
+    //   type: file.type.startsWith("video") ? "video" : "image",
+    //   preview: URL.createObjectURL(file),
+    // }));
+    setMedia((prev) => [...prev, ...validFiles]);
     e.target.value = null;
   };
 
@@ -106,7 +235,11 @@ export default function CreatePostModal({ open, handleClose }) {
   };
 
   const handleSubmit = async () => {
-    if (!title.trim() || !content.trim()) {
+    if (
+      !title.trim() ||
+      plainContent.length === 0 ||
+      plainContent.length > MAX_CONTENT
+    ) {
       Swal.fire({
         title: "Atención",
         text: "Título y contenido son obligatorios",
@@ -298,28 +431,68 @@ export default function CreatePostModal({ open, handleClose }) {
                 {title.length}/{MAX_TITLE}
               </Typography>
 
-              <TextField
-                placeholder='¿Qué tienes en mente hoy?'
-                multiline
-                minRows={3}
-                variant='standard'
-                fullWidth
-                value={content}
-                onChange={(e) => setContent(e.target.value)}
-                inputProps={{ maxLength: MAX_CONTENT }}
-                InputProps={{
-                  disableUnderline: true,
-                  sx: { fontSize: "1.05rem", mt: 1, color: "#555" },
+              <Box
+                sx={{
+                  mt: 2,
+                  "& .ql-toolbar": {
+                    borderRadius: "12px 12px 0 0",
+                    borderColor: "#e0e0e0",
+                  },
+                  "& .ql-container": {
+                    borderRadius: "0 0 12px 12px",
+                    borderColor: "#e0e0e0",
+                    minHeight: "220px",
+                  },
+                  "& .ql-editor": {
+                    minHeight: "220px",
+                    fontSize: "1rem",
+                    color: "#555",
+                  },
                 }}
-              />
+              >
+                <ReactQuill
+                  theme="snow"
+                  value={content}
+                  modules={quillModules}
+                  placeholder="¿Qué tienes en mente hoy?"
+                  onChange={(value) => {
+                    const text = value
+                      .replace(/<(.|\n)*?>/g, "")
+                      .replace(/&nbsp;/g, " ")
+                      .trim();
+
+                    // Permitir borrar contenido
+                    if (text.length === 0) {
+                      setContent("");
+                      return;
+                    }
+
+                    // Si no pasa el límite guarda normalmente
+                    if (text.length <= MAX_CONTENT) {
+                      setContent(value);
+                      return;
+                    }
+
+                    // Si excede, corta el texto visible
+                    const editor = document.querySelector(".ql-editor");
+
+                    if (editor) {
+                      const currentText = editor.innerText
+                        .slice(0, MAX_CONTENT);
+
+                      setContent(currentText);
+                    }
+                  }}
+                />
+              </Box>
               <Typography
                 variant='caption'
                 color={
-                  content.length >= MAX_CONTENT ? "error" : "text.secondary"
+                  contentLength >= MAX_CONTENT ? "error" : "text.secondary"
                 }
                 sx={{ display: "flex", justifyContent: "flex-end" }}
               >
-                {content.length}/{MAX_CONTENT}
+                {contentLength}/{MAX_CONTENT}
               </Typography>
             </Box>
           </Box>
@@ -420,7 +593,12 @@ export default function CreatePostModal({ open, handleClose }) {
 
             <Button
               onClick={handleSubmit}
-              disabled={!title.trim() || !content.trim() || loading}
+              disabled={
+                !title.trim() ||
+                plainContent.length === 0 ||
+                contentLength > MAX_CONTENT ||
+                loading
+              }
               variant='contained'
               sx={{
                 borderRadius: 20,
