@@ -34,7 +34,7 @@ const menuItems = [
   { name: "10 Secretos", path: "/secretos", auth: "both" },
   { name: "Lives", path: "/lives", auth: "both" },
   { name: "Salón", path: "/el-salon-de-tus-sueños", auth: "both" },
-  { name: "Eventos ", path: "/eventos", auth: "both" },
+  { name: "Eventos ", path: "https://eventoswapizima.com", auth: "both" },
   { name: "Distribución", path: "/distribucion", auth: "both" },
 ];
 

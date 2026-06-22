@@ -1,12 +1,5 @@
 import React, { useContext, useEffect, useRef } from "react";
-import {
-  Box,
-  Typography,
-  IconButton,
-  useTheme,
-  Paper,
-  Stack,
-} from "@mui/material";
+import { Box, Typography, IconButton, Stack } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -14,12 +7,11 @@ import { Navigation } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
 import SystemContext from "../../context/System/SystemContext";
-import { Link } from "react-router-dom";
 import PinkSpinner from "../../components/Loading/PinkSpinner";
+import SystemCard from "./SystemCard";
 
 const Systems = () => {
   const { getAllSystems, systems } = useContext(SystemContext);
-  const theme = useTheme();
   const swiperPrevRef = useRef(null);
   const swiperNextRef = useRef(null);
 
@@ -30,388 +22,143 @@ const Systems = () => {
   return (
     <Box
       sx={{
-        background: `
-linear-gradient(181deg,rgba(255, 223, 239, 1) 0%, rgba(255, 255, 255, 1) 100%);
-      radial-gradient(circle at top left, rgba(255,200,220,0.25), transparent 60%)
-    `,
-        p: { xs: 4, sm: 6, md: 8 },
+        background: "linear-gradient(180deg, #FFF0F5 0%, #FFFFFF 100%)",
+        py: { xs: 6, md: 10 },
+        px: { xs: 2, sm: 4, md: 6 },
         position: "relative",
-        minHeight: "70vh",
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "center",
-        borderRadius: "20px",
+        borderRadius: "32px",
         overflow: "hidden",
-
-        // ---------- ANIMACIONES KEYFRAMES ----------
-        "@keyframes floatUp": {
-          "0%": { transform: "translateY(0)" },
-          "100%": { transform: "translateY(-40px)" },
-        },
-        "@keyframes pulse": {
-          "0%": { transform: "scale(1)", opacity: 0.5 },
-          "50%": { transform: "scale(1.15)", opacity: 0.9 },
-          "100%": { transform: "scale(1)", opacity: 0.5 },
-        },
-        "@keyframes rotateSoft": {
-          "0%": { transform: "rotate(0deg)" },
-          "100%": { transform: "rotate(360deg)" },
-        },
-        "@keyframes sparkle": {
-          "0%, 100%": { opacity: 0 },
-          "50%": { opacity: 0.8 },
-        },
-        "@keyframes wave": {
-          "0%": { transform: "translateX(0)" },
-          "100%": { transform: "translateX(40px)" },
-        },
       }}
     >
-      {/* ---- DECORACIONES NUEVAS ---- */}
-
-      {/* 🫧 Burbujas flotando */}
-      {[1, 2, 3, 4].map((b, i) => (
-        <Box
-          key={i}
-          sx={{
-            position: "absolute",
-            width: 20 + i * 6,
-            height: 20 + i * 6,
-            borderRadius: "50%",
-            backgroundColor: "#F8C8D8",
-            opacity: 0.28,
-            filter: "blur(1px)",
-            left: `${10 + i * 15}%`,
-            bottom: `${5 + i * 12}%`,
-            animation: `floatUp ${6 + i * 2}s ease-in-out infinite alternate`,
-            zIndex: 0,
-            display: { xs: "none", md: "block" },
-          }}
-        />
-      ))}
-
-      {/* ✨ Sparkles (brillitos) */}
-      {[1, 2, 3, 4, 5, 6].map((s, i) => (
-        <Box
-          key={i}
-          sx={{
-            position: "absolute",
-            width: 6,
-            height: 6,
-            borderRadius: "50%",
-            backgroundColor: "#DC4485",
-            opacity: 0.7,
-            left: `${20 + i * 10}%`,
-            top: `${15 + i * 8}%`,
-            animation: `sparkle ${2 + i}s ease-in-out infinite`,
-            zIndex: 0,
-            display: { xs: "none", md: "block" },
-          }}
-        />
-      ))}
-
-      {/* 🔄 Círculo girando */}
-      <Box
-        sx={{
-          position: "absolute",
-          width: 140,
-          height: 140,
-          border: "4px solid #F3BBCE",
-          borderRadius: "50%",
-          top: "20%",
-          right: "10%",
-          opacity: 0.25,
-          animation: "rotateSoft 22s linear infinite",
-          zIndex: 0,
-          display: { xs: "none", md: "block" },
-        }}
-      />
-
-      {/* 🌿 Línea ondulada */}
-      <Box
-        sx={{
-          position: "absolute",
-          width: 120,
-          height: 4,
-          background:
-            "linear-gradient(90deg, transparent, #DC4485, transparent)",
-          top: "60%",
-          left: "10%",
-          borderRadius: 2,
-          opacity: 0.4,
-          animation: "wave 6s ease-in-out infinite alternate",
-          zIndex: 0,
-          display: { xs: "none", md: "block" },
-        }}
-      />
-
-      {/* 🌸 Círculo pulsante */}
-      <Box
-        sx={{
-          position: "absolute",
-          bottom: "18%",
-          right: "18%",
-          width: 65,
-          height: 65,
-          borderRadius: "50%",
-          backgroundColor: "#DC4485",
-          opacity: 0.25,
-          animation: "pulse 5s infinite ease-in-out",
-          zIndex: 0,
-          display: { xs: "none", md: "block" },
-        }}
-      />
-
-      {/* DECORACIONES ORIGINALES */}
-      <Box
-        sx={{
-          position: "absolute",
-          top: "10%",
-          left: "5%",
-          width: "50px",
-          height: "20px",
-          borderTop: "3px double #DC4485",
-          borderBottom: "3px double #F3BBCE",
-          transform: "rotate(15deg)",
-          display: { xs: "none", md: "block" },
-          zIndex: 0,
-        }}
-      />
-      <Box
-        sx={{
-          position: "absolute",
-          bottom: "10%",
-          left: "8%",
-          width: "80px",
-          height: "80px",
-          borderRadius: "50% 0 50% 50%",
-          backgroundColor: "#DC4485",
-          opacity: 0.5,
-          display: { xs: "none", md: "block" },
-          zIndex: 0,
-        }}
-      />
-      <Box
-        sx={{
-          position: "absolute",
-          top: "15%",
-          right: "5%",
-          width: "50px",
-          height: "50px",
-          borderRadius: "50%",
-          border: "30px solid #D72E79",
-          opacity: 0.4,
-          display: { xs: "none", md: "block" },
-          zIndex: 0,
-        }}
-      />
-
-      {/* --- Cabecera --- */}
-      <Stack alignItems='center' sx={{ mb: 6, zIndex: 2 }}>
+      {/* Cabecera Editorial */}
+      <Stack alignItems='center' sx={{ mb: 6, px: 2 }}>
         <Typography
-          variant='overline'
+          variant='caption'
           sx={{
-            color: theme.palette.text.secondary,
-            fontWeight: 600,
+            color: "#E53888",
+            fontWeight: "800",
             textTransform: "uppercase",
-            position: "relative",
-            mb: 1,
-            "&::after": {
-              content: '""',
-              position: "absolute",
-              bottom: -4,
-              left: "50%",
-              transform: "translateX(-50%)",
-              width: "40px",
-              height: "4px",
-              backgroundColor: "#DC4485",
-              borderRadius: "2px",
-            },
+            letterSpacing: "2px",
+            mb: 1.5,
           }}
         >
-          {/* Nuestros Cursos */}
+          Ruta de Aprendizaje Profesional
         </Typography>
 
         <Typography
           variant='h3'
           sx={{
-            fontWeight: 700,
+            fontWeight: 900,
             lineHeight: 1.2,
             textAlign: "center",
-            color: "#E53888",
-            fontSize: { xs: "2rem", sm: "2.5rem", md: "3.5rem" },
+            color: "#1F2937",
+            fontSize: { xs: "2.2rem", sm: "2.8rem", md: "3.5rem" },
+            maxWidth: "800px",
           }}
         >
-          Aprende con los {""}
-          <Box component='span' sx={{ position: "relative" }}>
+          Aprende con los{" "}
+          <Box
+            component='span'
+            sx={{
+              color: "#E53888",
+              position: "relative",
+              display: "inline-block",
+            }}
+          >
             10 Secretos
-            <Box
-              component='span'
-              sx={{
-                position: "absolute",
-                left: 0,
-                bottom: 0,
-                width: "100%",
-                height: "8px",
-                backgroundColor: "#E53888",
-                opacity: 0.7,
-                borderRadius: "4px",
-                zIndex: -1,
-              }}
-            />
           </Box>{" "}
           para ser exitosa
         </Typography>
       </Stack>
 
-      {/* --- Carrusel --- */}
+      {/* Contenedor del Carrusel Slider */}
       <Box
         sx={{
           position: "relative",
           width: "100%",
-          maxWidth: "1300px",
+          maxWidth: "1400px",
           mx: "auto",
-          borderRadius: "12px",
-          bgcolor: "transparent",
-          padding: "10px",
+          px: { xs: 1, sm: 6 }, // Deja espacio libre para las flechas laterales en desktop
         }}
       >
-        <Swiper
-          modules={[Navigation]}
-          loop={true}
-          spaceBetween={20}
-          slidesPerView={1}
-          navigation={{
-            prevEl: swiperPrevRef.current,
-            nextEl: swiperNextRef.current,
-          }}
-          onBeforeInit={(swiper) => {
-            swiper.params.navigation.prevEl = swiperPrevRef.current;
-            swiper.params.navigation.nextEl = swiperNextRef.current;
-          }}
-          breakpoints={{
-            600: { slidesPerView: 2, spaceBetween: 25 },
-            900: { slidesPerView: 3, spaceBetween: 30 },
-            1200: { slidesPerView: 4, spaceBetween: 35 },
-          }}
-        >
-          {systems ? (
-            systems.map((system, index) => (
-              <SwiperSlide key={system.id}>
-                <Link
-                  to={`/cursos/bysystem/${system.id}`}
-                  style={{ textDecoration: "none" }}
-                >
-                  <Paper
-                    elevation={3}
-                    sx={{
-                      p: { xs: 3, sm: 4 },
-                      textAlign: "center",
-                      borderRadius: "18px",
-                      minHeight: "300px",
-                      mb: "4px",
-                      ml: "3px",
-                      mr: "3px",
-                    }}
-                  >
-                    <Box
-                      sx={{
-                        width: 100,
-                        height: 100,
-                        borderRadius: "50%",
-                        backgroundColor: "#FCE4EC",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        mx: "auto",
-                        mb: 2,
-                      }}
-                    >
-                      <Box
-                        component='div'
-                        // src={system.icon}
-                        // alt={system.name}
-                        sx={{
-                          width: "80%",
-                          height: "80%",
-                          objectFit: "contain",
-                        }}
-                      >
-                        <Typography
-                          variant='h2'
-                          fontWeight='bold'
-                          color='#E53888'
-                        >
-                          {index + 1}
-                        </Typography>
-                      </Box>
-                    </Box>
-
-                    <Typography variant='h6' sx={{ fontWeight: 700, mb: 1 }}>
-                      {system.name}
-                    </Typography>
-
-                    <Typography
-                      variant='body2'
-                      color='text.secondary'
-                      textAlign='justify'
-                      sx={{
-                        flexGrow: 1,
-                        display: "-webkit-box",
-                        WebkitLineClamp: 5,
-                        WebkitBoxOrient: "vertical",
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
-                      }}
-                    >
-                      {system.description}
-                    </Typography>
-                  </Paper>
-                </Link>
+        {systems && systems.length > 0 ? (
+          <Swiper
+            modules={[Navigation]}
+            loop={systems.length > 4}
+            grabCursor={true}
+            spaceBetween={24}
+            slidesPerView={1.15} // En móvil muestra una y deja asomar la siguiente
+            breakpoints={{
+              640: { slidesPerView: 1.6, spaceBetween: 24 },
+              900: { slidesPerView: 2.5, spaceBetween: 28 },
+              1200: { slidesPerView: 3.5, spaceBetween: 32 },
+              1440: { slidesPerView: 4, spaceBetween: 32 },
+            }}
+            navigation={{
+              prevEl: swiperPrevRef.current,
+              nextEl: swiperNextRef.current,
+            }}
+            onBeforeInit={(swiper) => {
+              swiper.params.navigation.prevEl = swiperPrevRef.current;
+              swiper.params.navigation.nextEl = swiperNextRef.current;
+            }}
+          >
+            {systems.map((system, index) => (
+              <SwiperSlide
+                key={system.id}
+                style={{ height: "auto", display: "flex" }}
+              >
+                <SystemCard system={system} index={index} />
               </SwiperSlide>
-            ))
-          ) : (
-            <PinkSpinner />
-          )}
-        </Swiper>
+            ))}
+          </Swiper>
+        ) : (
+          <Box sx={{ py: 6 }}>
+            <PinkSpinner label='Cargando pilares de estudio...' />
+          </Box>
+        )}
 
-        {/* NAVIGATION BUTTONS */}
+        {/* CONTROLES DE NAVEGACIÓN FLOTANTES PLANOS */}
         <IconButton
           ref={swiperPrevRef}
           sx={{
             position: "absolute",
-            left: { xs: -5, sm: -50 },
+            left: 0,
             top: "50%",
             transform: "translateY(-50%)",
-            backgroundColor: "#E53888",
-            color: "white",
-            "&:hover": { backgroundColor: "#E53888" },
+            backgroundColor: "#fff",
+            color: "#1F2937",
+            border: "1px solid #E5E7EB",
+            "&:hover": { backgroundColor: "#FFF5F7", borderColor: "#F472B6" },
             zIndex: 10,
-            width: 44,
-            height: 44,
+            width: 48,
+            height: 48,
             display: { xs: "none", sm: "flex" },
+            boxShadow: "none",
           }}
         >
-          <ArrowBackIcon />
+          <ArrowBackIcon sx={{ fontSize: "20px" }} />
         </IconButton>
 
         <IconButton
           ref={swiperNextRef}
           sx={{
             position: "absolute",
-            right: { xs: -5, sm: -50 },
+            right: 0,
             top: "50%",
             transform: "translateY(-50%)",
-            backgroundColor: "#E53888",
-            color: "white",
-            "&:hover": { backgroundColor: "#E53888" },
+            backgroundColor: "#fff",
+            color: "#1F2937",
+            border: "1px solid #E5E7EB",
+            "&:hover": { backgroundColor: "#FFF5F7", borderColor: "#F472B6" },
             zIndex: 10,
-            width: 44,
-            height: 44,
+            width: 48,
+            height: 48,
             display: { xs: "none", sm: "flex" },
+            boxShadow: "none",
           }}
         >
-          <ArrowForwardIcon />
+          <ArrowForwardIcon sx={{ fontSize: "20px" }} />
         </IconButton>
       </Box>
     </Box>

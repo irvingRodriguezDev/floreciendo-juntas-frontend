@@ -24,7 +24,7 @@ const menuItems = [
   { name: "10 Secretos", path: "/secretos" },
   { name: "Lives", path: "/lives" },
   { name: "Salón", path: "/el-salon-de-tus-sueños" },
-  { name: "Eventos", path: "/eventos" },
+  // { name: "Eventos", path: "/eventos" },
   { name: "Distribución", path: "/distribucion" },
 ];
 

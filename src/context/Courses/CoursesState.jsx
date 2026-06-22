@@ -81,8 +81,8 @@ const CoursesState = ({ children }) => {
         console.log(error, "ocurrio un error al obtener los ultimos cursos");
       });
   };
-  const getCourseById = (id) => {
-    let url = `/courses/${id}`;
+  const getCourseById = (slug) => {
+    let url = `/courses/${slug}`;
     MethodGet(url)
       .then((res) => {
         dispatch({

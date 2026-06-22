@@ -1,5 +1,5 @@
 import { Box, IconButton, Paper, Badge } from "@mui/material";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import SaloonIcon from "../../icons/SaloonIcon";
 import TicketsIcon from "../../icons/TicketsIcon";
 import ShopIcon from "../../icons/ShopIcon";
@@ -70,9 +70,11 @@ const MobileAppNavigation = ({ cartCount, onOpenSalonCart }) => {
       <IconButton onClick={() => navigate("/el-salon-de-tus-sueños")}>
         <SaloonIcon width={30} />
       </IconButton>
-      <IconButton onClick={() => navigate("/eventos")}>
-        <TicketsIcon width={30} />
-      </IconButton>
+      <Link to='https://eventoswapizima.com/' target='__blank'>
+        <IconButton>
+          <TicketsIcon width={30} />
+        </IconButton>
+      </Link>
       <IconButton onClick={() => navigate("/distribucion")}>
         <DistributionIcon width={30} />
       </IconButton>

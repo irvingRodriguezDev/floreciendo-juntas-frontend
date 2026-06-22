@@ -1,197 +1,227 @@
 import React from "react";
-import {
-  Box,
-  Button,
-  Typography,
-  Card,
-  Stack,
-  Grid,
-  useTheme,
-} from "@mui/material";
+import { Box, Typography, Card, Stack, Grid } from "@mui/material";
 import { motion } from "framer-motion";
 
 import FacebookIcon from "../icons/FacebookIcon";
 import InstagramIcon from "../icons/InstagramIcon";
 import TiktokIcon from "../icons/TiktokIcon";
-import { Link } from "react-router-dom";
+import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 
 const MotionCard = motion.create(Card);
-const MotionStack = motion.create(Stack);
 
 const socialData = [
   {
     id: 1,
     name: "Facebook",
-    followers: "+51K Seguidores",
-    icon: <FacebookIcon width={50} />,
+    followers: "+63K seguidores",
+    icon: <FacebookIcon width={36} />,
     link: "https://www.facebook.com/caarolinataveera",
   },
   {
     id: 2,
     name: "Instagram",
-    followers: "+12K Seguidores",
-    icon: <InstagramIcon width={50} />,
+    followers: "+17K Seguidores",
+    icon: <InstagramIcon width={36} />,
     link: "https://www.instagram.com/carolina_tavera1997/",
   },
   {
     id: 3,
     name: "Tiktok",
-    followers: "+225K Seguidores",
-    icon: <TiktokIcon width={42} />,
+    followers: "+242K Seguidores",
+    icon: <TiktokIcon width={30} />,
     link: "https://www.tiktok.com/@carolina_tavera",
   },
 ];
 
 const SocialCards = () => {
-  const theme = useTheme();
-
   return (
-    <>
+    <Box
+      sx={{
+        width: "100%",
+        background: "linear-gradient(180deg, #FFF0F5 0%, #FFFFFF 100%)",
+        borderRadius: "32px",
+        py: { xs: 6, md: 8 },
+        px: { xs: 2, sm: 4, md: 6 },
+        overflow: "hidden",
+      }}
+    >
       <Grid
         container
         spacing={4}
         justifyContent='center'
-        sx={{
-          py: 5,
-          px: 1,
-          background: `
-linear-gradient(181deg,rgba(255, 223, 239, 1) 0%, rgba(255, 255, 255, 1) 100%);
-      radial-gradient(circle at top left, rgba(255,200,220,0.25), transparent 60%)
-    `,
-          borderRadius: "16px",
-        }}
+        sx={{ maxWidth: "1300px", margin: "0 auto" }}
       >
-        {/* TÍTULO CON ANIMACIÓN */}
+        {/* TÍTULO EDITORIAL */}
         <Grid size={12}>
-          <MotionStack
-            alignItems='center'
-            sx={{ mb: 5 }}
-            initial={{ opacity: 0, y: 40 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, ease: "easeOut" }}
-          >
+          <Stack alignItems='center' sx={{ mb: 4, textAlign: "center" }}>
             <Typography
-              variant='overline'
+              variant='caption'
               sx={{
-                fontWeight: 600,
+                color: "#E53888",
+                fontWeight: "800",
                 textTransform: "uppercase",
-                color: theme.palette.text.secondary,
-                letterSpacing: "1.5px",
+                letterSpacing: "2px",
+                mb: 1,
               }}
             >
-              Síguenos en todas nuestras
+              Comunidad Wapizima
             </Typography>
 
             <Typography
               variant='h3'
               component='h2'
               sx={{
-                fontWeight: 700,
-                textAlign: "center",
+                fontWeight: 900,
+                color: "#1F2937",
                 lineHeight: 1.2,
-                fontSize: { xs: "2.3rem", sm: "3rem", md: "3.4rem" },
+                fontSize: { xs: "2.2rem", sm: "2.8rem", md: "3.4rem" },
               }}
             >
-              Redes{" "}
+              Únete a nuestras{" "}
               <Box
                 component='span'
                 sx={{
-                  position: "relative",
+                  color: "#E53888",
                   display: "inline-block",
-                  px: 0.5,
                 }}
               >
-                Sociales
-                {/* Subrayado animado */}
-                <Box
-                  component={motion.span}
-                  initial={{ width: 0 }}
-                  animate={{ width: "100%" }}
-                  transition={{ duration: 0.8, ease: "easeOut" }}
-                  sx={{
-                    position: "absolute",
-                    bottom: 0,
-                    left: 0,
-                    height: "8px",
-                    backgroundColor: "#FFC5DE",
-                    opacity: 0.9,
-                    borderRadius: "4px",
-                    zIndex: -1,
-                  }}
-                />
+                Redes Sociales
               </Box>
             </Typography>
-          </MotionStack>
+          </Stack>
         </Grid>
 
-        {/* CARDS CON ANIMACIÓN */}
-
+        {/* CARDS PLANAS INTERACTIVAS */}
         {socialData.map((item) => (
           <Grid
-            size={{ xs: 12, sm: 6, md: 3 }}
+            size={{ xs: 12, sm: 6, md: 4 }}
             sx={{ display: "flex", justifyContent: "center" }}
             key={item.id}
           >
-            <Link
-              to={item.link}
+            <Box
+              component='a'
+              href={item.link}
               target='_blank'
               rel='noopener noreferrer'
               aria-label={`Seguir en ${item.name}`}
-              style={{ textDecoration: "none" }}
+              style={{
+                textDecoration: "none",
+                width: "100%",
+                display: "block",
+              }}
             >
               <MotionCard
-                initial={{ opacity: 0, y: 10 }}
+                initial={{ opacity: 0, y: 15 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.5 }}
+                transition={{ duration: 0.4 }}
                 whileHover={{
                   y: -6,
-                  boxShadow: "0 10px 32px rgba(255, 0, 128, 0.18)",
+                  borderColor: "#F472B6",
                 }}
+                elevation={0} // Look plano sin sombras
                 sx={{
                   p: 3,
-                  borderRadius: "18px",
+                  borderRadius: "24px",
                   backgroundColor: "white",
-                  border: "1px solid #FFE4F0",
-                  boxShadow: "0 4px 20px rgba(255, 0, 128, 0.06)",
-                  cursor: "pointer",
-                  transition: "all 0.3s ease",
+                  border: "1px solid #F3F4F6",
+                  transition: "all 0.2s ease-in-out",
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "space-between",
+                  minHeight: "150px",
+                  // Control global de hover para animar la flechita interna
+                  "&:hover .arrow-btn": {
+                    backgroundColor: "#E53888",
+                    color: "#fff",
+                    transform: "translateX(4px)",
+                  },
                 }}
               >
                 {/* ICONO + TEXTO */}
-                <Stack direction='row' alignItems='center' spacing={2}>
+                <Stack direction='row' alignItems='center' spacing={2.5}>
                   <Box
                     sx={{
-                      width: 60,
-                      height: 60,
-                      borderRadius: "14px",
-                      background: "linear-gradient(145deg, #fff, #ffeef5)",
+                      width: 54,
+                      height: 54,
+                      borderRadius: "16px",
+                      background: "#FFF5F7",
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
-                      boxShadow: "0 3px 8px rgba(255,0,128,0.15)",
+                      flexShrink: 0,
                     }}
                   >
                     {item.icon}
                   </Box>
 
                   <Box>
-                    <Typography variant='h6' fontWeight={700}>
+                    <Typography
+                      variant='subtitle1'
+                      sx={{
+                        fontWeight: "800",
+                        color: "#1F2937",
+                        lineHeight: 1.2,
+                        mb: 0.5,
+                      }}
+                    >
                       {item.name}
                     </Typography>
-                    <Typography variant='body2' color='text.secondary'>
+                    <Typography
+                      variant='caption'
+                      sx={{
+                        fontWeight: "700",
+                        color: "#F472B6",
+                        textTransform: "uppercase",
+                        fontSize: "11px",
+                      }}
+                    >
                       {item.followers}
                     </Typography>
                   </Box>
                 </Stack>
 
-                {/* BOTÓN */}
+                {/* BOTÓN / LLAMADO A LA ACCIÓN PLANO */}
+                <Stack
+                  direction='row'
+                  alignItems='center'
+                  justifyContent='space-between'
+                  sx={{ mt: 3, pt: 2, borderTop: "1px solid #FAFAFA" }}
+                >
+                  <Typography
+                    variant='caption'
+                    sx={{
+                      fontWeight: "bold",
+                      color: "#4B5563",
+                      fontSize: "12px",
+                    }}
+                  >
+                    Seguir comunidad
+                  </Typography>
+
+                  <Box
+                    className='arrow-btn'
+                    sx={{
+                      width: 32,
+                      height: 32,
+                      borderRadius: "50%",
+                      backgroundColor: "#FFF5F7",
+                      color: "#E53888",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      transition: "all 0.2s ease-in-out",
+                    }}
+                  >
+                    <ArrowForwardIcon sx={{ fontSize: "16px" }} />
+                  </Box>
+                </Stack>
               </MotionCard>
-            </Link>
+            </Box>
           </Grid>
         ))}
       </Grid>
-    </>
+    </Box>
   );
 };
 

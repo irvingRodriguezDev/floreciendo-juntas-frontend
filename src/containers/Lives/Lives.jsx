@@ -31,46 +31,62 @@ const LivesPage = () => {
         {lives.length === 0 && (
           <Box
             component={motion.div}
-            initial={{ opacity: 0, y: 24 }}
+            initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7 }}
+            transition={{ duration: 0.5, ease: "easeOut" }}
             sx={{
-              mt: { xs: 8, md: 10 },
+              mt: { xs: 6, md: 8 },
               textAlign: "center",
-              px: 3,
+              px: 4,
+              py: 6,
+              backgroundColor: "#FFFFFF",
+              borderRadius: "24px",
+              border: "1px dashed #E5E7EB", // Borde sutil que enmarca el espacio vacío de forma limpia
+              maxWidth: "600px",
+              mx: "auto",
             }}
           >
-            <motion.img
-              src={petal}
-              width={64}
-              alt=''
-              animate={{ y: [0, -10, 0] }}
-              transition={{ repeat: Infinity, duration: 6, ease: "easeInOut" }}
-              style={{ opacity: 0.6, marginBottom: 16 }}
-            />
+            {/* Sello o detalle flotante sutil */}
+            <Box
+              component={motion.div}
+              animate={{ y: [0, -6, 0] }}
+              transition={{ repeat: Infinity, duration: 5, ease: "easeInOut" }}
+              sx={{ mb: 2.5, display: "inline-block" }}
+            >
+              <img
+                src={petal}
+                width={48}
+                alt='Detalle floral'
+                style={{ opacity: 0.4, objectFit: "contain" }}
+              />
+            </Box>
 
+            {/* Título Editorial en tono carbón premium */}
             <Typography
               sx={{
-                fontSize: { xs: "1.6rem", md: "2.2rem" },
+                fontSize: { xs: "1.4rem", md: "1.8rem" },
                 fontWeight: 900,
-                color: "#D82E7A",
-                mb: 1,
+                color: "#1F2937",
+                mb: 1.5,
+                letterSpacing: "-0.5px",
               }}
             >
-              No hay lives programados
+              No hay transmisiones programadas
             </Typography>
 
+            {/* Copy fluido enfocado en la marca */}
             <Typography
               sx={{
-                fontSize: "1rem",
-                color: "#6D5A63",
-                maxWidth: 520,
+                fontSize: "0.95rem",
+                color: "#4B5563",
+                maxWidth: "440px",
                 mx: "auto",
                 lineHeight: 1.6,
               }}
             >
-              Estamos creando nuevos espacios para compartir, aprender y
-              florecer juntas 🌷 Muy pronto habrá novedades.
+              Estamos preparando nuevas masterclasses en vivo y espacios
+              exclusivos para interactuar y florecer juntas. Muy pronto
+              anunciaremos las próximas fechas.
             </Typography>
           </Box>
         )}
@@ -214,8 +230,8 @@ const LivesPage = () => {
                           live.status === "live"
                             ? "linear-gradient(90deg,#E86A92,#FF8FB3)"
                             : live.status === "scheduled"
-                            ? "linear-gradient(90deg,#FFE1EC,#FFB8D2)"
-                            : "#ECECEC",
+                              ? "linear-gradient(90deg,#FFE1EC,#FFB8D2)"
+                              : "#ECECEC",
                         color: live.status === "live" ? "#fff" : "#8A4A62",
                       }}
                     >

@@ -20,7 +20,9 @@ const Home = () => {
           <BannerHome />
           {/* <FullScreenVideo /> */}
         </Grid>
-        <Grid size={12}>{/* <About /> */}</Grid>
+        {/* <Grid size={12}>
+          <About />
+        </Grid> */}
         <Grid size={12}>
           <TopCourses />
         </Grid>
@@ -30,11 +32,12 @@ const Home = () => {
         <Grid size={12}>
           <Systems />
         </Grid>
-        <Grid size={12}>{/* <WhyChooseUsSection /> */}</Grid>
         <Grid size={12}>
-          <LatestEventsSection />
+          <WhyChooseUsSection />
         </Grid>
-        <Grid size={12}>{/* <RifaSalonSuenos /> */}</Grid>{" "}
+        <Grid size={12}>
+          <RifaSalonSuenos />
+        </Grid>{" "}
         <Grid size={12}>
           <SocialLinks />
         </Grid>

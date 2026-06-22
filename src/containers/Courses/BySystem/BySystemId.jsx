@@ -21,7 +21,7 @@ const BySystemId = () => {
   const [loading, setLoading] = useState(false);
   const [debouncedSearch] = useDebounce(search, 600);
   const [page, setPage] = useState(1);
-  const [rowsPerPage, setRowsPerPage] = useState(9);
+  const [rowsPerPage, setRowsPerPage] = useState(12);
   useEffect(() => {
     let url = `/systems/${id}`;
     MethodGet(url)
@@ -93,7 +93,7 @@ const BySystemId = () => {
                   size={{ xs: 12, sm: 6, md: 6, lg: 4, xl: 3 }}
                   sx={{ display: "flex", justifyContent: "center" }}
                 >
-                  <AllCourses courses={c} />
+                  <AllCourses course={c} />
                 </Grid>
               ))
             ) : (

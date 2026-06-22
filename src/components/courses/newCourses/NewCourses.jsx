@@ -218,15 +218,15 @@ const NewCourses = () => {
             modules={[Navigation, Pagination]}
             loop={courses.length > 4}
             grabCursor={true}
-            centeredSlides={true}
+            centeredSlides={false} // Cambiado a false para que en desktop empiece alineado a la izquierda limpiamente
             centerInsufficientSlides={true}
             spaceBetween={20}
             slidesPerView={1.15}
             breakpoints={{
-              640: { slidesPerView: 1.4, spaceBetween: 20 },
-              768: { slidesPerView: 2, spaceBetween: 25 },
-              1024: { slidesPerView: 2.8, spaceBetween: 30 },
-              1440: { slidesPerView: 3.5, spaceBetween: 35 },
+              640: { slidesPerView: 1.5, spaceBetween: 20 },
+              768: { slidesPerView: 2.2, spaceBetween: 24 },
+              1024: { slidesPerView: 3, spaceBetween: 28 },
+              1440: { slidesPerView: 4, spaceBetween: 32 }, // Mostramos un poco más de contenido por pantalla
             }}
             navigation={{
               prevEl: swiperPrevRef.current,
@@ -237,99 +237,129 @@ const NewCourses = () => {
               swiper.params.navigation.nextEl = swiperNextRef.current;
             }}
             style={{
-              padding: theme.spacing(2, 0),
+              padding: "16px 0",
               maxWidth: "1500px",
               margin: "0 auto",
             }}
           >
-            {courses.map((c) => (
-              <SwiperSlide
-                key={c.id}
-                component={motion.div}
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.5 }}
-                whileHover={{ scale: 1.02 }}
-                style={{
-                  display: "flex",
-                  justifyContent: "center",
-                }}
-              >
-                <Link
-                  to={`/detalle-curso/${c.id}`}
+            {courses.map((c) => {
+              const hasProgress = autenticado && usuario?.isSubscribed;
+
+              return (
+                <SwiperSlide
+                  key={c.id}
                   style={{
-                    textDecoration: "none",
-                    width: "100%",
-                    maxWidth: "350px",
+                    display: "flex",
+                    justifyContent: "center",
+                    height: "auto", // Importante para que todas las tarjetas midan lo mismo verticalmente
                   }}
                 >
-                  <Card
-                    component={motion.div}
-                    whileHover={{
-                      boxShadow: "0px 12px 30px rgba(249,113,175,0.8)",
-                    }}
-                    transition={{ duration: 0.3 }}
-                    sx={{
-                      borderRadius: "20px",
-                      overflow: "hidden",
-                      backgroundColor: "#fff",
-                      border: "1px solid #f3f3f3",
-                      cursor: "pointer",
-                      display: "flex",
-                      flexDirection: "column",
-                      boxShadow: "6px 6px 15px rgba(0,0,0,0.08)",
+                  <Link
+                    to={`/detalle-curso/${c.id}`} // 🔥 Corregido para usar tu nuevo sistema de Slug
+                    style={{
+                      textDecoration: "none",
+                      width: "100%",
+                      display: "block",
                     }}
                   >
-                    {/* Imagen */}
-                    <CardMedia
-                      component='img'
-                      image={c.cover_image_url}
-                      alt={c.title}
-                      sx={{
-                        width: "100%",
-                        aspectRatio: {
-                          xs: "5 / 4",
-                          sm: "4 / 3",
-                          md: "3 / 2",
-                          lg: "1 / 1",
-                        },
-                        objectFit: "cover",
-                        borderRadius: { xs: "16px", lg: "12px" },
-                        backgroundColor: "#f5f5f5",
-                        filter: "saturate(0.95)",
-                      }}
-                    />
-
-                    {/* Contenido */}
                     <Box
+                      component={motion.div}
+                      whileHover={{
+                        y: -6,
+                        borderColor: "#F472B6", // Look plano: cambia el color del borde en lugar de luces pesadas
+                      }}
+                      transition={{ duration: 0.2, ease: "easeInOut" }}
                       sx={{
-                        p: 2,
-                        textAlign: "center",
+                        borderRadius: "24px", // Esquinas más suaves y estéticas
+                        overflow: "hidden",
+                        backgroundColor: "#fff",
+                        border: "1px solid #F3F4F6", // Borde gris claro ultra limpio
+                        cursor: "pointer",
                         display: "flex",
                         flexDirection: "column",
-                        alignItems: "center",
-                        gap: 1,
+                        height: "100%", // Hace que todas tengan la misma altura exacta en el slider
+                        boxShadow: "none", // Adiós sombras toscas
+                        transition: "border-color 0.2s ease",
+                        p: 1.5, // Padding contenedor general (diseño tipo cápsula)
                       }}
                     >
-                      {c && autenticado && usuario.isSubscribed && (
-                        <Progress progress={c?.user_progress_percentage ?? 0} />
-                      )}
+                      {/* Imagen del Curso */}
+                      <Box sx={{ width: "100%", position: "relative" }}>
+                        <CardMedia
+                          component='img'
+                          image={c.cover_image_url}
+                          alt={c.title}
+                          sx={{
+                            width: "100%",
+                            aspectRatio: "4 / 3", // Proporción ideal para sliders horizontales
+                            objectFit: "cover",
+                            borderRadius: "16px", // Curvatura interna armoniosa
+                            backgroundColor: "#FFF5F7",
+                          }}
+                        />
+                      </Box>
 
-                      <Typography
-                        variant='subtitle1'
+                      {/* Contenido de la Tarjeta */}
+                      <Box
                         sx={{
-                          fontWeight: 700,
-                          lineHeight: 1.3,
-                          mt: 1.2,
+                          p: 1.5,
+                          pt: 2,
+                          display: "flex",
+                          flexDirection: "column",
+                          flexGrow: 1, // Empuja el contenido hacia abajo uniformemente
+                          justifyContent: "space-between",
                         }}
                       >
-                        {shortenText(c.title, 35)}
-                      </Typography>
+                        {/* Bloque Superior: Progreso y Título */}
+                        <Box>
+                          {hasProgress && (
+                            <Box sx={{ width: "100%", mb: 1.5 }}>
+                              <Progress
+                                progress={c?.user_progress_percentage ?? 0}
+                              />
+                            </Box>
+                          )}
+
+                          <Typography
+                            sx={{
+                              fontWeight: 800,
+                              fontSize: "0.95rem",
+                              lineHeight: 1.35,
+                              color: "#1F2937", // Texto oscuro limpio
+                              // Evitamos la función cortaTexto difuminada por CSS nativo limpio de 2 líneas
+                              display: "-webkit-box",
+                              WebkitLineClamp: 2,
+                              WebkitBoxOrient: "vertical",
+                              overflow: "hidden",
+                              textOverflow: "ellipsis",
+                              minHeight: "2.6rem",
+                            }}
+                          >
+                            {c.title}
+                          </Typography>
+                        </Box>
+
+                        {/* Bloque Inferior: Detalles del Curso (Añade valor de negocio) */}
+                        <Typography
+                          variant='caption'
+                          sx={{
+                            color: "#E91E63",
+                            fontWeight: "bold",
+                            mt: 1.5,
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "space-between",
+                          }}
+                        >
+                          <span>{c.videosCount || 0} Lecciones</span>
+                          <span>Ver →</span>
+                        </Typography>
+                      </Box>
                     </Box>
-                  </Card>
-                </Link>
-              </SwiperSlide>
-            ))}
+                  </Link>
+                </SwiperSlide>
+              );
+            })}
           </Swiper>
         )}
 

@@ -6,6 +6,7 @@ import {
   LinearProgress,
   Button,
   IconButton,
+  Stack,
 } from "@mui/material";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import PauseIcon from "@mui/icons-material/Pause";
@@ -32,7 +33,7 @@ const VideoPlayer = ({
 
   const [isPlaying, setIsPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
-  const [certificateEnabled, setCertificateEnabled] = useState(false);
+  const [certificateEnabled, setCertificateEnabled] = useState(true);
 
   const LOCAL_KEY = `video-progress-${userId}-${courseId}`;
 
@@ -91,87 +92,87 @@ const VideoPlayer = ({
      Obtener estado backend (1 vez)
   ============================== */
 
-  useEffect(() => {
-    const fetchProgress = async () => {
-      try {
-        const { data } = await MethodGet(
-          `/progress-video/${userId}/${courseId}`,
-        );
+  // useEffect(() => {
+  //   const fetchProgress = async () => {
+  //     try {
+  //       const { data } = await MethodGet(
+  //         `/progress-video/${userId}/${courseId}`,
+  //       );
 
-        if (data?.certificate_enabled) {
-          setCertificateEnabled(true);
-          setProgress(100);
-          alreadySentRef.current = true;
-          clearLocalProgress();
-        }
-      } catch (error) {
-        console.error("Error obteniendo progreso:", error);
-      }
-    };
+  //       if (data?.certificate_enabled) {
+  //         setCertificateEnabled(true);
+  //         setProgress(100);
+  //         alreadySentRef.current = true;
+  //         clearLocalProgress();
+  //       }
+  //     } catch (error) {
+  //       console.error("Error obteniendo progreso:", error);
+  //     }
+  //   };
 
-    fetchProgress();
-  }, [userId, courseId]);
+  //   fetchProgress();
+  // }, [userId, courseId]);
 
   /* ==============================
      Restaurar progreso local
   ============================== */
-  useEffect(() => {
-    const video = videoRef.current;
-    if (!video || certificateEnabled) return;
+  // useEffect(() => {
+  //   const video = videoRef.current;
+  //   if (!video || certificateEnabled) return;
 
-    const seconds = getLocalProgress();
-    if (seconds > 5) {
-      video.currentTime = seconds;
-    }
-  }, [certificateEnabled]);
+  //   const seconds = getLocalProgress();
+  //   if (seconds > 5) {
+  //     video.currentTime = seconds;
+  //   }
+  // }, [certificateEnabled]);
 
   /* ==============================
      Progreso (cada 5s 🔥)
   ============================== */
-  useEffect(() => {
-    if (certificateEnabled) return;
+  // useEffect(() => {
+  //   if (certificateEnabled) return;
 
-    intervalRef.current = setInterval(() => {
-      const video = videoRef.current;
-      if (!video || !video.duration) return;
+  //   intervalRef.current = setInterval(() => {
+  //     const video = videoRef.current;
+  //     if (!video || !video.duration) return;
 
-      const percent = Math.floor((video.currentTime / video.duration) * 100);
+  //     const percent = Math.floor((video.currentTime / video.duration) * 100);
 
-      setProgress(percent);
-      saveLocalProgress(video.currentTime);
+  //     setProgress(percent);
+  //     saveLocalProgress(video.currentTime);
 
-      if (percent >= 80 && !alreadySentRef.current) {
-        unlockCertificate(video);
-      }
-    }, 5000); // ⬅️ antes era 1000ms
+  //     if (percent >= 80 && !alreadySentRef.current) {
+  //       unlockCertificate(video);
+  //     }
+  //   }, 5000); // ⬅️ antes era 1000ms
 
-    return () => {
-      clearInterval(intervalRef.current);
-      intervalRef.current = null;
-    };
-  }, [certificateEnabled]);
+  //   return () => {
+  //     clearInterval(intervalRef.current);
+  //     intervalRef.current = null;
+  //   };
+  // }, [certificateEnabled]);
 
   /* ==============================
      Backend call (UNA sola vez)
   ============================== */
-  const unlockCertificate = async (video) => {
-    if (alreadySentRef.current) return;
+  // const unlockCertificate = async (video) => {
+  //   if (alreadySentRef.current) return;
 
-    alreadySentRef.current = true;
-    setCertificateEnabled(true);
-    clearLocalProgress();
+  //   alreadySentRef.current = true;
+  //   setCertificateEnabled(true);
+  //   clearLocalProgress();
 
-    try {
-      await MethodPost(`/progress-video/${userId}/${courseId}`, {
-        secondsWatched: Math.floor(video.currentTime),
-        totalSeconds: Math.floor(video.duration),
-        progress: 100,
-        certificate_enabled: true,
-      });
-    } catch (error) {
-      console.error("Error habilitando certificado:", error);
-    }
-  };
+  //   try {
+  //     await MethodPost(`/progress-video/${userId}/${courseId}`, {
+  //       secondsWatched: Math.floor(video.currentTime),
+  //       totalSeconds: Math.floor(video.duration),
+  //       progress: 100,
+  //       certificate_enabled: true,
+  //     });
+  //   } catch (error) {
+  //     console.error("Error habilitando certificado:", error);
+  //   }
+  // };
 
   /* ==============================
      Video ended (fallback)
@@ -201,7 +202,7 @@ const VideoPlayer = ({
   ============================== */
   const safeUserName = usuario?.name ?? "";
   return (
-    <Box sx={{ maxWidth: 900, mx: "auto", mt: 4 }}>
+    <Box sx={{ maxWidth: "100%", mx: "auto", mt: 4 }}>
       <Box
         sx={{
           position: "relative",
@@ -243,11 +244,11 @@ const VideoPlayer = ({
       </Box>
 
       <Box sx={{ mt: 3, p: 2, borderRadius: 2, backgroundColor: "#FFF6F9" }}>
-        <Typography fontWeight={700}>{title}</Typography>
-        <Typography fontSize='0.85rem' color='#DC4485'>
+        <Typography fontWeight={700}>{title} </Typography>
+        {/* <Typography fontSize='0.85rem' color='#DC4485'>
           Has avanzado un {progress}%
-        </Typography>
-
+        </Typography> */}
+        {/* 
         <LinearProgress
           variant='determinate'
           value={progress}
@@ -257,52 +258,166 @@ const VideoPlayer = ({
             backgroundColor: "#F3D6DF",
             "& .MuiLinearProgress-bar": { backgroundColor: "#E53888" },
           }}
-        />
+        /> */}
       </Box>
+      {/* 📚 BLOQUE MATERIAL DE TRABAJO (WORKBOOK) */}
       {workbookUrl !== null && (
-        <Box sx={{ mt: 3, p: 2, borderRadius: 2, backgroundColor: "#FFF6F9" }}>
-          <Typography fontSize='0.85rem' color='#DC4485'>
-            Este curso contiene un material de trabajo
-          </Typography>
-          <Link to={workbookUrl} target='__blank'>
-            <Button
-              variant='contained'
-              sx={{ borderRadius: "12px", bgcolor: "#e43888", mt: 2 }}
+        <Box
+          sx={{
+            mt: 3,
+            p: 2.5,
+            borderRadius: "20px",
+            backgroundColor: "#F9FAFB", // Fondo neutro limpio para diferenciarlo del premio
+            border: "1px solid #F3F4F6",
+            display: "flex",
+            flexDirection: { xs: "column", sm: "row" },
+            alignItems: { xs: "flex-start", sm: "center" },
+            justifyContent: "space-between",
+            gap: 2,
+          }}
+        >
+          <Stack direction='row' alignItems='center' spacing={1.5}>
+            <Box
+              sx={{
+                width: 40,
+                height: 40,
+                borderRadius: "12px",
+                backgroundColor: "#FFF5F7",
+                color: "#E53888",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontSize: "1.2rem",
+                flexShrink: 0,
+              }}
             >
-              Consiguelo aquí
-            </Button>
-          </Link>
+              📖
+            </Box>
+            <Box>
+              <Typography
+                variant='subtitle2'
+                sx={{ fontWeight: "800", color: "#1F2937", lineHeight: 1.2 }}
+              >
+                Material didáctico disponible
+              </Typography>
+              <Typography
+                variant='caption'
+                sx={{ color: "#6B7280", fontWeight: 500 }}
+              >
+                Este curso contiene un cuaderno de trabajo complementario en
+                PDF.
+              </Typography>
+            </Box>
+          </Stack>
+
+          <Button
+            variant='outlined'
+            component='a' // Cambiado a ancla nativa segura para archivos de S3
+            href={workbookUrl}
+            target='_blank'
+            rel='noopener noreferrer'
+            sx={{
+              width: { xs: "100%", sm: "auto" },
+              borderColor: "#E53888",
+              color: "#E53888",
+              fontWeight: "bold",
+              fontSize: "0.85rem",
+              textTransform: "none",
+              borderRadius: "12px",
+              px: 3,
+              py: 1,
+              "&:hover": {
+                borderColor: "#C2185B",
+                backgroundColor: "#FFF5F7",
+              },
+            }}
+          >
+            Descargar Workbook
+          </Button>
         </Box>
       )}
 
+      {/* 🌸 BLOQUE RECONOCIMIENTO OFICIAL */}
       {certificateEnabled && hasCertificate && safeUserName && (
         <Box
           sx={{
-            mt: 4,
-            p: 3,
-            borderRadius: 2,
-            backgroundColor: "#FFF6F9",
+            mt: 3.5, // Ajustado para un espaciado armónico si coexisten ambos
+            p: { xs: 3, md: 4 },
+            borderRadius: "24px",
+            backgroundColor: "#FFF4FA",
+            border: "1px dashed #E53888",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
             textAlign: "center",
           }}
         >
-          <Typography fontSize='1.8rem' fontWeight={700} color='#e53888'>
-            ¡Reconocimiento disponible! 🌸
+          <Box
+            sx={{
+              width: 54,
+              height: 54,
+              borderRadius: "50%",
+              backgroundColor: "#ffffff",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              fontSize: "1.6rem",
+              mb: 2,
+              border: "1px solid #FCE7F3",
+            }}
+          >
+            🌸
+          </Box>
+
+          <Typography
+            variant='h6'
+            sx={{
+              fontWeight: 900,
+              color: "#1F2937",
+              letterSpacing: "-0.5px",
+              mb: 0.5,
+            }}
+          >
+            ¡Tu reconocimiento está listo!
+          </Typography>
+
+          <Typography
+            variant='body2'
+            sx={{
+              color: "#6B7280",
+              maxWidth: "400px",
+              mb: 3,
+              lineHeight: 1.5,
+            }}
+          >
+            Felicidades por concluir tus horas de práctica. Ya puedes descargar
+            tu reconocimiento oficial firmado por las instructoras de Wapizima.
           </Typography>
 
           <Button
-            fullWidth
-            sx={{
-              mt: 2,
-              width: "50%",
-              backgroundColor: "#DC4485",
-              color: "#fff",
-              fontWeight: 600,
-              textTransform: "uppercase",
-              borderRadius: "18px",
-            }}
+            variant='contained'
             onClick={() => downloadCertificate(courseId, safeUserName || "")}
+            endIcon={<SimCardDownloadIcon sx={{ fontSize: "18px" }} />}
+            sx={{
+              width: { xs: "100%", sm: "auto" },
+              minWidth: "240px",
+              backgroundColor: "#E53888",
+              color: "#ffffff",
+              fontWeight: "bold",
+              fontSize: "0.9rem",
+              textTransform: "none",
+              borderRadius: "14px",
+              px: 4,
+              py: 1.4,
+              boxShadow: "none",
+              transition: "all 0.2s ease-in-out",
+              "&:hover": {
+                backgroundColor: "#C2185B",
+                boxShadow: "none",
+              },
+            }}
           >
-            Descargar Reconocimiento <SimCardDownloadIcon />
+            Descargar Reconocimiento
           </Button>
         </Box>
       )}

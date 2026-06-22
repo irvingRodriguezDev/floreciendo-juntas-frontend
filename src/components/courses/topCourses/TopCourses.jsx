@@ -9,6 +9,7 @@ import "swiper/css";
 
 import CoursesContext from "../../../context/Courses/CoursesContext";
 import { Link } from "react-router-dom";
+import TopCourseCard from "./TopCourseCard";
 
 const TopCourses = () => {
   const { getTopTenCourses, topCourses } = useContext(CoursesContext);
@@ -107,79 +108,11 @@ linear-gradient(181deg,rgba(255, 223, 239, 1) 0%, rgba(255, 255, 255, 1) 100%);
       >
         {topCourses &&
           topCourses.map((course, index) => (
-            <Grid size={{ xs: 12, sm: 6, md: 4, lg: 3, xl: 3 }} key={index}>
-              <Link
-                to={`/detalle-curso/${course.courseId}`}
-                style={{ textDecoration: "none" }}
-              >
-                <Grid container spacing={2}>
-                  <Box
-                    className='nf-card-container'
-                    sx={{
-                      position: "relative",
-                      borderRadius: "12px",
-                      overflow: "hidden",
-                      // boxShadow: "0px 4px 12px rgba(0,0,0,0.1)",
-                      background: "transparent",
-                    }}
-                  >
-                    <Grid size={12} sx={{ backgroundColor: "transparent" }}>
-                      <Box
-                        className='nf-number'
-                        sx={{
-                          position: "absolute",
-                          top: "15%",
-                          background: "rgba(255, 255, 255, 0.23)",
-                          backdropFilter: "blur(18.5px)",
-                          color: "transparent",
-                          width: { xs: "70px", md: "100px" },
-                          height: { xs: "70px", md: "100px" },
-                          left: "0%",
-                          borderRadius: "50%",
-                          display: "flex",
-                          justifyContent: "center",
-                          alignItems: "center",
-                          fontSize: { xs: "50px", sm: "60px", md: "70px" },
-                          zIndex: 2,
-                          transition: "transform 0.3s",
-                          "&:hover": {
-                            transform: "scale(1.05)",
-                          },
-                        }}
-                      >
-                        {index + 1}
-                      </Box>
-
-                      <CardMedia
-                        component='img'
-                        image={course.cover_image_url}
-                        alt={course.title}
-                        sx={{
-                          width: "100%",
-                          aspectRatio: "1 / 1",
-                          objectFit: "cover",
-                          borderRadius: { xs: "16px", lg: "12px" },
-                          backgroundColor: "#f5f5f5",
-                          filter: "saturate(0.95)",
-                        }}
-                      />
-                    </Grid>
-                    <Grid
-                      size={12}
-                      sx={{
-                        bg: "white",
-                        textAlign: "center",
-                        textTransform: "uppercase",
-                        color: "#EA4F9B",
-                        fontWeight: "bold",
-                      }}
-                    >
-                      <Typography fontWeight='bold'>{course.title}</Typography>
-                    </Grid>
-                  </Box>
-                </Grid>
-              </Link>
-            </Grid>
+            <TopCourseCard
+              key={course.id || index}
+              course={course}
+              index={index}
+            />
           ))}
       </Grid>
     </Box>

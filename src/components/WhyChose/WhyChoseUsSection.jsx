@@ -14,7 +14,7 @@ import SchoolIcon from "@mui/icons-material/School";
 import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
 import PlayCircleFilledIcon from "@mui/icons-material/PlayCircleFilled";
 import CloseIcon from "@mui/icons-material/Close";
-// import image from "../../assets/images/Captura de pantalla 2025-11-24 a la(s) 1.26.37 p.m..png";
+import image from "../../assets/images/Captura de pantalla 2025-11-24 a la(s) 1.26.37 p.m..png";
 // Datos de las características
 const features = [
   {
@@ -192,7 +192,7 @@ const WhyChooseUsSection = () => {
           {/* IZQUIERDA */}
           <Grid size={{ xs: 12, md: 6 }}>
             <Stack spacing={5}>
-              <Stack sx={{ textAlign: "justify" }}>
+              <Stack>
                 <Typography
                   variant='overline'
                   sx={{
@@ -262,16 +262,16 @@ const WhyChooseUsSection = () => {
                 border: `10px solid #F971AF`,
               }}
             >
-              {/* <Box
+              <Box
                 component='img'
                 src={image}
                 alt='Estudiantes aprendiendo'
                 loading='lazy'
                 sx={{ width: "100%", height: "100%", objectFit: "cover" }}
-              /> */}
+              />
 
               {/* Botón Play */}
-              <Box
+              {/* <Box
                 sx={{
                   position: "absolute",
                   top: "50%",
@@ -294,7 +294,7 @@ const WhyChooseUsSection = () => {
                 <PlayCircleFilledIcon
                   sx={{ fontSize: 85, color: "white", position: "relative" }}
                 />
-              </Box>
+              </Box> */}
             </Box>
           </Grid>
         </Grid>

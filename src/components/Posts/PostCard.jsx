@@ -8,13 +8,13 @@ import {
   Stack,
   TextField,
   Avatar,
-  IconButton,
   CardMedia,
   Paper,
   Collapse,
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
+import ChatBubbleOutlineIcon from "@mui/icons-material/ChatBubbleOutline";
 import ReactionButtons from "./ReactionButtons";
 import Comment from "./Comment";
 import dayjs from "dayjs";
@@ -26,21 +26,22 @@ import AuthContext from "../../context/Auth/AuthContext";
 dayjs.extend(relativeTime);
 dayjs.locale("es");
 
-const PostCard = ({ posts }) => {
+const PostCard = ({ posts = [] }) => {
   const { getReactionsForPosts, reactionsSummary } = useContext(PostsContext);
   const { usuario } = useContext(AuthContext);
 
   useEffect(() => {
-    if (posts.length && usuario?.id) {
+    if (posts && posts.length && usuario?.id) {
       const postIds = posts.map((p) => p.id);
       getReactionsForPosts(postIds, usuario.id);
     }
-  }, [usuario?.id]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [usuario?.id, posts?.length]);
 
   if (!posts || !posts.length) return null;
 
   return (
-    <Stack spacing={2}>
+    <Stack spacing={2.5} sx={{ width: "100%" }}>
       {posts.map((post) => {
         const reactionsData = reactionsSummary[post.id] || {
           summary: {},
@@ -69,190 +70,237 @@ const PostItem = ({ post }) => {
   const [expanded, setExpanded] = useState(false);
   const [newComment, setNewComment] = useState("");
 
-  // ✅ Elimina estado local de comentarios, ya vienen de `post.comments`
   const comments = post.comments || [];
 
   const handleAddComment = async () => {
     const trimmed = newComment.trim();
     if (!trimmed) return;
 
-    // Body
     const data = {
-      userId: usuario.id,
+      userId: usuario?.id,
       postId: post.id,
       comment: trimmed,
     };
 
-    // Params -> userId
-    await createComment(data, usuario.id);
-
+    await createComment(data, usuario?.id);
     setNewComment("");
   };
 
   return (
     <Paper
-      elevation={3}
+      elevation={0} // 100% Look plano e impecable
       sx={{
-        borderRadius: "20px",
+        borderRadius: "24px",
+        backgroundColor: "#ffffff",
+        border: "1px solid #F3F4F6",
+        width: "100%",
         overflow: "hidden",
-        transition: "all 0.25s ease-in-out",
-        "&:hover": {
-          transform: "translateY(-2px)",
-          boxShadow: "0 8px 20px rgba(0,0,0,0.08)",
-        },
       }}
     >
-      <CardContent sx={{ p: 3 }}>
-        {/* Header */}
-        <Stack direction='row' alignItems='center' spacing={2} mb={1.5}>
+      <CardContent sx={{ p: { xs: 2.5, sm: 3 } }}>
+        {/* Cabecera de Autor Editorial */}
+        <Stack direction='row' alignItems='center' spacing={2} mb={2}>
           <Avatar
             alt={post.author?.name}
-            src={post.author?.profileImage || "/static/images/avatar/1.jpg"}
+            src={post.author?.profileImage}
             sx={{
-              width: 48,
-              height: 48,
-              border: "2px solid #FAD1E3",
-              boxShadow: "0 0 0 2px rgba(216,46,136,0.2)",
+              width: 44,
+              height: 44,
+              backgroundColor: "#FFF5F7",
+              color: "#E53888",
+              fontWeight: "bold",
+              fontSize: "14px",
+              border: "1px solid #FCE7F3",
             }}
-          />
+          >
+            {post.author?.name?.charAt(0).toUpperCase() || "A"}
+          </Avatar>
           <Box>
             <Typography
-              variant='subtitle1'
-              sx={{ fontWeight: 600, color: "#333" }}
+              variant='subtitle2'
+              sx={{
+                fontWeight: "800",
+                color: "#1F2937",
+                lineHeight: 1.2,
+                mb: 0.3,
+              }}
             >
-              {post.author?.name || "Anónimo"}
+              {post.author?.name || "Alumna Wapizima"}
             </Typography>
-            <Typography variant='caption' color='text.secondary'>
+            <Typography
+              variant='caption'
+              sx={{ color: "#9CA3AF", fontWeight: 500 }}
+            >
               {dayjs(post.createdAt).fromNow()}
             </Typography>
           </Box>
         </Stack>
 
-        {/* Contenido */}
-        <Typography variant='body1' sx={{ mb: 2, color: "#444" }}>
+        {/* Cuerpo del Texto */}
+        <Typography
+          variant='body1'
+          sx={{
+            mb: 2,
+            color: "#374151",
+            lineHeight: 1.6,
+            fontSize: "0.98rem",
+            whiteSpace: "pre-line", // Mantiene saltos de línea de la alumna
+          }}
+        >
           {post.content}
         </Typography>
 
-        {/* Imagen adjunta */}
+        {/* Imagen Adjunta Tipo Galería */}
         {post.attachments && (
           <Box
             sx={{
               width: "100%",
-              maxHeight: 420,
+              maxHeight: 460,
               borderRadius: "16px",
               overflow: "hidden",
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              mb: 2,
-              boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+              backgroundColor: "#F9FAFB",
+              border: "1px solid #F3F4F6",
+              mb: 2.5,
             }}
           >
             <CardMedia
               component='img'
               image={post.attachments}
-              alt='Post attachment'
+              alt='Avance de práctica'
               sx={{
                 objectFit: "cover",
                 width: "100%",
                 height: "100%",
+                maxHeight: 460,
               }}
             />
           </Box>
         )}
 
-        {/* Reacciones */}
-        <Box sx={{ mb: 1 }}>
-          <ReactionButtons
-            target={{
-              ...post,
-              reactions: reactionsSummary[post.id] || {},
-              userReaction: post.userReaction || null,
-            }}
-          />
-        </Box>
-
-        <Divider sx={{ my: 2 }} />
-
-        {/* Botón para ver comentarios */}
-        <Box
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "end",
-            gap: 0.5,
-          }}
+        {/* Barra de Acciones e Interacción */}
+        <Stack
+          direction='row'
+          alignItems='center'
+          justifyContent='space-between'
+          sx={{ mt: 1, pt: 1 }}
         >
+          {/* Componente de Reacciones */}
+          <Box>
+            <ReactionButtons
+              target={{
+                ...post,
+                reactions: reactionsSummary[post.id] || {},
+                userReaction: post.userReaction || null,
+              }}
+            />
+          </Box>
+
+          {/* Gatillo Desplegable Comentarios */}
           <Button
             size='small'
             onClick={() => setExpanded((prev) => !prev)}
-            endIcon={
-              expanded ? (
-                <ExpandLessIcon sx={{ color: "#D82E7A" }} />
-              ) : (
-                <ExpandMoreIcon sx={{ color: "#D82E7A" }} />
-              )
-            }
+            startIcon={<ChatBubbleOutlineIcon sx={{ fontSize: "18px" }} />}
+            endIcon={expanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+            sx={{
+              textTransform: "none",
+              color: expanded ? "#E53888" : "#6B7280",
+              fontWeight: "bold",
+              fontSize: "13px",
+              borderRadius: "10px",
+              px: 1.5,
+              py: 0.5,
+              "&:hover": {
+                backgroundColor: "#FFF5F7",
+                color: "#E53888",
+              },
+            }}
           >
-            <Typography variant='subtitle2' color='#D82E7A' fontWeight={600}>
-              {expanded
-                ? "Ocultar comentarios"
-                : `Ver comentarios (${comments.length})`}
-            </Typography>
+            {comments.length === 0
+              ? "Comentar"
+              : `${comments.length} comentarios`}
           </Button>
-        </Box>
+        </Stack>
 
-        {/* Sección de comentarios */}
+        {/* Sección Expandible de Comentarios en Bloque Dedicado */}
         <Collapse in={expanded} timeout='auto' unmountOnExit>
-          <Stack spacing={1.5} sx={{ mt: 1 }}>
-            {comments.length > 0 ? (
-              comments.map((c) => <Comment key={c.id} comment={c} />)
-            ) : (
-              <Typography
-                variant='body2'
-                color='text.secondary'
-                sx={{ fontStyle: "italic" }}
-              >
-                No hay comentarios todavía. Sé el primero en comentar 💬
-              </Typography>
-            )}
-          </Stack>
+          <Box
+            sx={{
+              mt: 2.5,
+              p: 2,
+              borderRadius: "18px",
+              backgroundColor: "#F9FAFB", // Contenedor sutil para anidar respuestas
+              border: "1px solid #F3F4F6",
+            }}
+          >
+            <Stack spacing={2} sx={{ mb: 2 }}>
+              {comments.length > 0 ? (
+                comments.map((c) => <Comment key={c.id} comment={c} />)
+              ) : (
+                <Typography
+                  variant='caption'
+                  sx={{
+                    color: "#9CA3AF",
+                    fontStyle: "italic",
+                    display: "block",
+                    py: 1,
+                  }}
+                >
+                  No hay comentarios todavía en esta publicación.
+                </Typography>
+              )}
+            </Stack>
 
-          {/* Input de nuevo comentario */}
-          <Box sx={{ display: "flex", alignItems: "center", gap: 1, mt: 2 }}>
-            <TextField
-              size='small'
-              fullWidth
-              placeholder='Escribe un comentario...'
-              value={newComment}
-              onChange={(e) => setNewComment(e.target.value)}
-              onKeyPress={(e) => e.key === "Enter" && handleAddComment()}
-              sx={{
-                "& .MuiOutlinedInput-root": {
-                  borderRadius: "16px",
-                  "& fieldset": {
-                    borderColor: "rgba(216,46,136,0.3)",
-                    borderWidth: "2px",
+            <Divider sx={{ my: 1.5, borderColor: "#E5E7EB" }} />
+
+            {/* Input de Respuesta Tipo Cápsula */}
+            <Stack direction='row' alignItems='center' gap={1.5}>
+              <TextField
+                size='small'
+                fullWidth
+                placeholder='Escribe una respuesta a tus compañeras...'
+                value={newComment}
+                onChange={(e) => setNewComment(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && handleAddComment()}
+                sx={{
+                  "& .MuiOutlinedInput-root": {
+                    borderRadius: "14px",
+                    backgroundColor: "#ffffff",
+                    fontSize: "0.9rem",
+                    "& fieldset": {
+                      borderColor: "#E5E7EB",
+                    },
+                    "&:hover fieldset": { borderColor: "#F472B6" },
+                    "&.Mui-focused fieldset": { borderColor: "#E53888" },
                   },
-                  "&:hover fieldset": { borderColor: "#D82E7A" },
-                  "&.Mui-focused fieldset": { borderColor: "#D82E7A" },
-                },
-              }}
-            />
-            <Button
-              variant='contained'
-              onClick={handleAddComment}
-              disabled={!newComment.trim()}
-              sx={{
-                bgcolor: "#D82E7A",
-                borderRadius: "12px",
-                textTransform: "none",
-                fontWeight: 600,
-                "&:hover": { bgcolor: "#c0256b" },
-              }}
-            >
-              Comentar
-            </Button>
+                }}
+              />
+              <Button
+                variant='contained'
+                onClick={handleAddComment}
+                disabled={!newComment.trim()}
+                sx={{
+                  backgroundColor: "#E53888",
+                  color: "white",
+                  borderRadius: "12px",
+                  textTransform: "none",
+                  fontWeight: "bold",
+                  px: 2.5,
+                  fontSize: "13px",
+                  boxShadow: "none",
+                  height: "38px",
+                  "&:hover": {
+                    backgroundColor: "#C2185B",
+                    boxShadow: "none",
+                  },
+                  "&.Mui-disabled": {
+                    backgroundColor: "#E5E7EB",
+                    color: "#9CA3AF",
+                  },
+                }}
+              >
+                Responder
+              </Button>
+            </Stack>
           </Box>
         </Collapse>
       </CardContent>

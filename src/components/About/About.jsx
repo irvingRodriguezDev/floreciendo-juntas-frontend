@@ -10,8 +10,8 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, Pagination } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/pagination";
-// import foto1 from "../../assets/images/IMG_7049.JPG";
-// import foto2 from "../../assets/images/IMG_7048.JPG";
+import foto1 from "../../assets/images/IMG_7049.JPG";
+import foto2 from "../../assets/images/IMG_7048.JPG";
 
 // Componente de estadísticas
 const StatisticCard = ({ icon: Icon, value, label, color }) => (
@@ -52,18 +52,18 @@ const StatisticCard = ({ icon: Icon, value, label, color }) => (
 
 const About = () => {
   const theme = useTheme();
-  // const slides = [
-  //   {
-  //     img: foto1,
-  //     title: "+10 Años",
-  //     text: "de experiencia formando manicuristas exitosas",
-  //   },
-  //   {
-  //     img: foto2,
-  //     title: "Certificaciones",
-  //     text: "Cursos avalados y reconocidos",
-  //   },
-  // ];
+  const slides = [
+    {
+      img: foto1,
+      title: "+10 Años",
+      text: "de experiencia formando manicuristas exitosas",
+    },
+    {
+      img: foto2,
+      title: "Certificaciones",
+      text: "Cursos avalados y reconocidos",
+    },
+  ];
   return (
     <Box
       sx={{
@@ -92,7 +92,7 @@ const About = () => {
             loop
             style={{ width: "100%", maxWidth: 650 }}
           >
-            {/* {slides.map((item, i) => (
+            {slides.map((item, i) => (
               <SwiperSlide key={i}>
                 <Box
                   sx={{
@@ -162,7 +162,7 @@ const About = () => {
                   </Paper>
                 </Box>
               </SwiperSlide>
-            ))} */}
+            ))}
           </Swiper>
         </Grid>
 

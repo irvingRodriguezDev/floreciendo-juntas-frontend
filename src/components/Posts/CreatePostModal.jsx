@@ -1,4 +1,4 @@
-import { useContext, useState, useEffect } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -9,12 +9,11 @@ import {
   IconButton,
   Box,
   Typography,
-  ImageListItem,
   Stack,
-  Divider,
 } from "@mui/material";
 import AttachFileIcon from "@mui/icons-material/AttachFile";
 import DeleteIcon from "@mui/icons-material/Delete";
+import CloseIcon from "@mui/icons-material/Close";
 import PostsContext from "../../context/Posts/PostsContext";
 
 const CreatePostModal = ({ open, onClose, courseId }) => {
@@ -25,15 +24,14 @@ const CreatePostModal = ({ open, onClose, courseId }) => {
   const handleChangeImage = (e) => {
     const file = e.target.files[0];
     if (file) {
-      // Liberar la URL anterior si existía
       if (image?.urlPhoto) URL.revokeObjectURL(image.urlPhoto);
 
       setImage({
         urlPhoto: URL.createObjectURL(file),
-        file, // El File real para enviar
+        file,
       });
     }
-    e.target.value = null; // Para poder seleccionar el mismo archivo otra vez
+    e.target.value = null;
   };
 
   const handleDeleteImage = () => {
@@ -47,6 +45,13 @@ const CreatePostModal = ({ open, onClose, courseId }) => {
     onClose();
   };
 
+  // 🔥 Limpieza en el desmontaje para evitar fugas de memoria
+  useEffect(() => {
+    return () => {
+      if (image?.urlPhoto) URL.revokeObjectURL(image.urlPhoto);
+    };
+  }, [image]);
+
   const handleSubmit = async () => {
     if (!content.trim() && !image) return;
 
@@ -55,7 +60,7 @@ const CreatePostModal = ({ open, onClose, courseId }) => {
     formData.append("content", content);
 
     if (image) {
-      formData.append("attachment", image.file); // File real
+      formData.append("attachment", image.file);
     }
 
     await createPost(formData);
@@ -69,114 +74,134 @@ const CreatePostModal = ({ open, onClose, courseId }) => {
       open={open}
       onClose={handleClose}
       fullWidth
-      maxWidth='md'
+      maxWidth='sm' // Ajustado a SM para que se vea más compacto y estético estilo app móvil de lujo
       PaperProps={{
         sx: {
-          borderRadius: "12px",
-          background: "linear-gradient(180deg, #fff, #fff6fa)",
-          boxShadow: "0px 8px 24px rgba(216, 46, 122, 0.15)",
+          borderRadius: "24px",
+          backgroundColor: "#ffffff",
+          boxShadow: "none",
+          border: "1px solid #F3F4F6",
           p: 1,
         },
       }}
     >
+      {/* Cabecera con botón de cerrar integrado */}
       <DialogTitle
-        sx={{ fontWeight: 700, textAlign: "center", color: "#d82e7a", pb: 0 }}
+        sx={{
+          fontWeight: 800,
+          color: "#1F2937",
+          fontSize: "1.15rem",
+          pt: 2,
+          pb: 1,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+        }}
       >
-        Crear nueva publicación 💬
+        <span>Crear publicación</span>
+        <IconButton onClick={handleClose} sx={{ color: "#9CA3AF" }}>
+          <CloseIcon sx={{ fontSize: "20px" }} />
+        </IconButton>
       </DialogTitle>
 
-      <DialogContent sx={{ mt: 1 }}>
+      <DialogContent sx={{ mt: 1, pb: 1 }}>
         <TextField
           multiline
           fullWidth
           minRows={4}
-          placeholder='¿Qué estás pensando hoy?'
+          maxRows={8}
+          placeholder='¿Qué quieres compartir hoy con la comunidad Wapizima?...'
           value={content}
           onChange={(e) => setContent(e.target.value)}
           variant='outlined'
           sx={{
             "& .MuiOutlinedInput-root": {
-              borderRadius: "12px",
-              backgroundColor: "#fff1f7",
-              "& fieldset": { borderColor: "#f8bbd0" },
-              "&:hover fieldset": { borderColor: "#d82e7a" },
-              "&.Mui-focused fieldset": { borderColor: "#d82e7a" },
+              borderRadius: "16px",
+              backgroundColor: "#F9FAFB", // Fondo gris ultra limpio en lugar de rosa saturado
+              p: 2,
+              fontSize: "0.95rem",
+              "& fieldset": { borderColor: "#E5E7EB" },
+              "&:hover fieldset": { borderColor: "#F472B6" },
+              "&.Mui-focused fieldset": { borderColor: "#E53888" },
             },
           }}
         />
 
-        <Divider sx={{ my: 2, borderColor: "#f8bbd0" }} />
-
-        <Stack direction='row' alignItems='center' spacing={1}>
+        {/* Zona Adjuntos e Imágenes */}
+        <Stack
+          direction='row'
+          alignItems='center'
+          spacing={1.5}
+          sx={{ mt: 2.5 }}
+        >
           <input
             accept='image/*'
             type='file'
-            id='file-input'
+            id='modal-file-input'
             hidden
             onChange={handleChangeImage}
           />
-          <label htmlFor='file-input'>
-            <IconButton
+          <label htmlFor='modal-file-input'>
+            <Button
               component='span'
+              startIcon={<AttachFileIcon sx={{ fontSize: "18px" }} />}
               sx={{
-                bgcolor: "#fdeaf2",
+                backgroundColor: "#FFF5F7",
+                color: "#E53888",
                 borderRadius: "12px",
-                border: "1px solid #f8bbd0",
-                "&:hover": { bgcolor: "#fcd0e0" },
+                textTransform: "none",
+                fontWeight: "bold",
+                fontSize: "13px",
+                px: 2,
+                py: 0.8,
+                "&:hover": { backgroundColor: "#FCE7F3" },
               }}
             >
-              <AttachFileIcon sx={{ color: "#d82e7a" }} />
-            </IconButton>
+              Foto de práctica
+            </Button>
           </label>
-          <Typography
-            variant='body2'
-            color='text.secondary'
-            sx={{ fontStyle: "italic" }}
-          >
-            Adjuntar imagen
-          </Typography>
         </Stack>
 
+        {/* Vista previa tipo Galería */}
         {image && (
-          <>
-            <Typography
-              variant='subtitle2'
-              sx={{ mb: 1, color: "#d82e7a", fontWeight: 600 }}
+          <Box
+            sx={{
+              mt: 3,
+              position: "relative",
+              width: "100%",
+              borderRadius: "16px",
+              overflow: "hidden",
+            }}
+          >
+            <Box
+              component='img'
+              src={image.urlPhoto}
+              alt='Preview'
+              sx={{
+                width: "100%",
+                maxHeight: "300px",
+                objectFit: "cover",
+                borderRadius: "16px",
+                backgroundColor: "#F9FAFB",
+                border: "1px solid #E5E7EB",
+              }}
+            />
+            <IconButton
+              onClick={handleDeleteImage}
+              sx={{
+                position: "absolute",
+                top: 12,
+                right: 12,
+                backgroundColor: "rgba(31, 41, 55, 0.7)", // Fondo oscuro semitransparente profesional
+                color: "#ffffff",
+                "&:hover": { backgroundColor: "rgba(31, 41, 55, 0.9)" },
+                width: 32,
+                height: 32,
+              }}
             >
-              Vista previa
-            </Typography>
-            <Box sx={{ mt: 3, display: "flex", justifyContent: "center" }}>
-              <ImageListItem
-                sx={{
-                  position: "relative",
-                  borderRadius: "12px",
-                  overflow: "hidden",
-                  boxShadow: "0 2px 8px rgba(216,46,122,0.15)",
-                  width: "50%",
-                  height: 250,
-                }}
-              >
-                <img
-                  src={image.urlPhoto}
-                  alt='preview'
-                  style={{ width: "420px", height: "400px" }}
-                />
-                <IconButton
-                  onClick={handleDeleteImage}
-                  sx={{
-                    position: "absolute",
-                    top: 8,
-                    right: 8,
-                    bgcolor: "rgba(255,255,255,0.7)",
-                    "&:hover": { bgcolor: "white" },
-                    color: "#d82e7a",
-                  }}
-                >
-                  <DeleteIcon />
-                </IconButton>
-              </ImageListItem>
-            </Box>
-          </>
+              <DeleteIcon sx={{ fontSize: "16px" }} />
+            </IconButton>
+          </Box>
         )}
       </DialogContent>
 
@@ -184,17 +209,18 @@ const CreatePostModal = ({ open, onClose, courseId }) => {
         sx={{
           px: 3,
           pb: 2,
-          pt: 1,
-          justifyContent: "space-between",
-          borderTop: "1px solid #f8bbd0",
+          pt: 2,
+          justifyContent: "flex-end",
+          gap: 1.5,
         }}
       >
         <Button
           onClick={handleClose}
           sx={{
-            color: "#d82e7a",
-            fontWeight: 600,
+            color: "#6B7280",
+            fontWeight: 700,
             textTransform: "none",
+            fontSize: "0.95rem",
             borderRadius: "12px",
           }}
         >
@@ -205,16 +231,26 @@ const CreatePostModal = ({ open, onClose, courseId }) => {
           onClick={handleSubmit}
           disabled={!isFormValid}
           sx={{
-            bgcolor: "#d82e7a",
-            borderRadius: "12px",
-            px: 3,
-            fontWeight: 600,
+            backgroundColor: "#E53888",
+            color: "white",
+            borderRadius: "14px",
+            px: 4,
+            py: 1,
+            fontWeight: "bold",
             textTransform: "none",
-            "&:hover": { bgcolor: "#c0276d" },
-            "&.Mui-disabled": { bgcolor: "#f8bbd0", color: "#fff" },
+            fontSize: "0.95rem",
+            boxShadow: "none",
+            "&:hover": {
+              backgroundColor: "#C2185B",
+              boxShadow: "none",
+            },
+            "&.Mui-disabled": {
+              backgroundColor: "#F3F4F6",
+              color: "#9CA3AF",
+            },
           }}
         >
-          Publicar
+          Publicar en el muro
         </Button>
       </DialogActions>
     </Dialog>
