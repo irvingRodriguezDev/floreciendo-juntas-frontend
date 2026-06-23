@@ -83,8 +83,6 @@ export default function ProfileTabs() {
           }}
         >
           <Tab label='Información' />
-          <Tab label='Insignias' />
-          <Tab label='Mis Boletos' />
           <Tab label='Mi Salón' />
           <Tab label='Mis Direcciones' />
           {usuario && usuario.isSubscribed && <Tab label='Certificaciones' />}
@@ -114,31 +112,31 @@ export default function ProfileTabs() {
             </motion.div>
           )}
 
-          {value === 1 && (
+          {/* {value === 1 && (
             <motion.div key='t2' {...animation}>
               <BadgesSection />
+            </motion.div>
+          )} */}
+
+          {/* {value === 2 && (
+            <motion.div key='t3' {...animation}>
+              <UserTicketsTable />
+            </motion.div>
+          )} */}
+
+          {value === 1 && (
+            <motion.div key='t2' {...animation}>
+              <DreamSalonSection />
             </motion.div>
           )}
 
           {value === 2 && (
             <motion.div key='t3' {...animation}>
-              <UserTicketsTable />
-            </motion.div>
-          )}
-
-          {value === 3 && (
-            <motion.div key='t3' {...animation}>
-              <DreamSalonSection />
-            </motion.div>
-          )}
-
-          {value === 4 && (
-            <motion.div key='t4' {...animation}>
               <AddressSection />
             </motion.div>
           )}
 
-          {value === 5 && usuario?.isSubscribed && (
+          {value === 3 && usuario?.isSubscribed && (
             <motion.div
               key='certifications'
               {...animation}
@@ -147,7 +145,7 @@ export default function ProfileTabs() {
               <Certifications />
             </motion.div>
           )}
-          {value === 6 && usuario?.isSubscribed && (
+          {value === 4 && usuario?.isSubscribed && (
             <motion.div
               key='formations'
               {...animation}
@@ -156,7 +154,7 @@ export default function ProfileTabs() {
               <FormationsOnline />
             </motion.div>
           )}
-          {value === 7 && usuario?.isSubscribed && (
+          {value === 5 && usuario?.isSubscribed && (
             <motion.div
               key='store'
               {...animation}
