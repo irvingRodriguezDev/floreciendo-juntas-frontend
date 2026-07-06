@@ -17,7 +17,7 @@ import {
   CUSTOMER_LOGIN_MUTATION,
   CUSTOMER_CREATE_MUTATION,
 } from "./grapql/auth";
-import { shopifyFetch } from "../../containers/Store/ShopifyClient";
+// import { shopifyFetch } from "../../containers/Store/ShopifyClient";
 import { useNavigate } from "react-router-dom";
 const AuthState = (props) => {
   const navigate = useNavigate();
@@ -130,34 +130,6 @@ const AuthState = (props) => {
       localStorage.setItem("token", token);
       tokenAuth(token);
 
-      // 2️⃣ Login silencioso en Shopify (NO debe romper login principal)
-      try {
-        const shopifyVariables = {
-          input: {
-            email: datos.email,
-            password: datos.password,
-          },
-        };
-
-        const shopifyResponse = await shopifyFetch(
-          CUSTOMER_LOGIN_MUTATION,
-          shopifyVariables,
-        );
-
-        const authData = shopifyResponse?.data?.customerAccessTokenCreate;
-
-        if (authData?.customerAccessToken) {
-          localStorage.setItem(
-            "customerAccessToken",
-            authData.customerAccessToken.accessToken,
-          );
-        } else if (authData?.customerUserErrors?.length) {
-          console.warn("Shopify:", authData.customerUserErrors[0].message);
-        }
-      } catch (err) {
-        console.warn("⚠️ Shopify login falló (no bloqueante):", err);
-      }
-
       // 3️⃣ Estado global
       dispatch({
         type: types.LOGIN_EXITOSO,
@@ -198,34 +170,6 @@ const AuthState = (props) => {
 
       localStorage.setItem("token", token);
       tokenAuth(token);
-
-      // 2️⃣ Registro en Shopify (sin login)
-      try {
-        const shopifyVariables = {
-          input: {
-            firstName: data.name || "",
-            lastName: data.username || "",
-            email: data.email,
-            password: data.password,
-            acceptsMarketing: false,
-          },
-        };
-
-        const shopifyResponse = await shopifyFetch(
-          CUSTOMER_CREATE_MUTATION,
-          shopifyVariables,
-        );
-
-        const createData = shopifyResponse?.data?.customerCreate;
-
-        if (createData?.customer) {
-          console.log("✅ Usuario creado en Shopify");
-        } else if (createData?.customerUserErrors?.length) {
-          console.warn("Shopify:", createData.customerUserErrors[0].message);
-        }
-      } catch (err) {
-        console.error("Shopify register failed:", err);
-      }
 
       // 3️⃣ Estado global
       dispatch({

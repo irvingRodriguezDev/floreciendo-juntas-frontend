@@ -9,11 +9,13 @@ import {
   InputAdornment,
   Fade,
   Backdrop,
+  Chip,
+  Divider,
 } from "@mui/material";
 import { useState, useEffect, useContext } from "react";
 import { User, Phone, Mail, X, Save } from "lucide-react"; // Usando lucide para frescura
 import AuthContext from "../../context/Auth/AuthContext";
-
+import AlternateEmailIcon from "@mui/icons-material/AlternateEmail";
 const style = {
   position: "absolute",
   top: "50%",
@@ -52,7 +54,12 @@ const inputStyles = {
 
 const ModalUpdateUser = ({ open, onClose }) => {
   const { usuario, UpdateUser } = useContext(AuthContext);
-  const [form, setForm] = useState({ name: "", phone: "", email: "" });
+  const [form, setForm] = useState({
+    name: "",
+    phone: "",
+    email: "",
+    tiktokUsername: "",
+  });
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -61,6 +68,7 @@ const ModalUpdateUser = ({ open, onClose }) => {
         name: usuario.name || "",
         phone: usuario.phone || "",
         email: usuario.email || "",
+        tiktokUsername: usuario.tiktokUsername || "",
       });
     }
   }, [usuario, open]);
@@ -172,6 +180,33 @@ const ModalUpdateUser = ({ open, onClose }) => {
                 startAdornment: (
                   <InputAdornment position='start'>
                     <Mail size={18} color='#D82E7A' />
+                  </InputAdornment>
+                ),
+              }}
+            />
+            <Divider sx={{ my: 1, borderColor: "rgba(216,46,122,0.15)" }}>
+              <Chip
+                label='Usuario Tiktok'
+                sx={{
+                  bgcolor: "rgba(216,46,122,0.1)",
+                  color: "#D82E7A",
+                  fontWeight: "bold",
+                }}
+              />
+            </Divider>
+
+            <TextField
+              label='Usuario Tiktok'
+              name='tiktokUsername'
+              autoComplete='off'
+              value={form.tiktokUsername || ""}
+              onChange={handleChange}
+              fullWidth
+              sx={inputStyles}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position='start'>
+                    <AlternateEmailIcon size={18} color='#D82E7A' />
                   </InputAdornment>
                 ),
               }}

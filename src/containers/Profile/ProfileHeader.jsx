@@ -211,7 +211,7 @@ const ProfileMain = () => {
                 </Box>
 
                 <Grid container spacing={2} sx={{ mb: 3 }}>
-                  <Grid size={{ xs: 12, md: 6 }}>
+                  <Grid size={{ xs: 12, md: 4 }}>
                     <Typography sx={{ color: "#777", fontSize: "0.85rem" }}>
                       Correo Electrónico
                     </Typography>
@@ -219,7 +219,7 @@ const ProfileMain = () => {
                       {usuario?.email}
                     </Typography>
                   </Grid>
-                  <Grid size={{ xs: 12, md: 6 }}>
+                  <Grid size={{ xs: 12, md: 4 }}>
                     <Typography sx={{ color: "#777", fontSize: "0.85rem" }}>
                       Teléfono
                     </Typography>
@@ -227,6 +227,17 @@ const ProfileMain = () => {
                       {usuario?.phone || "No registrado"}
                     </Typography>
                   </Grid>
+                  {usuario.tiktokUsername ||
+                    (usuario.tiktokUsername !== null && (
+                      <Grid size={{ xs: 12, md: 4 }}>
+                        <Typography sx={{ color: "#777", fontSize: "0.85rem" }}>
+                          Usuario TikTok
+                        </Typography>
+                        <Typography sx={{ fontWeight: 500 }}>
+                          @{usuario?.tiktokUsername || "No registrado"}
+                        </Typography>
+                      </Grid>
+                    ))}
                 </Grid>
 
                 <Divider sx={{ mb: 4, opacity: 0.6 }} />

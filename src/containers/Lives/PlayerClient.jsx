@@ -26,7 +26,6 @@ const PlayerCliente = ({
   commentsVisible,
   onToggleComments,
   viewers,
-  appViewers,
 }) => {
   const videoRef = useRef(null);
   const ivsPlayerRef = useRef(null);
@@ -230,7 +229,7 @@ const PlayerCliente = ({
           {/* ── Columna derecha (viewers + fullscreen) ── */}
 
           {/* Viewers — esquina superior derecha */}
-          {appViewers > 0 && (
+          {viewers >= 0 && (
             <Box
               sx={{
                 position: "absolute",
@@ -258,7 +257,7 @@ const PlayerCliente = ({
                   lineHeight: 1,
                 }}
               >
-                {appViewers.toLocaleString()}
+                {viewers}
               </Typography>
             </Box>
           )}

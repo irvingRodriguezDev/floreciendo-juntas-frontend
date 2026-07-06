@@ -24,8 +24,9 @@ import { useCaptcha } from "../../hooks/useCaptcha";
 // Esquema de validación optimizado
 const RegisterSchema = Yup.object().shape({
   name: Yup.string().required("El nombre es requerido"),
-  username: Yup.string().required(
-    "El nombre para tus reconocimientos es requerido",
+
+  tiktokUsername: Yup.string().required(
+    "El usuario de tiktok es requerido(importante para el sorteo de regalos)",
   ),
   phone: Yup.string()
     .required("El teléfono es requerido")
@@ -76,7 +77,8 @@ const Register = () => {
       email: credentials.email,
       name: credentials.name,
       phone: credentials.phone,
-      username: credentials.username,
+      username: credentials.username || "",
+      tiktokUsername: credentials.tiktokUsername,
       captchaToken: token,
     };
     await registerUser(data);
@@ -186,11 +188,11 @@ const Register = () => {
               <Formik
                 initialValues={{
                   name: "",
-                  username: "",
                   email: "",
                   password: "",
                   password_confirmation: "",
                   phone: "",
+                  tiktokUsername: "",
                 }}
                 validationSchema={RegisterSchema}
                 onSubmit={handleRegister}
@@ -214,7 +216,7 @@ const Register = () => {
                     </Typography>
 
                     <Grid container spacing={2}>
-                      <Grid size={12}>
+                      <Grid size={6}>
                         <TextField
                           label='Nombre completo'
                           name='name'
@@ -230,22 +232,26 @@ const Register = () => {
                         />
                       </Grid>
 
-                      <Grid size={12}>
+                      <Grid size={{ xs: 12, md: 6 }}>
                         <TextField
-                          label='Nombre para reconocimientos'
-                          name='username'
+                          label='Usuario de TikTok'
+                          name='tiktokUsername'
                           fullWidth
                           autoComplete='off'
-                          value={values.username}
+                          value={values.tiktokUsername}
                           onChange={handleChange}
                           onBlur={handleBlur}
-                          error={touched.username && Boolean(errors.username)}
-                          helperText={touched.username && errors.username}
+                          error={
+                            touched.tiktokUsername &&
+                            Boolean(errors.tiktokUsername)
+                          }
+                          helperText={
+                            touched.tiktokUsername && errors.tiktokUsername
+                          }
                           sx={inputStyles}
                           disabled={loading}
                         />
                       </Grid>
-
                       <Grid size={{ xs: 12, md: 6 }}>
                         <TextField
                           label='Correo Electrónico'

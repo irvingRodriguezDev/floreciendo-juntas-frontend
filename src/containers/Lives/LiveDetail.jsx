@@ -18,6 +18,7 @@ import LiveHeader from "../../components/lives/LiveHeader";
 import LiveInfoCard from "../../components/lives/LiveInfoCard";
 import LiveBlocked from "../../components/lives/LiveBlocked";
 import LiveCommentsSidebar from "./LiveCommentsSidebar";
+import { useIvsViewers } from "../../hooks/useIvsViewers";
 
 // ─── Variantes de animación del player ───────────────────────────────────────
 const videoVariants = {
@@ -99,6 +100,10 @@ const LiveDetalle = () => {
   const handleClickShowComments = () => {
     setCommentsVisible(true);
   };
+
+  // -- Contador de personas en el live --//
+  const viewers = useIvsViewers(id, live?.aws_channel_arn);
+
   // ── Refs ──
   const containerRef = useRef(null);
   useEffect(() => {
@@ -148,7 +153,7 @@ const LiveDetalle = () => {
   }, []);
 
   // ── Comentarios ──
-  const { comments, sendComment, viewers, appViewers } = useLiveComments(id);
+  const { comments, sendComment, appViewers } = useLiveComments(id);
 
   // ── Acciones ──
   const handleFullscreen = () => {
@@ -304,7 +309,6 @@ const LiveDetalle = () => {
                     onFullscreen={handleFullscreen}
                     onToggleComments={() => setCommentsVisible((prev) => !prev)}
                     viewers={viewers}
-                    appViewers={appViewers}
                   />
                 </motion.div>
 
