@@ -26,6 +26,11 @@ export const useLiveComments = (liveId) => {
       });
     };
 
+    // SOLO ESCUCHAR cuando el admin elimina un comentario
+    const handleRemoveComment = ({ id }) => {
+      setComments((prev) => prev.filter((comment) => comment.id !== id));
+    };
+
     // ── Viewers ────────────────────────────────────
     const handleViewerCount = (data) => {
       if (String(data.liveId) !== String(liveId)) return;
@@ -45,6 +50,7 @@ export const useLiveComments = (liveId) => {
 
     socket.on("load_comments", handleLoad);
     socket.on("new_comment", handleNew);
+    socket.on("remove_comment", handleRemoveComment);
     socket.on("live_viewer_count", handleViewerCount);
     socket.on("live_app_viewers", handleAppViewers);
     socket.on("connect", handleReconnect);
@@ -53,6 +59,7 @@ export const useLiveComments = (liveId) => {
       socket.emit("leave-live", liveId);
       socket.off("load_comments", handleLoad);
       socket.off("new_comment", handleNew);
+      socket.off("remove_comment", handleRemoveComment);
       socket.off("live_viewer_count", handleViewerCount);
       socket.off("live_app_viewers", handleAppViewers);
       socket.off("connect", handleReconnect);
@@ -68,5 +75,11 @@ export const useLiveComments = (liveId) => {
     });
   };
 
-  return { comments, sendComment, viewers, appViewers, health };
+  return {
+    comments,
+    sendComment,
+    viewers,
+    appViewers,
+    health
+  };
 };
