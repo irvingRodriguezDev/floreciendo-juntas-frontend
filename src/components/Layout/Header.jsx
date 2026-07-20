@@ -25,7 +25,7 @@ import CartButton from "./CartButton";
 import CartSidebar from "./CartSidebar";
 import BadgeBox from "../ui/BadgeBox";
 import ShopifyCartButton from "../../containers/Store/ShopifyCartButton";
-import ShopifyCartDrawer from "../../containers/Store/ShopifyCartDrawer";
+// import ShopifyCartDrawer from "../../containers/Store/ShopifyCartDrawer";
 import FornitureIcon from "../icons/FornitureIcon";
 import NotificationsBell from "../Notifications/NotificationsBell";
 /* Menu items (igual que antes) */
@@ -334,10 +334,10 @@ const Header = () => {
               {/* <ShopifyCartButton onClick={() => setOpenCartShopify(true)} /> */}
               {/* </IconButton> */}
 
-              <ShopifyCartDrawer
+              {/* <ShopifyCartDrawer
                 open={openCartShopify}
                 onClose={() => setOpenCartShopify(false)}
-              />
+              /> */}
 
               {/* 🔐 Auth */}
               {!autenticado ? (

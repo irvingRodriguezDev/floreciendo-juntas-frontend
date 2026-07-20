@@ -6,7 +6,6 @@ import PlayCircleIcon from "@mui/icons-material/PlayCircle";
 
 const TopCourseCard = ({ course, index }) => {
   if (!course) return null;
-  console.log(course, "course");
   return (
     <Grid size={{ xs: 12, sm: 6, md: 4, lg: 3 }} key={index}>
       <Link

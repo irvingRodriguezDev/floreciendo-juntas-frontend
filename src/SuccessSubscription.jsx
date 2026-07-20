@@ -100,7 +100,7 @@ export default function SuccessSubscription() {
         transition={{ delay: 1, duration: 0.6 }}
         sx={{ mt: 4, fontSize: "1rem", color: "#7A2C5A" }}
       >
-        Serás redirigida a la página principal en unos segundos...
+        Serás redirigida a la página de tu cursos en unos segundos...
       </Typography>
 
       {/* Decoración 1 */}

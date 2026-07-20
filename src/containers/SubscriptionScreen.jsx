@@ -1,143 +1,147 @@
 import React, { useContext } from "react";
 import { Box, Grid, Typography, Container, styled } from "@mui/material";
-import LocalFloristIcon from "@mui/icons-material/LocalFlorist";
-import SubscriptionForm from "../components/Payment/SubscriptionButton";
 import Layout from "../components/Layout/Layout";
 import AuthContext from "../context/Auth/AuthContext";
-
-// 🌸 Paleta Floreciendo Juntas
+import SubscriptionForm from "../components/Payment/SubscriptionButton";
+// 🏛️ Paleta "Quiet Luxury" & Editorial (Floreciendo Juntas Edición de Lujo)
 const COLORS = {
-  bgGradient: "linear-gradient(180deg, #FFF5F8 0%, #FBECEC 100%)",
-  accent: "#D81B60",
-  textPrimary: "#4A148C",
-  textSecondary: "#6A1B9A",
+  bgCanvas: "#FEF0F7", // Fondo color lino / arena ultra suave y cálido
+  cardBase: "#FFFFFF", // Blanco puro para la tarjeta principal
+  champagneGold: "#d82e7a", // Oro champaña mate (reemplaza al rosa chillón)
+  plumDeep: "#2A1B24", // Ciruela/Vino profundo (reemplaza al negro para el texto)
+  textMuted: "#7A6E75", // Gris topo para textos secundarios
+  borderFine: "rgba(216, 46, 122, 0.25)", // Borde oro sutil
 };
 
-// 🌷 Fondo general
 const Background = styled(Box)(({ theme }) => ({
   minHeight: "100vh",
-  background: COLORS.bgGradient,
+  background: COLORS.bgCanvas,
   display: "flex",
   alignItems: "center",
-  padding: theme.spacing(6, 2),
+  padding: theme.spacing(10, 2),
+  position: "relative",
 
   [theme.breakpoints.down("sm")]: {
-    padding: theme.spacing(4, 1),
+    padding: theme.spacing(6, 1.5),
   },
 }));
 
-// 🌸 Card contenedora
+// 🌟 Contenedor estilo Atelier / Alta Costura
 const CardWrapper = styled(Box)(({ theme }) => ({
-  backgroundColor: "#FFFFFF",
-  borderRadius: theme.shape.borderRadius * 3,
-  padding: theme.spacing(6, 4),
-  boxShadow: "0 20px 40px rgba(216, 27, 96, 0.18)",
+  backgroundColor: COLORS.cardBase,
+  borderRadius: "20px", // Bordes más arquitectónicos y menos redondeados/infantiles
+  padding: theme.spacing(8, 6),
+  boxShadow: "0 30px 70px rgba(42, 27, 36, 0.04)", // Sombra hiper sutil y difuminada
+  border: `1px solid ${COLORS.borderFine}`,
   position: "relative",
-  overflow: "hidden",
 
   [theme.breakpoints.down("sm")]: {
-    padding: theme.spacing(4, 2),
+    padding: theme.spacing(5, 3),
   },
 
-  // Decoración superior derecha
+  // Un marco interno clásico de las papelerías de lujo
   "&::before": {
     content: '""',
     position: "absolute",
-    top: "8%",
-    right: "6%",
-    width: 80,
-    height: 80,
-    border: `3px solid ${COLORS.accent}`,
-    borderRadius: "50%",
-    opacity: 0.25,
-  },
-
-  // Decoración inferior izquierda
-  "&::after": {
-    content: '""',
-    position: "absolute",
-    bottom: "10%",
-    left: "6%",
-    width: 40,
-    height: 40,
-    background: `radial-gradient(circle, ${COLORS.accent} 35%, transparent 36%)`,
-    backgroundSize: "14px 14px",
-    opacity: 0.25,
+    top: "16px",
+    left: "16px",
+    right: "16px",
+    bottom: "16px",
+    border: `1px solid rgba(216, 46, 122, 0.15)`,
+    borderRadius: "14px",
+    pointerEvents: "none",
   },
 }));
 
-// 🌺 Pantalla principal
 const SubscriptionScreen = ({ children }) => {
   const { usuario } = useContext(AuthContext);
+
   return (
     <Layout>
       <Background>
-        <Container maxWidth='md'>
+        <Container maxWidth='sm'>
+          {" "}
+          {/* Bajamos a 'sm' para que se vea más recogido y premium */}
           <CardWrapper>
             <Grid container spacing={4} justifyContent='center'>
-              {/* 🌸 Encabezado emocional */}
+              {/* 🌸 Identidad Visual Minimalista */}
               <Grid size={12} textAlign='center'>
-                <Box
+                {/* Isotipo minimalista: Reemplazamos el ícono tosco por un monograma o detalle textil */}
+                <Typography
                   sx={{
-                    width: 64,
-                    height: 64,
-                    borderRadius: "50%",
-                    backgroundColor: "#FFF0F6",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    mx: "auto",
+                    fontFamily: "serif",
+                    fontSize: "1.5rem",
+                    color: COLORS.champagneGold,
+                    letterSpacing: "0.3em",
                     mb: 2,
+                    fontWeight: 300,
                   }}
                 >
-                  <LocalFloristIcon
-                    sx={{ color: COLORS.accent, fontSize: 34 }}
-                  />
-                </Box>
+                  F ✦ J
+                </Typography>
 
                 <Typography
                   component='h1'
                   sx={{
-                    fontWeight: 800,
-                    color: "#e53888",
-                    fontSize: "clamp(1.8rem, 4vw, 2.5rem)",
+                    fontWeight: 400,
+                    color: COLORS.plumDeep,
+                    fontSize: "clamp(2rem, 4vw, 2.6rem)",
+                    letterSpacing: "0.04em",
+                    lineHeight: 1.3,
+                    fontFamily:
+                      "'Playfair Display', 'Didot', 'Bodoni MT', serif",
+                    textTransform: "uppercase", // El uppercase le da el toque editorial instantáneo
                   }}
                 >
-                  Florece contigo 🌷
+                  Florece Contigo
                 </Typography>
+
+                {/* Separador fino estilo boutique */}
+                <Box
+                  sx={{
+                    width: 40,
+                    height: "1px",
+                    backgroundColor: COLORS.champagneGold,
+                    mx: "auto",
+                    my: 3,
+                  }}
+                />
 
                 <Typography
                   sx={{
-                    mt: 1.5,
-                    color: "#e53888",
-                    maxWidth: 520,
+                    color: COLORS.textMuted,
+                    maxWidth: 440,
                     mx: "auto",
-                    fontSize: "1.05rem",
-                    lineHeight: 1.6,
+                    fontSize: "1rem",
+                    lineHeight: 1.8,
+                    fontWeight: 300,
+                    letterSpacing: "0.01em",
                   }}
                 >
-                  Suscribirte es regalarte un espacio de crecimiento,
-                  acompañamiento y aprendizaje a tu ritmo.
+                  Regálate un espacio exclusivo de evolución. Una membresía
+                  diseñada para conectar, aprender a tu ritmo y expandir tu
+                  potencial junto a una comunidad selecta de mujeres.
                 </Typography>
               </Grid>
 
-              {/* 🌷 Aquí va TU componente de suscripción */}
-              <Grid size={12}>
+              {/* 💳 Zona del Formulario de Pago */}
+              <Grid size={12} sx={{ px: { md: 2 } }}>
                 {children}
                 <SubscriptionForm userId={usuario ? usuario.id : null} />
               </Grid>
 
-              {/* 🌸 Mensaje inferior de contención */}
+              {/* 🔒 Nota de Privacidad / Elegancia en el pie */}
               <Grid size={12} textAlign='center'>
                 <Typography
                   sx={{
-                    mt: 2,
-                    fontSize: "0.9rem",
-                    color: "#9E9E9E",
+                    fontSize: "0.75rem",
+                    color: COLORS.textMuted,
+                    letterSpacing: "0.1em",
+                    textTransform: "uppercase",
+                    opacity: 0.8,
                   }}
                 >
-                  Puedes cancelar o cambiar tu suscripción cuando lo necesites
-                  💗
+                  Gestión segura • Cancela cuando lo decidas
                 </Typography>
               </Grid>
             </Grid>

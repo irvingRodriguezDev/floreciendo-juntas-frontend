@@ -12,7 +12,6 @@ import ProductsState from "./context/Products/ProductsState";
 import CartState from "./context/Cart/CartState";
 import OrdersState from "./context/Orders/OrdersState";
 import LivesState from "./context/Lives/LivesState";
-import ShopifyCartState from "./context/ShopifyCart/ShopifyCartState";
 import ScrollTop from "./utils/ScrollTop";
 import CommunityState from "./context/Community/CommunityState";
 import { useNotificationHandler } from "./hooks/useNotificationHandler";
@@ -40,14 +39,12 @@ function App() {
                           <CartState>
                             <OrdersState>
                               <LivesState>
-                                <ShopifyCartState>
-                                  <CertificationsState>
-                                    <StoresState>
-                                      <ScrollTop />
-                                      <AppRouter />
-                                    </StoresState>
-                                  </CertificationsState>
-                                </ShopifyCartState>
+                                <CertificationsState>
+                                  <StoresState>
+                                    <ScrollTop />
+                                    <AppRouter />
+                                  </StoresState>
+                                </CertificationsState>
                               </LivesState>
                             </OrdersState>
                           </CartState>

@@ -1,26 +1,14 @@
 import React, { useContext, useState } from "react";
 import Layout from "../Layout/Layout";
-import {
-  Button,
-  FormControl,
-  Grid,
-  Paper,
-  TextField,
-  Typography,
-  Divider,
-  Chip,
-  Box,
-  CircularProgress,
-} from "@mui/material";
-import { Visibility, VisibilityOff } from "@mui/icons-material";
-import { IconButton, InputAdornment } from "@mui/material";
-import { Link } from "react-router-dom";
-import { Formik, Form } from "formik";
+import { Button, FormControl, Grid, Paper, Box } from "@mui/material";
+import { Formik } from "formik";
 import * as Yup from "yup";
 import AuthContext from "../../context/Auth/AuthContext";
 import CartContext from "../../context/Cart/CartContext";
 import Swal from "sweetalert2";
 import { useCaptcha } from "../../hooks/useCaptcha";
+import Decorations from "./Decorations";
+import RegisterForm from "./RegisterForm";
 // Esquema de validación optimizado
 const RegisterSchema = Yup.object().shape({
   name: Yup.string().required("El nombre es requerido"),
@@ -37,7 +25,30 @@ const RegisterSchema = Yup.object().shape({
   email: Yup.string()
     .email("Correo inválido")
     .required("El correo es obligatorio")
-    .trim(), // Evita espacios accidentales
+    .trim()
+    .test(
+      "valid-domain",
+      "El dominio del correo no es válido (ej: gmail.com, hotmail.com)",
+      (value) => {
+        if (!value) return false;
+
+        // Dominios exactos permitidos
+        const allowedDomains = [
+          "gmail.com",
+          "icloud.com",
+          "live.com.mx",
+          "outlook.com",
+          "hotmail.com",
+          "hotmail.es",
+        ];
+
+        // Extraemos lo que está después del @
+        const domain = value.split("@")[1];
+
+        // Validamos que el dominio esté en la lista exacta
+        return allowedDomains.includes(domain?.toLowerCase());
+      },
+    ),
   password: Yup.string()
     .min(6, "Mínimo 6 caracteres")
     .required("La contraseña es obligatoria"),
@@ -114,47 +125,7 @@ const Register = () => {
         }}
       >
         {/* ELEMENTOS DECORATIVOS */}
-        <Box
-          sx={{
-            position: "absolute",
-            top: { xs: "-100px", md: "-15%" },
-            left: { xs: "-100px", md: "-10%" },
-            width: { xs: 400, md: 800 },
-            height: { xs: 400, md: 800 },
-            borderRadius: "50%",
-            border: "4px solid #D82E7A",
-            opacity: { xs: 0.1, md: 0.15 },
-            zIndex: 0,
-          }}
-        />
-        <Box
-          sx={{
-            position: "absolute",
-            top: { xs: "50%", md: "-5%" },
-            left: { xs: "unset", md: "5%" },
-            width: { xs: 300, md: 600 },
-            height: { xs: 300, md: 600 },
-            borderRadius: "50%",
-            backgroundColor: "#FF69B4",
-            opacity: { xs: 0.05, md: 0.08 },
-            zIndex: 0,
-          }}
-        />
-        <Box
-          sx={{
-            position: "absolute",
-            bottom: { xs: "5%", md: "10%" },
-            right: { xs: "5%", md: "10%" },
-            width: { xs: 40, md: 80 },
-            height: { xs: 40, md: 80 },
-            backgroundColor: "#D82E7A",
-            transform: "rotate(45deg)",
-            opacity: { xs: 0.2, md: 0.3 },
-            zIndex: 0,
-            borderRadius: "8px",
-          }}
-        />
-
+        <Decorations />
         <Grid
           container
           justifyContent='center'
@@ -177,7 +148,7 @@ const Register = () => {
                 padding: { xs: "30px", sm: "40px", md: "50px" },
                 borderRadius: "30px",
                 width: "100%",
-                background: "rgba(255, 255, 255, 0.7)",
+                background: "rgba(255, 255, 255, 0.03)",
                 backdropFilter: "blur(5.5px)",
                 border: "1px solid rgba(255, 255, 255, 0.3)",
                 boxShadow: "0 4px 30px rgba(0, 0, 0, 0.1)",
@@ -198,254 +169,19 @@ const Register = () => {
                 onSubmit={handleRegister}
               >
                 {({ values, errors, touched, handleChange, handleBlur }) => (
-                  <Form>
-                    <Typography
-                      variant='h3'
-                      textAlign='center'
-                      fontWeight='bold'
-                      mb={4}
-                      sx={{
-                        background: "linear-gradient(135deg, #ff69b4, #d82e7a)",
-                        backgroundClip: "text",
-                        WebkitBackgroundClip: "text",
-                        WebkitTextFillColor: "transparent",
-                        fontSize: { xs: "30px", sm: "42px" },
-                      }}
-                    >
-                      ¡Únete a la comunidad!
-                    </Typography>
-
-                    <Grid container spacing={2}>
-                      <Grid size={6}>
-                        <TextField
-                          label='Nombre completo'
-                          name='name'
-                          fullWidth
-                          autoComplete='off'
-                          value={values.name}
-                          onChange={handleChange}
-                          onBlur={handleBlur}
-                          error={touched.name && Boolean(errors.name)}
-                          helperText={touched.name && errors.name}
-                          sx={inputStyles}
-                          disabled={loading}
-                        />
-                      </Grid>
-
-                      <Grid size={{ xs: 12, md: 6 }}>
-                        <TextField
-                          label='Usuario de TikTok'
-                          name='tiktokUsername'
-                          fullWidth
-                          autoComplete='off'
-                          value={values.tiktokUsername}
-                          onChange={handleChange}
-                          onBlur={handleBlur}
-                          error={
-                            touched.tiktokUsername &&
-                            Boolean(errors.tiktokUsername)
-                          }
-                          helperText={
-                            touched.tiktokUsername && errors.tiktokUsername
-                          }
-                          sx={inputStyles}
-                          disabled={loading}
-                        />
-                      </Grid>
-                      <Grid size={{ xs: 12, md: 6 }}>
-                        <TextField
-                          label='Correo Electrónico'
-                          type='email'
-                          name='email'
-                          fullWidth
-                          autoComplete='off'
-                          value={values.email}
-                          onChange={handleChange}
-                          onBlur={handleBlur}
-                          error={touched.email && Boolean(errors.email)}
-                          helperText={touched.email && errors.email}
-                          sx={inputStyles}
-                          disabled={loading}
-                        />
-                      </Grid>
-
-                      <Grid size={{ xs: 12, md: 6 }}>
-                        <TextField
-                          label='Teléfono (10 dígitos)'
-                          name='phone'
-                          fullWidth
-                          autoComplete='off'
-                          value={values.phone}
-                          onChange={(e) => {
-                            // Solo permite números y máximo 10 caracteres
-                            const val = e.target.value
-                              .replace(/\D/g, "")
-                              .slice(0, 10);
-                            handleChange({
-                              target: { name: "phone", value: val },
-                            });
-                          }}
-                          onBlur={handleBlur}
-                          error={touched.phone && Boolean(errors.phone)}
-                          helperText={touched.phone && errors.phone}
-                          sx={inputStyles}
-                          disabled={loading}
-                        />
-                      </Grid>
-
-                      <Grid size={{ xs: 12, md: 6 }}>
-                        <TextField
-                          label='Contraseña'
-                          type={showPassword ? "text" : "password"}
-                          name='password'
-                          fullWidth
-                          autoComplete='off'
-                          value={values.password}
-                          onChange={handleChange}
-                          onBlur={handleBlur}
-                          error={touched.password && Boolean(errors.password)}
-                          helperText={touched.password && errors.password}
-                          sx={inputStyles}
-                          disabled={loading}
-                          slotProps={{
-                            input: {
-                              endAdornment: (
-                                <InputAdornment position='end'>
-                                  <IconButton
-                                    aria-label='toggle password visibility'
-                                    onClick={handleClickShowPassword}
-                                    onMouseDown={(e) => e.preventDefault()} // Evita que el foco se pierda
-                                    edge='end'
-                                    sx={{
-                                      color: "#D82E7A",
-                                      marginRight: "8px",
-                                    }}
-                                  >
-                                    {showPassword ? (
-                                      <VisibilityOff />
-                                    ) : (
-                                      <Visibility />
-                                    )}
-                                  </IconButton>
-                                </InputAdornment>
-                              ),
-                            },
-                          }}
-                        />
-                      </Grid>
-
-                      <Grid size={{ xs: 12, md: 6 }}>
-                        <TextField
-                          label='Confirmar Contraseña'
-                          type={showConfirmPassword ? "text" : "password"}
-                          name='password_confirmation'
-                          fullWidth
-                          autoComplete='off'
-                          value={values.password_confirmation}
-                          onChange={handleChange}
-                          onBlur={handleBlur}
-                          error={
-                            touched.password_confirmation &&
-                            Boolean(errors.password_confirmation)
-                          }
-                          helperText={
-                            touched.password_confirmation &&
-                            errors.password_confirmation
-                          }
-                          sx={inputStyles}
-                          disabled={loading}
-                          slotProps={{
-                            input: {
-                              endAdornment: (
-                                <InputAdornment position='end'>
-                                  <IconButton
-                                    aria-label='toggle password visibility'
-                                    onClick={handleClickShowConfirmPassword}
-                                    onMouseDown={(e) => e.preventDefault()} // Evita que el foco se pierda
-                                    edge='end'
-                                    sx={{
-                                      color: "#D82E7A",
-                                      marginRight: "8px",
-                                    }}
-                                  >
-                                    {showPassword ? (
-                                      <VisibilityOff />
-                                    ) : (
-                                      <Visibility />
-                                    )}
-                                  </IconButton>
-                                </InputAdornment>
-                              ),
-                            },
-                          }}
-                        />
-                      </Grid>
-
-                      <Grid size={12}>
-                        <Button
-                          variant='contained'
-                          fullWidth
-                          type='submit'
-                          size='large'
-                          disabled={loading}
-                          sx={{
-                            borderRadius: "18px",
-                            background:
-                              "linear-gradient(135deg, #ff69b4, #d82e7a)",
-                            boxShadow: "0 10px 25px rgba(216,46,136,0.4)",
-                            fontWeight: "bold",
-                            py: 2,
-                            fontSize: "18px",
-                            transition: "all 0.3s ease",
-                            "&:hover": {
-                              transform: "translateY(-3px)",
-                              boxShadow: "0 15px 30px rgba(216,46,136,0.5)",
-                            },
-                          }}
-                        >
-                          {loading ? (
-                            <CircularProgress size={26} color='inherit' />
-                          ) : (
-                            "Registrarme"
-                          )}
-                        </Button>
-                      </Grid>
-
-                      <Grid size={12}>
-                        <Divider sx={{ my: 1 }}>
-                          <Chip
-                            sx={{
-                              color: "#D82E7A",
-                              border: "1px solid #D82E7A",
-                            }}
-                            label='¿Ya eres parte?'
-                          />
-                        </Divider>
-                      </Grid>
-
-                      <Grid size={12}>
-                        <Link
-                          to='/iniciar-sesion'
-                          style={{ textDecoration: "none" }}
-                        >
-                          <Button
-                            variant='outlined'
-                            fullWidth
-                            size='large'
-                            sx={{
-                              borderRadius: "18px",
-                              borderColor: "#D82E7A",
-                              color: "#D82E7A",
-                              fontWeight: "bold",
-                              py: 2,
-                            }}
-                          >
-                            Iniciar sesión
-                          </Button>
-                        </Link>
-                      </Grid>
-                    </Grid>
-                  </Form>
+                  <RegisterForm
+                    values={values}
+                    errors={errors}
+                    touched={touched}
+                    handleClickShowConfirmPassword={
+                      handleClickShowConfirmPassword
+                    }
+                    handleClickShowPassword={handleClickShowPassword}
+                    showPassword={showPassword}
+                    handleBlur={handleBlur}
+                    handleChange={handleChange}
+                    inputStyles={inputStyles}
+                  />
                 )}
               </Formik>
             </Paper>

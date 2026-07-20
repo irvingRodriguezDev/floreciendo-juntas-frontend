@@ -37,6 +37,7 @@ import CertificationDetail from "../components/Certifications/Details/Certificat
 import NotFound from "../containers/NotFound/Page404";
 import ModuleDetail from "../components/Certifications/Modules/ModuleDetail";
 import Distribution from "../containers/Distribution/Distribution";
+import PaymentCanceledScreen from "../PaymentCanceledScreen";
 
 function AppRouter() {
   const { autenticado, usuarioAutenticado, cargando } = useContext(AuthContext);
@@ -115,6 +116,7 @@ function AppRouter() {
           path='/success-payment-subscription'
           element={<SuccessSubscription />}
         />
+        <Route path='/pago-interrumpido' element={<PaymentCanceledScreen />} />
         <Route path='/error' element={<Error />} />
         <Route path='/detalle-producto/:id' element={<ProductDetailPage />} />
         <Route path='/detalle-orden/:id' element={<DetailOrders />} />
