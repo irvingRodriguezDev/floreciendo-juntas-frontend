@@ -4,7 +4,6 @@ import AuthContext from "../context/Auth/AuthContext";
 
 const HeroDescription = () => {
   const { autenticado, usuario } = useContext(AuthContext);
-  console.log(usuario, "el usuario");
 
   // Evaluamos si la usuaria tiene la suscripción activa
   const isSubscribed =

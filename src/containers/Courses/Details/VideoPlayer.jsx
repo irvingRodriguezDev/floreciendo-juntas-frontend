@@ -43,22 +43,37 @@ const VideoPlayer = ({
   /* ==============================
      LocalStorage helpers
   ============================== */
+  /* ==============================
+     LocalStorage helpers (Optimizados)
+  ============================== */
   const saveVideoProgress = (seconds, currentPercent) => {
     if (!activeVideoKey) return;
 
     let data = {};
     try {
       data = JSON.parse(localStorage.getItem(COURSE_KEY) || "{}");
-    } catch (e) { }
+    } catch (e) {
+      console.error("Error al leer progreso local:", e);
+    }
 
     const existing = data[activeVideoKey] || { seconds: 0, percent: 0 };
 
-    if (currentPercent > existing.percent) {
+    // Siempre guardamos el valor máximo alcanzado (Math.max) tanto en % como en segundos
+    const newPercent = Math.max(currentPercent, existing.percent);
+    const newSeconds = Math.max(seconds, existing.seconds);
+
+    // Solo escribimos en localStorage si realmente hubo un incremento
+    if (newPercent > existing.percent || newSeconds > existing.seconds) {
       data[activeVideoKey] = {
-        seconds: Math.max(seconds, existing.seconds),
-        percent: Math.max(currentPercent, existing.percent),
+        seconds: newSeconds,
+        percent: newPercent,
       };
-      localStorage.setItem(COURSE_KEY, JSON.stringify(data));
+
+      try {
+        localStorage.setItem(COURSE_KEY, JSON.stringify(data));
+      } catch (e) {
+        console.error("Error al guardar progreso local:", e);
+      }
     }
   };
 
@@ -70,47 +85,81 @@ const VideoPlayer = ({
     let data = {};
     try {
       data = JSON.parse(localStorage.getItem(COURSE_KEY) || "{}");
-    } catch (e) { }
+    } catch (e) {
+      console.error("Error al obtener progreso global local:", e);
+    }
 
     let totalPercent = 0;
     let totalSeconds = 0;
 
     allVideos.forEach((v) => {
       const key = v.id || v.cloudfrontUrl;
-      totalPercent += data[key]?.percent || 0;
-      totalSeconds += data[key]?.seconds || 0;
+      if (key && data[key]) {
+        totalPercent += data[key].percent || 0;
+        totalSeconds += data[key].seconds || 0;
+      }
     });
 
+    // Aseguramos que el porcentaje global no exceda 100% por redondeos
+    const rawAverage = totalPercent / allVideos.length;
+    const globalPercent = Math.min(100, Math.round(rawAverage));
+
     return {
-      globalPercent: Math.round(totalPercent / allVideos.length),
-      totalSeconds,
+      globalPercent,
+      totalSeconds: Math.floor(totalSeconds),
     };
   };
 
   const clearLocalProgress = () => {
-    localStorage.removeItem(COURSE_KEY);
+    try {
+      localStorage.removeItem(COURSE_KEY);
+    } catch (e) {
+      console.error("Error al limpiar progreso local:", e);
+    }
   };
-
-  const updateBackendProgress = async (totalSeconds, currentPercent, certEnabled) => {
+  /* ==============================
+     Sincronización con el Backend
+  ============================== */
+  const updateBackendProgress = async (
+    totalSeconds,
+    currentPercent,
+    certEnabled,
+  ) => {
     try {
       await MethodPost(`/progress-video/${userId}/${courseId}`, {
         secondsWatched: Math.floor(totalSeconds),
         percent: currentPercent,
         certificate_enabled: certEnabled,
       });
+      return true; // 👈 Confirmamos que la sincronización fue exitosa
     } catch (error) {
-      console.error("Error actualizando progreso:", error);
+      console.error("Error actualizando progreso en backend:", error);
+      return false; // 👈 Indicamos que falló para tomar precauciones
     }
   };
 
   const unlockCertificate = async (totalSeconds, globalPercent) => {
+    // Si ya se está procesando o ya se envió, evitamos peticiones duplicadas
     if (alreadySentRef.current) return;
-    alreadySentRef.current = true;
-    setCertificateEnabled(true);
-    await updateBackendProgress(totalSeconds, globalPercent, true);
-    clearLocalProgress();
-  };
 
+    // Bloqueo temporal mientras se ejecuta la petición
+    alreadySentRef.current = true;
+
+    const success = await updateBackendProgress(
+      totalSeconds,
+      globalPercent,
+      true,
+    );
+
+    if (success) {
+      // ✅ Si la API respondió con éxito, aseguramos el estado local
+      setCertificateEnabled(true);
+      clearLocalProgress();
+    } else {
+      // ❌ Si falló la red, liberamos la bandera para reintentar en el siguiente ciclo
+      alreadySentRef.current = false;
+    }
+  };
   /* ==============================
      Play / Pause overlay
   ============================== */
@@ -175,13 +224,21 @@ const VideoPlayer = ({
      Obtener estado backend (1 vez)
   ============================== */
   useEffect(() => {
+    let isMounted = true; // Evita memory leaks si el componente se desmonta mientras la API responde
+
     const fetchProgress = async () => {
       try {
-        const { data } = await MethodGet(`/progress-video/${userId}/${courseId}`);
+        const { data } = await MethodGet(
+          `/progress-video/${userId}/${courseId}`,
+        );
+
+        if (!isMounted) return;
+
         if (data?.certificate_enabled) {
           setCertificateEnabled(true);
           setProgress(100);
           alreadySentRef.current = true;
+          clearLocalProgress(); // Aseguramos limpiar cache si la API confirma certificado activo
         } else {
           setCertificateEnabled(false);
           const bdPercent = data?.percent || 0;
@@ -189,41 +246,78 @@ const VideoPlayer = ({
           setProgress(Math.max(bdPercent, localPercent));
         }
       } catch (error) {
-        console.error("Error obteniendo progreso:", error);
+        console.error("Error obteniendo progreso desde la API:", error);
+        if (!isMounted) return;
+
+        // Fallback a LocalStorage en caso de fallo de red
+        const localPercent = getGlobalProgress().globalPercent;
+        setProgress(localPercent);
       }
     };
-    fetchProgress();
+
+    if (userId && courseId) {
+      fetchProgress();
+    }
+
+    return () => {
+      isMounted = false;
+    };
   }, [userId, courseId]);
 
   /* ==============================
-     Progreso (cada 5s 🔥)
+     Progreso (Local cada 5s 🔥 / API cada 60s 🚀)
   ============================== */
   useEffect(() => {
-    if (certificateEnabled) return;
+    // Si el certificado ya está activo o faltan IDs obligatorios, no iniciamos el timer
+    if (certificateEnabled || !userId || !courseId) return;
+
+    let apiTickCounter = 0;
 
     intervalRef.current = setInterval(() => {
       const video = videoRef.current;
-      if (!video || !video.duration || video.duration === Infinity || video.paused) return;
+      if (
+        !video ||
+        !video.duration ||
+        video.duration === Infinity ||
+        video.paused
+      ) {
+        return;
+      }
 
-      const videoPercent = Math.round((video.currentTime / video.duration) * 100);
+      // 1. Guardado Local & UI (Cada 5 segundos)
+      const videoPercent = Math.round(
+        (video.currentTime / video.duration) * 100,
+      );
+
       window.dispatchEvent(new Event("progressUpdated"));
       saveVideoProgress(video.currentTime, videoPercent);
 
       const { globalPercent, totalSeconds } = getGlobalProgress();
       setProgress((prev) => Math.max(prev, globalPercent));
 
+      // Incrementar contador acumulado
+      apiTickCounter += 5;
+
+      // 2. Liberación Inmediata de Certificado (Si llega al 80%)
       if (globalPercent >= 80 && !alreadySentRef.current) {
         unlockCertificate(totalSeconds, globalPercent);
-      } else {
+        return;
+      }
+
+      // 3. Envío al Backend (Únicamente cada 60 segundos = 12 ticks)
+      if (apiTickCounter >= 60) {
         updateBackendProgress(totalSeconds, globalPercent, false);
+        apiTickCounter = 0; // Reiniciar contador
       }
     }, 5000);
 
     return () => {
-      clearInterval(intervalRef.current);
-      intervalRef.current = null;
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
     };
-  }, [certificateEnabled, activeVideo, allVideos]);
+  }, [certificateEnabled, activeVideo, allVideos, userId, courseId]);
 
   /* ==============================
      UI
@@ -276,11 +370,11 @@ const VideoPlayer = ({
       {/* Progress Section */}
       <Box sx={{ mt: 3, p: 2, borderRadius: 2, backgroundColor: "#FFF6F9" }}>
         <Typography fontWeight={700}>{title}</Typography>
-        <Typography fontSize="0.85rem" color="#DC4485" sx={{ mt: 1, mb: 1 }}>
+        <Typography fontSize='0.85rem' color='#DC4485' sx={{ mt: 1, mb: 1 }}>
           Has avanzado un {progress}% del curso general
         </Typography>
         <LinearProgress
-          variant="determinate"
+          variant='determinate'
           value={progress}
           sx={{
             height: 6,
@@ -307,7 +401,7 @@ const VideoPlayer = ({
             gap: 2,
           }}
         >
-          <Stack direction="row" alignItems="center" spacing={1.5}>
+          <Stack direction='row' alignItems='center' spacing={1.5}>
             <Box
               sx={{
                 width: 40,
@@ -326,23 +420,27 @@ const VideoPlayer = ({
             </Box>
             <Box>
               <Typography
-                variant="subtitle2"
+                variant='subtitle2'
                 sx={{ fontWeight: "800", color: "#1F2937", lineHeight: 1.2 }}
               >
                 Material didáctico disponible
               </Typography>
-              <Typography variant="caption" sx={{ color: "#6B7280", fontWeight: 500 }}>
-                Este curso contiene un cuaderno de trabajo complementario en PDF.
+              <Typography
+                variant='caption'
+                sx={{ color: "#6B7280", fontWeight: 500 }}
+              >
+                Este curso contiene un cuaderno de trabajo complementario en
+                PDF.
               </Typography>
             </Box>
           </Stack>
 
           <Button
-            variant="outlined"
-            component="a" // Cambiado a ancla nativa segura para archivos de S3
+            variant='outlined'
+            component='a' // Cambiado a ancla nativa segura para archivos de S3
             href={workbookUrl}
-            target="_blank"
-            rel="noopener noreferrer"
+            target='_blank'
+            rel='noopener noreferrer'
             sx={{
               width: { xs: "100%", sm: "auto" },
               borderColor: "#E53888",
@@ -393,22 +491,27 @@ const VideoPlayer = ({
             🌸
           </Box>
           <Typography
-            variant="h6"
-            sx={{ fontWeight: 900, color: "#1F2937", letterSpacing: "-0.5px", mb: 0.5 }}
+            variant='h6'
+            sx={{
+              fontWeight: 900,
+              color: "#1F2937",
+              letterSpacing: "-0.5px",
+              mb: 0.5,
+            }}
           >
             ¡Tu reconocimiento está listo!
           </Typography>
 
           <Typography
-            variant="body2"
+            variant='body2'
             sx={{ color: "#6B7280", maxWidth: "400px", mb: 3, lineHeight: 1.5 }}
           >
-            Felicidades por concluir tus horas de práctica. Ya puedes descargar tu
-            reconocimiento oficial firmado por las instructoras de Wapizima.
+            Felicidades por concluir tus horas de práctica. Ya puedes descargar
+            tu reconocimiento oficial firmado por las instructoras de Wapizima.
           </Typography>
 
           <Button
-            variant="contained"
+            variant='contained'
             onClick={() => downloadCertificate(courseId, safeUserName || "")}
             endIcon={<SimCardDownloadIcon sx={{ fontSize: "18px" }} />}
             sx={{
@@ -424,8 +527,8 @@ const VideoPlayer = ({
               py: 1.4,
               boxShadow: "none",
               transition: "all 0.2s ease-in-out",
-              "&:hover": { 
-                backgroundColor: "#C2185B", 
+              "&:hover": {
+                backgroundColor: "#C2185B",
                 boxShadow: "none",
               },
             }}
