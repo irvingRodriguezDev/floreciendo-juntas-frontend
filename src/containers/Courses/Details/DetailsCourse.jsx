@@ -220,6 +220,8 @@ const CourseDetailScreen = () => {
                   src={videoSrc}
                   poster={course.cover_image_url}
                   courseId={Number(course.id)}
+                  allVideos={course.videos}
+                  activeVideo={activeVideo}
                   userId={userId}
                   usuario={usuario}
                   title={`${course.title} - ${activeVideo?.title || ""}`}

@@ -10,10 +10,10 @@ import {
 } from "@mui/material";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import PauseIcon from "@mui/icons-material/Pause";
+import SimCardDownloadIcon from "@mui/icons-material/SimCardDownload";
 import MethodGet, { MethodPost } from "../../../config/Service";
 import CoursesContext from "../../../context/Courses/CoursesContext";
-import SimCardDownloadIcon from "@mui/icons-material/SimCardDownload";
-import { Link } from "react-router-dom";
+
 const VideoPlayer = ({
   userId,
   courseId,
@@ -23,6 +23,8 @@ const VideoPlayer = ({
   title,
   hasCertificate,
   workbookUrl,
+  allVideos = [],
+  activeVideo,
 }) => {
   const { downloadCertificate } = useContext(CoursesContext);
 
@@ -35,25 +37,106 @@ const VideoPlayer = ({
   const [progress, setProgress] = useState(0);
   const [certificateEnabled, setCertificateEnabled] = useState(true);
 
-  const LOCAL_KEY = `video-progress-${userId}-${courseId}`;
+  const COURSE_KEY = `course-progress-${userId}-${courseId}`;
+  const activeVideoKey = activeVideo?.id || activeVideo?.cloudfrontUrl;
 
   /* ==============================
      LocalStorage helpers
   ============================== */
-  const saveLocalProgress = (seconds) => {
-    localStorage.setItem(LOCAL_KEY, String(seconds));
+  const saveVideoProgress = (seconds, currentPercent) => {
+    if (!activeVideoKey) return;
+
+    let data = {};
+    try {
+      data = JSON.parse(localStorage.getItem(COURSE_KEY) || "{}");
+    } catch (e) { }
+
+    const existing = data[activeVideoKey] || { seconds: 0, percent: 0 };
+
+    if (currentPercent > existing.percent) {
+      data[activeVideoKey] = {
+        seconds: Math.max(seconds, existing.seconds),
+        percent: Math.max(currentPercent, existing.percent),
+      };
+      localStorage.setItem(COURSE_KEY, JSON.stringify(data));
+    }
   };
 
-  const getLocalProgress = () => {
-    return Number(localStorage.getItem(LOCAL_KEY) || 0);
+  const getGlobalProgress = () => {
+    if (!allVideos || allVideos.length === 0) {
+      return { globalPercent: 0, totalSeconds: 0 };
+    }
+
+    let data = {};
+    try {
+      data = JSON.parse(localStorage.getItem(COURSE_KEY) || "{}");
+    } catch (e) { }
+
+    let totalPercent = 0;
+    let totalSeconds = 0;
+
+    allVideos.forEach((v) => {
+      const key = v.id || v.cloudfrontUrl;
+      totalPercent += data[key]?.percent || 0;
+      totalSeconds += data[key]?.seconds || 0;
+    });
+
+    return {
+      globalPercent: Math.round(totalPercent / allVideos.length),
+      totalSeconds,
+    };
   };
 
   const clearLocalProgress = () => {
-    localStorage.removeItem(LOCAL_KEY);
+    localStorage.removeItem(COURSE_KEY);
+  };
+
+  const updateBackendProgress = async (totalSeconds, currentPercent, certEnabled) => {
+    try {
+      await MethodPost(`/progress-video/${userId}/${courseId}`, {
+        secondsWatched: Math.floor(totalSeconds),
+        percent: currentPercent,
+        certificate_enabled: certEnabled,
+      });
+    } catch (error) {
+      console.error("Error actualizando progreso:", error);
+    }
+  };
+
+  const unlockCertificate = async (totalSeconds, globalPercent) => {
+    if (alreadySentRef.current) return;
+    alreadySentRef.current = true;
+    setCertificateEnabled(true);
+    await updateBackendProgress(totalSeconds, globalPercent, true);
+    clearLocalProgress();
   };
 
   /* ==============================
-     Init HLS (OPTIMIZADO)
+     Play / Pause overlay
+  ============================== */
+  const handlePlayPause = () => {
+    const video = videoRef.current;
+    if (!video) return;
+    video.paused ? video.play() : video.pause();
+  };
+
+  const handleEnded = () => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    saveVideoProgress(video.currentTime, 100);
+    const { globalPercent, totalSeconds } = getGlobalProgress();
+    setProgress((prev) => Math.max(prev, globalPercent));
+
+    if (globalPercent >= 80 && !alreadySentRef.current) {
+      unlockCertificate(totalSeconds, globalPercent);
+    } else {
+      updateBackendProgress(totalSeconds, globalPercent, false);
+    }
+  };
+
+  /* ==============================
+   Init HLS (OPTIMIZADO)
   ============================== */
   useEffect(() => {
     const video = videoRef.current;
@@ -91,118 +174,65 @@ const VideoPlayer = ({
   /* ==============================
      Obtener estado backend (1 vez)
   ============================== */
-
-  // useEffect(() => {
-  //   const fetchProgress = async () => {
-  //     try {
-  //       const { data } = await MethodGet(
-  //         `/progress-video/${userId}/${courseId}`,
-  //       );
-
-  //       if (data?.certificate_enabled) {
-  //         setCertificateEnabled(true);
-  //         setProgress(100);
-  //         alreadySentRef.current = true;
-  //         clearLocalProgress();
-  //       }
-  //     } catch (error) {
-  //       console.error("Error obteniendo progreso:", error);
-  //     }
-  //   };
-
-  //   fetchProgress();
-  // }, [userId, courseId]);
-
-  /* ==============================
-     Restaurar progreso local
-  ============================== */
-  // useEffect(() => {
-  //   const video = videoRef.current;
-  //   if (!video || certificateEnabled) return;
-
-  //   const seconds = getLocalProgress();
-  //   if (seconds > 5) {
-  //     video.currentTime = seconds;
-  //   }
-  // }, [certificateEnabled]);
+  useEffect(() => {
+    const fetchProgress = async () => {
+      try {
+        const { data } = await MethodGet(`/progress-video/${userId}/${courseId}`);
+        if (data?.certificate_enabled) {
+          setCertificateEnabled(true);
+          setProgress(100);
+          alreadySentRef.current = true;
+        } else {
+          setCertificateEnabled(false);
+          const bdPercent = data?.percent || 0;
+          const localPercent = getGlobalProgress().globalPercent;
+          setProgress(Math.max(bdPercent, localPercent));
+        }
+      } catch (error) {
+        console.error("Error obteniendo progreso:", error);
+      }
+    };
+    fetchProgress();
+  }, [userId, courseId]);
 
   /* ==============================
      Progreso (cada 5s 🔥)
   ============================== */
-  // useEffect(() => {
-  //   if (certificateEnabled) return;
+  useEffect(() => {
+    if (certificateEnabled) return;
 
-  //   intervalRef.current = setInterval(() => {
-  //     const video = videoRef.current;
-  //     if (!video || !video.duration) return;
+    intervalRef.current = setInterval(() => {
+      const video = videoRef.current;
+      if (!video || !video.duration || video.duration === Infinity || video.paused) return;
 
-  //     const percent = Math.floor((video.currentTime / video.duration) * 100);
+      const videoPercent = Math.round((video.currentTime / video.duration) * 100);
+      window.dispatchEvent(new Event("progressUpdated"));
+      saveVideoProgress(video.currentTime, videoPercent);
 
-  //     setProgress(percent);
-  //     saveLocalProgress(video.currentTime);
+      const { globalPercent, totalSeconds } = getGlobalProgress();
+      setProgress((prev) => Math.max(prev, globalPercent));
 
-  //     if (percent >= 80 && !alreadySentRef.current) {
-  //       unlockCertificate(video);
-  //     }
-  //   }, 5000); // ⬅️ antes era 1000ms
+      if (globalPercent >= 80 && !alreadySentRef.current) {
+        unlockCertificate(totalSeconds, globalPercent);
+      } else {
+        updateBackendProgress(totalSeconds, globalPercent, false);
+      }
+    }, 5000);
 
-  //   return () => {
-  //     clearInterval(intervalRef.current);
-  //     intervalRef.current = null;
-  //   };
-  // }, [certificateEnabled]);
-
-  /* ==============================
-     Backend call (UNA sola vez)
-  ============================== */
-  // const unlockCertificate = async (video) => {
-  //   if (alreadySentRef.current) return;
-
-  //   alreadySentRef.current = true;
-  //   setCertificateEnabled(true);
-  //   clearLocalProgress();
-
-  //   try {
-  //     await MethodPost(`/progress-video/${userId}/${courseId}`, {
-  //       secondsWatched: Math.floor(video.currentTime),
-  //       totalSeconds: Math.floor(video.duration),
-  //       progress: 100,
-  //       certificate_enabled: true,
-  //     });
-  //   } catch (error) {
-  //     console.error("Error habilitando certificado:", error);
-  //   }
-  // };
-
-  /* ==============================
-     Video ended (fallback)
-  ============================== */
-  const handleEnded = () => {
-    const video = videoRef.current;
-    if (!video) return;
-
-    setProgress(100);
-    if (!alreadySentRef.current) {
-      unlockCertificate(video);
-    }
-  };
-
-  /* ==============================
-     Play / Pause overlay
-  ============================== */
-  const handlePlayPause = () => {
-    const video = videoRef.current;
-    if (!video) return;
-
-    video.paused ? video.play() : video.pause();
-  };
+    return () => {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    };
+  }, [certificateEnabled, activeVideo, allVideos]);
 
   /* ==============================
      UI
   ============================== */
   const safeUserName = usuario?.name ?? "";
+
   return (
     <Box sx={{ maxWidth: "100%", mx: "auto", mt: 4 }}>
+      {/* Video Player */}
       <Box
         sx={{
           position: "relative",
@@ -243,14 +273,14 @@ const VideoPlayer = ({
         </IconButton>
       </Box>
 
+      {/* Progress Section */}
       <Box sx={{ mt: 3, p: 2, borderRadius: 2, backgroundColor: "#FFF6F9" }}>
-        <Typography fontWeight={700}>{title} </Typography>
-        {/* <Typography fontSize='0.85rem' color='#DC4485'>
-          Has avanzado un {progress}%
-        </Typography> */}
-        {/* 
+        <Typography fontWeight={700}>{title}</Typography>
+        <Typography fontSize="0.85rem" color="#DC4485" sx={{ mt: 1, mb: 1 }}>
+          Has avanzado un {progress}% del curso general
+        </Typography>
         <LinearProgress
-          variant='determinate'
+          variant="determinate"
           value={progress}
           sx={{
             height: 6,
@@ -258,8 +288,9 @@ const VideoPlayer = ({
             backgroundColor: "#F3D6DF",
             "& .MuiLinearProgress-bar": { backgroundColor: "#E53888" },
           }}
-        /> */}
+        />
       </Box>
+
       {/* 📚 BLOQUE MATERIAL DE TRABAJO (WORKBOOK) */}
       {workbookUrl !== null && (
         <Box
@@ -267,7 +298,7 @@ const VideoPlayer = ({
             mt: 3,
             p: 2.5,
             borderRadius: "20px",
-            backgroundColor: "#F9FAFB", // Fondo neutro limpio para diferenciarlo del premio
+            backgroundColor: "#F9FAFB",
             border: "1px solid #F3F4F6",
             display: "flex",
             flexDirection: { xs: "column", sm: "row" },
@@ -276,7 +307,7 @@ const VideoPlayer = ({
             gap: 2,
           }}
         >
-          <Stack direction='row' alignItems='center' spacing={1.5}>
+          <Stack direction="row" alignItems="center" spacing={1.5}>
             <Box
               sx={{
                 width: 40,
@@ -295,27 +326,23 @@ const VideoPlayer = ({
             </Box>
             <Box>
               <Typography
-                variant='subtitle2'
+                variant="subtitle2"
                 sx={{ fontWeight: "800", color: "#1F2937", lineHeight: 1.2 }}
               >
                 Material didáctico disponible
               </Typography>
-              <Typography
-                variant='caption'
-                sx={{ color: "#6B7280", fontWeight: 500 }}
-              >
-                Este curso contiene un cuaderno de trabajo complementario en
-                PDF.
+              <Typography variant="caption" sx={{ color: "#6B7280", fontWeight: 500 }}>
+                Este curso contiene un cuaderno de trabajo complementario en PDF.
               </Typography>
             </Box>
           </Stack>
 
           <Button
-            variant='outlined'
-            component='a' // Cambiado a ancla nativa segura para archivos de S3
+            variant="outlined"
+            component="a" // Cambiado a ancla nativa segura para archivos de S3
             href={workbookUrl}
-            target='_blank'
-            rel='noopener noreferrer'
+            target="_blank"
+            rel="noopener noreferrer"
             sx={{
               width: { xs: "100%", sm: "auto" },
               borderColor: "#E53888",
@@ -326,10 +353,7 @@ const VideoPlayer = ({
               borderRadius: "12px",
               px: 3,
               py: 1,
-              "&:hover": {
-                borderColor: "#C2185B",
-                backgroundColor: "#FFF5F7",
-              },
+              "&:hover": { borderColor: "#C2185B", backgroundColor: "#FFF5F7" },
             }}
           >
             Descargar Workbook
@@ -368,34 +392,23 @@ const VideoPlayer = ({
           >
             🌸
           </Box>
-
           <Typography
-            variant='h6'
-            sx={{
-              fontWeight: 900,
-              color: "#1F2937",
-              letterSpacing: "-0.5px",
-              mb: 0.5,
-            }}
+            variant="h6"
+            sx={{ fontWeight: 900, color: "#1F2937", letterSpacing: "-0.5px", mb: 0.5 }}
           >
             ¡Tu reconocimiento está listo!
           </Typography>
 
           <Typography
-            variant='body2'
-            sx={{
-              color: "#6B7280",
-              maxWidth: "400px",
-              mb: 3,
-              lineHeight: 1.5,
-            }}
+            variant="body2"
+            sx={{ color: "#6B7280", maxWidth: "400px", mb: 3, lineHeight: 1.5 }}
           >
-            Felicidades por concluir tus horas de práctica. Ya puedes descargar
-            tu reconocimiento oficial firmado por las instructoras de Wapizima.
+            Felicidades por concluir tus horas de práctica. Ya puedes descargar tu
+            reconocimiento oficial firmado por las instructoras de Wapizima.
           </Typography>
 
           <Button
-            variant='contained'
+            variant="contained"
             onClick={() => downloadCertificate(courseId, safeUserName || "")}
             endIcon={<SimCardDownloadIcon sx={{ fontSize: "18px" }} />}
             sx={{
@@ -411,8 +424,8 @@ const VideoPlayer = ({
               py: 1.4,
               boxShadow: "none",
               transition: "all 0.2s ease-in-out",
-              "&:hover": {
-                backgroundColor: "#C2185B",
+              "&:hover": { 
+                backgroundColor: "#C2185B", 
                 boxShadow: "none",
               },
             }}
