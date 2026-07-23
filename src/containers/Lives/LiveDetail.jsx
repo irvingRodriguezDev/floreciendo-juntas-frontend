@@ -1,4 +1,10 @@
-import React, { useContext, useEffect, useState, useRef } from "react";
+import React, {
+  useContext,
+  useEffect,
+  useState,
+  useRef,
+  useCallback,
+} from "react";
 import { Box, useMediaQuery, useTheme } from "@mui/material";
 import { motion, AnimatePresence } from "framer-motion";
 import { useParams, useNavigate } from "react-router-dom";
@@ -7,6 +13,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import AuthContext from "../../context/Auth/AuthContext";
 import LivesContext from "../../context/Lives/LivesContext";
 import { useLiveComments } from "../../hooks/useLiveComments";
+import { useIvsViewers } from "../../hooks/useIvsViewers";
 
 // Components
 import Layout from "../../components/Layout/Layout";
@@ -18,7 +25,6 @@ import LiveHeader from "../../components/lives/LiveHeader";
 import LiveInfoCard from "../../components/lives/LiveInfoCard";
 import LiveBlocked from "../../components/lives/LiveBlocked";
 import LiveCommentsSidebar from "./LiveCommentsSidebar";
-import { useIvsViewers } from "../../hooks/useIvsViewers";
 
 // ─── Variantes de animación del player ───────────────────────────────────────
 const videoVariants = {
@@ -31,53 +37,56 @@ const videoVariants = {
   ended: { scale: 1.05, filter: "blur(20px) brightness(0.5)" },
 };
 
-// ─── Estilos del contenedor fullscreen ───────────────────────────────────────
-const fullscreenGridSx = {
-  "&:fullscreen": {
+// ─── Estilos integrados para la vista de video y Fullscreen ─────────────────
+const fullscreenContainerSx = (commentsVisible) => ({
+  display: "grid",
+  gridTemplateColumns: { xs: "1fr", md: "3fr 1fr" },
+  borderRadius: { xs: 0, sm: 4 },
+  overflow: "hidden",
+  bgcolor: "#000",
+  position: "relative",
+
+  // Fullscreen Estándar y Webkit
+  "&:fullscreen, &:-webkit-full-screen": {
     height: "100vh",
     width: "100vw",
     borderRadius: 0,
-    gridTemplateColumns: "3fr 1fr",
+    display: "block",
+    position: "relative",
+    backgroundColor: "#000",
+
     "& .player-col": {
+      width: "100%",
       height: "100vh",
-      display: "flex",
-      flexDirection: "column",
     },
     "& .player-motion": {
-      flex: 1,
-      height: "100%",
-      "& > div": { height: "100%" }, // Box interno de PlayerCliente
-    },
-    "& video": {
-      objectFit: "cover",
-      height: "100% !important",
-      aspectRatio: "unset !important",
-    },
-  },
-  "&:-webkit-full-screen": {
-    height: "100vh",
-    width: "100vw",
-    borderRadius: 0,
-    gridTemplateColumns: "3fr 1fr",
-    "& .player-col": {
-      height: "100vh",
-      display: "flex",
-      flexDirection: "column",
-    },
-    "& .player-motion": {
-      flex: 1,
       height: "100%",
       "& > div": { height: "100%" },
     },
     "& video": {
       objectFit: "cover",
-      height: "100% !important",
+      height: "100vh !important",
       aspectRatio: "unset !important",
     },
-  },
-};
 
-// ─────────────────────────────────────────────────────────────────────────────
+    // Sidebar Flotante translúcido en pantalla completa
+    "& .comments-sidebar": {
+      position: "absolute",
+      top: 0,
+      right: commentsVisible ? 0 : "-340px",
+      width: "340px",
+      height: "100vh",
+      zIndex: 100,
+      backgroundColor: "rgba(10, 10, 10, 0.82)",
+      backdropFilter: "blur(16px)",
+      borderLeft: "1px solid rgba(255, 255, 255, 0.1)",
+      transition: "right 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+      "@media (max-width: 768px)": {
+        display: "none",
+      },
+    },
+  },
+});
 
 const LiveDetalle = () => {
   const { id } = useParams();
@@ -89,33 +98,24 @@ const LiveDetalle = () => {
   const { getLiveById, live } = useContext(LivesContext);
   const { usuario, isAuthenticating, autenticado } = useContext(AuthContext);
 
-  // ── State ──
+  // ── States ──
   const [livePhase, setLivePhase] = useState("scheduled");
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [commentsVisible, setCommentsVisible] = useState(true);
 
-  const handleClickHiddenComments = () => {
-    setCommentsVisible(false);
-  };
-  const handleClickShowComments = () => {
-    setCommentsVisible(true);
-  };
-
-  // -- Contador de personas en el live --//
+  // ── Hooks de IVR Viewers & Comentarios ──
   const viewers = useIvsViewers(id, live?.aws_channel_arn);
+  const { comments, sendComment } = useLiveComments(id);
 
   // ── Refs ──
   const containerRef = useRef(null);
-  useEffect(() => {
-    console.log("commentsVisible cambió a:", commentsVisible);
-  }, [commentsVisible]);
 
-  // ── Cargar live ──
+  // ── Cargar live de forma segura ──
   useEffect(() => {
-    if (id && (!live || live.id !== id)) {
+    if (id && (!live || String(live.id) !== String(id))) {
       getLiveById(id);
     }
-  }, [id, live?.id]);
+  }, [id, live, getLiveById]);
 
   // ── Máquina de estados del live ──
   useEffect(() => {
@@ -137,49 +137,65 @@ const LiveDetalle = () => {
     }
   }, [live?.status, livePhase]);
 
-  // ── Listener fullscreen ──
+  // ── Escuchador de Fullscreen ──
   useEffect(() => {
-    const handler = () => {
-      setIsFullscreen(
-        !!(document.fullscreenElement || document.webkitFullscreenElement),
+    const handleFullscreenChange = () => {
+      const isFull = Boolean(
+        document.fullscreenElement || document.webkitFullscreenElement,
       );
+      setIsFullscreen(isFull);
     };
-    document.addEventListener("fullscreenchange", handler);
-    document.addEventListener("webkitfullscreenchange", handler);
+
+    document.addEventListener("fullscreenchange", handleFullscreenChange);
+    document.addEventListener("webkitfullscreenchange", handleFullscreenChange);
+
     return () => {
-      document.removeEventListener("fullscreenchange", handler);
-      document.removeEventListener("webkitfullscreenchange", handler);
+      document.removeEventListener("fullscreenchange", handleFullscreenChange);
+      document.removeEventListener(
+        "webkitfullscreenchange",
+        handleFullscreenChange,
+      );
     };
   }, []);
 
-  // ── Comentarios ──
-  const { comments, sendComment, appViewers } = useLiveComments(id);
-
-  // ── Acciones ──
-  const handleFullscreen = () => {
+  // ── Alternar Fullscreen ──
+  const handleFullscreen = useCallback(() => {
     const el = containerRef.current;
-    if (!document.fullscreenElement && !document.webkitFullscreenElement) {
-      el?.requestFullscreen?.() ?? el?.webkitRequestFullscreen?.();
-    } else {
-      document.exitFullscreen?.() ?? document.webkitExitFullscreen?.();
-    }
-  };
+    if (!el) return;
 
-  // ── Guard de carga ──
+    if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+      if (el.requestFullscreen) {
+        el.requestFullscreen();
+      } else if (el.webkitRequestFullscreen) {
+        el.webkitRequestFullscreen();
+      }
+    } else {
+      if (document.exitFullscreen) {
+        document.exitFullscreen();
+      } else if (document.webkitExitFullscreen) {
+        document.webkitExitFullscreen();
+      }
+    }
+  }, []);
+
+  // ── Guard de carga inicial ──
   if (isAuthenticating || !live) {
     return (
       <PinkSpinner
-        label={isAuthenticating ? "Verificando acceso..." : "Cargando live..."}
+        label={
+          isAuthenticating
+            ? "Verificando acceso..."
+            : "Cargando evento en vivo..."
+        }
       />
     );
   }
 
-  // ── Derivados ──
+  // ── Datos derivados ──
   const isSubscribed = Boolean(usuario?.isSubscribed);
   const isScheduled = live.status === "scheduled";
   const isActive = live.status === "live" || live.status === "ended";
 
-  // ─────────────────────────────────────────────────────────────────────────
   return (
     <Layout>
       <Box
@@ -190,7 +206,7 @@ const LiveDetalle = () => {
           py: { xs: 0, sm: 2 },
         }}
       >
-        {/* ── Header ── */}
+        {/* ── Encabezado ── */}
         <Box sx={{ px: { xs: 2, sm: 0 }, mt: { xs: 2, sm: 0 } }}>
           <LiveHeader live={live} onFullscreen={handleFullscreen} />
         </Box>
@@ -204,97 +220,21 @@ const LiveDetalle = () => {
             overflow: "hidden",
           }}
         >
-          {/* Estado: programado */}
+          {/* Estado: Programado */}
           {isScheduled && (
             <Box sx={{ py: 8, display: "flex", justifyContent: "center" }}>
               <LiveCountdown startTime={live.start_time} />
             </Box>
           )}
 
-          {/* Estado: en vivo o finalizado */}
+          {/* Estado: En Vivo o Finalizado */}
           {isActive && (
-            <Box
-              ref={containerRef}
-              sx={{
-                display: "grid",
-                gridTemplateColumns: { xs: "1fr", md: "3fr 1fr" },
-                borderRadius: { xs: 0, sm: 4 },
-                overflow: "hidden",
-                bgcolor: "#000",
-
-                // Fullscreen: video ocupa TODO, comentarios flotan encima a la derecha
-                "&:fullscreen": {
-                  height: "100vh",
-                  width: "100vw",
-                  borderRadius: 0,
-                  display: "block", // ← deja de ser grid, el player ocupa todo
-                  position: "relative",
-
-                  // Columna del player ocupa todo
-                  "& .player-col": {
-                    width: "100%",
-                    height: "100vh",
-                  },
-                  "& .player-motion": {
-                    height: "100%",
-                    "& > div": { height: "100%" },
-                  },
-                  "& video": {
-                    objectFit: "cover",
-                    height: "100vh !important",
-                    aspectRatio: "unset !important",
-                  },
-
-                  // Sidebar flota sobre el video
-                  "& .comments-sidebar": {
-                    position: "absolute",
-                    top: 0,
-                    right: 0,
-                    width: "320px",
-                    height: "100vh",
-                    zIndex: 100,
-                    bgcolor: "rgba(10,10,10,0.75)",
-                    backdropFilter: "blur(12px)",
-                    borderLeft: "1px solid rgba(255,255,255,0.08)",
-                    // En mobile se oculta
-                    "@media (max-width: 768px)": {
-                      display: "none",
-                    },
-                  },
-                },
-
-                "&:-webkit-full-screen": {
-                  height: "100vh",
-                  width: "100vw",
-                  borderRadius: 0,
-                  display: "block",
-                  position: "relative",
-                  "& .player-col": { width: "100%", height: "100vh" },
-                  "& .player-motion": {
-                    height: "100%",
-                    "& > div": { height: "100%" },
-                  },
-                  "& video": {
-                    objectFit: "cover",
-                    height: "100vh !important",
-                    aspectRatio: "unset !important",
-                  },
-                  "& .comments-sidebar": {
-                    position: "absolute",
-                    top: 0,
-                    right: commentsVisible ? 0 : "-320px",
-                    width: "320px",
-                    height: "100vh",
-                    zIndex: 100,
-                    bgcolor: "rgba(10,10,10,0.75)",
-                    backdropFilter: "blur(12px)",
-                    "@media (max-width: 768px)": { display: "none" },
-                  },
-                },
-              }}
-            >
-              {/* Columna izquierda: player */}
-              <Box className='player-col' sx={{ position: "relative" }}>
+            <Box ref={containerRef} sx={fullscreenContainerSx(commentsVisible)}>
+              {/* Columna Player de Video */}
+              <Box
+                className='player-col'
+                sx={{ position: "relative", width: "100%" }}
+              >
                 <motion.div
                   className='player-motion'
                   animate={livePhase}
@@ -312,12 +252,12 @@ const LiveDetalle = () => {
                   />
                 </motion.div>
 
-                {/* Bloqueo para no suscritos */}
+                {/* Bloqueo para no suscriptoras */}
                 {live.status === "live" && (!autenticado || !isSubscribed) && (
                   <LiveBlocked autenticado={autenticado} usuario={usuario} />
                 )}
 
-                {/* Overlay de finalización */}
+                {/* Overlay al finalizar transmisión */}
                 <AnimatePresence>
                   {(livePhase === "ending" || livePhase === "ended") && (
                     <motion.div
@@ -327,11 +267,12 @@ const LiveDetalle = () => {
                       style={{
                         position: "absolute",
                         inset: 0,
-                        zIndex: 10000,
+                        zIndex: 1000,
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
-                        backgroundColor: "rgba(0,0,0,0.6)",
+                        backgroundColor: "rgba(0, 0, 0, 0.75)",
+                        backdropFilter: "blur(8px)",
                       }}
                     >
                       <LiveEndedOverlay onGoHome={() => navigate("/lives")} />
@@ -340,18 +281,19 @@ const LiveDetalle = () => {
                 </AnimatePresence>
               </Box>
 
-              {/* Columna derecha: comentarios */}
-
-              <LiveCommentsSidebar
-                liveId={live.id}
-                comments={comments}
-                sendComment={sendComment} // ← bug fix: faltaba ={sendComment}
-              />
+              {/* Sidebar de comentarios */}
+              <Box className='comments-sidebar'>
+                <LiveCommentsSidebar
+                  liveId={live.id}
+                  comments={comments}
+                  sendComment={sendComment}
+                />
+              </Box>
             </Box>
           )}
         </Box>
 
-        {/* ── Info extra ── */}
+        {/* ── Detalles e Información adicional ── */}
         <Box sx={{ mt: 4, px: { xs: 2, sm: 0 }, pb: 4 }}>
           <LiveInfoCard
             title='Qué aprenderás en este live'

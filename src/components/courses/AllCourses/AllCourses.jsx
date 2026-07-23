@@ -61,7 +61,7 @@ const AllCourses = ({ course }) => {
               aspectRatio: {
                 xs: "16 / 10", // Mejor proporción horizontal para móviles
                 sm: "4 / 3",
-                md: "1 / 1", // Cuadrado premium en desktop se ve muy editorial/revista
+                md: "4 / 4", // Cuadrado premium en desktop se ve muy editorial/revista
               },
               objectFit: "cover",
               borderRadius: "18px",

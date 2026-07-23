@@ -1,11 +1,14 @@
 import React, { useContext, useEffect, useRef } from "react";
-import { Box, Typography, IconButton, Stack } from "@mui/material";
+import { Box, Typography, IconButton, Stack, Button } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper/modules";
+import { Link } from "react-router-dom";
+
 import "swiper/css";
 import "swiper/css/navigation";
+
 import SystemContext from "../../context/System/SystemContext";
 import PinkSpinner from "../../components/Loading/PinkSpinner";
 import SystemCard from "./SystemCard";
@@ -160,6 +163,37 @@ const Systems = () => {
         >
           <ArrowForwardIcon sx={{ fontSize: "20px" }} />
         </IconButton>
+      </Box>
+
+      {/* 🚀 BOTÓN CTA: EXPLORAR TODOS LOS SECRETOS */}
+      <Box sx={{ textAlign: "center", mt: { xs: 4, md: 6 } }}>
+        <Button
+          component={Link}
+          to='/secretos'
+          variant='outlined'
+          endIcon={<ArrowForwardIcon />}
+          sx={{
+            color: "#E53888",
+            borderColor: "#E53888",
+            borderWidth: "2px",
+            fontWeight: 700,
+            fontSize: { xs: "0.9rem", md: "1rem" },
+            padding: "10px 28px",
+            borderRadius: "50px",
+            textTransform: "none",
+            transition: "all 0.3s ease",
+            "&:hover": {
+              borderWidth: "2px",
+              borderColor: "#C2256F",
+              backgroundColor: "#E53888",
+              color: "#FFFFFF",
+              transform: "translateY(-2px)",
+              boxShadow: "0 8px 20px rgba(229, 56, 136, 0.25)",
+            },
+          }}
+        >
+          Explorar todos los secretos
+        </Button>
       </Box>
     </Box>
   );

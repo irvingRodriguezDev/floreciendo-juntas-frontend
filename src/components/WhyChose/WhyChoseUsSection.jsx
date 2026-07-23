@@ -28,7 +28,7 @@ const features = [
     icon: HeadsetMicIcon,
     title: "Soporte Dedicado",
     description:
-      "Siempre estamos listas para ayudarte a resolver dudas y problemas 24/7. ¡No estás sola!",
+      "Siempre estamos listas para ayudarte a resolver dudas 24/7. ¡Nunca estarás sola en tu proceso!",
     iconColor: "#E46F9F",
   },
   {
@@ -46,7 +46,6 @@ const features = [
     iconColor: "#E46F9F",
   },
 ];
-
 // Componente individual
 const FeatureItem = ({ icon: Icon, title, description, iconColor }) => (
   <Stack spacing={1} sx={{ maxWidth: { xs: "100%", md: "300px" } }}>
@@ -60,15 +59,18 @@ const FeatureItem = ({ icon: Icon, title, description, iconColor }) => (
         alignItems: "center",
         justifyContent: "center",
         mb: 1,
-        boxShadow: "0 4px 10px rgba(0, 0, 0, 0.1)",
+        boxShadow: "0 4px 10px rgba(228, 111, 159, 0.3)",
       }}
     >
       <Icon sx={{ color: "white", fontSize: 24 }} />
     </Box>
-    <Typography variant='h6' sx={{ fontWeight: 700, lineHeight: 1.3 }}>
+    <Typography
+      variant='h6'
+      sx={{ fontWeight: 700, lineHeight: 1.3, color: "#1F2937" }}
+    >
       {title}
     </Typography>
-    <Typography variant='body2' color='text.secondary' textAlign='justify'>
+    <Typography variant='body2' color='text.secondary' textAlign='left'>
       {description}
     </Typography>
   </Stack>
@@ -96,7 +98,6 @@ function Sparkles({ count = 6 }) {
     </>
   );
 }
-
 const WhyChooseUsSection = () => {
   const [openVideo, setOpenVideo] = useState(false);
   const theme = useTheme();
@@ -269,72 +270,10 @@ const WhyChooseUsSection = () => {
                 loading='lazy'
                 sx={{ width: "100%", height: "100%", objectFit: "cover" }}
               />
-
-              {/* Botón Play */}
-              {/* <Box
-                sx={{
-                  position: "absolute",
-                  top: "50%",
-                  left: "50%",
-                  transform: "translate(-50%, -50%)",
-                  cursor: "pointer",
-                }}
-                onClick={() => setOpenVideo(true)}
-              >
-                <Box
-                  sx={{
-                    position: "absolute",
-                    width: "100px",
-                    height: "100px",
-                    borderRadius: "50%",
-                    backgroundColor: "rgba(255,255,255,0.35)",
-                    animation: "pulse 2s infinite",
-                  }}
-                />
-                <PlayCircleFilledIcon
-                  sx={{ fontSize: 85, color: "white", position: "relative" }}
-                />
-              </Box> */}
             </Box>
           </Grid>
         </Grid>
       </Box>
-
-      {/* MODAL DE VIDEO */}
-      <Modal open={openVideo} onClose={() => setOpenVideo(false)}>
-        <Box
-          sx={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            backgroundColor: "#000",
-            padding: 2,
-            borderRadius: 3,
-            outline: "none",
-            width: "90%",
-            maxWidth: "800px",
-          }}
-        >
-          <IconButton
-            onClick={() => setOpenVideo(false)}
-            sx={{ position: "absolute", right: 10, top: 10, color: "white" }}
-          >
-            <CloseIcon />
-          </IconButton>
-
-          <iframe
-            width='100%'
-            height='450'
-            src='https://www.youtube.com/embed/QB7ACr7pUuE'
-            title='Video'
-            frameBorder='0'
-            allow='autoplay; encrypted-media'
-            allowFullScreen
-            style={{ borderRadius: "12px" }}
-          />
-        </Box>
-      </Modal>
     </>
   );
 };

@@ -13,7 +13,7 @@ const socialData = [
   {
     id: 1,
     name: "Facebook",
-    followers: "+63K seguidores",
+    followers: "+66K seguidores",
     icon: <FacebookIcon width={36} />,
     link: "https://www.facebook.com/caarolinataveera",
   },
@@ -26,8 +26,8 @@ const socialData = [
   },
   {
     id: 3,
-    name: "Tiktok",
-    followers: "+242K Seguidores",
+    name: "TikTok",
+    followers: "+254K Seguidores",
     icon: <TiktokIcon width={30} />,
     link: "https://www.tiktok.com/@carolina_tavera",
   },
@@ -52,7 +52,7 @@ const SocialCards = () => {
         sx={{ maxWidth: "1300px", margin: "0 auto" }}
       >
         {/* TÍTULO EDITORIAL */}
-        <Grid size={12}>
+        <Grid size={{ xs: 12 }}>
           <Stack alignItems='center' sx={{ mb: 4, textAlign: "center" }}>
             <Typography
               variant='caption'
@@ -94,7 +94,7 @@ const SocialCards = () => {
         {/* CARDS PLANAS INTERACTIVAS */}
         {socialData.map((item) => (
           <Grid
-            size={{ xs: 12, sm: 6, md: 4 }}
+            size={{ xs: 12, md: 4, lg: 4 }}
             sx={{ display: "flex", justifyContent: "center" }}
             key={item.id}
           >
@@ -104,7 +104,7 @@ const SocialCards = () => {
               target='_blank'
               rel='noopener noreferrer'
               aria-label={`Seguir en ${item.name}`}
-              style={{
+              sx={{
                 textDecoration: "none",
                 width: "100%",
                 display: "block",
@@ -119,7 +119,7 @@ const SocialCards = () => {
                   y: -6,
                   borderColor: "#F472B6",
                 }}
-                elevation={0} // Look plano sin sombras
+                elevation={0}
                 sx={{
                   p: 3,
                   borderRadius: "24px",
@@ -130,7 +130,6 @@ const SocialCards = () => {
                   flexDirection: "column",
                   justifyContent: "space-between",
                   minHeight: "150px",
-                  // Control global de hover para animar la flechita interna
                   "&:hover .arrow-btn": {
                     backgroundColor: "#E53888",
                     color: "#fff",

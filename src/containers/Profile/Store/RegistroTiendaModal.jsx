@@ -11,23 +11,28 @@ import {
   Stack,
   CircularProgress,
   Autocomplete as MUIAutocomplete,
+  Tooltip,
 } from "@mui/material";
 import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate";
+import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
+import StorefrontOutlinedIcon from "@mui/icons-material/StorefrontOutlined";
 import CloseIcons from "../../../components/icons/CloseIcons";
 import { useGoogleMaps } from "../../../context/GoogleMaps/GoogleMapsProvider";
 import StoresContext from "../../../context/Stores/StoresContext";
 
+const PRIMARY_PINK = "#E53888";
+
 const inputStyles = {
-  mb: 2,
+  mb: 1.5,
   "& .MuiOutlinedInput-root": {
-    borderRadius: "12px",
-    "& fieldset": { borderColor: "rgba(216,46,136,0.3)" },
-    "&:hover fieldset": { borderColor: "#D82E7A" },
-    "&.Mui-focused fieldset": { borderColor: "#D82E7A" },
+    borderRadius: "14px",
+    backgroundColor: "#FAFAFA",
+    "& fieldset": { borderColor: "#E5E7EB" },
+    "&:hover fieldset": { borderColor: PRIMARY_PINK },
+    "&.Mui-focused fieldset": { borderColor: PRIMARY_PINK },
   },
-  "& .MuiInputBase-input": { color: "black" },
-  "& .MuiInputLabel-root": { color: "#D82E7A" },
-  "& .MuiInputLabel-root.Mui-focused": { color: "#D82E7A" },
+  "& .MuiInputLabel-root": { color: "#6B7280", fontSize: "0.9rem" },
+  "& .MuiInputLabel-root.Mui-focused": { color: PRIMARY_PINK, fontWeight: 700 },
 };
 
 const INITIAL_FORM = {
@@ -47,6 +52,7 @@ const RegistroTiendaDialog = ({ open, handleClose }) => {
   const [formData, setFormData] = useState(INITIAL_FORM);
   const [options, setOptions] = useState([]);
   const [inputValue, setInputValue] = useState("");
+  const [selectedPlace, setSelectedPlace] = useState(null);
   const [preview, setPreview] = useState(null);
   const [loading, setLoading] = useState(false);
 
@@ -61,20 +67,22 @@ const RegistroTiendaDialog = ({ open, handleClose }) => {
     }
   }, [isLoaded]);
 
+  // Limpiar estados al cerrar el Modal
   useEffect(() => {
     if (!open) {
       setFormData(INITIAL_FORM);
       setPreview(null);
       setOptions([]);
       setInputValue("");
+      setSelectedPlace(null);
     }
   }, [open]);
 
-  // 🔍 Google Places
+  // 🔍 Google Places Autocomplete
   const handleFetchSuggestions = (_, value) => {
     setInputValue(value);
 
-    if (value.length < 4 || !autocompleteService.current) {
+    if (!value || value.length < 3 || !autocompleteService.current) {
       setOptions([]);
       return;
     }
@@ -83,14 +91,23 @@ const RegistroTiendaDialog = ({ open, handleClose }) => {
       {
         input: value,
         componentRestrictions: { country: "mx" },
-        types: ["address"],
+        types: ["establishment", "geocode"],
       },
       (predictions) => setOptions(predictions || []),
     );
   };
 
   const handleSelectPlace = (_, selection) => {
-    if (!selection || !geocoder.current) return;
+    setSelectedPlace(selection);
+    if (!selection || !geocoder.current) {
+      setFormData((prev) => ({
+        ...prev,
+        address: "",
+        latitude: null,
+        longitude: null,
+      }));
+      return;
+    }
 
     geocoder.current.geocode(
       { placeId: selection.place_id },
@@ -109,38 +126,45 @@ const RegistroTiendaDialog = ({ open, handleClose }) => {
     );
   };
 
-  // 📸 Imagen
+  // 📸 Carga de Imagen
   const handleChangeFile = (e) => {
     const file = e.target.files[0];
     if (!file) return;
 
     setPreview(URL.createObjectURL(file));
-
-    setFormData((prev) => ({
-      ...prev,
-      image: file,
-    }));
+    setFormData((prev) => ({ ...prev, image: file }));
   };
 
-  // 🚀 Submit
+  const handleRemoveImage = () => {
+    setPreview(null);
+    setFormData((prev) => ({ ...prev, image: null }));
+  };
+
+  // 🚀 Formatear Teléfono y Enviar
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
 
     try {
-      await createStoreUser(formData); // 👈 enviamos objeto limpio
+      // Limpiamos teléfono de caracteres no numéricos
+      const cleanedData = {
+        ...formData,
+        phone: formData.phone.replace(/\D/g, ""),
+      };
+
+      await createStoreUser(cleanedData);
       handleClose();
     } catch (error) {
-      console.error(error);
+      console.error("Error al registrar tienda:", error);
     } finally {
       setLoading(false);
     }
   };
 
   const isFormValid =
-    formData.name &&
-    formData.description &&
-    formData.phone &&
+    formData.name.trim() &&
+    formData.description.trim() &&
+    formData.phone.trim() &&
     formData.latitude &&
     formData.image;
 
@@ -150,120 +174,218 @@ const RegistroTiendaDialog = ({ open, handleClose }) => {
       onClose={handleClose}
       fullWidth
       maxWidth='xs'
-      PaperProps={{ sx: { borderRadius: "20px", p: 1 } }}
+      PaperProps={{
+        sx: {
+          borderRadius: "24px",
+          p: 1,
+          boxShadow: "0 20px 50px rgba(0,0,0,0.15)",
+        },
+      }}
     >
-      <DialogTitle sx={{ display: "flex", justifyContent: "space-between" }}>
-        <Typography fontWeight={800}>Nueva Distribuidora</Typography>
-        <IconButton onClick={handleClose}>
-          <CloseIcons width={25} />
+      {/* TÍTULO */}
+      <DialogTitle
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          pb: 1,
+        }}
+      >
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+          <Box
+            sx={{
+              p: 1,
+              borderRadius: "50%",
+              backgroundColor: "#FFF1F2",
+              color: PRIMARY_PINK,
+              display: "flex",
+            }}
+          >
+            <StorefrontOutlinedIcon sx={{ fontSize: 22 }} />
+          </Box>
+          <Typography
+            variant='h6'
+            sx={{ fontWeight: 800, color: "#1F2937", fontSize: "1.15rem" }}
+          >
+            Nueva Distribuidora
+          </Typography>
+        </Box>
+
+        <IconButton
+          onClick={handleClose}
+          size='small'
+          sx={{ color: "#9CA3AF", "&:hover": { color: PRIMARY_PINK } }}
+        >
+          <CloseIcons width={22} />
         </IconButton>
       </DialogTitle>
 
-      <DialogContent>
+      <DialogContent sx={{ pt: 1 }}>
         <Stack
           component='form'
-          spacing={2}
+          spacing={1.5}
           onSubmit={handleSubmit}
-          sx={{ mt: 1 }}
+          sx={{ mt: 2 }}
         >
+          {/* NOMBRE */}
           <TextField
-            label='Nombre'
+            label='Nombre de la tienda / distribuidora'
             size='small'
             required
+            value={formData.name}
             sx={inputStyles}
             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
           />
 
+          {/* DESCRIPCIÓN */}
           <TextField
-            label='Descripción'
+            label='Descripción del negocio'
             multiline
             rows={2}
             required
+            value={formData.description}
             sx={inputStyles}
             onChange={(e) =>
               setFormData({ ...formData, description: e.target.value })
             }
           />
 
+          {/* WHATSAPP */}
           <TextField
-            label='WhatsApp'
+            label='Teléfono de WhatsApp'
             required
-            placeholder='52...'
+            size='small'
+            placeholder='Ej. 521234567890'
+            value={formData.phone}
             sx={inputStyles}
             onChange={(e) =>
               setFormData({ ...formData, phone: e.target.value })
             }
+            helperText='Formato a 10 dígitos (ej. 5512345678)'
           />
 
+          {/* AUTOCOMPLETE GOOGLE PLACES */}
           <MUIAutocomplete
             options={options}
+            value={selectedPlace}
             getOptionLabel={(o) => o.description || ""}
             onInputChange={handleFetchSuggestions}
             onChange={handleSelectPlace}
+            noOptionsText={
+              inputValue.length < 3
+                ? "Escribe al menos 3 caracteres..."
+                : "No se encontraron ubicaciones"
+            }
             renderInput={(params) => (
               <TextField
                 {...params}
-                label='Dirección Física'
+                label='Dirección física'
                 required
                 size='small'
                 sx={inputStyles}
-                helperText='Selecciona de la lista'
+                helperText={
+                  formData.latitude
+                    ? "✓ Ubicación geo-localizada"
+                    : "Selecciona una opción de la lista"
+                }
+                FormHelperTextProps={{
+                  sx: { color: formData.latitude ? "#059669" : "#6B7280" },
+                }}
               />
             )}
           />
 
-          <Button
-            variant='outlined'
-            component='label'
-            startIcon={<AddPhotoAlternateIcon />}
-            sx={{
-              borderColor: "#D82E7A",
-              color: "#D82E7A",
-              borderRadius: "12px",
-            }}
-          >
-            {preview ? "Cambiar Imagen" : "Subir Imagen del Negocio"}
-            <input
-              hidden
-              type='file'
-              accept='image/*'
-              onChange={handleChangeFile}
-            />
-          </Button>
-
-          {preview && (
+          {/* SUBIR IMAGEN */}
+          {!preview ? (
+            <Button
+              variant='outlined'
+              component='label'
+              startIcon={<AddPhotoAlternateIcon />}
+              sx={{
+                borderColor: PRIMARY_PINK,
+                color: PRIMARY_PINK,
+                borderRadius: "14px",
+                py: 1.2,
+                textTransform: "none",
+                fontWeight: 700,
+                fontSize: "0.88rem",
+                "&:hover": {
+                  backgroundColor: "#FFF1F2",
+                  borderColor: PRIMARY_PINK,
+                },
+              }}
+            >
+              Subir Imagen del Negocio
+              <input
+                hidden
+                type='file'
+                accept='image/*'
+                onChange={handleChangeFile}
+              />
+            </Button>
+          ) : (
             <Box
               sx={{
+                position: "relative",
                 width: "100%",
-                height: 120,
-                borderRadius: "12px",
+                height: 140,
+                borderRadius: "16px",
                 overflow: "hidden",
-                border: "1px solid #ddd",
+                border: "1px solid #E5E7EB",
               }}
             >
               <img
                 src={preview}
-                alt='preview'
+                alt='vista previa'
                 style={{ width: "100%", height: "100%", objectFit: "cover" }}
               />
+              <Tooltip title='Eliminar imagen'>
+                <IconButton
+                  size='small'
+                  onClick={handleRemoveImage}
+                  sx={{
+                    position: "absolute",
+                    top: 8,
+                    right: 8,
+                    backgroundColor: "rgba(0, 0, 0, 0.6)",
+                    color: "#FFFFFF",
+                    "&:hover": { backgroundColor: "#EF4444" },
+                  }}
+                >
+                  <DeleteOutlineIcon fontSize='small' />
+                </IconButton>
+              </Tooltip>
             </Box>
           )}
 
+          {/* BOTÓN REGISTRAR */}
           <Button
             type='submit'
             variant='contained'
             disabled={!isFormValid || loading}
             sx={{
-              bgcolor: "#FF4081",
-              borderRadius: "12px",
-              py: 1.5,
-              fontWeight: 700,
+              mt: 1,
+              backgroundColor: PRIMARY_PINK,
+              borderRadius: "50px",
+              py: 1.2,
+              fontWeight: 800,
+              fontSize: "0.95rem",
+              textTransform: "none",
+              boxShadow: "0 4px 14px rgba(229, 56, 136, 0.25)",
+              "&:hover": {
+                backgroundColor: "#CF2C75",
+                boxShadow: "0 6px 18px rgba(229, 56, 136, 0.35)",
+              },
+              "&.Mui-disabled": {
+                backgroundColor: "#F3F4F6",
+                color: "#9CA3AF",
+              },
             }}
           >
             {loading ? (
               <CircularProgress size={24} color='inherit' />
             ) : (
-              "Registrar ahora"
+              "Registrar distribuidora"
             )}
           </Button>
         </Stack>

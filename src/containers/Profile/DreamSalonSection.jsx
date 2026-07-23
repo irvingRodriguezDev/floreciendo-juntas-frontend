@@ -1,76 +1,104 @@
+import React, { useContext, useEffect } from "react";
 import { Box, Typography } from "@mui/material";
+import { motion } from "framer-motion";
+import StorefrontOutlinedIcon from "@mui/icons-material/StorefrontOutlined";
 import OrdersContext from "../../context/Orders/OrdersContext";
-import { useContext, useEffect } from "react";
 import AuthContext from "../../context/Auth/AuthContext";
 import OrdersTable from "../../components/Orders/OrdersTable";
-import { motion } from "framer-motion";
 
 const PRIMARY_PINK = "#E53888";
-const LIGHT_ACCENT = "#FFF8FB";
 
 const DreamSalonSection = () => {
   const { usuario } = useContext(AuthContext);
   const { getOrdersUser, orders } = useContext(OrdersContext);
 
+  // Carga de órdenes cuando el ID del usuario esté disponible
   useEffect(() => {
-    getOrdersUser(usuario);
-  }, []);
+    if (usuario?.id) {
+      getOrdersUser(usuario);
+    }
+  }, [usuario?.id]);
 
   return (
-    <Box
-      component={motion.div}
-      initial={{ opacity: 0, y: 25 }}
+    <motion.div
+      initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-      sx={{
-        p: { xs: 3, md: 4 },
-        bgcolor: LIGHT_ACCENT,
-        borderRadius: "18px",
-        border: `1.5px solid ${PRIMARY_PINK}`,
-        boxShadow: "0 8px 24px rgba(229, 56, 136, 0.12)",
-        textAlign: "center",
-        mt: 3,
-      }}
+      transition={{ duration: 0.4, ease: "easeOut" }}
     >
-      <Typography
-        variant='h5'
-        color={PRIMARY_PINK}
+      <Box
         sx={{
-          mb: 1,
-          fontWeight: 700,
-          position: "relative",
-          display: "inline-block",
-          px: 1,
+          p: { xs: 1, md: 2 },
+          textAlign: "center",
         }}
       >
-        El Salón de Tus Sueños
+        {/* ÍCONO Y ENCABEZADO */}
         <Box
           sx={{
-            width: "60%",
-            height: "3px",
+            display: "inline-flex",
+            p: 1.5,
+            borderRadius: "50%",
+            backgroundColor: "#FFF1F2",
+            color: PRIMARY_PINK,
+            mb: 1.5,
+          }}
+        >
+          <StorefrontOutlinedIcon sx={{ fontSize: 32 }} />
+        </Box>
+
+        <Typography
+          variant='h5'
+          sx={{
+            mb: 1,
+            fontWeight: 800,
+            color: "#1F2937",
+            fontSize: { xs: "1.35rem", md: "1.6rem" },
+            letterSpacing: "-0.3px",
+          }}
+        >
+          El Salón de Tus Sueños
+        </Typography>
+
+        {/* LÍNEA DIVISORA DECORATIVA */}
+        <Box
+          sx={{
+            width: 40,
+            height: 3,
             bgcolor: PRIMARY_PINK,
             borderRadius: 2,
             mx: "auto",
-            mt: 0.6,
+            mb: 2,
           }}
         />
-      </Typography>
 
-      <Typography
-        variant='body1'
-        color='text.secondary'
-        sx={{
-          mb: 3,
-          maxWidth: "600px",
-          mx: "auto",
-        }}
-      >
-        ¡Este espacio refleja tu visión! El éxito de tu negocio es nuestro mayor
-        orgullo. Sigue creciendo y transformando vidas con tu arte.
-      </Typography>
+        <Typography
+          variant='body1'
+          sx={{
+            mb: 4,
+            maxWidth: "580px",
+            mx: "auto",
+            color: "#4B5563",
+            fontSize: { xs: "0.95rem", md: "1rem" },
+            lineHeight: 1.6,
+          }}
+        >
+          ¡Este espacio refleja tu visión! El éxito de tu negocio es nuestro
+          mayor orgullo. Consulta aquí el historial de tus pedidos e insumos
+          para seguir haciendo crecer tu arte. 💅✨
+        </Typography>
 
-      <OrdersTable orders={orders} />
-    </Box>
+        {/* TABLA DE PEDIDOS */}
+        <Box
+          sx={{
+            backgroundColor: "#FAFAFA",
+            borderRadius: "20px",
+            p: { xs: 1.5, sm: 3 },
+            border: "1px solid #F3F4F6",
+          }}
+        >
+          <OrdersTable orders={orders} />
+        </Box>
+      </Box>
+    </motion.div>
   );
 };
 

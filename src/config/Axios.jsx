@@ -24,27 +24,34 @@ clienteAxios.interceptors.response.use(
     if (!error.response) return Promise.reject(error);
 
     const { status, data } = error.response;
+    const url = error.config?.url || "";
 
-    // 🚨 CONDICIÓN CLAVE: No redirigir si el error ocurre intentando iniciar sesión
-    const isLoginRequest = error.config.url.includes("/iniciar-sesion");
-    // Ajusta "/login" según sea el endpoint de tu API
+    // 🚨 RUTAS QUE NUNCA DEBEN FORZAR UNA REDIRECCIÓN POR 401
+    const isLoginRequest =
+      url.includes("/iniciar-sesion") || url.includes("/login");
+    const isCheckAuthRequest = url.includes("/auth/me"); // 👈 Tu endpoint exacto
 
-    if (status === 401 && !isLoginRequest) {
-      const reason = data?.reason || "expired";
+    if (status === 401) {
+      // Limpiamos el token expirado/inválido
+      localStorage.removeItem("token");
 
+      // Si el 401 viene de intentar iniciar sesión o de verificar el token al cargar la app:
+      // SIMPLEMENTE IGNORAMOS LA REDIRECCIÓN Y REJECTAMOS LA PROMESA.
+      if (isLoginRequest || isCheckAuthRequest) {
+        return Promise.reject(error);
+      }
+
+      // Si ocurrió en otra acción privada y no estamos redirigiendo ya:
       if (!isRedirecting) {
-        isRedirecting = true;
+        const reason = data?.reason || "expired";
         sessionStorage.setItem("session_expired_reason", reason);
-        localStorage.removeItem("token");
 
-        // Solo redirigimos si NO estamos ya en la ruta de login
-        if (window.location.pathname !== "/iniciar-sesion") {
+        // Solo redirigimos si la usuaria está en una ruta estrictamente privada (ej. /mi-perfil)
+        if (window.location.pathname.startsWith("/mi-perfil")) {
+          isRedirecting = true;
           setTimeout(() => {
             window.location.replace("/iniciar-sesion");
           }, 100);
-        } else {
-          // Si ya estamos en login, reseteamos el flag para futuros intentos
-          isRedirecting = false;
         }
       }
     }

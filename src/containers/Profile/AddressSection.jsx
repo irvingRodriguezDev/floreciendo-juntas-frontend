@@ -8,37 +8,52 @@ import {
   Button,
   Box,
   Chip,
+  IconButton,
+  Tooltip,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import HomeRoundedIcon from "@mui/icons-material/HomeRounded";
 import EditRoundedIcon from "@mui/icons-material/EditRounded";
 import FavoriteRoundedIcon from "@mui/icons-material/FavoriteRounded";
+import LocationOnIcon from "@mui/icons-material/LocationOn";
+import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
+import AddLocationAltOutlinedIcon from "@mui/icons-material/AddLocationAltOutlined";
+import Swal from "sweetalert2";
+
 import UserContext from "../../context/User/UserContext";
 import ShippingAddressModal from "../../components/Orders/ShippingAddressModal";
-import LocationOnIcon from "@mui/icons-material/LocationOn";
 import UpdateAddressModal from "../../components/Orders/UpdateAddressModal";
-import DeleteIcon from "@mui/icons-material/Delete";
-const AddressCard = styled(Card)(({ theme }) => ({
-  borderRadius: 20,
-  background: "#fff5fa",
-  border: "2px solid #ffd6e8",
-  transition: "all 0.3s ease",
-  boxShadow: "0px 4px 18px rgba(214, 51, 132, 0.15)",
+
+const PRIMARY_PINK = "#E53888";
+
+// Tarjeta estilizada con borde sutil y elevación suave
+const AddressCard = styled(Card)(() => ({
+  borderRadius: 22,
+  backgroundColor: "#FFFFFF",
+  border: "1px solid #F3F4F6",
+  transition: "all 0.25s ease-in-out",
+  boxShadow: "0px 4px 15px rgba(0, 0, 0, 0.04)",
+  display: "flex",
+  flexDirection: "column",
+  justifyContent: "space-between",
+  height: "100%",
   "&:hover": {
     transform: "translateY(-4px)",
-    boxShadow: "0px 8px 22px rgba(214, 51, 132, 0.25)",
+    borderColor: "#FCE7F3",
+    boxShadow: "0px 12px 28px rgba(229, 56, 136, 0.12)",
   },
 }));
 
-const IconBox = styled(Box)(({ theme }) => ({
-  width: 42,
-  height: 42,
+const IconBox = styled(Box)(() => ({
+  width: 44,
+  height: 44,
   borderRadius: "14px",
-  backgroundColor: "#ffd6e8",
+  backgroundColor: "#FFF1F2",
   display: "flex",
   justifyContent: "center",
   alignItems: "center",
-  color: "#d63384",
+  color: PRIMARY_PINK,
+  flexShrink: 0,
 }));
 
 export default function AddressSection() {
@@ -47,74 +62,183 @@ export default function AddressSection() {
   useEffect(() => {
     getAddresses();
   }, []);
+
+  // Modal Crear
   const [open, setOpen] = useState(false);
+  const handleClickOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
 
-  const handleClickOpen = () => {
-    setOpen(true);
-  };
-  const handleClose = () => {
-    setOpen(false);
-  };
-
-  //modal update
+  // Modal Editar
   const [openUpdateAddress, setOpenUpdateAddress] = useState(false);
   const [direction, setDirection] = useState(null);
+
   const openModalUpdate = (dir) => {
-    setOpenUpdateAddress(true);
     setDirection(dir);
+    setOpenUpdateAddress(true);
   };
+
   const closeModalUpdate = () => {
     setOpenUpdateAddress(false);
     setDirection(null);
   };
 
+  // Confirmación antes de eliminar
+  const handleDeleteAddress = (id) => {
+    Swal.fire({
+      title: "¿Eliminar dirección?",
+      text: "Esta acción no se puede deshacer.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: PRIMARY_PINK,
+      cancelButtonColor: "#6B7280",
+      confirmButtonText: "Sí, eliminar",
+      cancelButtonText: "Cancelar",
+      customClass: {
+        popup: "swal2-rounded",
+      },
+    }).then((result) => {
+      if (result.isConfirmed) {
+        DeleteAddress(id);
+        Swal.fire({
+          title: "Eliminada",
+          text: "La dirección ha sido removida.",
+          icon: "success",
+          confirmButtonColor: PRIMARY_PINK,
+          timer: 1500,
+        });
+      }
+    });
+  };
+
   return (
     <>
-      <Box sx={{ mt: 2 }}>
-        <Grid size={12} sx={{ display: "flex", justifyContent: "end", mb: 4 }}>
+      <Box sx={{ pt: 1 }}>
+        {/* BOTÓN REGISTRAR DIRECCIÓN */}
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            mb: 4,
+            flexWrap: "wrap",
+            gap: 2,
+          }}
+        >
+          <Box>
+            <Typography
+              variant='h6'
+              sx={{ fontWeight: 800, color: "#1F2937", fontSize: "1.15rem" }}
+            >
+              Mis Direcciones de Envío
+            </Typography>
+            <Typography variant='body2' sx={{ color: "#6B7280" }}>
+              Administra las ubicaciones donde deseas recibir tus productos e
+              insumos.
+            </Typography>
+          </Box>
+
           <Button
-            variant='outlined'
+            variant='contained'
             startIcon={<LocationOnIcon />}
             onClick={handleClickOpen}
             sx={{
-              borderColor: "#E63988",
-              color: "#E63988",
+              backgroundColor: PRIMARY_PINK,
+              color: "#FFFFFF",
               textTransform: "none",
-              borderRadius: "12px",
+              borderRadius: "50px",
               px: 3,
-              py: 1,
-              borderWidth: 2,
+              py: 1.1,
+              fontWeight: 700,
+              fontSize: "0.9rem",
+              boxShadow: "0 6px 18px rgba(229, 56, 136, 0.25)",
+              "&:hover": {
+                backgroundColor: "#CF2C75",
+                boxShadow: "0 8px 22px rgba(229, 56, 136, 0.35)",
+              },
             }}
           >
-            Registrar nueva dirección de envío
+            Nueva dirección
           </Button>
-        </Grid>
+        </Box>
 
+        {/* LISTADO DE DIRECCIONES */}
         <Grid container spacing={3}>
-          {address?.length === 0 && (
-            <Grid size={12}>
-              <Typography sx={{ textAlign: "center", color: "#b82a6f" }}>
-                No tienes direcciones guardadas todavía.
-              </Typography>
+          {/* EMPTY STATE CUANDO NO HAY DIRECCIONES */}
+          {(!address || address.length === 0) && (
+            <Grid size={{ xs: 12 }}>
+              <Box
+                sx={{
+                  textAlign: "center",
+                  py: 6,
+                  px: 2,
+                  backgroundColor: "#FAFAFA",
+                  borderRadius: "24px",
+                  border: "1px dashed #E5E7EB",
+                }}
+              >
+                <AddLocationAltOutlinedIcon
+                  sx={{ fontSize: 48, color: "#9CA3AF", mb: 1.5 }}
+                />
+                <Typography
+                  variant='h6'
+                  sx={{ color: "#374151", fontWeight: 700, mb: 0.5 }}
+                >
+                  Aún no tienes direcciones guardadas
+                </Typography>
+                <Typography
+                  variant='body2'
+                  sx={{ color: "#6B7280", mb: 3, maxWidth: 400, mx: "auto" }}
+                >
+                  Registra una dirección de envío para agilizar tus compras y
+                  envíos futuros.
+                </Typography>
+                <Button
+                  variant='outlined'
+                  onClick={handleClickOpen}
+                  sx={{
+                    color: PRIMARY_PINK,
+                    borderColor: PRIMARY_PINK,
+                    borderRadius: "50px",
+                    textTransform: "none",
+                    fontWeight: 700,
+                    px: 3,
+                    "&:hover": {
+                      borderColor: "#CF2C75",
+                      backgroundColor: "#FFF1F2",
+                    },
+                  }}
+                >
+                  Agregar mi primera dirección
+                </Button>
+              </Box>
             </Grid>
           )}
 
+          {/* TARJETAS DE DIRECCIÓN */}
           {address?.map((dir) => (
             <Grid size={{ xs: 12, sm: 6, lg: 4 }} key={dir.id}>
               <AddressCard>
-                <CardContent>
-                  {/* HEADER */}
-                  <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+                <CardContent sx={{ p: 2.5 }}>
+                  {/* HEADER CARD */}
+                  <Box
+                    sx={{
+                      display: "flex",
+                      alignItems: "flex-start",
+                      gap: 2,
+                      mb: 2,
+                    }}
+                  >
                     <IconBox>
                       <HomeRoundedIcon />
                     </IconBox>
 
-                    <Box>
+                    <Box sx={{ flexGrow: 1 }}>
                       <Typography
                         sx={{
-                          fontWeight: 700,
-                          color: "#d63384",
-                          fontSize: "1.1rem",
+                          fontWeight: 800,
+                          color: "#1F2937",
+                          fontSize: "1.05rem",
+                          lineHeight: 1.2,
                         }}
                       >
                         {dir.recipientName}
@@ -122,90 +246,119 @@ export default function AddressSection() {
 
                       {dir.isDefault && (
                         <Chip
-                          icon={<FavoriteRoundedIcon />}
+                          icon={
+                            <FavoriteRoundedIcon
+                              sx={{
+                                fontSize: "0.85rem !important",
+                                color: "#FFFFFF !important",
+                              }}
+                            />
+                          }
                           label='Predeterminada'
                           size='small'
                           sx={{
-                            mt: 0.5,
-                            backgroundColor: "#d63384",
-                            color: "#fff",
-                            fontWeight: "bold",
+                            mt: 0.8,
+                            backgroundColor: PRIMARY_PINK,
+                            color: "#FFFFFF",
+                            fontWeight: 700,
+                            fontSize: "0.7rem",
+                            height: 22,
                           }}
                         />
                       )}
                     </Box>
                   </Box>
 
-                  {/* DETAILS */}
-                  <Box sx={{ mt: 2, color: "#7a406b" }}>
+                  {/* DETALLES DE DIRECCIÓN */}
+                  <Box
+                    sx={{
+                      color: "#4B5563",
+                      fontSize: "0.9rem",
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: 0.4,
+                      backgroundColor: "#FAFAFA",
+                      p: 1.5,
+                      borderRadius: "14px",
+                      border: "1px solid #F3F4F6",
+                    }}
+                  >
+                    <Typography sx={{ fontWeight: 600, color: "#1F2937" }}>
+                      {dir.street} #{dir.number}
+                    </Typography>
+                    <Typography>Col. {dir.neighborhood}</Typography>
                     <Typography>
-                      {dir.street} {dir.number}, {dir.neighborhood}
+                      {dir.city}, {dir.state} — C.P. {dir.zipCode}
                     </Typography>
-                    <Typography>
-                      {dir.city}, {dir.state}
-                    </Typography>
-                    <Typography>C.P. {dir.zipCode}</Typography>
-                    <Typography sx={{ mt: 1, fontSize: ".9rem" }}>
-                      <strong>Referencia:</strong> {dir.instructions}
-                    </Typography>
-                    <Typography sx={{ mt: 0.5, fontSize: ".9rem" }}>
+
+                    {dir.instructions && (
+                      <Typography
+                        sx={{ mt: 0.5, fontSize: "0.82rem", color: "#6B7280" }}
+                      >
+                        <strong>Ref:</strong> {dir.instructions}
+                      </Typography>
+                    )}
+
+                    <Typography
+                      sx={{ mt: 0.2, fontSize: "0.82rem", color: "#6B7280" }}
+                    >
                       <strong>Tel:</strong> {dir.phoneNumber}
                     </Typography>
                   </Box>
                 </CardContent>
 
-                {/* ACTIONS */}
+                {/* ACCIONES */}
                 <CardActions
                   sx={{
                     display: "flex",
                     justifyContent: "space-between",
-                    px: 2,
+                    px: 2.5,
                     pb: 2,
+                    pt: 0,
                   }}
                 >
-                  {/* <Button
-                    variant='contained'
-                    sx={{
-                      backgroundColor: "#d63384",
-                      borderRadius: "12px",
-                      fontWeight: "bold",
-                      "&:hover": { backgroundColor: "#b82a6f" },
-                    }}
-                  >
-                    Usar esta dirección
-                  </Button> */}
-
                   <Button
                     variant='text'
                     startIcon={<EditRoundedIcon />}
                     onClick={() => openModalUpdate(dir)}
                     sx={{
-                      color: "#d63384",
-                      fontWeight: "bold",
+                      color: "#4B5563",
+                      fontWeight: 700,
                       textTransform: "none",
+                      fontSize: "0.85rem",
+                      borderRadius: "10px",
+                      "&:hover": {
+                        backgroundColor: "#F3F4F6",
+                        color: PRIMARY_PINK,
+                      },
                     }}
                   >
                     Editar
                   </Button>
 
-                  <Button
-                    variant='text'
-                    startIcon={<DeleteIcon />}
-                    onClick={() => DeleteAddress(dir.id)}
-                    sx={{
-                      color: "#d63384",
-                      fontWeight: "bold",
-                      textTransform: "none",
-                    }}
-                  >
-                    Eliminar
-                  </Button>
+                  <Tooltip title='Eliminar dirección'>
+                    <IconButton
+                      onClick={() => handleDeleteAddress(dir.id)}
+                      sx={{
+                        color: "#9CA3AF",
+                        borderRadius: "10px",
+                        "&:hover": {
+                          backgroundColor: "#FFF1F2",
+                          color: "#EF4444",
+                        },
+                      }}
+                    >
+                      <DeleteOutlineIcon sx={{ fontSize: 20 }} />
+                    </IconButton>
+                  </Tooltip>
                 </CardActions>
               </AddressCard>
             </Grid>
           ))}
         </Grid>
       </Box>
+
+      {/* MODALES */}
       <ShippingAddressModal open={open} onClose={handleClose} />
       {direction !== null && (
         <UpdateAddressModal

@@ -12,18 +12,18 @@ import SocialLinks from "../../components/SocialLinks/SocialLinks";
 import RifaSalonSuenos from "../../components/Raffle/Raffle";
 import FullScreenVideo from "../../components/FullScreenVideo";
 import VideoFull from "../../components/fullscreen/VideoFull";
+import LatestWinners from "../winners/LatestWinners";
 const Home = () => {
   return (
     <Layout>
       <Grid container spacing={2} sx={{ mt: 5, padding: "25px" }}>
         <Grid size={12}>
           <BannerHome />
-          {/* <FullScreenVideo /> */}
         </Grid>
-        {/* <Grid size={12}>
-          <About />
-        </Grid> */}
         <Grid size={12}>
+          <LatestWinners />
+        </Grid>
+        <Grid size={12} id='seccion-cursos'>
           <TopCourses />
         </Grid>
         <Grid size={12}>

@@ -1,401 +1,245 @@
-import { Box, Typography, useTheme } from "@mui/material";
-
+import { Box, Typography, Button, Stack, useTheme } from "@mui/material";
+import PlayCircleOutlineIcon from "@mui/icons-material/PlayCircleOutline";
+import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import VideoModal from "./VideoModal";
-const BannerHome = () => {
+import { Link } from "react-router-dom";
+import AuthContext from "../../context/Auth/AuthContext";
+import { useContext } from "react";
+import HeroActionButton from "../HeroActionButton";
+import HeroDescription from "../HeroDescription";
+
+const BannerHome = ({ onExploreCourses, onRegister }) => {
   const theme = useTheme();
+  const { usuario, autenticado } = useContext(AuthContext);
   const videoSource =
     "https://floreciendojuntas1.s3.us-east-2.amazonaws.com/production/statics/Floreciendo+Juntas+Plataforma+(1).mov";
-
+  const handleScrollToCourses = () => {
+    const element = document.getElementById("seccion-cursos");
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+  const tieneMembresiaActiva = usuario?.isSubscribed || usuario?.roleId === 4;
   return (
     <Box
       sx={{
         display: "flex",
         flexDirection: { xs: "column", md: "row" },
         alignItems: "center",
-        justifyContent: "center",
-        minHeight: "80vh",
-        background: "#F971AF",
-        padding: 4,
+        justifyContent: "space-between",
+        minHeight: "50vh",
+        // Gradiente para dar profundidad y un toque más elegante
+        background:
+          "linear-gradient(135deg, #FF69B4 0%, #F971AF 50%, #E83E8C 100%)",
+        padding: { xs: 3, sm: 5, md: 6 },
         position: "relative",
         overflow: "hidden",
-        borderRadius: "16px",
+        borderRadius: "24px",
+        boxShadow: "0px 15px 35px rgba(249, 113, 175, 0.25)",
       }}
     >
-      {/* --- ELEMENTOS DECORATIVOS --- */}
+      {/* --- ELEMENTOS DECORATIVOS AMBIENTALES --- */}
 
-      {/* Aros grandes derechos */}
+      {/* Resplandor suave de fondo */}
       <Box
         sx={{
           position: "absolute",
-          top: "10%",
-          right: "5%",
-          width: 650,
-          height: 650,
+          top: "-20%",
+          left: "-10%",
+          width: "500px",
+          height: "500px",
           borderRadius: "50%",
-          border: "3px solid #F971AF",
-          opacity: 0.9,
-          zIndex: 1,
-          display: { xs: "none", md: "block" },
-        }}
-      />
-      <Box
-        sx={{
-          position: "absolute",
-          top: "25%",
-          right: "8%",
-          width: 500,
-          height: 500,
-          borderRadius: "50%",
-          border: "3px solid #F971AF",
-          opacity: 0.3,
-          zIndex: 0,
-          display: { xs: "none", md: "block" },
-        }}
-      />
-
-      {/* Líneas curvas inferiores */}
-      <Box
-        sx={{
-          position: "absolute",
-          bottom: "15%",
-          left: "-5%",
-          width: 300,
-          height: 300,
-          borderRadius: "50%",
-          border: "1px solid #F971AF",
-          opacity: 0.9,
-          filter: "blur(1px)",
-          transform: "rotate(15deg)",
-          display: { xs: "none", md: "block" },
-        }}
-      />
-      <Box
-        sx={{
-          position: "absolute",
-          bottom: "12%",
-          left: "0%",
-          width: 350,
-          height: 350,
-          borderRadius: "50%",
-          border: "1px solid #F971AF",
-          opacity: 0.8,
-          filter: "blur(1px)",
-          transform: "rotate(25deg)",
-          display: { xs: "none", md: "block" },
-        }}
-      />
-
-      {/* Flor minimalista */}
-      <Box
-        sx={{
-          position: "absolute",
-          top: "12%",
-          left: "6%",
-          width: 18,
-          height: 18,
-          borderRadius: "50%",
-          backgroundColor: "#F971AF",
-          opacity: 0.6,
-          display: { xs: "none", md: "block" },
-        }}
-      />
-
-      {[0, 1, 2, 3].map((i) => (
-        <Box
-          key={i}
-          sx={{
-            position: "absolute",
-            top: "12%",
-            left: "6%",
-            width: 12,
-            height: 12,
-            borderRadius: "50%",
-            backgroundColor: "#F971AF",
-            opacity: 0.4,
-            transform: `translate(
-          ${Math.cos(i * 90 * (Math.PI / 180)) * 18}px,
-          ${Math.sin(i * 90 * (Math.PI / 180)) * 18}px
-        )`,
-            display: { xs: "none", md: "block" },
-          }}
-        />
-      ))}
-
-      {/* Sparkles distribuidos vertical derecha */}
-      {Array.from({ length: 8 }).map((_, i) => (
-        <Box
-          key={i}
-          sx={{
-            position: "absolute",
-            top: `${20 + i * 5}%`,
-            right: `${5 + (i % 3) * 3}%`,
-            width: 6,
-            height: 6,
-            borderRadius: "50%",
-            backgroundColor: "#F971AF",
-            opacity: 0.3,
-            display: { xs: "none", md: "block" },
-          }}
-        />
-      ))}
-
-      {/* Glow vertical suave */}
-      <Box
-        sx={{
-          position: "absolute",
-          top: 0,
-          left: "50%",
-          width: "250px",
-          height: "100%",
           background:
-            "linear-gradient(90deg, transparent, rgba(249,113,175,0.10), transparent)",
-          filter: "blur(10px)",
+            "radial-gradient(circle, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0) 70%)",
+          pointerEvents: "none",
+        }}
+      />
+
+      {/* Flores Flotantes de la Marca */}
+      <Box
+        sx={{
+          position: "absolute",
+          top: "2%",
+          right: "2%",
+          width: { md: "280px", lg: "340px" },
+          height: { md: "280px", lg: "340px" },
+          backgroundImage: `url("https://cdn.floreciendojuntas.com/production/statics/FLOR+ROSA+CONVEN.png")`,
+          backgroundSize: "contain",
+          backgroundRepeat: "no-repeat",
+          opacity: 0.85,
           display: { xs: "none", md: "block" },
           pointerEvents: "none",
         }}
       />
 
-      {/* Oval aura */}
       <Box
         sx={{
           position: "absolute",
-          top: "60%",
-          right: "20%",
-          width: 260,
-          height: 120,
-          borderRadius: "50%",
-          border: "2px solid #F971AF",
-          opacity: 0.12,
-          transform: "rotate(-20deg)",
-          display: { xs: "none", md: "block" },
-        }}
-      />
-
-      {/* Aro pequeño extra */}
-      <Box
-        sx={{
-          position: "absolute",
-          top: "30%",
-          right: "21%",
-          width: 150,
-          height: 150,
-          borderRadius: "50%",
-          border: "3px solid #F971AF",
-          opacity: 0.3,
-          display: { xs: "none", md: "block" },
-        }}
-      />
-
-      {/* Diamante rotado */}
-      <Box
-        sx={{
-          position: "absolute",
-          bottom: "10%",
-          right: "5%",
-          width: 200,
-          height: 200,
-          backgroundImage: `url(${"https://cdn.floreciendojuntas.com/production/statics/Gerbera+Daisy+-7.png"})`,
-          backgroundSize: "cover",
+          bottom: "-10%",
+          left: "-2%",
+          width: "300px",
+          height: "300px",
+          backgroundImage: `url("https://cdn.floreciendojuntas.com/production/statics/GERBERA+MAGENTA+desenfoque.png")`,
+          backgroundSize: "contain",
           backgroundRepeat: "no-repeat",
-          // backgroundColor: "#F971AF",
-          transform: "rotate(45deg)",
           opacity: 0.8,
           display: { xs: "none", md: "block" },
+          pointerEvents: "none",
         }}
       />
 
-      {/* Cuadro rosado flotante */}
+      {/* ---- CONTENIDO IZQUIERDO (TEXTO Y CTAs) ---- */}
       <Box
         sx={{
-          position: "absolute",
-          top: "1%",
-          left: "95%",
-          transform: "translate(-50%, -50%) rotate(35deg)",
-          width: "350px",
-          height: "350px",
-          backgroundImage: `url(${"https://cdn.floreciendojuntas.com/production/statics/FLOR+ROSA+CONVEN.png"})`,
-          backgroundSize: "cover",
-          backgroundRepeat: "no-repeat",
-          // backgroundColor: "#F971AF",
-          opacity: 0.9,
-          display: { xs: "none", md: "block" },
-        }}
-      />
-      <Box
-        sx={{
-          position: "absolute",
-          top: "50%",
-          left: "40%",
-          transform: "translate(-50%, -50%) rotate(15deg)",
-          width: "350px",
-          height: "350px",
-          backgroundImage: `url(${"https://cdn.floreciendojuntas.com/production/statics/FLOR+ROSA+2.png"})`,
-          backgroundSize: "cover",
-          backgroundRepeat: "no-repeat",
-          // backgroundColor: "#F971AF",
-          opacity: 0.9,
-          display: { xs: "none", md: "block" },
-        }}
-      />
-      <Box
-        sx={{
-          position: "absolute",
-          top: "10%",
-          left: "55%",
-          transform: "translate(-50%, -50%) rotate(15deg)",
-          width: "350px",
-          height: "350px",
-          backgroundImage: `url(${"https://cdn.floreciendojuntas.com/production/statics/GERBERA+MAGENTA.png"})`,
-          backgroundSize: "cover",
-          backgroundRepeat: "no-repeat",
-          // backgroundColor: "#F971AF",
-          opacity: 0.9,
-          display: { xs: "none", md: "block" },
-        }}
-      />
-      <Box
-        sx={{
-          position: "absolute",
-          top: "90%",
-          left: "5%",
-          transform: "translate(-50%, -50%) rotate(15deg)",
-          width: "350px",
-          height: "350px",
-          backgroundImage: `url(${"https://cdn.floreciendojuntas.com/production/statics/GERBERA+MAGENTA+desenfoque.png"})`,
-          backgroundSize: "cover",
-          backgroundRepeat: "no-repeat",
-          // backgroundColor: "#F971AF",
-          opacity: 0.9,
-          display: { xs: "none", md: "block" },
-        }}
-      />
-      {/* 3 puntos rosados */}
-      {[
-        { top: "40%", left: "10%" },
-        { top: "42%", left: "11%" },
-        { top: "40%", left: "12%" },
-      ].map((pos, idx) => (
-        <Box
-          key={idx}
-          sx={{
-            position: "absolute",
-            width: 10,
-            height: 10,
-            borderRadius: "50%",
-            backgroundColor: "#F971AF",
-            opacity: 0.4,
-            display: { xs: "none", md: "block" },
-            ...pos,
-          }}
-        />
-      ))}
-
-      {/* ---- CONTENIDO IZQUIERDO ---- */}
-      <Box
-        sx={{
-          flex: 1,
+          flex: 1.2,
           textAlign: { xs: "center", md: "left" },
-          marginRight: { md: theme.spacing(4) },
-          zIndex: 1,
+          zIndex: 2,
+          pr: { md: 4 },
         }}
       >
-        <Typography variant='body2' color='white' sx={{ mb: 1 }}>
-          TU CAMINO AL ÉXITO
+        {/* Badge superior */}
+        <Typography
+          variant='subtitle2'
+          sx={{
+            color: "#FFF",
+            fontWeight: 800,
+            letterSpacing: "2px",
+            mb: 1.5,
+            textTransform: "uppercase",
+            opacity: 0.95,
+            fontSize: "0.85rem",
+          }}
+        >
+          ✨ Tu Camino al Éxito
         </Typography>
 
+        {/* Título Principal */}
         <Typography
           variant='h3'
           component='h1'
           color='white'
           sx={{
-            fontWeight: 700,
-            mb: 2,
-            lineHeight: 1.2,
-            fontSize: { xs: "2.2rem", sm: "3rem", md: "3.5rem" },
+            fontWeight: 900,
+            mb: 2.5,
+            lineHeight: 1.15,
+            fontSize: { xs: "1.9rem", sm: "3rem", md: "3.4rem" },
+            textShadow: "0px 4px 12px rgba(0,0,0,0.12)",
           }}
         >
           LA COMUNIDAD #1 DE
           <br />
-          <span style={{ position: "relative", display: "inline-block" }}>
+          <span
+            style={{
+              position: "relative",
+              display: "inline-block",
+              marginTop: "4px",
+            }}
+          >
             EMPRENDEDORAS
             <Box
               component='span'
               sx={{
                 position: "absolute",
                 left: 0,
-                bottom: 0,
+                bottom: "4px",
                 width: "100%",
-                height: "8px",
-                backgroundColor: "#F8CDDA",
+                height: "10px",
+                backgroundColor: "rgba(255, 255, 255, 0.35)",
                 zIndex: -1,
-                opacity: 0.7,
                 borderRadius: "4px",
               }}
             />
           </span>
           <br />
           DE LA{" "}
-          <span style={{ position: "relative", display: "inline-block" }}>
+          <span
+            style={{
+              position: "relative",
+              display: "inline-block",
+              marginTop: "4px",
+            }}
+          >
             BELLEZA
             <Box
               component='span'
               sx={{
                 position: "absolute",
                 left: 0,
-                bottom: 0,
+                bottom: "4px",
                 width: "100%",
-                height: "8px",
-                backgroundColor: "#F971AF",
+                height: "10px",
+                backgroundColor: "rgba(255, 255, 255, 0.35)",
                 zIndex: -1,
-                opacity: 0.7,
                 borderRadius: "4px",
               }}
             />
           </span>
         </Typography>
 
-        <Typography
-          variant='body1'
-          color='white'
-          sx={{ mb: 4, maxWidth: 500, padding: 4 }}
-          textAlign='justify'
+        {/* Descripción de la Propuesta de Valor */}
+        <HeroDescription />
+
+        {/* BOTONES DE ACCIÓN (NUEVO E IMPRESCINDIBLE PARA CONVERSIÓN) */}
+        <Stack
+          direction={{ xs: "column", sm: "row" }}
+          spacing={2}
+          justifyContent={{ xs: "center", md: "flex-start" }}
+          alignItems='center'
         >
-          Aquí se fortalece el talento, las habilidades y el conocimiento. Se
-          amplia la visión y se aprende a construir un negocio real. Porque
-          <b> Florecer</b> no es casualidad es preparación. Y <b>juntas</b>, es
-          más poderoso
-        </Typography>
-        {/* <img src={firmacaro} width='100%' height='100%' /> */}
+          <HeroActionButton />
+        </Stack>
       </Box>
 
-      {/* ---- CONTENIDO DERECHO ---- */}
+      {/* ---- CONTENIDO DERECHO (FOTO CAROLINA + VIDEO) ---- */}
       <Box
         sx={{
-          flex: 1,
+          flex: 0.9,
           display: "flex",
-          justifyContent: "center",
+          justifyContent: "left",
           alignItems: "center",
           position: "relative",
-          marginTop: { xs: theme.spacing(6), md: 0 },
-          zIndex: 1,
+          marginTop: { xs: 5, md: 0 },
+          zIndex: 2,
         }}
       >
+        {/* Contenedor con marco brillante */}
         <Box
-          component='img'
-          src={"https://cdn.floreciendojuntas.com/production/statics/caro.jpg"}
-          alt='caro'
           sx={{
-            width: "100%",
-            maxWidth: { xs: 300, sm: 400, md: 500 },
-            height: "auto",
-            borderRadius: "50%",
-            objectFit: "cover",
             position: "relative",
-            zIndex: 1,
+            width: "100%",
+            maxWidth: { xs: 280, sm: 360, md: 420 },
+            borderRadius: "50%",
+            padding: "8px",
+            background:
+              "linear-gradient(180deg, rgba(255,255,255,0.6) 0%, rgba(255,255,255,0.1) 100%)",
+            boxShadow: "0px 20px 40px rgba(0, 0, 0, 0.2)",
           }}
-        />
-        <Box position='absolute' sx={{ zIndex: 10 }}>
-          <VideoModal buttonText='Ver nuestro video' videoUrl={videoSource} />
+        >
+          <Box
+            component='img'
+            src='https://cdn.floreciendojuntas.com/production/statics/caro.jpg'
+            alt='Carolina Tavera'
+            sx={{
+              width: "100%",
+              height: "auto",
+              borderRadius: "50%",
+              objectFit: "cover",
+              display: "block",
+            }}
+          />
+        </Box>
+
+        {/* Botón Flotante para el Video Modal */}
+        <Box
+          position='absolute'
+          sx={{
+            bottom: "50%",
+            zIndex: 10,
+            transform: "translateY(50%)",
+            left: { xs: "38%", md: "22%" },
+          }}
+        >
+          <VideoModal buttonText='Ver Introducción' videoUrl={videoSource} />
         </Box>
       </Box>
     </Box>

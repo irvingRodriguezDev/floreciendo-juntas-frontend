@@ -5,65 +5,69 @@ import {
   Tab,
   Typography,
   Paper,
-  Grid,
   Avatar,
   Fab,
+  InputBase,
+  Container,
 } from "@mui/material";
 import AuthContext from "../../context/Auth/AuthContext";
-import Floreciendo from "../../containers/Community/Categories/FloreciendoJuntas/Floreciendo";
 import CommunityContext from "../../context/Community/CommunityContext";
 import { useDebounce } from "use-debounce";
-import WritePostIcon from "../icons/WritePostIcon";
-import CreatePostModal from "./CreatePostCommunityModal";
+
+// Sub-componentes
+import Floreciendo from "../../containers/Community/Categories/FloreciendoJuntas/Floreciendo";
 import Servicios from "../../containers/Community/Categories/Services/Servicios";
 import Productos from "../../containers/Community/Categories/Products/Productos";
+import CreatePostModal from "./CreatePostCommunityModal";
+import WritePostIcon from "../icons/WritePostIcon";
+
 // Paleta Floreciendo Juntas 🌸
 const colors = {
-  background: "#FFF6F9",
-  tabBg: "#FFE6EE",
-  primary: "#D94885",
-  primarySoft: "#F7C6D8",
-  textDark: "#8A2E52",
-  textSoft: "#AA6B7E",
+  primary: "#D82E7A",
+  primaryHover: "#C02567",
+  primarySoft: "rgba(216, 46, 122, 0.08)",
+  textDark: "#2C2C2C",
+  textMuted: "#757575",
+  borderLight: "rgba(216, 46, 122, 0.12)",
 };
+
+const TAB_TYPES = ["floreciendo-juntas", "servicios", "productos"];
 
 export default function TabsTypeCommunity() {
   const [openWritePost, setOpenWritePost] = useState(false);
+  const { community_posts, getFeed, totalPages } = useContext(CommunityContext);
+  const { usuario, autenticado } = useContext(AuthContext);
+
+  const [search, setSearch] = useState("");
+  const [page, setPage] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const [value, setValue] = useState(0);
+  const [type, setType] = useState(TAB_TYPES[0]);
+
+  const rowsPerPage = 10;
+  const [debounceSearch] = useDebounce(search, 600);
 
   const handleClickOpenWritePost = () => setOpenWritePost(true);
   const handleCloseWritePost = () => setOpenWritePost(false);
-  const { community_posts, getFeed, totalPages } = useContext(CommunityContext);
-  const { usuario, autenticado } = useContext(AuthContext);
-  const [search, setSearch] = useState("");
-  const [page, setPage] = useState(1);
-  const rowsPerPage = 10; // Si no cambia, puedes dejarlo como constante
 
-  const [debounceSearch] = useDebounce(search, 600);
-  const [loading, setLoading] = useState(false);
-  const [value, setValue] = useState(0);
-  const [type, setType] = useState("floreciendo-juntas");
   const handleChange = (e, newValue) => {
     setValue(newValue);
-    setSearch(""); // ✨ Limpia el texto de búsqueda al cambiar de tab
+    setSearch("");
     setPage(1);
-    // Opcional: Si quieres actualizar el 'type' aquí mismo como sugerimos antes
-    const types = ["floreciendo-juntas", "servicios", "productos"];
-    setType(types[newValue]);
+    setType(TAB_TYPES[newValue]);
   };
 
-  // 🔥 Efecto para resetear página cuando se busca
+  // Reset de página al buscar
   useEffect(() => {
-    if (page !== 1) {
-      setPage(1);
-    }
+    if (page !== 1) setPage(1);
   }, [debounceSearch]);
 
+  // Carga de Feed
   useEffect(() => {
     let active = true;
 
     const fetchCommunityData = async () => {
       if (!autenticado) return;
-
       setLoading(true);
 
       try {
@@ -71,11 +75,9 @@ export default function TabsTypeCommunity() {
           await getFeed(page, rowsPerPage, debounceSearch, type);
         }
       } catch (error) {
-        console.error(error);
+        console.error("Error al cargar la comunidad:", error);
       } finally {
-        if (active) {
-          setLoading(false);
-        }
+        if (active) setLoading(false);
       }
     };
 
@@ -84,57 +86,93 @@ export default function TabsTypeCommunity() {
     return () => {
       active = false;
     };
-  }, [page, debounceSearch, autenticado, type]); // getFeed suele venir de context, asegúrate que sea estable o usa useCallback en el provider
+  }, [page, debounceSearch, autenticado, type]);
+
+  // Props compartidas entre las 3 pestañas
+  const sharedCategoryProps = {
+    community_posts,
+    setSearch,
+    search,
+    loading,
+    debounceSearch,
+    totalPages,
+    page,
+    setPage,
+  };
 
   return (
-    <Box
-      sx={{
-        width: "100%",
-        // bgcolor: colors.background,
-        borderRadius: 4,
-        p: { xs: 2, md: 4 },
-        // boxShadow: "0 4px 12px rgba(217, 72, 133, 0.12)",
-      }}
-    >
-      {/* INPUT DE CREACIÓN */}
-      <Grid size={12} sx={{ mt: { xs: -2, md: -6 } }}>
-        <Paper
-          onClick={handleClickOpenWritePost}
+    <Box sx={{ width: "100%", pb: 6 }}>
+      {/* 1. INPUT DE CREACIÓN (CARD ESTILO RED SOCIAL) */}
+      <Paper
+        elevation={0}
+        onClick={handleClickOpenWritePost}
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          gap: 2,
+          p: { xs: 1.5, sm: 2 },
+          mb: 3,
+          borderRadius: "16px",
+          cursor: "pointer",
+          bgcolor: "#FFFFFF",
+          border: `1px solid ${colors.borderLight}`,
+          boxShadow: "0 4px 20px rgba(216, 46, 122, 0.06)",
+          transition: "all 0.25s ease-in-out",
+          "&:hover": {
+            borderColor: colors.primary,
+            boxShadow: "0 6px 24px rgba(216, 46, 122, 0.12)",
+            transform: "translateY(-1px)",
+          },
+        }}
+      >
+        <Avatar
+          src={usuario?.profileImage}
+          alt={usuario?.name || "Usuario"}
           sx={{
+            width: { xs: 42, sm: 48 },
+            height: { xs: 42, sm: 48 },
+            border: `2px solid ${colors.primarySoft}`,
+          }}
+        />
+
+        <Box
+          sx={{
+            flexGrow: 1,
+            bgcolor: "#F9FAFB",
+            borderRadius: "30px",
+            px: 2.5,
+            py: 1.2,
+            border: "1px solid #E5E7EB",
             display: "flex",
             alignItems: "center",
-            gap: 2,
-            p: 2,
-            mb: 3,
-            borderRadius: "16px",
-            cursor: "pointer",
-            boxShadow: "0 6px 20px rgba(216,46,122,0.15)",
-            transition: "all .2s ease",
-            "&:hover": {
-              transform: "translateY(-2px)",
-              boxShadow: "0 10px 25px rgba(216,46,122,0.25)",
-            },
           }}
         >
-          <Avatar sx={{ width: 50, height: 50 }} src={usuario?.profileImage} />
-          <Box>
-            <Typography fontWeight='bold' sx={{ color: "#D82E7A" }}>
-              {usuario?.name || "Comunidad"}
-            </Typography>
-            <Typography variant='body2' sx={{ color: "#909090" }}>
-              ¿Qué quieres compartir hoy con nosotras?
-            </Typography>
-          </Box>
-        </Paper>
-      </Grid>
-      {/* Tabs */}
+          <Typography
+            variant='body2'
+            sx={{
+              color: colors.textMuted,
+              fontWeight: 400,
+              fontSize: { xs: "0.875rem", sm: "0.95rem" },
+            }}
+          >
+            ¿Qué quieres compartir hoy con nosotras,{" "}
+            <b style={{ color: colors.primary }}>
+              {usuario?.name?.split(" ")[0] || "creadora"}
+            </b>
+            ?
+          </Typography>
+        </Box>
+      </Paper>
+
+      {/* 2. TABS MODERNOS (TIPO SEGMENTED CONTROL) */}
       <Paper
         elevation={0}
         sx={{
-          borderRadius: 4,
-          overflow: "hidden",
-          bgcolor: colors.tabBg,
+          borderRadius: "14px",
+          bgcolor: "#FFFFFF",
+          p: 0.8,
           mb: 3,
+          border: `1px solid ${colors.borderLight}`,
         }}
       >
         <Tabs
@@ -142,98 +180,42 @@ export default function TabsTypeCommunity() {
           onChange={handleChange}
           variant='scrollable'
           scrollButtons='auto'
-          aria-label='scrollable auto tabs example'
-          TabIndicatorProps={{
-            style: { backgroundColor: "#d82e7a" },
-          }}
+          allowScrollButtonsMobile
+          TabIndicatorProps={{ style: { display: "none" } }} // Ocultamos la barra inferior tradicional
           sx={{
+            minHeight: "44px",
             "& .MuiTab-root": {
               fontWeight: 600,
-              fontSize: "1rem",
+              fontSize: { xs: "0.875rem", sm: "0.95rem" },
               textTransform: "none",
-              color: colors.textSoft,
-              px: 3,
-              py: 1.5,
-              fontFamily: "'Poppins', sans-serif",
+              color: colors.textMuted,
+              minHeight: "42px",
+              borderRadius: "10px",
+              px: { xs: 2, sm: 3 },
+              transition: "all 0.2s ease",
             },
             "& .Mui-selected": {
-              color: "#d82e7a !important",
+              color: `${colors.primary} !important`,
+              bgcolor: colors.primarySoft,
             },
           }}
         >
-          <Tab label='C. Floreciendo Juntas 🌸' />
-          <Tab label='C. Servicios 💼' />
-          <Tab label='C. Productos 🛍️' />
+          <Tab label='🌸 Comunidad Juntas' />
+          <Tab label='💼 Servicios' />
+          <Tab label='🛍️ Productos' />
         </Tabs>
       </Paper>
 
-      {/* Contenedor con animación */}
-      <Box
-        sx={{
-          //   bgcolor: "#FFFFFF",
-          borderRadius: 4,
-          p: 3,
-          minHeight: 200,
-          //   boxShadow: "0 3px 8px rgba(0,0,0,0.04)",
-          position: "relative",
-        }}
-      >
-        {value === 0 && (
-          <Floreciendo
-            community_posts={community_posts}
-            setSearch={setSearch}
-            search={search}
-            loading={loading}
-            debounceSearch={debounceSearch}
-            totalPages={totalPages}
-            page={page}
-            setPage={setPage}
-          />
-        )}
-
-        {value === 1 && (
-          <Servicios
-            community_posts={community_posts}
-            setSearch={setSearch}
-            search={search}
-            loading={loading}
-            debounceSearch={debounceSearch}
-            totalPages={totalPages}
-            page={page}
-            setPage={setPage}
-          />
-        )}
-
-        {value === 2 && (
-          <Productos
-            community_posts={community_posts}
-            setSearch={setSearch}
-            search={search}
-            loading={loading}
-            debounceSearch={debounceSearch}
-            totalPages={totalPages}
-            page={page}
-            setPage={setPage}
-          />
-        )}
+      {/* 3. CONTENEDOR DEL FEED */}
+      <Box sx={{ position: "relative", minHeight: 300 }}>
+        {value === 0 && <Floreciendo {...sharedCategoryProps} />}
+        {value === 1 && <Servicios {...sharedCategoryProps} />}
+        {value === 2 && <Productos {...sharedCategoryProps} />}
       </Box>
-      {/* BOTÓN FLOTANTE MÓVIL */}
-      <Fab
-        onClick={handleClickOpenWritePost}
-        sx={{
-          position: "fixed",
-          bottom: 170, // Ajustado: 170 era muy arriba
-          right: 20,
-          background: "#D82E7A",
-          color: "#fff",
-          "&:hover": { background: "#c02567" },
-          display: { xs: "flex", sm: "none" },
-          zIndex: 1000,
-        }}
-      >
-        <WritePostIcon width={30} />
-      </Fab>
 
+      {/* 4. BOTÓN FLOTANTE MÓVIL (FAB) */}
+
+      {/* MODAL */}
       <CreatePostModal
         open={openWritePost}
         handleClose={handleCloseWritePost}

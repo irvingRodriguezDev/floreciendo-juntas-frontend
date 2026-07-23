@@ -393,7 +393,8 @@ const Header = () => {
           {/* MOBILE */}
           {isMobile && (
             <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-              <NotificationsBell />
+              {autenticado && <NotificationsBell />}
+
               <IconButton
                 edge='start'
                 sx={{

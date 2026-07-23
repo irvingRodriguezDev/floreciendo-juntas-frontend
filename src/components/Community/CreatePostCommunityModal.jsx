@@ -10,25 +10,29 @@ import {
   Divider,
   Modal,
   Grid,
-  FormControl,
   RadioGroup,
   FormControlLabel,
   Radio,
   CircularProgress,
   Tooltip,
+  Chip,
+  Fade,
 } from "@mui/material";
 import ImageIcon from "@mui/icons-material/Image";
 import VideocamIcon from "@mui/icons-material/Videocam";
+import PushPinOutlinedIcon from "@mui/icons-material/PushPinOutlined";
 import CommunityContext from "../../context/Community/CommunityContext";
-import Swal from "sweetalert2";
 import AuthContext from "../../context/Auth/AuthContext";
 import CloseIcons from "../icons/CloseIcons";
 import TimeSelectPinnedPost from "../Selects/TimeSelectPinnedPost";
 import TypePostSelect from "../Selects/TypePostSelect";
 import ReactQuill from "react-quill-new";
 import "react-quill-new/dist/quill.snow.css";
-const Link = ReactQuill.Quill.import("formats/link");
+import { colors } from "../../utils/QuillModules";
+import { alerts } from "../../utils/Alerts";
 
+// Link personalizado para Quill
+const Link = ReactQuill.Quill.import("formats/link");
 class CustomLink extends Link {
   static create(value) {
     const node = super.create(value);
@@ -37,16 +41,22 @@ class CustomLink extends Link {
     return node;
   }
 }
-
 ReactQuill.Quill.register(CustomLink, true);
-
 
 const MAX_CONTENT = 1500;
 const MAX_TITLE = 120;
 const MAX_FILES = 4;
-const MAX_IMAGE_SIZE = 10 * 1024 * 1024; // 10MB
-const MAX_VIDEO_SIZE = 50 * 1024 * 1024; // 50MB
-export default function CreatePostModal({ open, handleClose }) {
+
+const themeColors = {
+  primary: "#D82E7A",
+  primaryHover: "#C02567",
+  primarySoft: "rgba(216, 46, 122, 0.08)",
+  borderLight: "rgba(216, 46, 122, 0.12)",
+  textDark: "#1F2937",
+  textMuted: "#6B7280",
+};
+
+export default function CreatePostModal({ open, handleClose, defaultType }) {
   const { createPostCommunity } = useContext(CommunityContext);
   const { usuario } = useContext(AuthContext);
 
@@ -54,7 +64,7 @@ export default function CreatePostModal({ open, handleClose }) {
   const [content, setContent] = useState("");
   const [media, setMedia] = useState([]);
   const [time, setTime] = useState("null");
-  const [typePost, setTypePost] = useState("floreciendo-juntas");
+  const [typePost, setTypePost] = useState(defaultType || "floreciendo-juntas");
   const [isPinned, setIsPinned] = useState("no");
   const [loading, setLoading] = useState(false);
 
@@ -62,112 +72,18 @@ export default function CreatePostModal({ open, handleClose }) {
     media.forEach((m) => URL.revokeObjectURL(m.preview));
     setMedia([]);
   };
-  
+
   const quillModules = useMemo(
     () => ({
       toolbar: [
-        [{ header: [1, 2, 3, false] }],
-        ["bold", "italic", "underline", "strike", "blockquote"],
-        [
-          {
-            color: [
-              "#000000",
-              "#424242",
-              "#636363",
-              "#9c9c9c",
-              "#cecece",
-              "#efefef",
-              "#ffffff",
-              "#e60000",
-              "#ff6600",
-              "#ff9900",
-              "#ffff00",
-              "#008a00",
-              "#0066cc",
-              "#9933ff",
-              "#fa9c9c",
-              "#ffdd99",
-              "#ffff99",
-              "#b3d9b3",
-              "#99ccff",
-              "#cc99ff",
-              "#FF5C93",
-              "#00b8e6",
-              "#00cccc",
-              "#20b2aa",
-              "#1e90ff",
-              "#1f3e7a",
-              "#0a0a2a",
-              "#4b0082",
-              "#800000",
-              "#cc3300",
-              "#996600",
-              "#666600",
-              "#4d4d00",
-              "#330000",
-              "#808000",
-              "#ffc0cb",
-              "#f08080",
-              "#ffa07a",
-              "#ffb6c1",
-              "#f0e68c",
-              "#bdb76b",
-              "#dda0dd",
-            ],
-          },
-          {
-            background: [
-              "#000000",
-              "#424242",
-              "#636363",
-              "#9c9c9c",
-              "#cecece",
-              "#efefef",
-              "#ffffff",
-              "#e60000",
-              "#ff6600",
-              "#ff9900",
-              "#ffff00",
-              "#008a00",
-              "#0066cc",
-              "#9933ff",
-              "#fa9c9c",
-              "#ffdd99",
-              "#ffff99",
-              "#b3d9b3",
-              "#99ccff",
-              "#cc99ff",
-              "#FF5C93",
-              "#00b8e6",
-              "#00cccc",
-              "#20b2aa",
-              "#1e90ff",
-              "#1f3e7a",
-              "#0a0a2a",
-              "#4b0082",
-              "#800000",
-              "#cc3300",
-              "#996600",
-              "#666600",
-              "#4d4d00",
-              "#330000",
-              "#808000",
-              "#ffc0cb",
-              "#f08080",
-              "#ffa07a",
-              "#ffb6c1",
-              "#f0e68c",
-              "#bdb76b",
-              "#dda0dd",
-            ],
-          },
-        ],
+        [{ header: [1, 2, false] }],
+        ["bold", "italic", "underline", "blockquote"],
+        [{ color: colors }, { background: colors }],
         [{ list: "ordered" }, { list: "bullet" }],
-        [{ align: [] }],
         ["link", "clean"],
       ],
     }),
-    []
+    [],
   );
 
   const plainContent = content
@@ -176,32 +92,27 @@ export default function CreatePostModal({ open, handleClose }) {
     .trim();
 
   const contentLength = plainContent.length;
-  
+
   const handleFiles = (e) => {
     const files = Array.from(e.target.files);
     if (media.length + files.length > MAX_FILES) {
-      Swal.fire({
-        icon: "warning",
-        title: "Límite alcanzado",
-        text: `Solo puedes subir hasta ${MAX_FILES} archivos`,
-        timer: 2000,
-        showConfirmButton: false,
-      });
+      alerts.error(
+        "Límite alcanzado",
+        `Solo puedes subir hasta ${MAX_FILES} archivos por publicación.`,
+      );
       return;
     }
+
     const validFiles = [];
     for (const file of files) {
       const isVideo = file.type.startsWith("video");
-
       const maxSize = isVideo ? 50 * 1024 * 1024 : 10 * 1024 * 1024;
 
       if (file.size > maxSize) {
-        Swal.fire({
-          icon: "warning",
-          title: "Archivo demasiado pesado",
-          text: `${file.name} excede el límite permitido`,
-        });
-
+        alerts.error(
+          "Archivo muy pesado",
+          `${file.name} supera el peso máximo permitido (${isVideo ? "50MB" : "10MB"}).`,
+        );
         continue;
       }
 
@@ -211,11 +122,7 @@ export default function CreatePostModal({ open, handleClose }) {
         preview: URL.createObjectURL(file),
       });
     }
-    // const previews = files.map((file) => ({
-    //   file,
-    //   type: file.type.startsWith("video") ? "video" : "image",
-    //   preview: URL.createObjectURL(file),
-    // }));
+
     setMedia((prev) => [...prev, ...validFiles]);
     e.target.value = null;
   };
@@ -228,25 +135,23 @@ export default function CreatePostModal({ open, handleClose }) {
   const onClose = () => {
     setTitle("");
     setContent("");
-    setTypePost("floreciendo-juntas");
+    setTypePost(defaultType || "floreciendo-juntas");
     cleanMedia();
-    handleClose();
     setIsPinned("no");
+    handleClose();
   };
 
   const handleSubmit = async () => {
-    if (
-      !title.trim() ||
-      plainContent.length === 0 ||
-      plainContent.length > MAX_CONTENT
-    ) {
-      Swal.fire({
-        title: "Atención",
-        text: "Título y contenido son obligatorios",
-        icon: "warning",
-        timer: 2000,
-        showConfirmButton: false,
-      });
+    if (!title.trim() || plainContent.length === 0) {
+      alerts.error(
+        "Campos incompletos",
+        "El título y el contenido son obligatorios.",
+      );
+      return;
+    }
+
+    if (plainContent.length > MAX_CONTENT) {
+      alerts.error("Límite excedido", "Has superado el máximo de caracteres.");
       return;
     }
 
@@ -262,157 +167,167 @@ export default function CreatePostModal({ open, handleClose }) {
 
     try {
       await createPostCommunity(formData);
+      alerts.success("¡Publicado!", "Tu post ya está visible en la comunidad.");
       onClose();
     } catch (error) {
-      Swal.fire({
-        title: "Error",
-        text: "No se pudo crear la publicación",
-        icon: "error",
-      });
+      alerts.error("Ocurrió un error", "No se pudo crear la publicación.");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <Modal open={open} onClose={onClose} closeAfterTransition>
-      <Box
-        sx={{
-          position: "absolute",
-          top: "50%",
-          left: "50%",
-          transform: "translate(-50%, -50%)",
-          width: { xs: "95%", sm: 580 },
-          maxHeight: "90vh",
-          overflowY: "auto",
-          outline: "none",
-        }}
-      >
-        <Card
+    <Modal
+      open={open}
+      onClose={onClose}
+      closeAfterTransition
+      sx={{ display: "flex", alignItems: "center", justifyContent: "center" }}
+    >
+      <Fade in={open}>
+        <Box
           sx={{
-            borderRadius: 4,
-            p: 3,
-            boxShadow: "0 24px 54px rgba(0,0,0,0.25)",
+            width: { xs: "92%", sm: 600 },
+            maxHeight: "90vh",
+            overflowY: "auto",
+            outline: "none",
           }}
         >
-          {/* Header */}
-          <Box
-            display='flex'
-            justifyContent='space-between'
-            alignItems='center'
-            mb={3}
+          <Card
+            elevation={0}
+            sx={{
+              borderRadius: "28px",
+              p: { xs: 2.5, sm: 3.5 },
+              bgcolor: "#FFFFFF",
+              boxShadow: "0 20px 60px rgba(0,0,0,0.18)",
+              border: `1px solid ${themeColors.borderLight}`,
+            }}
           >
-            <Box display='flex' gap={2} alignItems='center'>
-              <Avatar
-                src={usuario?.profileImage}
-                sx={{ width: 50, height: 50, border: "2px solid #E33887" }}
-              />
-              <Box>
-                <Typography
-                  variant='h6'
-                  fontWeight={800}
-                  sx={{ color: "#333", lineHeight: 1.2 }}
-                >
-                  Crear Publicación
-                </Typography>
-                <Typography variant='caption' color='text.secondary'>
-                  Compartiendo como <b>{usuario?.name}</b>
-                </Typography>
-              </Box>
-            </Box>
-            <IconButton
-              onClick={onClose}
-              sx={{
-                transition: "0.3s",
-                "&:hover": { transform: "rotate(90deg)" },
-              }}
-            >
-              <CloseIcons width={28} />
-            </IconButton>
-          </Box>
-
-          <Box sx={{ display: "flex", flexDirection: "column", gap: 2.5 }}>
-            {/* Sector de Configuración (Tipo y Pinned) */}
+            {/* Header */}
             <Box
-              sx={{
-                p: 2,
-                bgcolor: "rgba(216,46,122,0.03)",
-                borderRadius: 3,
-                border: "1px solid rgba(216,46,122,0.1)",
-              }}
+              display='flex'
+              justifyContent='space-between'
+              alignItems='center'
+              mb={2.5}
             >
-              <Grid container spacing={2} alignItems='center'>
-                <Grid size={12}>
-                  <TypePostSelect
-                    detectarCambiosTypePost={(val) => setTypePost(val.value)}
-                  />
-                </Grid>
+              <Box display='flex' gap={1.8} alignItems='center'>
+                <Avatar
+                  src={usuario?.profileImage}
+                  alt={usuario?.name}
+                  sx={{
+                    width: 48,
+                    height: 48,
+                    border: `2px solid ${themeColors.primarySoft}`,
+                  }}
+                />
+                <Box>
+                  <Typography
+                    variant='h6'
+                    fontWeight={800}
+                    sx={{ color: themeColors.textDark, fontSize: "1.1rem" }}
+                  >
+                    Crear Publicación
+                  </Typography>
+                  <Typography variant='body2' color='text.secondary'>
+                    Publicando como <b>{usuario?.name?.split(" ")[0]}</b>
+                  </Typography>
+                </Box>
+              </Box>
 
-                {usuario?.roleId === 1 && (
-                  <>
-                    <Grid size={12}>
-                      <Divider sx={{ borderStyle: "dashed" }} />
-                    </Grid>
-                    <Grid size={6}>
-                      <Typography
-                        variant='caption'
-                        fontWeight='800'
-                        color='#E33887'
-                        sx={{
-                          display: "block",
-                          mb: 0.5,
-                          textTransform: "uppercase",
-                        }}
-                      >
-                        ¿Anclar Post?
-                      </Typography>
-                      <RadioGroup
-                        row
-                        value={isPinned}
-                        onChange={(e) => setIsPinned(e.target.value)}
-                      >
-                        <FormControlLabel
-                          value='yes'
-                          control={
-                            <Radio
-                              size='small'
-                              sx={{
-                                color: "#E33887",
-                                "&.Mui-checked": { color: "#E33887" },
-                              }}
-                            />
-                          }
-                          label={<Typography variant='body2'>Sí</Typography>}
-                        />
-                        <FormControlLabel
-                          value='no'
-                          control={
-                            <Radio
-                              size='small'
-                              sx={{
-                                color: "#E33887",
-                                "&.Mui-checked": { color: "#E33887" },
-                              }}
-                            />
-                          }
-                          label={<Typography variant='body2'>No</Typography>}
-                        />
-                      </RadioGroup>
-                    </Grid>
+              <IconButton
+                onClick={onClose}
+                sx={{
+                  bgcolor: "#F9FAFB",
+                  "&:hover": { bgcolor: "#F3F4F6", transform: "rotate(90deg)" },
+                  transition: "all 0.2s ease",
+                }}
+              >
+                <CloseIcons width={20} />
+              </IconButton>
+            </Box>
+
+            {/* Selector de Categoría (Estilo Badge/Selector) */}
+            <Box sx={{ mb: 2 }}>
+              <TypePostSelect
+                value={typePost}
+                detectarCambiosTypePost={(val) => setTypePost(val.value)}
+              />
+            </Box>
+
+            {/* Opciones de Anclaje para Administradores */}
+            {usuario?.roleId === 1 && (
+              <Box
+                sx={{
+                  p: 2,
+                  mb: 2.5,
+                  bgcolor: "rgba(216,46,122,0.04)",
+                  borderRadius: "16px",
+                  border: `1px solid ${themeColors.borderLight}`,
+                }}
+              >
+                <Grid container spacing={2} alignItems='center'>
+                  <Grid size={6}>
+                    <Typography
+                      variant='caption'
+                      fontWeight='800'
+                      sx={{
+                        color: themeColors.primary,
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 0.5,
+                        textTransform: "uppercase",
+                      }}
+                    >
+                      <PushPinOutlinedIcon sx={{ fontSize: 16 }} /> ¿Anclar
+                      Post?
+                    </Typography>
+                    <RadioGroup
+                      row
+                      value={isPinned}
+                      onChange={(e) => setIsPinned(e.target.value)}
+                    >
+                      <FormControlLabel
+                        value='yes'
+                        control={
+                          <Radio
+                            size='small'
+                            sx={{
+                              color: themeColors.primary,
+                              "&.Mui-checked": { color: themeColors.primary },
+                            }}
+                          />
+                        }
+                        label={<Typography variant='body2'>Sí</Typography>}
+                      />
+                      <FormControlLabel
+                        value='no'
+                        control={
+                          <Radio
+                            size='small'
+                            sx={{
+                              color: themeColors.primary,
+                              "&.Mui-checked": { color: themeColors.primary },
+                            }}
+                          />
+                        }
+                        label={<Typography variant='body2'>No</Typography>}
+                      />
+                    </RadioGroup>
+                  </Grid>
+                  {isPinned === "yes" && (
                     <Grid size={6}>
                       <TimeSelectPinnedPost
                         detectarCambiosTimePinned={(val) => setTime(val.value)}
                       />
                     </Grid>
-                  </>
-                )}
-              </Grid>
-            </Box>
+                  )}
+                </Grid>
+              </Box>
+            )}
 
-            {/* Area de Texto */}
-            <Box>
+            {/* Inputs de Título y Contenido */}
+            <Box sx={{ display: "flex", flexDirection: "column", gap: 1.5 }}>
               <TextField
-                placeholder='Título impactante...'
+                placeholder='Escribe un título llamativo...'
                 variant='standard'
                 fullWidth
                 value={title}
@@ -420,7 +335,11 @@ export default function CreatePostModal({ open, handleClose }) {
                 inputProps={{ maxLength: MAX_TITLE }}
                 InputProps={{
                   disableUnderline: true,
-                  sx: { fontSize: "1.3rem", fontWeight: 700, color: "#333" },
+                  sx: {
+                    fontSize: "1.2rem",
+                    fontWeight: 700,
+                    color: themeColors.textDark,
+                  },
                 }}
               />
               <Typography
@@ -431,60 +350,36 @@ export default function CreatePostModal({ open, handleClose }) {
                 {title.length}/{MAX_TITLE}
               </Typography>
 
+              {/* Editor ReactQuill */}
               <Box
                 sx={{
-                  mt: 2,
                   "& .ql-toolbar": {
-                    borderRadius: "12px 12px 0 0",
-                    borderColor: "#e0e0e0",
+                    borderRadius: "14px 14px 0 0",
+                    borderColor: "#E5E7EB",
+                    bgcolor: "#F9FAFB",
                   },
                   "& .ql-container": {
-                    borderRadius: "0 0 12px 12px",
-                    borderColor: "#e0e0e0",
-                    minHeight: "220px",
+                    borderRadius: "0 0 14px 14px",
+                    borderColor: "#E5E7EB",
+                    minHeight: "180px",
+                    fontFamily: "inherit",
                   },
                   "& .ql-editor": {
-                    minHeight: "220px",
-                    fontSize: "1rem",
-                    color: "#555",
+                    minHeight: "180px",
+                    fontSize: "0.95rem",
+                    color: "#374151",
                   },
                 }}
               >
                 <ReactQuill
-                  theme="snow"
+                  theme='snow'
                   value={content}
                   modules={quillModules}
-                  placeholder="¿Qué tienes en mente hoy?"
-                  onChange={(value) => {
-                    const text = value
-                      .replace(/<(.|\n)*?>/g, "")
-                      .replace(/&nbsp;/g, " ")
-                      .trim();
-
-                    // Permitir borrar contenido
-                    if (text.length === 0) {
-                      setContent("");
-                      return;
-                    }
-
-                    // Si no pasa el límite guarda normalmente
-                    if (text.length <= MAX_CONTENT) {
-                      setContent(value);
-                      return;
-                    }
-
-                    // Si excede, corta el texto visible
-                    const editor = document.querySelector(".ql-editor");
-
-                    if (editor) {
-                      const currentText = editor.innerText
-                        .slice(0, MAX_CONTENT);
-
-                      setContent(currentText);
-                    }
-                  }}
+                  placeholder='¿Qué quieres compartir hoy con la comunidad?'
+                  onChange={(val) => setContent(val)}
                 />
               </Box>
+
               <Typography
                 variant='caption'
                 color={
@@ -495,136 +390,168 @@ export default function CreatePostModal({ open, handleClose }) {
                 {contentLength}/{MAX_CONTENT}
               </Typography>
             </Box>
-          </Box>
 
-          {/* Previsualización de Media */}
-          {media.length > 0 && (
-            <Box
-              sx={{
-                display: "flex",
-                gap: 1.5,
-                mt: 2,
-                overflowX: "auto",
-                py: 1,
-              }}
-            >
-              {media.map((m, i) => (
-                <Box
-                  key={i}
-                  sx={{
-                    position: "relative",
-                    flexShrink: 0,
-                    borderRadius: 2,
-                    overflow: "hidden",
-                    boxShadow: "0 4px 10px rgba(0,0,0,0.1)",
-                  }}
-                >
+            {/* Previsualización de Archivos Subidos */}
+            {media.length > 0 && (
+              <Box
+                sx={{
+                  display: "flex",
+                  gap: 1.5,
+                  mt: 1.5,
+                  overflowX: "auto",
+                  pb: 1,
+                }}
+              >
+                {media.map((m, i) => (
                   <Box
-                    component={m.type === "image" ? "img" : "video"}
-                    src={m.preview}
-                    muted
-                    preload='metadata'
-                    sx={{ width: 120, height: 120, objectFit: "cover" }}
-                  />
-                  <IconButton
-                    size='small'
-                    onClick={() => removeMedia(i)}
+                    key={i}
                     sx={{
-                      position: "absolute",
-                      top: 4,
-                      right: 4,
-                      bgcolor: "rgba(0,0,0,0.6)",
-                      color: "white",
-                      "&:hover": { bgcolor: "black" },
+                      position: "relative",
+                      flexShrink: 0,
+                      borderRadius: "14px",
+                      overflow: "hidden",
+                      border: "1px solid #E5E7EB",
                     }}
                   >
-                    <CloseIcons width={14} />
-                  </IconButton>
-                </Box>
-              ))}
-            </Box>
-          )}
+                    <Box
+                      component={m.type === "image" ? "img" : "video"}
+                      src={m.preview}
+                      muted
+                      preload='metadata'
+                      sx={{ width: 100, height: 100, objectFit: "cover" }}
+                    />
+                    <Chip
+                      label={m.type === "image" ? "Foto" : "Video"}
+                      size='small'
+                      sx={{
+                        position: "absolute",
+                        bottom: 4,
+                        left: 4,
+                        height: 18,
+                        fontSize: "0.65rem",
+                        bgcolor: "rgba(0,0,0,0.6)",
+                        color: "#fff",
+                      }}
+                    />
+                    <IconButton
+                      size='small'
+                      onClick={() => removeMedia(i)}
+                      sx={{
+                        position: "absolute",
+                        top: 4,
+                        right: 4,
+                        bgcolor: "rgba(0,0,0,0.6)",
+                        color: "white",
+                        padding: "3px",
+                        "&:hover": { bgcolor: "black" },
+                      }}
+                    >
+                      <CloseIcons width={12} />
+                    </IconButton>
+                  </Box>
+                ))}
+              </Box>
+            )}
 
-          <Divider sx={{ my: 3 }} />
+            <Divider sx={{ my: 2.5, borderColor: "#F3F4F6" }} />
 
-          {/* Footer */}
-          <Box
-            display='flex'
-            justifyContent='space-between'
-            alignItems='center'
-          >
+            {/* Footer / Acciones */}
             <Box
               display='flex'
+              justifyContent='space-between'
               alignItems='center'
-              sx={{ bgcolor: "#f5f5f5", borderRadius: 10, px: 1 }}
             >
-              <Tooltip title='Imagen'>
-                <IconButton component='label'>
-                  <ImageIcon sx={{ color: "#d72e7a" }} />
-                  <input
-                    type='file'
-                    hidden
-                    multiple
-                    accept='image/*'
-                    onChange={handleFiles}
-                  />
-                </IconButton>
-              </Tooltip>
-              <Tooltip title='Video'>
-                <IconButton component='label'>
-                  <VideocamIcon sx={{ color: "#d72e7a" }} />
-                  <input
-                    type='file'
-                    hidden
-                    multiple
-                    accept='video/*'
-                    onChange={handleFiles}
-                  />
-                </IconButton>
-              </Tooltip>
-              <Box sx={{ width: 1, height: 20, bgcolor: "#ccc", mx: 1 }} />
-              <Typography
-                variant='caption'
-                sx={{ fontWeight: "bold", color: "text.secondary", pr: 1.5 }}
+              <Box
+                display='flex'
+                alignItems='center'
+                sx={{
+                  bgcolor: "#F9FAFB",
+                  borderRadius: "30px",
+                  px: 1,
+                  py: 0.5,
+                  border: "1px solid #E5E7EB",
+                }}
               >
-                {media.length}/{MAX_FILES}
-              </Typography>
-            </Box>
+                <Tooltip title='Subir Imagen'>
+                  <IconButton component='label' size='small'>
+                    <ImageIcon
+                      sx={{ color: themeColors.primary, fontSize: 22 }}
+                    />
+                    <input
+                      type='file'
+                      hidden
+                      multiple
+                      accept='image/*'
+                      onChange={handleFiles}
+                    />
+                  </IconButton>
+                </Tooltip>
 
-            <Button
-              onClick={handleSubmit}
-              disabled={
-                !title.trim() ||
-                plainContent.length === 0 ||
-                contentLength > MAX_CONTENT ||
-                loading
-              }
-              variant='contained'
-              sx={{
-                borderRadius: 20,
-                px: 6,
-                py: 1.2,
-                textTransform: "none",
-                fontSize: "1rem",
-                fontWeight: "bold",
-                background: "linear-gradient(45deg, #D82E7A 30%, #E33887 90%)",
-                boxShadow: "0 6px 20px rgba(216, 46, 122, 0.4)",
-                transition: "0.3s",
-                "&:hover": {
-                  transform: "translateY(-2px)",
-                  boxShadow: "0 8px 25px rgba(216, 46, 122, 0.5)",
-                },
-              }}
-            >
-              {loading ? (
-                <CircularProgress size={26} color='inherit' />
-              ) : (
-                "Publicar"
-              )}
-            </Button>
-          </Box>
-        </Card>
-      </Box>
+                <Tooltip title='Subir Video'>
+                  <IconButton component='label' size='small'>
+                    <VideocamIcon
+                      sx={{ color: themeColors.primary, fontSize: 22 }}
+                    />
+                    <input
+                      type='file'
+                      hidden
+                      multiple
+                      accept='video/*'
+                      onChange={handleFiles}
+                    />
+                  </IconButton>
+                </Tooltip>
+
+                <Box sx={{ width: 1, height: 18, bgcolor: "#E5E7EB", mx: 1 }} />
+
+                <Typography
+                  variant='caption'
+                  sx={{
+                    fontWeight: 700,
+                    color: themeColors.textMuted,
+                    pr: 1.5,
+                  }}
+                >
+                  {media.length}/{MAX_FILES}
+                </Typography>
+              </Box>
+
+              <Button
+                onClick={handleSubmit}
+                disabled={
+                  !title.trim() ||
+                  plainContent.length === 0 ||
+                  contentLength > MAX_CONTENT ||
+                  loading
+                }
+                variant='contained'
+                disableElevation
+                sx={{
+                  borderRadius: "14px",
+                  px: 4,
+                  py: 1.2,
+                  textTransform: "none",
+                  fontSize: "0.95rem",
+                  fontWeight: 700,
+                  bgcolor: themeColors.primary,
+                  color: "#FFFFFF",
+                  boxShadow: "0 8px 20px rgba(216, 46, 122, 0.25)",
+                  transition: "all 0.2s ease",
+                  "&:hover": {
+                    bgcolor: themeColors.primaryHover,
+                  },
+                }}
+              >
+                {loading ? (
+                  <CircularProgress size={22} color='inherit' />
+                ) : (
+                  "Publicar 🌸"
+                )}
+              </Button>
+            </Box>
+          </Card>
+        </Box>
+      </Fade>
     </Modal>
   );
 }

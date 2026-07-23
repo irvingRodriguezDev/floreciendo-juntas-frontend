@@ -300,12 +300,19 @@ const AuthState = (props) => {
    * 🔹 Cerrar sesión
    */
   const cerrarSesion = () => {
+    // 1. Desconectar sockets y eventos
+    disconnectSocket();
+
+    // 2. Limpiar Storage
     localStorage.removeItem("user_id");
     localStorage.removeItem("token");
     localStorage.removeItem("customerAccessToken");
-    disconnectSocket();
 
+    // 3. Disparar estado global
     dispatch({ type: types.CERRAR_SESION });
+
+    // 4. Redirección limpia
+    // Usar replace evita que puedan darle "atrás" en el navegador hacia la vista protegida
     navigate("/", { replace: true });
   };
 

@@ -51,7 +51,7 @@ function AppRouter() {
   }, []);
 
   useEffect(() => {
-    const reason = localStorage.getItem("session_expired_reason");
+    const reason = sessionStorage.getItem("session_expired_reason");
 
     if (reason) {
       const messages = {
@@ -62,7 +62,7 @@ function AppRouter() {
       };
 
       setAlert(messages[reason] || messages.default);
-      localStorage.removeItem("session_expired_reason");
+      sessionStorage.removeItem("session_expired_reason");
     }
   }, []);
 
@@ -141,7 +141,7 @@ function AppRouter() {
         />
 
         {/* 404 */}
-        <Route path='*' element={<Navigate to='/notFound' replace />} />
+        <Route path='*' element={<NotFound />} />
       </Routes>
     </>
   );

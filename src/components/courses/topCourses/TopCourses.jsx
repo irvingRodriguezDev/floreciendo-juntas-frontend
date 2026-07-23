@@ -1,14 +1,11 @@
 import { useContext, useEffect } from "react";
 import "./TopCourses.css";
-import { Box, CardMedia, Grid, Typography, useTheme } from "@mui/material";
+import { Box, Button, Grid, Typography, useTheme } from "@mui/material";
 import { motion } from "framer-motion";
-import { Swiper, SwiperSlide } from "swiper/react";
-import { Autoplay } from "swiper/modules";
-
-import "swiper/css";
+import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
+import { Link } from "react-router-dom";
 
 import CoursesContext from "../../../context/Courses/CoursesContext";
-import { Link } from "react-router-dom";
 import TopCourseCard from "./TopCourseCard";
 
 const TopCourses = () => {
@@ -25,9 +22,9 @@ const TopCourses = () => {
         py: { xs: 6, md: 8 },
         px: { xs: 2, md: 4 },
         background: `
-linear-gradient(181deg,rgba(255, 223, 239, 1) 0%, rgba(255, 255, 255, 1) 100%);
-      radial-gradient(circle at top left, rgba(255,200,220,0.25), transparent 60%)
-    `,
+          linear-gradient(181deg, rgba(255, 223, 239, 1) 0%, rgba(255, 255, 255, 1) 100%),
+          radial-gradient(circle at top left, rgba(255,200,220,0.25), transparent 60%)
+        `,
         borderRadius: "24px",
       }}
     >
@@ -36,7 +33,7 @@ linear-gradient(181deg,rgba(255, 223, 239, 1) 0%, rgba(255, 255, 255, 1) 100%);
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
         transition={{ duration: 0.8 }}
-        style={{ textAlign: "center", marginBottom: "70px" }}
+        style={{ textAlign: "center", marginBottom: "50px" }}
       >
         {/* KICKER / OVERLINE */}
         <motion.div
@@ -53,10 +50,10 @@ linear-gradient(181deg,rgba(255, 223, 239, 1) 0%, rgba(255, 255, 255, 1) 100%);
               fontWeight: 600,
               textTransform: "uppercase",
               mb: 1,
-              fontSize: { xs: "15px", md: "18px" },
+              fontSize: { xs: "14px", md: "16px" },
             }}
           >
-            {/* Los favoritos de nuestra comunidad */}
+            Los favoritos de nuestra comunidad
           </Typography>
         </motion.div>
 
@@ -77,7 +74,6 @@ linear-gradient(181deg,rgba(255, 223, 239, 1) 0%, rgba(255, 255, 255, 1) 100%);
               fontSize: { xs: "2rem", sm: "2.5rem", md: "3.5rem" },
             }}
           >
-            {""}
             <Box component='span' sx={{ position: "relative" }}>
               En Tendencia
               <Box
@@ -94,16 +90,17 @@ linear-gradient(181deg,rgba(255, 223, 239, 1) 0%, rgba(255, 255, 255, 1) 100%);
                   zIndex: -1,
                 }}
               />
-            </Box>{" "}
+            </Box>
           </Typography>
         </motion.div>
       </motion.div>
 
+      {/* GRID DE CURSOS */}
       <Grid
         container
         spacing={2}
         sx={{
-          padding: "20px",
+          padding: { xs: "0px", md: "20px" },
         }}
       >
         {topCourses &&
@@ -115,6 +112,44 @@ linear-gradient(181deg,rgba(255, 223, 239, 1) 0%, rgba(255, 255, 255, 1) 100%);
             />
           ))}
       </Grid>
+
+      {/* 🚀 BOTÓN CTA PARA EXPLORAR TODO EL CATÁLOGO */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.6, delay: 0.3 }}
+      >
+        <Box sx={{ textAlign: "center", mt: { xs: 4, md: 6 } }}>
+          <Button
+            component={Link}
+            to='/cursos'
+            variant='outlined'
+            endIcon={<ArrowForwardIcon />}
+            sx={{
+              color: "#E53888",
+              borderColor: "#E53888",
+              borderWidth: "2px",
+              fontWeight: 700,
+              fontSize: { xs: "0.9rem", md: "1rem" },
+              padding: "10px 28px",
+              borderRadius: "50px",
+              textTransform: "none",
+              transition: "all 0.3s ease",
+              "&:hover": {
+                borderWidth: "2px",
+                borderColor: "#C2256F",
+                backgroundColor: "#E53888",
+                color: "#FFFFFF",
+                transform: "translateY(-2px)",
+                boxShadow: "0 8px 20px rgba(229, 56, 136, 0.25)",
+              },
+            }}
+          >
+            Ver todos los cursos
+          </Button>
+        </Box>
+      </motion.div>
     </Box>
   );
 };

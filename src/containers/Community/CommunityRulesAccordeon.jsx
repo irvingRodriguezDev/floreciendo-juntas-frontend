@@ -1,121 +1,137 @@
-import React from "react";
+import React, { useState } from "react";
 import {
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
-  Typography,
   Box,
+  Card,
+  Typography,
+  Collapse,
+  IconButton,
   List,
   ListItem,
+  ListItemIcon,
   ListItemText,
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import PushPinIcon from "@mui/icons-material/PushPin";
+import FavoriteIcon from "@mui/icons-material/Favorite";
+import AutoAwesomeIcon from "@mui/icons-material/AutoAwesome";
+import HandshakeIcon from "@mui/icons-material/Handshake";
 
-const CommunityRulesAccordion = () => {
+const rulesList = [
+  {
+    icon: <FavoriteIcon sx={{ color: "#D82E7A", fontSize: 20 }} />,
+    title: "Respeto y Empatía",
+    desc: "Un espacio seguro para expresarnos y apoyarnos sin juzgar.",
+  },
+  {
+    icon: <HandshakeIcon sx={{ color: "#D82E7A", fontSize: 20 }} />,
+    title: "Colaboración Constructiva",
+    desc: "Comparte tips, dudas y conocimientos para crecer juntas.",
+  },
+  {
+    icon: <AutoAwesomeIcon sx={{ color: "#D82E7A", fontSize: 20 }} />,
+    title: "Contenido de Valor",
+    desc: "Mantén las publicaciones enfocadas en nuestra comunidad.",
+  },
+];
+
+export default function CommunityRulesCard() {
+  const [expanded, setExpanded] = useState(false);
+
   return (
-    <Box
+    <Card
+      elevation={0}
+      onClick={() => setExpanded(!expanded)}
       sx={{
-        width: "100%",
-        mx: "auto",
-        my: 4,
-        borderRadius: "18px",
+        borderRadius: "20px",
+        background:
+          "linear-gradient(135deg, rgba(216, 46, 122, 0.05) 0%, rgba(255, 255, 255, 0.9) 100%)",
+        border: "1px solid rgba(216, 46, 122, 0.18)",
+        p: 2,
+        cursor: "pointer",
+        transition: "all 0.3s ease",
+        "&:hover": {
+          boxShadow: "0 8px 25px rgba(216, 46, 122, 0.08)",
+          borderColor: "rgba(216, 46, 122, 0.3)",
+        },
       }}
     >
-      <Accordion defaultExpanded={false} style={{ borderRadius: "12px" }}>
-        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-          <Typography variant='h6' fontWeight='bold' color='#D82E7A'>
-            🌸 Bienvenida a la Comunidad Floreciendo Juntas
+      {/* Header Fijo */}
+      <Box display='flex' alignItems='center' justifyContent='space-between'>
+        <Box display='flex' alignItems='center' gap={1.5}>
+          <Box
+            sx={{
+              bgcolor: "rgba(216, 46, 122, 0.12)",
+              borderRadius: "12px",
+              p: 1,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <PushPinIcon sx={{ color: "#D82E7A", fontSize: 20 }} />
+          </Box>
+          <Box>
             <Typography
-              variant='subtitle1'
-              sx={{ color: "gray" }}
-              component='span'
+              variant='subtitle2'
+              fontWeight={800}
+              sx={{ color: "#1F2937", lineHeight: 1.2, fontSize: "0.95rem" }}
             >
-              📌 Haz click aqui para conocer las reglas de la comunidad
+              Reglas de la Comunidad 🌸
             </Typography>
-          </Typography>
-        </AccordionSummary>
+            <Typography
+              variant='caption'
+              sx={{ color: "#6B7280", fontWeight: 500 }}
+            >
+              {expanded
+                ? "Haz click para ocultar"
+                : "Conoce las pautas para una convivencia sana"}
+            </Typography>
+          </Box>
+        </Box>
 
-        <AccordionDetails>
-          <Typography sx={{ mb: 2 }}>
-            ¡Hola, Wapizima! <br /> Bienvenida a nuestra comunidad, un espacio
-            donde cada una de nosotras florece y crece juntas. Aquí, el respeto,
-            el apoyo y el aprendizaje son la clave para construir un futuro
-            brillante en el mundo de la belleza.
-          </Typography>
+        <IconButton
+          size='small'
+          sx={{
+            transform: expanded ? "rotate(180deg)" : "rotate(0deg)",
+            transition: "transform 0.3s ease",
+            color: "#D82E7A",
+            bgcolor: "rgba(216, 46, 122, 0.06)",
+          }}
+        >
+          <ExpandMoreIcon />
+        </IconButton>
+      </Box>
 
-          <List>
-            {rules.map((rule, index) => (
-              <ListItem key={index} alignItems='flex-start'>
+      {/* Contenido Desplegable (Reglas) */}
+      <Collapse in={expanded} timeout='auto' unmountOnExit>
+        <Box
+          sx={{ mt: 2, pt: 1.5, borderTop: "1px dashed rgba(216,46,122,0.15)" }}
+        >
+          <List disablePadding>
+            {rulesList.map((rule, idx) => (
+              <ListItem key={idx} sx={{ px: 0, py: 0.8 }}>
+                <ListItemIcon sx={{ minWidth: 32 }}>{rule.icon}</ListItemIcon>
                 <ListItemText
                   primary={
-                    <Typography fontWeight='bold' color='#D82E7A'>
-                      {index + 1}. {rule.title}
+                    <Typography
+                      variant='body2'
+                      fontWeight={700}
+                      color='#1F2937'
+                    >
+                      {rule.title}
                     </Typography>
                   }
                   secondary={
-                    <Typography variant='body2'>{rule.description}</Typography>
+                    <Typography variant='caption' color='#6B7280'>
+                      {rule.desc}
+                    </Typography>
                   }
                 />
               </ListItem>
             ))}
           </List>
-        </AccordionDetails>
-      </Accordion>
-    </Box>
+        </Box>
+      </Collapse>
+    </Card>
   );
-};
-
-const rules = [
-  {
-    title: "Respeto Mutuo",
-    description:
-      "Mantén siempre un tono respetuoso y amable. Los comentarios ofensivos, discriminatorios o negativos no serán tolerados.",
-  },
-  {
-    title: "Comentarios Constructivos",
-    description:
-      "Fomenta la retroalimentación positiva y constructiva. Apoya a tus compañeras con sugerencias que las ayuden a mejorar.",
-  },
-  {
-    title: "Privacidad y Confidencialidad",
-    description:
-      "No compartas información personal o privada de otras usuarias sin su consentimiento.",
-  },
-  {
-    title: "Contenido Relevante",
-    description:
-      "Publica únicamente contenido relacionado con las capacitaciones y prácticas del sector de la belleza. Evita temas ajenos.",
-  },
-  {
-    title: "Apoyo y Motivación",
-    description:
-      "Celebra los logros y avances de las demás. La comunidad crece cuando florecemos juntas.",
-  },
-  {
-    title: "No Spam",
-    description:
-      "Evita la promoción de productos, servicios o enlaces externos que no estén relacionados con la plataforma.",
-  },
-  {
-    title: "Interacción Positiva",
-    description:
-      "Reacciona y comenta con empatía. Un comentario positivo puede inspirar y motivar a otras usuarias.",
-  },
-  {
-    title: "Responsabilidad en las Publicaciones",
-    description:
-      "Asegúrate de que el contenido compartido sea tuyo o tengas permiso para compartirlo. Respeta los derechos de autor.",
-  },
-  {
-    title: "Seguridad y Bienestar",
-    description:
-      "Si detectas algún comportamiento inapropiado o dañino, repórtalo a los administradores de la comunidad.",
-  },
-  {
-    title: "Crecimiento y Aprendizaje",
-    description:
-      "Aprovecha cada interacción como una oportunidad para aprender y crecer profesionalmente.",
-  },
-];
-
-export default CommunityRulesAccordion;
+}

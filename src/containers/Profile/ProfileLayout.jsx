@@ -1,41 +1,25 @@
-import { useContext } from "react";
-import { Box, Container, Button, Grid } from "@mui/material";
+import { Box, Container } from "@mui/material";
 import ProfileBanner from "../../components/Banner/ProfileBanner";
-import AuthContext from "../../context/Auth/AuthContext";
-import { useNavigate } from "react-router-dom";
 import ProfileTabs from "./ProfileTabs";
 
-// Colores primarios para mantener la identidad visual
-const LIGHT_PINK = "";
-
 const ProfileLayout = () => {
-  const { usuario, cerrarSesion } = useContext(AuthContext);
-  const navigate = useNavigate();
   return (
-    <Box sx={{ bgcolor: LIGHT_PINK, minHeight: "100vh", py: 13 }}>
-      <Container maxWidth='xxl'>
+    <Box
+      sx={{
+        backgroundColor: "#FAFAFA", // Fondo limpio para hacer resaltar los contenedores
+        minHeight: "100vh",
+        pt: { xs: 10, md: 14 },
+        pb: 8,
+      }}
+    >
+      <Container maxWidth='xl'>
+        {/* Banner Superior con datos del usuario y Cerrar Sesión integrado */}
         <ProfileBanner />
-        <Grid container spacing={2}>
-          <Grid
-            size={12}
-            sx={{
-              display: "flex",
-              justifyContent: "end",
-              mt: 2,
-              mb: 2,
-            }}
-          >
-            <Button
-              onClick={() => cerrarSesion(navigate)}
-              variant='contained'
-              size='large'
-              sx={{ borderRadius: "12px", bgcolor: "#D82F7A" }}
-            >
-              Cerrar Sesión
-            </Button>
-          </Grid>
-        </Grid>
-        <ProfileTabs />
+
+        {/* Tabs de Configuración / Cursos / Membresía */}
+        <Box sx={{ mt: 4 }}>
+          <ProfileTabs />
+        </Box>
       </Container>
     </Box>
   );

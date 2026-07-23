@@ -1,6 +1,6 @@
 import React from "react";
 import { Box, Typography } from "@mui/material";
-import LockIcon from "@mui/icons-material/Lock";
+import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import SubscriptionForm from "../../../components/Payment/SubscriptionButton"; // Ajusta la ruta
 
 const PRIMARY_PINK = "#E53888";
@@ -10,36 +10,95 @@ const VideoBlocker = ({ userId, title }) => {
     <Box
       sx={{
         width: "100%",
-        height: { xs: 750, md: 600 }, // Mantener la altura del video
+        minHeight: { xs: "auto", md: 520 }, // Flexible y proporcionado
+        py: { xs: 6, md: 8 },
+        px: { xs: 3, sm: 4 },
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
-        bgcolor: "#FFF5F8", // Fondo rosa muy suave
-        borderRadius: "12px",
-        padding: "20px",
+        backgroundColor: "#FFF4FA",
+        borderRadius: "28px",
         textAlign: "center",
-        border: `2px dashed ${PRIMARY_PINK}`,
+        border: "1px solid #FCE7F3",
+        boxShadow: "0 10px 30px rgba(229, 56, 136, 0.05)",
         position: "relative",
+        overflow: "hidden",
       }}
     >
-      <LockIcon sx={{ fontSize: 40, color: PRIMARY_PINK, mb: 2, mt: 2 }} />
-      <Typography
-        variant='h5'
-        sx={{ fontWeight: 600, color: PRIMARY_PINK, mb: 1, mt: -2 }}
+      {/* Ícono de Candado Editorial */}
+      <Box
+        sx={{
+          width: 64,
+          height: 64,
+          borderRadius: "20px",
+          backgroundColor: "#FFF5F7",
+          color: PRIMARY_PINK,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          mb: 2.5,
+        }}
       >
-        Unete a Floreciendo Juntas
-      </Typography>
-      <Typography variant='body1' color='text.secondary' mb={3}>
-        Este contenido es exclusivo. Suscríbete para acceder a este curso y toda
-        la comunidad.
+        <LockOutlinedIcon sx={{ fontSize: 32 }} />
+      </Box>
+
+      {/* Título Principal */}
+      <Typography
+        variant='h4'
+        component='h3'
+        sx={{
+          fontWeight: 900,
+          color: "#1F2937",
+          mb: 1,
+          fontSize: { xs: "1.5rem", sm: "1.8rem" },
+          lineHeight: 1.2,
+        }}
+      >
+        Contenido Exclusivo
       </Typography>
 
-      {/* ⚠️ NOTA: El SubscriptionForm ya incluye la lógica de Stripe */}
-      <SubscriptionForm userId={userId} />
+      {/* Subtítulo informativo */}
+      <Typography
+        variant='body1'
+        sx={{
+          color: "#6B7280",
+          maxWidth: 480,
+          mx: "auto",
+          mb: 3,
+          fontSize: { xs: "0.95rem", sm: "1rem" },
+          lineHeight: 1.6,
+        }}
+      >
+        {title ? (
+          <>
+            Para ver la clase{" "}
+            <strong style={{ color: PRIMARY_PINK }}>"{title}"</strong> y acceder
+            a todo el catálogo, suscríbete a la comunidad.
+          </>
+        ) : (
+          "Suscríbete a la membresía para acceder a este curso, los talleres en vivo y la comunidad exclusiva."
+        )}
+      </Typography>
 
-      <Typography variant='caption' sx={{ mt: 0, color: "text.disabled" }}>
-        Proceso de pago seguro por Stripe.
+      {/* Formulario de Suscripción / Botón Stripe */}
+      <Box sx={{ width: "100%", maxWidth: 360, mb: 2 }}>
+        <SubscriptionForm userId={userId} />
+      </Box>
+
+      {/* Indicador de Seguridad */}
+      <Typography
+        variant='caption'
+        sx={{
+          color: "#9CA3AF",
+          fontWeight: 500,
+          fontSize: "12px",
+          display: "flex",
+          alignItems: "center",
+          gap: "4px",
+        }}
+      >
+        🔒 Pago seguro procesado por Stripe
       </Typography>
     </Box>
   );

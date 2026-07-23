@@ -80,7 +80,7 @@ const SubscriptionScreen = ({ children }) => {
                   F ✦ J
                 </Typography>
 
-                <Typography
+                {/* <Typography
                   component='h1'
                   sx={{
                     fontWeight: 400,
@@ -94,7 +94,7 @@ const SubscriptionScreen = ({ children }) => {
                   }}
                 >
                   Florece Contigo
-                </Typography>
+                </Typography> */}
 
                 {/* Separador fino estilo boutique */}
                 <Box
@@ -118,9 +118,8 @@ const SubscriptionScreen = ({ children }) => {
                     letterSpacing: "0.01em",
                   }}
                 >
-                  Regálate un espacio exclusivo de evolución. Una membresía
-                  diseñada para conectar, aprender a tu ritmo y expandir tu
-                  potencial junto a una comunidad selecta de mujeres.
+                  Aprende, conecta y expande tu negocio a tu ritmo junto a una
+                  comunidad selecta de emprendedoras.
                 </Typography>
               </Grid>
 

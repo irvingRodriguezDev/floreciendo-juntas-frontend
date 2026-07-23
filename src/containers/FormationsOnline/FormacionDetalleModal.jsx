@@ -10,6 +10,8 @@ import {
   Chip,
   Stack,
   Divider,
+  Skeleton,
+  Tooltip,
 } from "@mui/material";
 import {
   Close as CloseIcon,
@@ -17,35 +19,29 @@ import {
   CheckCircle as CheckIcon,
   HourglassEmpty as PendingIcon,
   Cancel as CancelIcon,
+  Visibility as VisibilityIcon,
 } from "@mui/icons-material";
+import { motion, AnimatePresence } from "framer-motion";
 import MethodGet from "../../config/Service";
 import clienteAxios from "../../config/Axios";
 import Swal from "sweetalert2";
 
-// --- CONFIGURACIÓN DE ESTILOS GLOBALES ---
-const PINK_PALETTE = {
-  primary: "#D82F7A",
-  light: "#FCE4EC",
-  medium: "#F8BBD0",
-  dark: "#880E4F",
-  glassBg: "rgba(255, 255, 255, 0.7)",
-};
+const PRIMARY_PINK = "#E53888";
 
 const modalStyle = {
   position: "absolute",
   top: "50%",
   left: "50%",
   transform: "translate(-50%, -50%)",
-  width: { xs: "90%", sm: 550 },
-  maxHeight: "85vh",
+  width: { xs: "92%", sm: 580 },
+  maxHeight: "88vh",
   bgcolor: "#FFFFFF",
   borderRadius: "24px",
-  boxShadow: "0 20px 40px rgba(216, 27, 96, 0.15)",
-  p: 4,
+  boxShadow: "0 20px 50px rgba(0, 0, 0, 0.15)",
+  p: { xs: 2.5, sm: 3.5 },
   display: "flex",
   flexDirection: "column",
   outline: "none",
-  overflowY: "auto",
 };
 
 // ==========================================
@@ -55,23 +51,23 @@ function StatusChip({ status }) {
   const config = {
     pendiente: {
       label: "Sin enviar",
-      icon: <PendingIcon />,
-      style: { backgroundColor: "#F5F5F5", color: "#616161" },
+      icon: <PendingIcon sx={{ fontSize: "16px !important" }} />,
+      style: { backgroundColor: "#F3F4F6", color: "#6B7280" },
     },
     enviado: {
-      label: "Enviado",
-      icon: <PendingIcon />,
-      style: { backgroundColor: "#FFF3E0", color: "#E65100" },
+      label: "En revisión",
+      icon: <PendingIcon sx={{ fontSize: "16px !important" }} />,
+      style: { backgroundColor: "#FEF3C7", color: "#D97706" },
     },
     aceptado: {
       label: "Aceptado",
-      icon: <CheckIcon />,
-      style: { backgroundColor: "#E8F5E9", color: "#1B5E20" },
+      icon: <CheckIcon sx={{ fontSize: "16px !important" }} />,
+      style: { backgroundColor: "#D1FAE5", color: "#059669" },
     },
     rechazado: {
       label: "Rechazado",
-      icon: <CancelIcon />,
-      style: { backgroundColor: "#FFEBEE", color: "#C62828" },
+      icon: <CancelIcon sx={{ fontSize: "16px !important" }} />,
+      style: { backgroundColor: "#FEE2E2", color: "#DC2626" },
     },
   };
 
@@ -83,7 +79,7 @@ function StatusChip({ status }) {
       label={current.label}
       size='small'
       style={current.style}
-      sx={{ fontWeight: 600, borderRadius: "8px" }}
+      sx={{ fontWeight: 700, borderRadius: "8px", fontSize: "0.75rem" }}
     />
   );
 }
@@ -102,29 +98,36 @@ function ModuloItem({ modulo, onFileChange }) {
       status = "aceptado";
   }
 
-  // Determinamos si el botón de adjuntar/corregir debe estar completamente oculto o deshabilitado
-  // Bloqueado si está "enviado" (en revisión) o si ya fue "aceptado" (aprobado)
   const isButtonDisabled = status === "enviado" || status === "aceptado";
-
-  // El botón solo se requiere activo si está pendiente por primera vez o si fue rechazado
   const isActionRequired = status === "pendiente" || status === "rechazado";
+
+  // Función para ver el preview de la imagen enviada
+  const handleViewDelivery = () => {
+    if (!delivery?.urlDelivery) return;
+    Swal.fire({
+      imageUrl: delivery.urlDelivery,
+      imageAlt: "Evidencia enviada",
+      title: "Evidencia adjuntada",
+      confirmButtonText: "Cerrar",
+      confirmButtonColor: PRIMARY_PINK,
+      customClass: { popup: "swal2-rounded" },
+    });
+  };
 
   return (
     <ListItem
       sx={{
         flexDirection: "column",
         alignItems: "stretch",
-        backgroundColor: PINK_PALETTE.glassBg,
-        backdropFilter: "blur(10px)",
-        border: `1px solid ${PINK_PALETTE.medium}`,
-        borderRadius: "16px",
+        backgroundColor: "#FAFAFA",
+        border: "1px solid #F3F4F6",
+        borderRadius: "18px",
         mb: 2,
-        p: 2.5,
-        boxShadow: "0 4px 12px rgba(216, 27, 96, 0.04)",
+        p: 2,
         transition: "all 0.2s ease-in-out",
         "&:hover": {
-          boxShadow: "0 6px 16px rgba(216, 27, 96, 0.08)",
-          borderColor: PINK_PALETTE.primary,
+          borderColor: "#FCE7F3",
+          boxShadow: "0 6px 18px rgba(229, 56, 136, 0.08)",
         },
       }}
     >
@@ -133,25 +136,51 @@ function ModuloItem({ modulo, onFileChange }) {
         justifyContent='space-between'
         alignItems='center'
         width='100%'
-        mb={isButtonDisabled && status === "enviado" ? 0 : 2} // Quitamos margen inferior si el botón desaparece
+        mb={1.5}
       >
         <Typography
-          sx={{ fontWeight: 700, color: "#333333", fontSize: "1.05rem" }}
+          sx={{ fontWeight: 800, color: "#1F2937", fontSize: "0.98rem" }}
         >
           {modulo.name}
         </Typography>
         <StatusChip status={status} />
       </Stack>
 
-      {/* Solo renderizamos la sección de acciones si NO está en revisión (submitted) */}
-      {status !== "enviado" && (
-        <Stack
-          direction='row'
-          spacing={1}
-          alignItems='center'
-          justifyContent='flex-end'
-          width='100%'
-        >
+      {/* ACCIONES DEL MÓDULO */}
+      <Stack
+        direction='row'
+        spacing={1}
+        alignItems='center'
+        justifyContent='space-between'
+        width='100%'
+        sx={{ pt: 1, borderTop: "1px dashed #E5E7EB" }}
+      >
+        {/* Ver evidencia subida si existe */}
+        {delivery?.urlDelivery ? (
+          <Tooltip title='Ver imagen de evidencia subida'>
+            <Button
+              size='small'
+              startIcon={<VisibilityIcon />}
+              onClick={handleViewDelivery}
+              sx={{
+                textTransform: "none",
+                color: "#6B7280",
+                fontSize: "0.82rem",
+                fontWeight: 600,
+                "&:hover": { color: PRIMARY_PINK, backgroundColor: "#FFF1F2" },
+              }}
+            >
+              Ver envío
+            </Button>
+          </Tooltip>
+        ) : (
+          <Typography variant='caption' sx={{ color: "#9CA3AF" }}>
+            Sin evidencia adjunta
+          </Typography>
+        )}
+
+        {/* Botón de subir / corregir */}
+        {status !== "enviado" && (
           <Button
             component='label'
             variant={isActionRequired ? "contained" : "outlined"}
@@ -159,28 +188,29 @@ function ModuloItem({ modulo, onFileChange }) {
             startIcon={<UploadIcon />}
             disabled={isButtonDisabled}
             sx={{
-              borderRadius: "10px",
+              borderRadius: "50px",
               textTransform: "none",
-              boxShadow: "none",
-              backgroundColor: isActionRequired
-                ? PINK_PALETTE.primary
-                : "transparent",
-              borderColor: PINK_PALETTE.medium,
-              color: isActionRequired ? "#FFFFFF" : PINK_PALETTE.primary,
+              px: 2,
+              py: 0.6,
+              fontSize: "0.82rem",
+              fontWeight: 700,
+              boxShadow: isActionRequired
+                ? "0 4px 12px rgba(229, 56, 136, 0.2)"
+                : "none",
+              backgroundColor: isActionRequired ? PRIMARY_PINK : "transparent",
+              borderColor: PRIMARY_PINK,
+              color: isActionRequired ? "#FFFFFF" : PRIMARY_PINK,
               "&:hover": {
-                backgroundColor: isActionRequired
-                  ? PINK_PALETTE.dark
-                  : PINK_PALETTE.light,
-                borderColor: PINK_PALETTE.primary,
-                boxShadow: "none",
+                backgroundColor: isActionRequired ? "#CF2C75" : "#FFF1F2",
+                borderColor: PRIMARY_PINK,
               },
               "&:disabled": {
-                borderColor: "#E0E0E0",
-                color: "#9E9E9E",
+                borderColor: "#E5E7EB",
+                color: "#9CA3AF",
               },
             }}
           >
-            {status === "pendiente" ? "Adjuntar" : "Corregir"}
+            {status === "pendiente" ? "Adjuntar práctica" : "Corregir"}
             <input
               type='file'
               accept='image/*'
@@ -188,8 +218,8 @@ function ModuloItem({ modulo, onFileChange }) {
               onChange={(e) => onFileChange(modulo.id, e)}
             />
           </Button>
-        </Stack>
-      )}
+        )}
+      </Stack>
     </ListItem>
   );
 }
@@ -199,18 +229,22 @@ function ModuloItem({ modulo, onFileChange }) {
 // ==========================================
 export default function FormacionDetalleModal({ open, handleClose, id }) {
   const [formationData, setFormationData] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   // Carga inicial de datos
   useEffect(() => {
     if (!id || !open) return;
 
+    setLoading(true);
     let url = `/formations/formation-progress/${id}`;
     MethodGet(url)
       .then((res) => {
         setFormationData(res.data);
+        setLoading(false);
       })
       .catch((error) => {
-        console.error("Ocurrió un error al cargar la información:", error);
+        console.error("Error al cargar detalle de formación:", error);
+        setLoading(false);
         handleClose();
       });
   }, [id, open]);
@@ -222,7 +256,7 @@ export default function FormacionDetalleModal({ open, handleClose, id }) {
 
     const localPreviewUrl = URL.createObjectURL(file);
 
-    // 1. Actualización visual optimista instantánea
+    // 1. Actualización visual optimista
     setFormationData((prev) => {
       if (!prev) return prev;
 
@@ -234,7 +268,7 @@ export default function FormacionDetalleModal({ open, handleClose, id }) {
               {
                 id: "temp-id",
                 urlDelivery: localPreviewUrl,
-                status: "submitted", // Alineado con el Backend
+                status: "submitted",
                 accepted: false,
                 submitDate: new Date(),
               },
@@ -247,37 +281,38 @@ export default function FormacionDetalleModal({ open, handleClose, id }) {
       return { ...prev, modules_formations: updatedModules };
     });
 
-    // 2. Preparación y envío del FormData
+    // 2. Preparación de FormData y envío al servidor
     const formData = new FormData();
-    formData.append("evidence", file); // Coincide con tu Multer del backend
+    formData.append("evidence", file);
     formData.append("moduleFormationId", moduloId);
 
+    Swal.fire({
+      title: "Subiendo evidencia...",
+      text: "Por favor espera un momento.",
+      allowOutsideClick: false,
+      allowEscapeKey: false,
+      didOpen: () => {
+        Swal.showLoading();
+      },
+    });
+
     try {
-      handleClose();
       let url = `/formations/submit-delivery/${moduloId}`;
-      Swal.fire({
-        title: "Subiendo evidencia...",
-        text: "Por favor, espera un momento.",
-        allowOutsideClick: false, // Evita que den clic afuera para cerrarlo
-        allowEscapeKey: false, // Evita que lo cierren con la tecla Esc
-        allowEnterKey: false, // Evita que lo cierren con Enter
-        didOpen: () => {
-          Swal.showLoading(); // Muestra el spinner animado nativo de SweetAlert
-        },
-      });
       const response = await clienteAxios.post(url, formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
+
       Swal.fire({
-        title: "Éxito",
-        text: "La evidencia se ha subido correctamente.",
+        title: "¡Evidencia enviada!",
+        text: "Tu práctica se ha subido correctamente para ser revisada.",
         icon: "success",
         timer: 2000,
         showConfirmButton: false,
       });
+
       const savedDelivery = response.data.delivery;
 
-      // 3. Reemplazar estado temporal por datos reales del servidor
+      // 3. Confirmar datos reales recibidos
       setFormationData((prev) => {
         if (!prev) return prev;
 
@@ -294,12 +329,13 @@ export default function FormacionDetalleModal({ open, handleClose, id }) {
         return { ...prev, modules_formations: updatedModules };
       });
     } catch (error) {
-      console.error("Error al subir la evidencia al servidor:", error);
+      console.error("Error al subir evidencia:", error);
       Swal.fire({
-        title: "Error",
-        text: "No se pudo subir tu evidencia. Por favor, intenta de nuevo.",
+        title: "Error al subir",
+        text: "Ocurrió un inconveniente con el archivo. Intenta nuevamente.",
         icon: "error",
         confirmButtonText: "Aceptar",
+        confirmButtonColor: PRIMARY_PINK,
       });
 
       // 4. Revertir cambios en caso de error
@@ -320,42 +356,68 @@ export default function FormacionDetalleModal({ open, handleClose, id }) {
           alignItems='center'
           mb={1}
         >
-          <Typography
-            variant='h5'
-            component='h2'
-            sx={{
-              fontWeight: 800,
-              color: PINK_PALETTE.primary,
-              letterSpacing: "-0.5px",
-            }}
-          >
-            {formationData?.name || "Detalle de Formación"}
-          </Typography>
+          {loading ? (
+            <Skeleton width='60%' height={32} />
+          ) : (
+            <Typography
+              variant='h6'
+              component='h2'
+              sx={{
+                fontWeight: 800,
+                color: "#1F2937",
+                fontSize: { xs: "1.15rem", sm: "1.35rem" },
+              }}
+            >
+              {formationData?.name || "Detalle de Formación"}
+            </Typography>
+          )}
+
           <IconButton
             onClick={handleClose}
-            sx={{ color: PINK_PALETTE.primary }}
+            size='small'
+            sx={{
+              color: "#9CA3AF",
+              "&:hover": { backgroundColor: "#FFF1F2", color: PRIMARY_PINK },
+            }}
           >
             <CloseIcon />
           </IconButton>
         </Stack>
 
-        <Typography variant='body2' color='text.secondary' mb={3}>
-          Sube tus evidencias prácticas de cada módulo para que tus instructoras
-          puedan evaluarlas y obtener tu certificación.
+        <Typography variant='body2' sx={{ color: "#6B7280", mb: 2.5 }}>
+          Sube la evidencia práctica de cada módulo para que tus instructoras
+          puedan evaluarla y liberar tu certificación.
         </Typography>
 
-        <Divider sx={{ mb: 2, borderColor: PINK_PALETTE.light }} />
+        <Divider sx={{ mb: 2.5, borderColor: "#F3F4F6" }} />
 
-        {/* LISTA DE MÓDULOS REFACTORIZADA */}
-        <List sx={{ flexGrow: 1, overflowY: "auto", pr: 0.5 }}>
-          {formationData?.modules_formations?.map((modulo) => (
-            <ModuloItem
-              key={modulo.id}
-              modulo={modulo}
-              onFileChange={handleFileChange}
-            />
-          ))}
-        </List>
+        {/* LISTA CON SKELETON O MÓDULOS */}
+        <Box sx={{ flexGrow: 1, overflowY: "auto", pr: 0.5, maxH: "50vh" }}>
+          {loading ? (
+            <Stack spacing={2}>
+              <Skeleton
+                variant='rounded'
+                height={80}
+                sx={{ borderRadius: "16px" }}
+              />
+              <Skeleton
+                variant='rounded'
+                height={80}
+                sx={{ borderRadius: "16px" }}
+              />
+            </Stack>
+          ) : (
+            <List disablePadding>
+              {formationData?.modules_formations?.map((modulo) => (
+                <ModuloItem
+                  key={modulo.id}
+                  modulo={modulo}
+                  onFileChange={handleFileChange}
+                />
+              ))}
+            </List>
+          )}
+        </Box>
 
         {/* PIE DE MODAL */}
         <Box mt={3} display='flex' justifyContent='flex-end'>
@@ -363,16 +425,16 @@ export default function FormacionDetalleModal({ open, handleClose, id }) {
             variant='contained'
             onClick={handleClose}
             sx={{
-              borderRadius: "12px",
+              borderRadius: "50px",
               px: 4,
               py: 1,
               textTransform: "none",
-              fontWeight: 600,
-              backgroundColor: PINK_PALETTE.primary,
-              boxShadow: "0 4px 12px #D82F7A",
+              fontWeight: 700,
+              backgroundColor: PRIMARY_PINK,
+              boxShadow: "0 4px 14px rgba(229, 56, 136, 0.25)",
               "&:hover": {
-                backgroundColor: PINK_PALETTE.dark,
-                boxShadow: "0 6px 16px #D82F7A",
+                backgroundColor: "#CF2C75",
+                boxShadow: "0 6px 18px rgba(229, 56, 136, 0.35)",
               },
             }}
           >

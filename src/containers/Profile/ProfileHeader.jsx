@@ -1,7 +1,18 @@
 import "./profile.css";
 import React, { useContext, useRef, useState } from "react";
-import { Box, Typography, Avatar, Grid, Button, Divider } from "@mui/material";
+import {
+  Box,
+  Typography,
+  Avatar,
+  Grid, // Compatible con MUI v6 / Grid v2
+  Button,
+  Divider,
+  IconButton,
+  Tooltip,
+} from "@mui/material";
 import { motion } from "framer-motion";
+import CameraAltIcon from "@mui/icons-material/CameraAlt";
+import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import AuthContext from "../../context/Auth/AuthContext";
 import CancelSubscriptionDialog from "./CancelSubscriptionDialog";
 import CancelingSubscription from "../../CancelingSubscription";
@@ -11,7 +22,6 @@ import ModalUpdateUser from "./ModalUpdateInformation";
 import SubscriptionCard from "./Subscription/CardSubscription";
 
 const PRIMARY_PINK = "#E53888";
-const TEXT_COLOR = "#4A4A4A";
 
 const ProfileMain = () => {
   const { ChangePhoto, usuario, usuarioAutenticado } = useContext(AuthContext);
@@ -33,11 +43,9 @@ const ProfileMain = () => {
 
     try {
       await MethodPost("/payment/cancel", {
-        userId: usuario.id,
+        userId: usuario?.id,
       });
 
-      // Refrescamos los datos del usuario DESPUÉS de la cancelación
-      // para que el estado de la suscripción cambie en el frontend
       await usuarioAutenticado();
 
       setCanceling(false);
@@ -69,31 +77,28 @@ const ProfileMain = () => {
         <CancelingSubscription onFinished={() => setCanceling(false)} />
       ) : (
         <motion.div
-          initial={{ opacity: 0, y: 8 }}
+          initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+          transition={{ duration: 0.45, ease: "easeOut" }}
         >
           <Box
             sx={{
-              bgcolor: "white",
-              borderRadius: "26px",
-              p: { xs: 2.5, md: 4 },
               position: "relative",
               overflow: "hidden",
-              boxShadow: "0 10px 30px rgba(0,0,0,0.08)",
-              border: "1px solid #FAD0DE",
             }}
           >
-            {/* Decoración de Fondo (Glows mejorados) */}
+            {/* GLOW DECORATIVO DE FONDO */}
             <Box
               sx={{
                 position: "absolute",
-                top: -50,
-                right: -50,
-                width: 150,
-                height: 150,
+                top: -60,
+                right: -60,
+                width: 200,
+                height: 200,
+                borderRadius: "50%",
                 background:
-                  "radial-gradient(circle, rgba(229,56,136,0.12) 0%, rgba(229,56,136,0) 70%)",
+                  "radial-gradient(circle, rgba(229, 56, 136, 0.1) 0%, rgba(229, 56, 136, 0) 70%)",
+                pointerEvents: "none",
                 zIndex: 0,
               }}
             />
@@ -103,44 +108,64 @@ const ProfileMain = () => {
               spacing={4}
               sx={{ position: "relative", zIndex: 1 }}
             >
-              {/* SECCIÓN AVATAR */}
+              {/* 📸 SECCIÓN AVATAR MEJORADA */}
               <Grid
                 size={{ xs: 12, md: 4 }}
                 sx={{
                   display: "flex",
                   flexDirection: "column",
                   alignItems: "center",
+                  justifyContent: "flex-start",
+                  pt: { xs: 1, md: 2 },
                 }}
               >
-                <motion.div
-                  whileHover={{ scale: 1.02 }}
-                  className='avatar-glow'
-                >
+                <Box sx={{ position: "relative", display: "inline-block" }}>
                   <Avatar
                     src={usuario?.profileImage}
+                    alt={usuario?.name || "Foto de Perfil"}
                     sx={{
-                      width: { xs: 160, md: 220, lg: 260 },
-                      height: { xs: 160, md: 220, lg: 260 },
-                      border: `5px solid ${PRIMARY_PINK}`,
-                      boxShadow: "0 15px 35px rgba(229,56,136,0.2)",
+                      width: { xs: 150, md: 200, lg: 220 },
+                      height: { xs: 150, md: 200, lg: 220 },
+                      border: `4px solid ${PRIMARY_PINK}`,
+                      boxShadow: "0 12px 30px rgba(229, 56, 136, 0.22)",
+                      transition: "transform 0.3s ease",
+                      "&:hover": {
+                        transform: "scale(1.02)",
+                      },
                     }}
                   />
-                </motion.div>
-                <Button
-                  variant='contained'
-                  onClick={() => fileInputRef.current.click()}
-                  sx={{
-                    mt: 3,
-                    bgcolor: PRIMARY_PINK,
-                    borderRadius: "30px",
-                    px: 4,
-                    textTransform: "none",
-                    fontWeight: 600,
-                    "&:hover": { bgcolor: "#CF2C75" },
-                  }}
+
+                  {/* Botón flotante para cambiar la foto directamente desde el avatar */}
+                  <Tooltip title='Cambiar foto de perfil' placement='top'>
+                    <IconButton
+                      onClick={() => fileInputRef.current.click()}
+                      sx={{
+                        position: "absolute",
+                        bottom: 8,
+                        right: 8,
+                        backgroundColor: PRIMARY_PINK,
+                        color: "#FFFFFF",
+                        boxShadow: "0 4px 12px rgba(0, 0, 0, 0.2)",
+                        border: "3px solid #FFFFFF",
+                        p: 1.2,
+                        "&:hover": {
+                          backgroundColor: "#C2256F",
+                          transform: "scale(1.1)",
+                        },
+                      }}
+                    >
+                      <CameraAltIcon sx={{ fontSize: 20 }} />
+                    </IconButton>
+                  </Tooltip>
+                </Box>
+
+                <Typography
+                  variant='caption'
+                  sx={{ color: "#9CA3AF", mt: 1.5, fontWeight: 500 }}
                 >
-                  Cambiar Foto
-                </Button>
+                  JPG o PNG (Máx. 5MB)
+                </Typography>
+
                 <input
                   type='file'
                   accept='image/*'
@@ -150,59 +175,77 @@ const ProfileMain = () => {
                 />
               </Grid>
 
-              {/* SECCIÓN INFORMACIÓN */}
+              {/* 👤 SECCIÓN INFORMACIÓN DEL USUARIO */}
               <Grid size={{ xs: 12, md: 8 }}>
                 <Box
                   sx={{
                     display: "flex",
                     justifyContent: "space-between",
                     alignItems: "flex-start",
-                    mb: 2,
+                    mb: 3,
+                    flexWrap: "wrap",
+                    gap: 2,
                   }}
                 >
                   <Box>
+                    {/* Badge de Suscripción */}
                     <Box
                       sx={{
                         display: "inline-flex",
                         alignItems: "center",
-                        background: usuario?.isSubscribed
-                          ? "#E6F4EA"
-                          : "#FFE0EC",
+                        gap: 0.8,
+                        backgroundColor: usuario?.isSubscribed
+                          ? "#F0FDF4"
+                          : "#FFF1F2",
+                        border: `1px solid ${
+                          usuario?.isSubscribed ? "#BBF7D0" : "#FCE7F3"
+                        }`,
                         px: 2,
-                        py: 0.5,
-                        borderRadius: "20px",
-                        fontSize: "0.75rem",
-                        fontWeight: 700,
-                        color: usuario?.isSubscribed ? "#1E8E3E" : PRIMARY_PINK,
-                        mb: 1,
+                        py: 0.6,
+                        borderRadius: "50px",
+                        fontSize: "0.78rem",
+                        fontWeight: 800,
+                        color: usuario?.isSubscribed ? "#166534" : PRIMARY_PINK,
+                        mb: 1.5,
                       }}
                     >
                       {usuario?.isSubscribed
                         ? "✦ MIEMBRO PREMIUM"
                         : "✦ CUENTA BÁSICA"}
                     </Box>
+
                     <Typography
-                      variant='h3'
+                      variant='h4'
                       sx={{
-                        color: TEXT_COLOR,
-                        fontWeight: 800,
+                        color: "#1F2937",
+                        fontWeight: 900,
+                        fontSize: { xs: "1.75rem", md: "2.2rem" },
                         letterSpacing: "-0.5px",
                       }}
                     >
-                      {usuario?.name || "Nombre"}
+                      {usuario?.name || "Alumna"}
                     </Typography>
                   </Box>
+
+                  {/* Botón Editar Perfil */}
                   <Button
                     onClick={() => setOpenUpdateUser(true)}
                     variant='outlined'
+                    startIcon={<EditOutlinedIcon />}
                     sx={{
                       color: PRIMARY_PINK,
-                      borderColor: PRIMARY_PINK,
-                      borderRadius: "12px",
+                      borderColor: "#FCE7F3",
+                      backgroundColor: "#FFF5F7",
+                      borderRadius: "50px",
+                      px: 2.5,
+                      py: 1,
+                      fontWeight: 700,
                       textTransform: "none",
+                      fontSize: "0.9rem",
+                      transition: "all 0.2s ease",
                       "&:hover": {
-                        borderColor: "#CF2C75",
-                        bgcolor: "rgba(229,56,136,0.05)",
+                        borderColor: PRIMARY_PINK,
+                        backgroundColor: "#FCE7F3",
                       },
                     }}
                   >
@@ -210,44 +253,97 @@ const ProfileMain = () => {
                   </Button>
                 </Box>
 
-                <Grid container spacing={2} sx={{ mb: 3 }}>
-                  <Grid size={{ xs: 12, md: 4 }}>
-                    <Typography sx={{ color: "#777", fontSize: "0.85rem" }}>
-                      Correo Electrónico
-                    </Typography>
-                    <Typography sx={{ fontWeight: 500 }}>
-                      {usuario?.email}
-                    </Typography>
-                  </Grid>
-                  <Grid size={{ xs: 12, md: 4 }}>
-                    <Typography sx={{ color: "#777", fontSize: "0.85rem" }}>
-                      Teléfono
-                    </Typography>
-                    <Typography sx={{ fontWeight: 500 }}>
-                      {usuario?.phone || "No registrado"}
-                    </Typography>
-                  </Grid>
-                  {usuario.tiktokUsername ||
-                    (usuario.tiktokUsername !== null && (
-                      <Grid size={{ xs: 12, md: 4 }}>
-                        <Typography sx={{ color: "#777", fontSize: "0.85rem" }}>
-                          Usuario TikTok
+                {/* Grid de Datos Personales */}
+                <Box
+                  sx={{
+                    backgroundColor: "#FAFAFA",
+                    borderRadius: "20px",
+                    p: 2.5,
+                    border: "1px solid #F3F4F6",
+                    mb: 3,
+                  }}
+                >
+                  <Grid container spacing={2}>
+                    <Grid size={{ xs: 12, sm: 6, md: 6 }}>
+                      <Typography
+                        sx={{
+                          color: "#9CA3AF",
+                          fontSize: "0.8rem",
+                          fontWeight: 600,
+                        }}
+                      >
+                        CORREO ELECTRÓNICO
+                      </Typography>
+                      <Typography
+                        sx={{
+                          fontWeight: 600,
+                          color: "#374151",
+                          fontSize: "0.95rem",
+                        }}
+                      >
+                        {usuario?.email || "Sin correo"}
+                      </Typography>
+                    </Grid>
+
+                    <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+                      <Typography
+                        sx={{
+                          color: "#9CA3AF",
+                          fontSize: "0.8rem",
+                          fontWeight: 600,
+                        }}
+                      >
+                        TELÉFONO
+                      </Typography>
+                      <Typography
+                        sx={{
+                          fontWeight: 600,
+                          color: "#374151",
+                          fontSize: "0.95rem",
+                        }}
+                      >
+                        {usuario?.phone || "No registrado"}
+                      </Typography>
+                    </Grid>
+
+                    {/* Validación segura para TikTok */}
+                    {usuario?.tiktokUsername && (
+                      <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+                        <Typography
+                          sx={{
+                            color: "#9CA3AF",
+                            fontSize: "0.8rem",
+                            fontWeight: 600,
+                          }}
+                        >
+                          USUARIO TIKTOK
                         </Typography>
-                        <Typography sx={{ fontWeight: 500 }}>
-                          @{usuario?.tiktokUsername || "No registrado"}
+                        <Typography
+                          sx={{
+                            fontWeight: 600,
+                            color: "#374151",
+                            fontSize: "0.95rem",
+                          }}
+                        >
+                          @{usuario.tiktokUsername}
                         </Typography>
                       </Grid>
-                    ))}
-                </Grid>
+                    )}
+                  </Grid>
+                </Box>
 
-                <Divider sx={{ mb: 4, opacity: 0.6 }} />
-
-                {/* TARJETA DE SUSCRIPCIÓN DINÁMICA */}
-                {usuario.isSubscribed && (
-                  <>
+                {/* 💳 SECCIÓN FACTURACIÓN / MEMBRESÍA */}
+                {usuario?.isSubscribed && (
+                  <Box sx={{ mt: 2 }}>
+                    <Divider sx={{ mb: 3, borderColor: "#F3F4F6" }} />
                     <Typography
                       variant='h6'
-                      sx={{ mb: 2, fontWeight: 700, color: TEXT_COLOR }}
+                      sx={{
+                        mb: 2,
+                        fontWeight: 800,
+                        color: "#1F2937",
+                        fontSize: "1.1rem",
+                      }}
                     >
                       Membresía y Facturación
                     </Typography>
@@ -256,9 +352,9 @@ const ProfileMain = () => {
                       subscription={usuario?.subscriptionDetails}
                       userId={usuario?.id}
                       onCancelClick={() => setOpen(true)}
-                      refreshUser={usuarioAutenticado} // Pasamos la función para reactivar
+                      refreshUser={usuarioAutenticado}
                     />
-                  </>
+                  </Box>
                 )}
               </Grid>
             </Grid>
@@ -266,13 +362,12 @@ const ProfileMain = () => {
         </motion.div>
       )}
 
-      {/* Modales */}
+      {/* MODALES */}
       <CancelSubscriptionDialog
         open={open}
         onClose={() => setOpen(false)}
         loading={loading}
         handleCancelSubscription={handleCancelSubscription}
-        // Pasamos la fecha para que el modal sea dinámico
         expiryDate={usuario?.subscriptionDetails?.next_renewal}
       />
 

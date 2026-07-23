@@ -13,18 +13,32 @@ const messaging = firebase.messaging();
  * 🔔 Push cuando la app está en background o cerrada
  */
 messaging.onBackgroundMessage((payload) => {
-  const data = payload.data || {};
+  // 💡 Extraemos datos priorizando el bloque 'notification' y respaldando con 'data'
+  const notificationTitle =
+    payload.notification?.title ||
+    payload.data?.title ||
+    "Nueva interacción en Floreciendo Juntas 🌸";
 
-  const title = data.title || "Nueva interacción en Floreciendo Juntas 🌸";
-  const body = data.body || "Tienes una nueva notificación";
-  const url = data.url || "/";
+  const notificationBody =
+    payload.notification?.body ||
+    payload.data?.body ||
+    "Tienes una nueva notificación";
 
-  self.registration.showNotification(title, {
-    body,
+  const url = payload.data?.url || payload.fcmOptions?.link || "/";
+
+  // En iOS/Safari, si el payload ya traía 'webpush.notification',
+  // APNs muestra la alerta automáticamente. Esto sirve como fallback seguro.
+  const notificationOptions = {
+    body: notificationBody,
     icon: "/foto.png",
     badge: "/foto.png",
     data: { url },
-  });
+  };
+
+  return self.registration.showNotification(
+    notificationTitle,
+    notificationOptions,
+  );
 });
 
 /**
@@ -33,20 +47,21 @@ messaging.onBackgroundMessage((payload) => {
 self.addEventListener("notificationclick", (event) => {
   event.notification.close();
 
-  const url = event.notification.data?.url || "/";
+  const urlToOpen = event.notification.data?.url || "/";
 
   event.waitUntil(
     clients
       .matchAll({ type: "window", includeUncontrolled: true })
       .then((clientList) => {
+        // Si la PWA ya está abierta en esa URL, le damos foco
         for (const client of clientList) {
-          if (client.url === url && "focus" in client) {
+          if (client.url.includes(urlToOpen) && "focus" in client) {
             return client.focus();
           }
         }
-
+        // Si no está abierta, la abrimos
         if (clients.openWindow) {
-          return clients.openWindow(url);
+          return clients.openWindow(urlToOpen);
         }
       }),
   );

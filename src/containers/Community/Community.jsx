@@ -1,14 +1,18 @@
-import { useContext, useEffect } from "react";
-import { Typography, Grid, Backdrop, Paper, Button, Box } from "@mui/material";
+import { useContext } from "react";
+import { Typography, Grid, Backdrop, Paper, Box, Stack } from "@mui/material";
 import Layout from "../../components/Layout/Layout";
 import AuthContext from "../../context/Auth/AuthContext";
 import { Link } from "react-router-dom";
 import CommunityRulesAccordion from "./CommunityRulesAccordeon";
 import TabsTypeCommunity from "../../components/Community/TabsTypeCommunity";
+import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
+import SubscriptionForm from "../../components/Payment/SubscriptionButton"; // 👈 Ajusta la ruta a tu componente
 
 const Community = () => {
   const { autenticado, usuario } = useContext(AuthContext);
-  const isSuscribed = usuario?.isSubscribed || false;
+
+  // Sincronizado con la verificación de rol y suscripción
+  const isSuscribed = Boolean(usuario?.isSubscribed || usuario?.roleId === 4);
   const isAuthorized = autenticado && isSuscribed;
 
   return (
@@ -20,94 +24,204 @@ const Community = () => {
           maxWidth: "lg",
           mx: "auto",
           position: "relative",
-          // 🔥 DESACTIVA EL SCROLL AQUÍ:
-          // Si no está autorizado, el alto se bloquea al tamaño de la pantalla
-          // y se oculta el desbordamiento, pero el Layout (Navbar) queda fuera de esto.
-          height: !isAuthorized ? "calc(100vh - 64px)" : "auto",
+          // Desactiva el scroll en la página si no está autorizado
+          height: !isAuthorized
+            ? { xs: "auto", sm: "auto", md: "auto", lg: "auto", xl: "auto" }
+            : "auto",
           overflow: !isAuthorized ? "hidden" : "visible",
         }}
       >
-        {/* HEADER SECCION */}
+        {/* HEADER SECCIÓN */}
         <Box sx={{ textAlign: "center", mb: 4 }}>
-          <Typography variant='h4' fontWeight='bold' sx={{ color: "#D82E7A" }}>
+          <Typography
+            variant='caption'
+            sx={{
+              color: "#E53888",
+              fontWeight: "800",
+              textTransform: "uppercase",
+              letterSpacing: "2px",
+              display: "block",
+              mb: 0.5,
+            }}
+          >
+            Comunidad Exclusiva
+          </Typography>
+          <Typography
+            variant='h3'
+            sx={{
+              fontWeight: 900,
+              color: "#1F2937",
+              fontSize: { xs: "2.2rem", sm: "2.8rem" },
+            }}
+          >
             Floreciendo Juntas 🌷
           </Typography>
-          <Typography variant='body1' sx={{ color: "#777", mt: 1 }}>
-            Un espacio seguro para compartir, aprender y crecer juntas.
+          <Typography
+            variant='body1'
+            sx={{ color: "#6B7280", mt: 1, fontSize: "1.05rem" }}
+          >
+            Un espacio seguro para compartir, aprender y crecer entre colegas.
           </Typography>
         </Box>
 
-        {/* CONTENIDO PRINCIPAL */}
-        <Grid container justifyContent='center' sx={{ mt: -6 }}>
-          <Grid item xs={12} sm={8} md={6}>
+        {/* CONTENIDO PRINCIPAL (Fondo bloqueado/difuminado) */}
+        <Grid container justifyContent='center' sx={{ mt: 1 }}>
+          <Grid size={{ xs: 12, md: 10, lg: 10 }}>
             <CommunityRulesAccordion />
-            <Box sx={{ mt: 2 }}>
+            <Box sx={{ mt: 3 }}>
               <TabsTypeCommunity />
             </Box>
           </Grid>
         </Grid>
 
-        {/* BLOQUEO LOCALIZADO */}
+        {/* BLOQUEO LOCALIZADO CON GLASSMORPHISM */}
         {!isAuthorized && (
           <Backdrop
             open
             sx={{
-              position: "absolute", // Importante: absoluto para no tapar el Navbar
+              position: "absolute",
               top: 0,
               left: 0,
               width: "100%",
               height: "100%",
-              zIndex: 10, // Suficiente para tapar el contenido interno, insuficiente para el Navbar
-              background: "rgba(255,240,247,0.85)",
-              backdropFilter: "blur(14px)",
-              alignItems: "center",
+              zIndex: 10,
+              backgroundColor: "#FFF4FA",
+              backdropFilter: "blur(12px)",
               display: "flex",
+              alignItems: "center",
               justifyContent: "center",
+              p: 2,
             }}
           >
             <Paper
-              elevation={10}
+              elevation={0}
               sx={{
-                p: 5,
-                borderRadius: "24px",
-                maxWidth: 450,
+                p: { xs: 3.5, sm: 4.5 },
+                borderRadius: "28px",
+                maxWidth: 460,
+                width: "100%",
                 textAlign: "center",
-                mx: 2,
-                border: "1px solid rgba(216, 46, 122, 0.2)",
+                backgroundColor: "#FFFFFF",
+                border: "1px solid #FCE7F3",
+                boxShadow: "0 20px 40px rgba(229, 56, 136, 0.08)",
               }}
             >
-              <Typography
-                variant='h5'
-                fontWeight='bold'
-                sx={{ color: "#D82E7A", mb: 2 }}
-              >
-                Atención 💗
-              </Typography>
-
-              <Typography variant='body1' sx={{ color: "#555", mb: 3 }}>
-                Para participar en la comunidad necesitas
-                {!autenticado ? (
-                  <strong> iniciar sesión</strong>
-                ) : (
-                  <strong> una suscripción activa</strong>
-                )}
-              </Typography>
-
-              <Button
-                component={Link}
-                to={!autenticado ? "/iniciar-sesion" : "/suscribirme"}
-                variant='contained'
-                fullWidth
+              {/* Ícono Superior */}
+              <Box
                 sx={{
-                  bgcolor: "#D82E7A",
-                  borderRadius: "12px",
-                  py: 1.5,
-                  fontWeight: "bold",
-                  "&:hover": { bgcolor: "#b52264" },
+                  width: 60,
+                  height: 60,
+                  borderRadius: "20px",
+                  backgroundColor: "#FFF5F7",
+                  color: "#E53888",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  mx: "auto",
+                  mb: 2,
                 }}
               >
-                {!autenticado ? "Iniciar sesión" : "Suscribirme ahora"}
-              </Button>
+                <LockOutlinedIcon sx={{ fontSize: 30 }} />
+              </Box>
+
+              <Typography
+                variant='h5'
+                sx={{ fontWeight: 900, color: "#1F2937", mb: 1 }}
+              >
+                Comunidad Privada
+              </Typography>
+
+              <Typography
+                variant='body2'
+                sx={{ color: "#4B5563", mb: 2.5, lineHeight: 1.5 }}
+              >
+                Suscríbete para interactuar con la comunidad, publicar tus
+                dudas, ver trabajos y participar en dinámicas en vivo.
+              </Typography>
+
+              {/* Minilista de beneficios */}
+              <Stack
+                spacing={1.2}
+                sx={{
+                  mb: 3,
+                  textAlign: "left",
+                  bgcolor: "#FFF5F7",
+                  p: 2,
+                  borderRadius: "16px",
+                }}
+              >
+                {[
+                  "Publica tus dudas y recibe feedback técnico",
+                  "Acceso al sorteo del Salón de tus Sueños",
+                  "Conecta con manicuristas de todo el país",
+                ].map((text, i) => (
+                  <Stack
+                    key={i}
+                    direction='row'
+                    spacing={1.2}
+                    alignItems='center'
+                  >
+                    <Typography
+                      sx={{
+                        color: "#E53888",
+                        fontWeight: "bold",
+                        fontSize: "14px",
+                      }}
+                    >
+                      ✓
+                    </Typography>
+                    <Typography
+                      sx={{
+                        fontWeight: "600",
+                        color: "#374151",
+                        fontSize: "0.85rem",
+                      }}
+                    >
+                      {text}
+                    </Typography>
+                  </Stack>
+                ))}
+              </Stack>
+
+              {/* ⚡ PAGO DIRECTO INCRUSTADO EN 1 CLIC */}
+              <Box sx={{ width: "100%", mb: 1.5 }}>
+                <SubscriptionForm userId={usuario?.id || null} />
+              </Box>
+
+              <Typography
+                variant='caption'
+                sx={{
+                  color: "#9CA3AF",
+                  fontWeight: 500,
+                  fontSize: "11px",
+                  display: "block",
+                  mb: 1.5,
+                }}
+              >
+                🔒 Pago seguro procesado por Stripe
+              </Typography>
+
+              {/* Enlace secundario si cerró sesión */}
+              {!autenticado && (
+                <Box>
+                  <Typography variant='caption' sx={{ color: "#6B7280" }}>
+                    ¿Ya tienes una cuenta activa?{" "}
+                    <Typography
+                      component={Link}
+                      to='/iniciar-sesion'
+                      variant='caption'
+                      sx={{
+                        color: "#E53888",
+                        fontWeight: "bold",
+                        textDecoration: "none",
+                        "&:hover": { textDecoration: "underline" },
+                      }}
+                    >
+                      Inicia sesión
+                    </Typography>
+                  </Typography>
+                </Box>
+              )}
             </Paper>
           </Backdrop>
         )}

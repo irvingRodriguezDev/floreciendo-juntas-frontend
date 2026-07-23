@@ -6,14 +6,15 @@ import WorkspacePremiumIcon from "@mui/icons-material/WorkspacePremium";
 import CardGiftcardIcon from "@mui/icons-material/CardGiftcard";
 import VolunteerActivismIcon from "@mui/icons-material/VolunteerActivism";
 import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
+import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import AuthContext from "../../context/Auth/AuthContext";
 import Marquee from "react-fast-marquee";
 
 export default function RifaSalonPro() {
   const { usuario, autenticado } = useContext(AuthContext);
 
-  // Sincronizado con el estado de tu autenticación de Wapizima
-  const isSubscribed = Boolean(usuario?.isSubscribed);
+  // Sincronizado con el estado de tu autenticación
+  const isSubscribed = Boolean(usuario?.isSubscribed || usuario?.roleId === 3);
 
   return (
     <Box
@@ -175,7 +176,7 @@ export default function RifaSalonPro() {
           </Stack>
         </Grid>
 
-        {/* Columna Derecha: Tarjeta de Suscripción Tipo Cápsula */}
+        {/* Columna Derecha: Tarjeta de Suscripción */}
         <Grid size={{ xs: 12, md: 6 }}>
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -191,6 +192,7 @@ export default function RifaSalonPro() {
                 border: "1px solid #FCE7F3",
                 maxWidth: 500,
                 margin: "0 auto",
+                boxShadow: "0 10px 30px rgba(229, 56, 136, 0.08)",
               }}
             >
               <Typography
@@ -249,61 +251,65 @@ export default function RifaSalonPro() {
                 ))}
               </Stack>
 
-              {/* Lógica de botones estilizada */}
+              {/* Lógica de botones homologada con el Checkout Rápido */}
               {autenticado && !isSubscribed ? (
-                <Link to='/subscripcion' style={{ textDecoration: "none" }}>
+                <Link to='/suscribirme' style={{ textDecoration: "none" }}>
                   <Button
                     variant='contained'
                     fullWidth
+                    endIcon={<ArrowForwardIcon />}
                     sx={{
                       bgcolor: "#E53888",
                       color: "white",
-                      borderRadius: "14px",
+                      borderRadius: "50px",
                       py: 1.8,
                       fontWeight: "bold",
                       fontSize: "1rem",
-                      boxShadow: "none",
+                      boxShadow: "0 8px 20px rgba(229, 56, 136, 0.25)",
                       textTransform: "none",
                       "&:hover": {
-                        bgcolor: "#C2185B",
-                        boxShadow: "none",
+                        bgcolor: "#C2256F",
+                        transform: "translateY(-2px)",
                       },
+                      transition: "all 0.3s ease",
                     }}
                   >
-                    Activar mi Suscripción Wapizima
+                    Activar mi Membresía ($200/mes)
                   </Button>
                 </Link>
               ) : !autenticado ? (
-                <Link to='/iniciar-sesion' style={{ textDecoration: "none" }}>
+                <Link to='/suscribirme' style={{ textDecoration: "none" }}>
                   <Button
                     variant='contained'
                     fullWidth
+                    endIcon={<ArrowForwardIcon />}
                     sx={{
                       bgcolor: "#E53888",
                       color: "white",
-                      borderRadius: "14px",
+                      borderRadius: "50px",
                       py: 1.8,
                       fontWeight: "bold",
                       fontSize: "1rem",
-                      boxShadow: "none",
+                      boxShadow: "0 8px 20px rgba(229, 56, 136, 0.25)",
                       textTransform: "none",
                       "&:hover": {
-                        bgcolor: "#C2185B",
-                        boxShadow: "none",
+                        bgcolor: "#C2256F",
+                        transform: "translateY(-2px)",
                       },
+                      transition: "all 0.3s ease",
                     }}
                   >
-                    Inicia sesión para activar membresía
+                    Unirme y Participar por $200/mes
                   </Button>
                 </Link>
               ) : (
                 // Estado para alumnas con suscripción activa
                 <Box
                   sx={{
-                    p: 2,
-                    borderRadius: "14px",
+                    p: 2.5,
+                    borderRadius: "16px",
                     backgroundColor: "#fff",
-                    border: "1px solid #F472B6",
+                    border: "2px solid #F472B6",
                     textAlign: "center",
                   }}
                 >
@@ -311,11 +317,11 @@ export default function RifaSalonPro() {
                     sx={{
                       fontWeight: "bold",
                       color: "#E53888",
-                      fontSize: "0.95rem",
+                      fontSize: "1rem",
                     }}
                   >
-                    ✨ Tienes una suscripción activa. ¡Ya estás participando por
-                    El Salón de tus Sueños!
+                    ✨ ¡Tu suscripción está activa! Ya estás dentro del sorteo
+                    del mes de El Salón de tus Sueños. 💖
                   </Typography>
                 </Box>
               )}
