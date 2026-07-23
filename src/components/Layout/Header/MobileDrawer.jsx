@@ -10,7 +10,6 @@ import {
 import { Link } from "react-router-dom";
 import Logo from "../../../assets/images/LOGOTIPO FLORECIENDO JUNTAS negro.png";
 import ShopifyCartButton from "../../../containers/Store/ShopifyCartButton";
-import ShopifyCartDrawer from "../../../containers/Store/ShopifyCartDrawer";
 import AuthContext from "../../../context/Auth/AuthContext";
 import { useContext } from "react";
 
@@ -58,10 +57,6 @@ const MobileDrawer = ({
 
           <ListItem>
             <ShopifyCartButton onClick={onOpenShopifyCart} />
-            <ShopifyCartDrawer
-              open={openShopifyCart}
-              onClose={onCloseShopifyCart}
-            />
           </ListItem>
         </List>
 

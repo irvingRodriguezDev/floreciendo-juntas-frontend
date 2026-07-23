@@ -12,7 +12,7 @@ const Community = () => {
   const { autenticado, usuario } = useContext(AuthContext);
 
   // Sincronizado con la verificación de rol y suscripción
-  const isSuscribed = Boolean(usuario?.isSubscribed || usuario?.roleId === 4);
+  const isSuscribed = Boolean(usuario?.isSubscribed && usuario?.roleId === 4);
   const isAuthorized = autenticado && isSuscribed;
 
   return (
@@ -26,7 +26,13 @@ const Community = () => {
           position: "relative",
           // Desactiva el scroll en la página si no está autorizado
           height: !isAuthorized
-            ? { xs: "auto", sm: "auto", md: "auto", lg: "auto", xl: "auto" }
+            ? {
+                xs: "120dvh",
+                sm: "100dvh",
+                md: "100dvh",
+                lg: "100dvh",
+                xl: "100dvh",
+              }
             : "auto",
           overflow: !isAuthorized ? "hidden" : "visible",
         }}
@@ -148,6 +154,7 @@ const Community = () => {
                   bgcolor: "#FFF5F7",
                   p: 2,
                   borderRadius: "16px",
+                  display: { xs: "none", md: "flex", lg: "flex", xl: "flex" },
                 }}
               >
                 {[

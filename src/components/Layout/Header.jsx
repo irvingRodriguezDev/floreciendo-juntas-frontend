@@ -518,18 +518,6 @@ const Header = () => {
                           >
                             Iniciar sesión
                           </Button>
-                          <Button
-                            component={Link}
-                            to='/registro'
-                            variant='contained'
-                            sx={{
-                              bgcolor: "#E53888",
-                              borderColor: "#E53888",
-                              borderRadius: "10px",
-                            }}
-                          >
-                            Crear cuenta
-                          </Button>
                         </>
                       ) : (
                         <>

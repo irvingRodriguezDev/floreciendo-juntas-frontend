@@ -51,7 +51,7 @@ const CourseDetailScreen = () => {
   }, [course, courseId]);
 
   // 🚀 Homologación de estado de suscripción/rol
-  const isSubscribed = Boolean(usuario?.isSubscribed || usuario?.roleId === 4);
+  const isSubscribed = Boolean(usuario?.isSubscribed && usuario?.roleId === 4);
   const isAuthorized = autenticado && isSubscribed;
   const userId = usuario?.id;
 
