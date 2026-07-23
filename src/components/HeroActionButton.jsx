@@ -9,7 +9,8 @@ const HeroButtons = () => {
 
   // Verificamos si la usuaria tiene membresía activa (ajusta según tus campos)
   const tieneMembresiaActiva =
-    usuario?.isSubscribed || usuario?.roleId === 4 || usuario?.roleId === 1;
+    (usuario?.isSubscribed && usuario?.roleId === 4) ||
+    (usuario?.isSubscribed && usuario?.roleId === 1);
 
   // Función para el scroll suave hacia la sección de cursos
   const handleScrollToCourses = () => {
