@@ -13,36 +13,14 @@ const messaging = firebase.messaging();
  * 🔔 Push cuando la app está en background o cerrada
  */
 messaging.onBackgroundMessage((payload) => {
-  // 💡 Extraemos datos priorizando el bloque 'notification' y respaldando con 'data'
-  const notificationTitle =
-    payload.notification?.title ||
-    payload.data?.title ||
-    "Nueva interacción en Floreciendo Juntas 🌸";
-
-  const notificationBody =
-    payload.notification?.body ||
-    payload.data?.body ||
-    "Tienes una nueva notificación";
-
-  const url = payload.data?.url || payload.fcmOptions?.link || "/";
-
-  // En iOS/Safari, si el payload ya traía 'webpush.notification',
-  // APNs muestra la alerta automáticamente. Esto sirve como fallback seguro.
-  const notificationOptions = {
-    body: notificationBody,
-    icon: "/foto.png",
-    badge: "/foto.png",
-    data: { url },
-  };
-
-  return self.registration.showNotification(
-    notificationTitle,
-    notificationOptions,
-  );
+  console.log("🌸 Push recibido en background:", payload);
+  // 💡 NO llamamos a self.registration.showNotification
+  // porque el bloque 'webpush.notification' del backend
+  // ya hace que iOS / Android la pinten automáticamente.
 });
 
 /**
- * 👉 Click en la notificación
+ * 👉 Click en la notificación (Mantenlo intacto, está perfecto)
  */
 self.addEventListener("notificationclick", (event) => {
   event.notification.close();

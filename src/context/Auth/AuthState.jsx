@@ -307,7 +307,7 @@ const AuthState = (props) => {
     localStorage.removeItem("user_id");
     localStorage.removeItem("token");
     localStorage.removeItem("customerAccessToken");
-
+    localStorage.removeItem("fcm_user_id");
     // 3. Disparar estado global
     dispatch({ type: types.CERRAR_SESION });
 

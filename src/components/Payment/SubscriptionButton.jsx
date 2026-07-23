@@ -182,7 +182,7 @@ const SubscriptionForm = ({ userId }) => {
         }
       } else {
         // 💡 Si YA estaba autenticado desde antes en el contexto
-        userObj = usuarioContext; // Asumiendo que obtienes 'usuario' de tu AuthContext
+        userObj = usuario; // Asumiendo que obtienes 'usuario' de tu AuthContext
       }
 
       // -----------------------------------------------------------------

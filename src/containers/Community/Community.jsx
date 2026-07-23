@@ -12,7 +12,9 @@ const Community = () => {
   const { autenticado, usuario } = useContext(AuthContext);
 
   // Sincronizado con la verificación de rol y suscripción
-  const isSuscribed = Boolean(usuario?.isSubscribed && usuario?.roleId === 4);
+  const isSuscribed =
+    Boolean(usuario?.isSubscribed && usuario?.roleId === 4) ||
+    Boolean(usuario?.isSubscribed && usuario.roleId === 1);
   const isAuthorized = autenticado && isSuscribed;
 
   return (
