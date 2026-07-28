@@ -1,48 +1,48 @@
 import React, { useContext, useEffect, useState } from "react";
 import {
   Box,
-  Tabs,
-  Tab,
-  Typography,
   Paper,
+  Typography,
   Avatar,
+  Chip,
+  Stack,
   Fab,
-  InputBase,
-  Container,
+  Tooltip,
+  CircularProgress,
+  Pagination, // 👈 1. Importamos la Paginación
 } from "@mui/material";
+import EditNoteIcon from "@mui/icons-material/EditNote";
 import AuthContext from "../../context/Auth/AuthContext";
 import CommunityContext from "../../context/Community/CommunityContext";
 import { useDebounce } from "use-debounce";
 
-// Sub-componentes
-import Floreciendo from "../../containers/Community/Categories/FloreciendoJuntas/Floreciendo";
-import Servicios from "../../containers/Community/Categories/Services/Servicios";
-import Productos from "../../containers/Community/Categories/Products/Productos";
 import CreatePostModal from "./CreatePostCommunityModal";
-import WritePostIcon from "../icons/WritePostIcon";
+import PostCard from "./PostCard"; // 👈 Asegúrate de importar tu PostCard actualizado
 
-// Paleta Floreciendo Juntas 🌸
 const colors = {
   primary: "#D82E7A",
   primaryHover: "#C02567",
   primarySoft: "rgba(216, 46, 122, 0.08)",
-  textDark: "#2C2C2C",
-  textMuted: "#757575",
+  textMuted: "#6B7280",
   borderLight: "rgba(216, 46, 122, 0.12)",
 };
 
-const TAB_TYPES = ["floreciendo-juntas", "servicios", "productos"];
+const CATEGORIES = [
+  { id: "all", label: "Todos", icon: "🌸" },
+  { id: "floreciendo-juntas", label: "General y Charlas", icon: "💬" },
+  { id: "servicios", label: "Servicios", icon: "💼" },
+  { id: "productos", label: "Productos", icon: "🛍️" },
+];
 
-export default function TabsTypeCommunity() {
+export default function CommunityFeed() {
   const [openWritePost, setOpenWritePost] = useState(false);
   const { community_posts, getFeed, totalPages } = useContext(CommunityContext);
   const { usuario, autenticado } = useContext(AuthContext);
 
   const [search, setSearch] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("all");
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
-  const [value, setValue] = useState(0);
-  const [type, setType] = useState(TAB_TYPES[0]);
 
   const rowsPerPage = 10;
   const [debounceSearch] = useDebounce(search, 600);
@@ -50,11 +50,15 @@ export default function TabsTypeCommunity() {
   const handleClickOpenWritePost = () => setOpenWritePost(true);
   const handleCloseWritePost = () => setOpenWritePost(false);
 
-  const handleChange = (e, newValue) => {
-    setValue(newValue);
-    setSearch("");
+  const handleCategoryChange = (categoryId) => {
+    setSelectedCategory(categoryId);
     setPage(1);
-    setType(TAB_TYPES[newValue]);
+  };
+
+  // Handler para la Paginación con scroll suave hacia arriba
+  const handlePageChange = (event, value) => {
+    setPage(value);
+    window.scrollTo({ top: 80, behavior: "smooth" });
   };
 
   // Reset de página al buscar
@@ -62,7 +66,7 @@ export default function TabsTypeCommunity() {
     if (page !== 1) setPage(1);
   }, [debounceSearch]);
 
-  // Carga de Feed
+  // Carga unificada de Feed
   useEffect(() => {
     let active = true;
 
@@ -72,7 +76,8 @@ export default function TabsTypeCommunity() {
 
       try {
         if (active) {
-          await getFeed(page, rowsPerPage, debounceSearch, type);
+          const typeParam = selectedCategory === "all" ? "" : selectedCategory;
+          await getFeed(page, rowsPerPage, debounceSearch, typeParam);
         }
       } catch (error) {
         console.error("Error al cargar la comunidad:", error);
@@ -86,23 +91,11 @@ export default function TabsTypeCommunity() {
     return () => {
       active = false;
     };
-  }, [page, debounceSearch, autenticado, type]);
-
-  // Props compartidas entre las 3 pestañas
-  const sharedCategoryProps = {
-    community_posts,
-    setSearch,
-    search,
-    loading,
-    debounceSearch,
-    totalPages,
-    page,
-    setPage,
-  };
+  }, [page, debounceSearch, autenticado, selectedCategory]);
 
   return (
     <Box sx={{ width: "100%", pb: 6 }}>
-      {/* 1. INPUT DE CREACIÓN (CARD ESTILO RED SOCIAL) */}
+      {/* 1. INPUT DE CREACIÓN (TARJETA RED SOCIAL) */}
       <Paper
         elevation={0}
         onClick={handleClickOpenWritePost}
@@ -110,17 +103,17 @@ export default function TabsTypeCommunity() {
           display: "flex",
           alignItems: "center",
           gap: 2,
-          p: { xs: 1.5, sm: 2 },
-          mb: 3,
-          borderRadius: "16px",
+          p: { xs: 1.2, sm: 1.8 },
+          mb: 2.5,
+          borderRadius: "18px",
           cursor: "pointer",
           bgcolor: "#FFFFFF",
           border: `1px solid ${colors.borderLight}`,
-          boxShadow: "0 4px 20px rgba(216, 46, 122, 0.06)",
-          transition: "all 0.25s ease-in-out",
+          boxShadow: "0 2px 12px rgba(216, 46, 122, 0.04)",
+          transition: "all 0.2s ease-in-out",
           "&:hover": {
             borderColor: colors.primary,
-            boxShadow: "0 6px 24px rgba(216, 46, 122, 0.12)",
+            boxShadow: "0 4px 18px rgba(216, 46, 122, 0.1)",
             transform: "translateY(-1px)",
           },
         }}
@@ -129,8 +122,8 @@ export default function TabsTypeCommunity() {
           src={usuario?.profileImage}
           alt={usuario?.name || "Usuario"}
           sx={{
-            width: { xs: 42, sm: 48 },
-            height: { xs: 42, sm: 48 },
+            width: { xs: 40, sm: 44 },
+            height: { xs: 40, sm: 44 },
             border: `2px solid ${colors.primarySoft}`,
           }}
         />
@@ -141,21 +134,18 @@ export default function TabsTypeCommunity() {
             bgcolor: "#F9FAFB",
             borderRadius: "30px",
             px: 2.5,
-            py: 1.2,
+            py: 1,
             border: "1px solid #E5E7EB",
-            display: "flex",
-            alignItems: "center",
           }}
         >
           <Typography
             variant='body2'
             sx={{
               color: colors.textMuted,
-              fontWeight: 400,
-              fontSize: { xs: "0.875rem", sm: "0.95rem" },
+              fontSize: { xs: "0.85rem", sm: "0.92rem" },
             }}
           >
-            ¿Qué quieres compartir hoy con nosotras,{" "}
+            ¿Qué quieres compartir hoy,{" "}
             <b style={{ color: colors.primary }}>
               {usuario?.name?.split(" ")[0] || "creadora"}
             </b>
@@ -164,63 +154,137 @@ export default function TabsTypeCommunity() {
         </Box>
       </Paper>
 
-      {/* 2. TABS MODERNOS (TIPO SEGMENTED CONTROL) */}
-      <Paper
-        elevation={0}
+      {/* 2. FILTROS RÁPIDOS (CHIPS ORGÁNICOS) */}
+      <Stack
+        direction={{ xs: "column", sm: "row", md: "row" }}
+        spacing={1}
         sx={{
-          borderRadius: "14px",
-          bgcolor: "#FFFFFF",
-          p: 0.8,
           mb: 3,
-          border: `1px solid ${colors.borderLight}`,
+          overflowX: "auto",
+          py: 0.5,
+          "::-webkit-scrollbar": { display: "none" },
         }}
       >
-        <Tabs
-          value={value}
-          onChange={handleChange}
-          variant='scrollable'
-          scrollButtons='auto'
-          allowScrollButtonsMobile
-          TabIndicatorProps={{ style: { display: "none" } }} // Ocultamos la barra inferior tradicional
-          sx={{
-            minHeight: "44px",
-            "& .MuiTab-root": {
-              fontWeight: 600,
-              fontSize: { xs: "0.875rem", sm: "0.95rem" },
-              textTransform: "none",
-              color: colors.textMuted,
-              minHeight: "42px",
-              borderRadius: "10px",
-              px: { xs: 2, sm: 3 },
-              transition: "all 0.2s ease",
-            },
-            "& .Mui-selected": {
-              color: `${colors.primary} !important`,
-              bgcolor: colors.primarySoft,
-            },
-          }}
-        >
-          <Tab label='🌸 Comunidad Juntas' />
-          <Tab label='💼 Servicios' />
-          <Tab label='🛍️ Productos' />
-        </Tabs>
-      </Paper>
+        {CATEGORIES.map((cat) => {
+          const isSelected = selectedCategory === cat.id;
+          return (
+            <Chip
+              key={cat.id}
+              label={`${cat.icon} ${cat.label}`}
+              onClick={() => handleCategoryChange(cat.id)}
+              clickable
+              sx={{
+                fontWeight: 600,
+                fontSize: { xs: "0.8rem", sm: "0.88rem" },
+                px: 1,
+                py: 2.2,
+                borderRadius: "12px",
+                bgcolor: isSelected ? colors.primary : "#FFFFFF",
+                color: isSelected ? "#FFFFFF" : "#4B5563",
+                border: isSelected ? "none" : "1px solid #E5E7EB",
+                boxShadow: isSelected
+                  ? "0 4px 14px rgba(216, 46, 122, 0.25)"
+                  : "none",
+                transition: "all 0.2s ease",
+                "&:hover": {
+                  bgcolor: isSelected ? colors.primaryHover : "#F3F4F6",
+                },
+              }}
+            />
+          );
+        })}
+      </Stack>
 
-      {/* 3. CONTENEDOR DEL FEED */}
+      {/* 3. FEED DE PUBLICACIONES */}
       <Box sx={{ position: "relative", minHeight: 300 }}>
-        {value === 0 && <Floreciendo {...sharedCategoryProps} />}
-        {value === 1 && <Servicios {...sharedCategoryProps} />}
-        {value === 2 && <Productos {...sharedCategoryProps} />}
+        {loading ? (
+          <Box sx={{ display: "flex", justifyContent: "center", py: 6 }}>
+            <CircularProgress sx={{ color: colors.primary }} />
+          </Box>
+        ) : community_posts && community_posts.length > 0 ? (
+          <Stack spacing={2.5}>
+            {community_posts.map((post) => (
+              <PostCard key={post.id || post._id} post={post} />
+            ))}
+          </Stack>
+        ) : (
+          <Paper
+            elevation={0}
+            sx={{
+              p: 4,
+              textAlign: "center",
+              borderRadius: "16px",
+              bgcolor: "#F9FAFB",
+              border: "1px dashed #E5E7EB",
+            }}
+          >
+            <Typography variant='body1' color='text.secondary'>
+              No se encontraron publicaciones en esta categoría.
+            </Typography>
+          </Paper>
+        )}
       </Box>
 
-      {/* 4. BOTÓN FLOTANTE MÓVIL (FAB) */}
+      {/* 4. CONTROL DE PAGINACIÓN */}
+      {!loading && totalPages > 1 && (
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            mt: 4,
+            pt: 2,
+          }}
+        >
+          <Pagination
+            count={totalPages}
+            page={page}
+            onChange={handlePageChange}
+            color='primary'
+            shape='rounded'
+            size='medium'
+            sx={{
+              "& .MuiPaginationItem-root": {
+                fontWeight: 600,
+                borderRadius: "10px",
+              },
+              "& .Mui-selected": {
+                bgcolor: `${colors.primary} !important`,
+                color: "#FFFFFF",
+                boxShadow: "0 2px 8px rgba(216, 46, 122, 0.3)",
+              },
+            }}
+          />
+        </Box>
+      )}
 
-      {/* MODAL */}
+      {/* 5. FAB MÓVIL */}
+      <Tooltip title='Crear Publicación'>
+        <Fab
+          color='primary'
+          onClick={handleClickOpenWritePost}
+          sx={{
+            position: "sticky",
+            bottom: 100,
+            right: 24,
+            bgcolor: colors.primary,
+            "&:hover": { bgcolor: colors.primaryHover },
+            display: { xs: "flex", md: "none" },
+            zIndex: 1000,
+            boxShadow: "0 8px 24px rgba(216, 46, 122, 0.4)",
+          }}
+        >
+          <EditNoteIcon sx={{ fontSize: 28 }} />
+        </Fab>
+      </Tooltip>
+
+      {/* MODAL DE CREACIÓN */}
       <CreatePostModal
         open={openWritePost}
         handleClose={handleCloseWritePost}
         usuario={usuario ?? null}
-        defaultType={type}
+        defaultType={
+          selectedCategory === "all" ? "floreciendo-juntas" : selectedCategory
+        }
       />
     </Box>
   );

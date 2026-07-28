@@ -45,9 +45,10 @@ const Layout = ({ children }) => {
   const handleUpdatePayment = async () => {
     try {
       setLoadingPortal(true);
-      // Sugerencia: Asegúrate de que el backend sepa a qué URL regresar al usuario
+
+      // Pasa la URL actual del navegador dinámicamente para evitar hardcodear el dominio
       const { data } = await clienteAxios.post("/billing/portal", {
-        returnUrl: "https://floreciendojuntas.com/mi-perfil", // Opcional: enviar la URL actual
+        returnUrl: window.location.href,
       });
 
       if (data.url) {
@@ -57,8 +58,8 @@ const Layout = ({ children }) => {
       console.error("Error al redirigir al portal:", error);
       Swal.fire({
         icon: "error",
-        title: "No pudimos conectar con Stripe",
-        text: "Intenta de nuevo en unos momentos.",
+        title: "Ocurrió un inconveniente",
+        text: "No pudimos conectar con el sistema de pagos. Por favor intenta de nuevo.",
         confirmButtonColor: "#E53888",
       });
     } finally {
@@ -71,132 +72,112 @@ const Layout = ({ children }) => {
       {/* HEADER */}
       <Header />
       {subscriptionDetails?.status === "past_due" && (
-        <Box sx={{ width: "100%", px: { xs: 2, sm: 4 }, mt: 3, mb: 2 }}>
+        <Box sx={{ width: "100%", px: { xs: 2, sm: 4 }, mt: 2, mb: 3 }}>
           <Paper
             elevation={0}
             sx={{
-              borderRadius: "24px",
-              background:
-                "linear-gradient(135deg, rgba(255, 249, 244, 0.9) 0%, rgba(255, 242, 232, 0.9) 100%)",
-              backdropFilter: "blur(10px)", // Efecto glassmorphism sutil
-              border: "1px solid rgba(237, 108, 2, 0.2)",
-              p: { xs: 3, md: 4 },
+              borderRadius: "20px",
+              background: "linear-gradient(135deg, #FFF5F8 0%, #FFEBF3 100%)", // Tonos alineados a la marca
+              border: "1px solid #F3B6D1",
+              p: { xs: 2.5, md: 3 },
               display: "flex",
               flexDirection: { xs: "column", md: "row" },
               alignItems: { xs: "flex-start", md: "center" },
               justifyContent: "space-between",
-              gap: 3,
+              gap: 2,
             }}
           >
-            {/* Columna Izquierda: Mensaje e Instrucciones */}
-            <Box sx={{ flex: 1, maxWidth: { md: "75%" } }}>
+            {/* Información principal */}
+            <Box sx={{ flex: 1 }}>
               <Stack
                 direction='row'
                 spacing={1.5}
                 alignItems='center'
-                sx={{ mb: 1.5 }}
+                sx={{ mb: 1 }}
               >
                 <Box
                   sx={{
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    bgcolor: "rgba(237, 108, 2, 0.12)",
+                    bgcolor: "#FFE0ED",
                     borderRadius: "50%",
-                    width: 32,
-                    height: 32,
-                    color: "#ed6c02",
+                    width: 36,
+                    height: 36,
+                    fontSize: "1.1rem",
                   }}
                 >
-                  {/* Puedes usar el icono de alerta nativo de tu pack de iconos, aquí simulamos el color */}
-                  ⚠️
+                  💳
                 </Box>
                 <Typography
                   variant='h6'
                   sx={{
                     fontWeight: 800,
-                    fontSize: { xs: "1.1rem", sm: "1.2rem" },
-                    color: "#b24b00",
-                    letterSpacing: "-0.02em",
+                    fontSize: { xs: "1rem", sm: "1.1rem" },
+                    color: "#C2185B",
                   }}
                 >
-                  Acción requerida: Pago pendiente
+                  Tu último pago de renovación no pudo procesarse
                 </Typography>
               </Stack>
 
               <Typography
-                variant='body1'
+                variant='body2'
                 sx={{
-                  color: "#000",
-                  lineHeight: 1.6,
-                  fontWeight: "bold",
-                  fontSize: "0.95rem",
+                  color: "#4A4A4A",
+                  lineHeight: 1.5,
+                  fontWeight: 500,
+                  fontSize: "0.9rem",
+                  pl: { md: "52px" }, // Alinea con el texto del título
                 }}
               >
-                No pudimos procesar tu pago de renovación. Para reactivar tu
-                acceso, añade tu nueva tarjeta como método principal. Una vez
-                guardada, Stripe liquidará tu factura pendiente automáticamente.
-              </Typography>
-
-              <Typography
-                variant='caption'
-                display='block'
-                sx={{
-                  color: "#E53888",
-                  fontWeight: "bold",
-                  fontSize: "1.2rem",
-                  mt: 1.5,
-                  letterSpacing: "0.02em",
-                  textTransform: "uppercase",
-                }}
-              >
-                * Nota importante: Por favor, evita comprar una nueva
-                suscripción desde el inicio.
+                Para mantener tu acceso activo sin interrupciones, por favor
+                actualiza tu tarjeta aquí.
+                <Box
+                  component='span'
+                  sx={{
+                    display: "block",
+                    color: "#E53888",
+                    fontWeight: 700,
+                    mt: 0.5,
+                  }}
+                >
+                  💡 No necesitas contratar un nuevo plan, solo actualiza tus
+                  datos.
+                </Box>
               </Typography>
             </Box>
 
-            {/* Columna Derecha: Botón de Acción Dedicado */}
+            {/* Botón de Acción */}
             <Box
               sx={{
                 width: { xs: "100%", md: "auto" },
-                display: "flex",
-                justifyContent: { xs: "stretch", md: "flex-end" },
+                pl: { md: 2 },
               }}
             >
               <Button
                 onClick={handleUpdatePayment}
+                disabled={loadingPortal}
                 variant='contained'
                 disableElevation
                 fullWidth={{ xs: true, md: false }}
                 sx={{
                   bgcolor: "#E53888",
                   color: "#fff",
-                  borderRadius: "16px",
+                  borderRadius: "14px",
                   textTransform: "none",
                   fontWeight: 700,
-                  fontSize: "1rem",
-                  px: 4,
-                  py: 1.8,
-                  boxShadow: "0 4px 14px rgba(229, 56, 136, 0.2)",
-                  transition: "all 0.2s ease-in-out",
-                  whiteSpace: "nowrap", // Evita que el texto del botón se rompa en dos líneas
+                  fontSize: "0.95rem",
+                  px: 3,
+                  py: 1.4,
+                  boxShadow: "0 4px 12px rgba(229, 56, 136, 0.25)",
+                  whiteSpace: "nowrap",
                   "&:hover": {
                     bgcolor: "#CF2C75",
-                    boxShadow: "0 6px 20px rgba(229, 56, 136, 0.3)",
-                    transform: "translateY(-1px)",
-                  },
-                  "&:active": {
-                    transform: "translateY(0)",
-                  },
-                  "&.Mui-disabled": {
-                    bgcolor: "#f093c4",
-                    color: "#fff",
                   },
                 }}
               >
-                {loadingPortal
-                  ? "Abriendo portal seguro..."
-                  : "Actualizar método de pago"}
+                {loadingPortal ? "Abriendo portal..." : "Actualizar mi tarjeta"}
               </Button>
             </Box>
           </Paper>
@@ -219,23 +200,12 @@ const Layout = ({ children }) => {
         />
       </Box>
 
-      {/* FOOTER SOLO DESKTOP */}
-      <Box display={{ xs: "none", md: "block" }}>
-        <Footer />
-      </Box>
-
       {/* APP NAVIGATION SOLO MOBILE */}
       <Box display={{ md: "block", lg: "none" }}>
         <MobileAppNavigation
           cartCount={cartCount}
           onOpenSalonCart={() => setOpenSalonCart(true)}
         />
-        {/* <PremiumWhatsApp
-          phoneNumber='525514960787'
-          accountName='Soporte Floreciendo Juntas'
-          avatar={flor}
-          bottom={110}
-        /> */}
       </Box>
 
       {/* 👉 Aquí luego montamos SalonCartDrawer / Modal */}

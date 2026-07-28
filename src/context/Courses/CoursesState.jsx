@@ -202,9 +202,14 @@ const CoursesState = ({ children }) => {
       const url = `/courses/download-certificate?courseId=${courseId}&userName=${encodeURIComponent(nombreCertificado.trim())}`;
 
       const res = await clienteAxios.get(url, { responseType: "blob" });
-
+      const nombreLimpio = nombreCertificado
+        .trim()
+        .normalize("NFD") // Descompone caracteres con acentos (ej. "Á" -> "A")
+        .replace(/[\u0300-\u036f]/g, "") // Remueve los acentos
+        .replace(/[^a-zA-Z0-9_-]/g, "_") // Reemplaza espacios y caracteres especiales por "_"
+        .replace(/_+/g, "_");
       // Nombramos el archivo dinámicamente con el nombre que el usuario eligió
-      const fileName = `Certificado-${nombreCertificado.trim().replace(/ /g, "_")}.pdf`;
+      const fileName = `Certificado-${nombreLimpio}-${Date.now()}.pdf`;
       fileDownload(res.data, fileName);
 
       // Mensaje de éxito

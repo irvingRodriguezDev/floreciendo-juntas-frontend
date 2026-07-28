@@ -166,7 +166,10 @@ const CertificationsState = ({ children }) => {
       const url = `/certifications/download-certificate?certificationId=${id}&nameCertification=${encodeURIComponent(nombreCertificado)}`;
 
       const res = await clienteAxios.get(url, { responseType: "blob" });
-      fileDownload(res.data, `Certificado-${nombreCertificado}.pdf`);
+      fileDownload(
+        res.data,
+        `Certificado-${nombreCertificado}-${Date.now()}.pdf`,
+      );
 
       Swal.fire({
         icon: "success",
@@ -233,7 +236,7 @@ const CertificationsState = ({ children }) => {
 
       const res = await clienteAxios.get(url, { responseType: "blob" });
 
-      fileDownload(res.data, `diploma-${nombreDiploma}.pdf`);
+      fileDownload(res.data, `diploma-${nombreDiploma}-${Date.now()}.pdf`);
 
       Swal.fire({
         icon: "success",

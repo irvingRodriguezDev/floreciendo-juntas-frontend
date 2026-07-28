@@ -9,29 +9,25 @@ import {
   Button,
   Divider,
   Modal,
-  Grid,
-  RadioGroup,
-  FormControlLabel,
-  Radio,
   CircularProgress,
   Tooltip,
-  Chip,
   Fade,
 } from "@mui/material";
 import ImageIcon from "@mui/icons-material/Image";
 import VideocamIcon from "@mui/icons-material/Videocam";
-import PushPinOutlinedIcon from "@mui/icons-material/PushPinOutlined";
+import ReactQuill from "react-quill-new";
+import "react-quill-new/dist/quill.snow.css";
+
 import CommunityContext from "../../context/Community/CommunityContext";
 import AuthContext from "../../context/Auth/AuthContext";
 import CloseIcons from "../icons/CloseIcons";
-import TimeSelectPinnedPost from "../Selects/TimeSelectPinnedPost";
 import TypePostSelect from "../Selects/TypePostSelect";
-import ReactQuill from "react-quill-new";
-import "react-quill-new/dist/quill.snow.css";
+import PinnedPostOptions from "./PinnedPostOptions";
+import MediaPreviewList from "./MediaPreviewList";
 import { colors } from "../../utils/QuillModules";
 import { alerts } from "../../utils/Alerts";
 
-// Link personalizado para Quill
+// Custom Link para ReactQuill
 const Link = ReactQuill.Quill.import("formats/link");
 class CustomLink extends Link {
   static create(value) {
@@ -67,6 +63,10 @@ export default function CreatePostModal({ open, handleClose, defaultType }) {
   const [typePost, setTypePost] = useState(defaultType || "floreciendo-juntas");
   const [isPinned, setIsPinned] = useState("no");
   const [loading, setLoading] = useState(false);
+
+  const detectarCambiosTypePost = (value) => {
+    setTypePost(value);
+  };
 
   const cleanMedia = () => {
     media.forEach((m) => URL.revokeObjectURL(m.preview));
@@ -155,10 +155,13 @@ export default function CreatePostModal({ open, handleClose, defaultType }) {
       return;
     }
 
+    // 💡 REMOVER ESTILOS EN ANCHO RIGIDOS PEGADOS DE OTROS SITIOS ANTES DE SUBIR
+    const cleanContentHtml = content.replace(/style="[^"]*width:[^"]*"/gi, "");
+
     setLoading(true);
     const formData = new FormData();
-    formData.append("title", title);
-    formData.append("content", content);
+    formData.append("title", title.trim());
+    formData.append("content", cleanContentHtml);
     formData.append("pinned", isPinned === "yes");
     formData.append("durationHours", Number(time));
     formData.append("type", typePost);
@@ -245,86 +248,24 @@ export default function CreatePostModal({ open, handleClose, defaultType }) {
               </IconButton>
             </Box>
 
-            {/* Selector de Categoría (Estilo Badge/Selector) */}
+            {/* Categoría */}
             <Box sx={{ mb: 2 }}>
               <TypePostSelect
                 value={typePost}
-                detectarCambiosTypePost={(val) => setTypePost(val.value)}
+                detectarCambiosTypePost={detectarCambiosTypePost}
               />
             </Box>
 
-            {/* Opciones de Anclaje para Administradores */}
+            {/* Opciones de Anclaje (Solo Admins) */}
             {usuario?.roleId === 1 && (
-              <Box
-                sx={{
-                  p: 2,
-                  mb: 2.5,
-                  bgcolor: "rgba(216,46,122,0.04)",
-                  borderRadius: "16px",
-                  border: `1px solid ${themeColors.borderLight}`,
-                }}
-              >
-                <Grid container spacing={2} alignItems='center'>
-                  <Grid size={6}>
-                    <Typography
-                      variant='caption'
-                      fontWeight='800'
-                      sx={{
-                        color: themeColors.primary,
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 0.5,
-                        textTransform: "uppercase",
-                      }}
-                    >
-                      <PushPinOutlinedIcon sx={{ fontSize: 16 }} /> ¿Anclar
-                      Post?
-                    </Typography>
-                    <RadioGroup
-                      row
-                      value={isPinned}
-                      onChange={(e) => setIsPinned(e.target.value)}
-                    >
-                      <FormControlLabel
-                        value='yes'
-                        control={
-                          <Radio
-                            size='small'
-                            sx={{
-                              color: themeColors.primary,
-                              "&.Mui-checked": { color: themeColors.primary },
-                            }}
-                          />
-                        }
-                        label={<Typography variant='body2'>Sí</Typography>}
-                      />
-                      <FormControlLabel
-                        value='no'
-                        control={
-                          <Radio
-                            size='small'
-                            sx={{
-                              color: themeColors.primary,
-                              "&.Mui-checked": { color: themeColors.primary },
-                            }}
-                          />
-                        }
-                        label={<Typography variant='body2'>No</Typography>}
-                      />
-                    </RadioGroup>
-                  </Grid>
-                  {isPinned === "yes" && (
-                    <Grid size={6}>
-                      <TimeSelectPinnedPost
-                        detectarCambiosTimePinned={(val) => setTime(val.value)}
-                      />
-                    </Grid>
-                  )}
-                </Grid>
-              </Box>
+              <PinnedPostOptions
+                isPinned={isPinned}
+                setIsPinned={setIsPinned}
+                setTime={setTime}
+              />
             )}
 
-            {/* Inputs de Título y Contenido */}
+            {/* Campos de Título y Editor */}
             <Box sx={{ display: "flex", flexDirection: "column", gap: 1.5 }}>
               <TextField
                 placeholder='Escribe un título llamativo...'
@@ -339,6 +280,9 @@ export default function CreatePostModal({ open, handleClose, defaultType }) {
                     fontSize: "1.2rem",
                     fontWeight: 700,
                     color: themeColors.textDark,
+                    // Garantiza que el input de título no genere desbordamiento horizontal
+                    width: "100%",
+                    wordBreak: "break-word",
                   },
                 }}
               />
@@ -350,24 +294,38 @@ export default function CreatePostModal({ open, handleClose, defaultType }) {
                 {title.length}/{MAX_TITLE}
               </Typography>
 
-              {/* Editor ReactQuill */}
+              {/* Editor ReactQuill con Ajustes de Responsividad */}
               <Box
                 sx={{
+                  width: "100%",
                   "& .ql-toolbar": {
                     borderRadius: "14px 14px 0 0",
                     borderColor: "#E5E7EB",
                     bgcolor: "#F9FAFB",
+                    display: "flex",
+                    flexWrap: "wrap",
                   },
                   "& .ql-container": {
                     borderRadius: "0 0 14px 14px",
                     borderColor: "#E5E7EB",
                     minHeight: "180px",
+                    maxHeight: "350px",
+                    overflowY: "auto",
                     fontFamily: "inherit",
                   },
+                  // 🔴 ESTILOS CRÍTICOS DENTRO DEL ÁREA DE TEXTO DEL EDITOR 🔴
                   "& .ql-editor": {
                     minHeight: "180px",
-                    fontSize: "0.95rem",
+                    fontSize: { xs: "0.9rem", sm: "0.95rem" },
                     color: "#374151",
+                    wordBreak: "break-word", // Rompe palabras hiperlargas
+                    overflowWrap: "anywhere", // Evita desbordamientos
+                    whiteSpace: "pre-wrap", // Mantiene los saltos de línea al escribir
+                    maxWidth: "100%",
+                    "& p": {
+                      lineHeight: "1.6",
+                      marginBottom: "0.5rem",
+                    },
                   },
                 }}
               >
@@ -391,71 +349,12 @@ export default function CreatePostModal({ open, handleClose, defaultType }) {
               </Typography>
             </Box>
 
-            {/* Previsualización de Archivos Subidos */}
-            {media.length > 0 && (
-              <Box
-                sx={{
-                  display: "flex",
-                  gap: 1.5,
-                  mt: 1.5,
-                  overflowX: "auto",
-                  pb: 1,
-                }}
-              >
-                {media.map((m, i) => (
-                  <Box
-                    key={i}
-                    sx={{
-                      position: "relative",
-                      flexShrink: 0,
-                      borderRadius: "14px",
-                      overflow: "hidden",
-                      border: "1px solid #E5E7EB",
-                    }}
-                  >
-                    <Box
-                      component={m.type === "image" ? "img" : "video"}
-                      src={m.preview}
-                      muted
-                      preload='metadata'
-                      sx={{ width: 100, height: 100, objectFit: "cover" }}
-                    />
-                    <Chip
-                      label={m.type === "image" ? "Foto" : "Video"}
-                      size='small'
-                      sx={{
-                        position: "absolute",
-                        bottom: 4,
-                        left: 4,
-                        height: 18,
-                        fontSize: "0.65rem",
-                        bgcolor: "rgba(0,0,0,0.6)",
-                        color: "#fff",
-                      }}
-                    />
-                    <IconButton
-                      size='small'
-                      onClick={() => removeMedia(i)}
-                      sx={{
-                        position: "absolute",
-                        top: 4,
-                        right: 4,
-                        bgcolor: "rgba(0,0,0,0.6)",
-                        color: "white",
-                        padding: "3px",
-                        "&:hover": { bgcolor: "black" },
-                      }}
-                    >
-                      <CloseIcons width={12} />
-                    </IconButton>
-                  </Box>
-                ))}
-              </Box>
-            )}
+            {/* Previsualización de Medios Adjuntos */}
+            <MediaPreviewList media={media} onRemoveMedia={removeMedia} />
 
             <Divider sx={{ my: 2.5, borderColor: "#F3F4F6" }} />
 
-            {/* Footer / Acciones */}
+            {/* Footer / Botones */}
             <Box
               display='flex'
               justifyContent='space-between'

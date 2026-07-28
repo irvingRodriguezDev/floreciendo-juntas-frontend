@@ -5,7 +5,7 @@ import React, {
   useRef,
   useCallback,
 } from "react";
-import { Box, useMediaQuery, useTheme } from "@mui/material";
+import { Box, Typography, useMediaQuery, useTheme } from "@mui/material";
 import { motion, AnimatePresence } from "framer-motion";
 import { useParams, useNavigate } from "react-router-dom";
 
@@ -105,7 +105,12 @@ const LiveDetalle = () => {
 
   // ── Hooks de IVR Viewers & Comentarios ──
   const viewers = useIvsViewers(id, live?.aws_channel_arn);
-  const { comments, sendComment } = useLiveComments(id);
+  const tokenAuth = localStorage.getItem("token");
+  const { comments, sendComment, isConnected } = useLiveComments(
+    live?.id,
+    live?.chatRoomArn || import.meta.env.VITE_AWS_IVS_CHAT_ROOM_ARN,
+    tokenAuth,
+  );
 
   // ── Refs ──
   const containerRef = useRef(null);
@@ -282,13 +287,60 @@ const LiveDetalle = () => {
               </Box>
 
               {/* Sidebar de comentarios */}
-              <Box className='comments-sidebar'>
-                <LiveCommentsSidebar
-                  liveId={live.id}
-                  comments={comments}
-                  sendComment={sendComment}
-                />
-              </Box>
+
+              {livePhase === "live" && (
+                <Box className='comments-sidebar'>
+                  {!autenticado || !isSubscribed ? (
+                    /* Mensaje visual de chat bloqueado */
+                    <Box
+                      sx={{
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        height: "100%",
+                        bgcolor: "#1a1a1a",
+                        borderRadius: "12px",
+                        p: 3,
+                        textAlign: "center",
+                        color: "white",
+                        border: "1px solid rgba(255,255,255,0.08)",
+                      }}
+                    >
+                      <Typography
+                        variant='h6'
+                        sx={{
+                          fontSize: "1rem",
+                          fontWeight: 600,
+                          mb: 1,
+                          color: "#e53888",
+                        }}
+                      >
+                        Chat exclusivo para suscriptoras
+                      </Typography>
+                      <Typography
+                        variant='body2'
+                        sx={{
+                          color: "rgba(255,255,255,0.6)",
+                          fontSize: "0.85rem",
+                        }}
+                      >
+                        {!autenticado
+                          ? "Inicia sesión para poder interactuar en la transmisión en vivo."
+                          : "Suscríbete a la plataforma para unirte al chat en vivo."}
+                      </Typography>
+                    </Box>
+                  ) : (
+                    /* Chat Normal para suscriptoras */
+                    <LiveCommentsSidebar
+                      liveId={live.id}
+                      comments={comments}
+                      sendComment={sendComment}
+                      isConnected={isConnected}
+                    />
+                  )}
+                </Box>
+              )}
             </Box>
           )}
         </Box>

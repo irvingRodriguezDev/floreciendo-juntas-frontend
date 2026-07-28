@@ -20,7 +20,7 @@ import { MethodPost } from "../../config/Service";
 import Swal from "sweetalert2";
 import ModalUpdateUser from "./ModalUpdateInformation";
 import SubscriptionCard from "./Subscription/CardSubscription";
-
+import Capullo from "../../assets/images/capullo.png";
 const PRIMARY_PINK = "#E53888";
 
 const ProfileMain = () => {

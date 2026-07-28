@@ -9,7 +9,7 @@ export default defineConfig({
     //   key: fs.readFileSync("./localhost-key.pem"),
     //   cert: fs.readFileSync("./localhost.pem"),
     // },
-    allowedHosts: ["excogitable-mavis-sulfureous.ngrok-free.dev"],
+    allowedHosts: ["basics-berry-alternatively-dramatically.trycloudflare.com"],
     port: 5173,
   },
 });

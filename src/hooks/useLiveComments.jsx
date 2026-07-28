@@ -1,85 +1,161 @@
-import { useEffect, useState } from "react";
-import { getSocket } from "../socket";
+import { useEffect, useState, useRef, useContext } from "react";
+import MethodGet, { MethodPost } from "../config/Service";
+import AuthContext from "../context/Auth/AuthContext";
 
-export const useLiveComments = (liveId) => {
+export const useLiveComments = (liveId, roomArn, tokenAuth) => {
+  const { usuario } = useContext(AuthContext);
   const [comments, setComments] = useState([]);
+  const [isConnected, setIsConnected] = useState(false);
   const [viewers, setViewers] = useState(0);
-  const [appViewers, setAppViewers] = useState(0);
   const [health, setHealth] = useState(null);
+  const socketRef = useRef(null);
 
+  // 1. Cargar el historial inicial desde la Base de Datos Node.js / Sequelize
   useEffect(() => {
-    const socket = getSocket();
-    if (!socket || !liveId) return;
+    if (!liveId) return;
 
-    socket.emit("join-live", liveId);
+    const fetchInitialComments = async () => {
+      try {
+        const response = await MethodGet(`/lives/comments/${liveId}`);
 
-    // ── Comentarios ────────────────────────────────
-    const handleLoad = (initialComments = []) => {
-      setComments(initialComments.slice(-19));
+        if (response?.data) {
+          // Tomamos los últimos 20 o los que retorne tu endpoint
+          setComments(response.data.slice(-20));
+        }
+      } catch (error) {
+        console.error("❌ Error cargando comentarios de la BD:", error);
+      }
     };
 
-    const handleNew = (comment) => {
-      setComments((prev) => {
-        const exists = prev.some((c) => c.id === comment.id);
-        if (exists) return prev;
-        return [...prev, comment].slice(-19);
-      });
+    fetchInitialComments();
+  }, [liveId, tokenAuth]);
+
+  // 2. Conectar a Amazon IVS Chat para mensajes en tiempo real
+  useEffect(() => {
+    // 💡 La validación va DENTRO del useEffect para no alterar los Hooks
+    if (!liveId || !roomArn || !tokenAuth) return;
+
+    let ws = null;
+
+    const connectIvsChat = async () => {
+      try {
+        // Petición del Token IVS a la API
+        const res = await MethodPost("/lives/chat-token", { roomArn: roomArn });
+
+        if (!res?.data.token) {
+          console.warn("⚠️ No se obtuvo el token de IVS Chat");
+          return;
+        }
+
+        // Conexión al WebSocket de IVS
+        const endpoint = "wss://edge.ivschat.us-east-1.amazonaws.com";
+        ws = new WebSocket(endpoint, [res.data?.token]);
+
+        ws.onopen = () => {
+          console.log("🌸 Conectado al IVS Chat de Floreciendo Juntas");
+          setIsConnected(true);
+        };
+
+        ws.onmessage = (event) => {
+          const data = JSON.parse(event.data);
+
+          if (data.Type === "MESSAGE") {
+            // 💡 Declaramos la variable 'attributes' primero
+            const attributes = data.Attributes || {};
+
+            const newComment = {
+              id: data.Id,
+              user_name:
+                attributes.username ||
+                data.Sender?.Attributes?.username ||
+                "Alumna",
+              user_id: attributes.userId || data.Sender?.UserId,
+              message: data.Content,
+
+              // 🔑 Leer las menciones enviadas en los Attributes de IVS Chat
+              replyToUser: attributes.replyToUser || null,
+              replyToUserId: attributes.replyToUserId || null,
+
+              createdAt: data.SendTime,
+            };
+
+            setComments((prev) => {
+              const exists = prev.some((c) => c.id === newComment.id);
+              if (exists) return prev;
+              return [...prev, newComment].slice(-50);
+            });
+          }
+
+          if (data.Type === "DELETE_MESSAGE") {
+            const deletedId = data.Attributes?.MessageId;
+            setComments((prev) =>
+              prev.filter((comment) => comment.id !== deletedId),
+            );
+          }
+        };
+
+        ws.onclose = () => {
+          setIsConnected(false);
+        };
+
+        ws.onerror = (err) => {
+          console.error("❌ Error en IVS Chat WebSocket:", err);
+        };
+
+        socketRef.current = ws;
+      } catch (error) {
+        console.error("🔥 Error iniciando IVS Chat:", error);
+      }
     };
 
-    // SOLO ESCUCHAR cuando el admin elimina un comentario
-    const handleRemoveComment = ({ id }) => {
-      setComments((prev) => prev.filter((comment) => comment.id !== id));
-    };
-
-    // ── Viewers ────────────────────────────────────
-    const handleViewerCount = (data) => {
-      if (String(data.liveId) !== String(liveId)) return;
-      setViewers(data.viewers);
-      setHealth(data.health ?? null);
-    };
-
-    const handleAppViewers = (data) => {
-      if (String(data.liveId) !== String(liveId)) return;
-      setAppViewers(data.count);
-    };
-
-    // ── Reconexión ─────────────────────────────────
-    const handleReconnect = () => {
-      socket.emit("join-live", liveId);
-    };
-
-    socket.on("load_comments", handleLoad);
-    socket.on("new_comment", handleNew);
-    socket.on("remove_comment", handleRemoveComment);
-    socket.on("live_viewer_count", handleViewerCount);
-    socket.on("live_app_viewers", handleAppViewers);
-    socket.on("connect", handleReconnect);
+    connectIvsChat();
 
     return () => {
-      socket.emit("leave-live", liveId);
-      socket.off("load_comments", handleLoad);
-      socket.off("new_comment", handleNew);
-      socket.off("remove_comment", handleRemoveComment);
-      socket.off("live_viewer_count", handleViewerCount);
-      socket.off("live_app_viewers", handleAppViewers);
-      socket.off("connect", handleReconnect);
+      if (ws) {
+        ws.close();
+      }
     };
-  }, [liveId]);
+  }, [liveId, roomArn, tokenAuth]);
 
-  const sendComment = (message) => {
-    const socket = getSocket();
-    if (!socket || !message?.trim()) return;
+  // ✉️ Función para enviar un comentario
+  const sendComment = async (message, replyTo = null) => {
+    if (!message?.trim()) return;
 
-    socket.emit("send_comment", { liveId, message: message.trim() }, (ack) => {
-      if (!ack?.ok) console.warn("❌ Comentario no enviado");
-    });
+    const trimmedMessage = message.trim();
+    const currentUserName = usuario?.name || "Alumna";
+
+    // A) Enviar por IVS Chat
+    if (socketRef.current && isConnected) {
+      const payload = {
+        Action: "SEND_MESSAGE",
+        Content: trimmedMessage,
+        Attributes: {
+          username: currentUserName,
+          // Mandamos la mención en los atributos de AWS IVS
+          replyToUser: replyTo?.userName || "",
+          replyToUserId: replyTo?.userId ? String(replyTo.userId) : "",
+        },
+      };
+
+      socketRef.current.send(JSON.stringify(payload));
+    }
+
+    // B) Guardar en BD en segundo plano
+    try {
+      await MethodPost(`/lives/create-comment/${liveId}`, {
+        message: trimmedMessage,
+        replyToUser: replyTo?.userName || null,
+        replyToUserId: replyTo?.userId || null,
+      });
+    } catch (error) {
+      console.error("⚠️ Error respaldando comentario:", error);
+    }
   };
-
   return {
     comments,
     sendComment,
+    isConnected,
     viewers,
-    appViewers,
-    health
+    health,
   };
 };

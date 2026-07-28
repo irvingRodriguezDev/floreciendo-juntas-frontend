@@ -1,82 +1,168 @@
-import Select from "react-select";
-import { Typography } from "@mui/material";
-const TypePostSelect = (props) => {
-  const status = [
-    { name: "floreciendo-juntas", value: "floreciendo-juntas" },
-    { name: "productos", value: "productos" },
-    {
-      name: "servicios",
-      value: "servicios",
-    },
-  ];
-  const detectarCambiosTypePost = (value) => {
-    props.detectarCambiosTypePost(value);
-  };
+import React from "react";
+import Select, { components } from "react-select";
+import { Typography, Box } from "@mui/material";
+
+// 🌸 Opciones enriquecidas con identidad visual y descripciones de la plataforma
+const OPTIONS = [
+  {
+    value: "floreciendo-juntas",
+    label: "Comunidad / Charlas",
+    icon: "🌸",
+    description: "Comparte experiencias, dudas o novedades con la comunidad",
+  },
+  {
+    value: "servicios",
+    label: "Servicios Profesionales",
+    icon: "💼",
+    description: "Anuncia tus servicios de belleza, asesorías o talleres",
+  },
+  {
+    value: "productos",
+    label: "Productos e Insumos",
+    icon: "🛍️",
+    description: "Muestra insumos, herramientas o material digital",
+  },
+];
+
+// 🎨 Componente personalizado para renderizar cada opción en el menú
+const CustomOption = (props) => {
+  return (
+    <components.Option {...props}>
+      <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, py: 0.5 }}>
+        <Typography sx={{ fontSize: "1.2rem" }}>{props.data.icon}</Typography>
+        <Box>
+          <Typography
+            fontWeight={600}
+            fontSize='0.88rem'
+            color={props.isSelected ? "#FFFFFF" : "#2C2C2C"}
+          >
+            {props.data.label}
+          </Typography>
+          <Typography
+            fontSize='0.75rem'
+            color={props.isSelected ? "rgba(255,255,255,0.85)" : "#6B7280"}
+          >
+            {props.data.description}
+          </Typography>
+        </Box>
+      </Box>
+    </components.Option>
+  );
+};
+
+// 🌟 Componente personalizado para el valor seleccionado en la caja
+const CustomSingleValue = (props) => {
+  return (
+    <components.SingleValue {...props}>
+      <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+        <span>{props.data.icon}</span>
+        <Typography fontWeight={600} fontSize='0.88rem' color='#1A1A1A'>
+          {props.data.label}
+        </Typography>
+      </Box>
+    </components.SingleValue>
+  );
+};
+
+const TypePostSelect = ({ detectarCambiosTypePost, value }) => {
+  const brandColor = "#D72E7A";
+  const brandSoftBg = "rgba(215, 46, 122, 0.06)";
 
   const customStyles = {
     control: (provided, state) => ({
       ...provided,
-      borderColor: state.isFocused ? "#E53888" : "#E53888",
-      boxShadow: state.isFocused ? "0 0 0 1px #E53888" : "none",
+      borderRadius: "14px",
+      padding: "3px 6px",
+      backgroundColor: "#FAF8F9",
+      borderColor: state.isFocused ? brandColor : "rgba(215, 46, 122, 0.2)",
+      borderWidth: state.isFocused ? "1.5px" : "1px",
+      boxShadow: state.isFocused
+        ? "0 0 0 3px rgba(215, 46, 122, 0.12)"
+        : "none",
+      transition: "all 0.2s ease",
+      cursor: "pointer",
       "&:hover": {
-        borderColor: "#E53888",
+        borderColor: brandColor,
+        backgroundColor: "#FFFFFF",
       },
     }),
     placeholder: (provided) => ({
       ...provided,
-      color: "#E53888", // color del placeholder
-    }),
-    singleValue: (provided) => ({
-      ...provided,
-      color: "black", // texto seleccionado
+      color: "#9CA3AF",
+      fontSize: "0.88rem",
+      fontWeight: 500,
     }),
     dropdownIndicator: (provided, state) => ({
       ...provided,
-      color: state.isFocused ? "#E53888" : "#E53888",
+      color: state.isFocused ? brandColor : "#9CA3AF",
+      transition: "color 0.2s ease",
       "&:hover": {
-        color: "#E53888",
+        color: brandColor,
       },
+    }),
+    indicatorSeparator: () => ({ display: "none" }), // Quita la barrita divisora antiestética
+    menu: (provided) => ({
+      ...provided,
+      borderRadius: "16px",
+      overflow: "hidden",
+      boxShadow: "0 10px 30px rgba(0,0,0,0.12)",
+      border: "1px solid rgba(215, 46, 122, 0.12)",
+      zIndex: 1000,
+      padding: "6px",
+    }),
+    menuList: (provided) => ({
+      ...provided,
+      padding: 0,
     }),
     option: (provided, state) => ({
       ...provided,
+      borderRadius: "10px",
+      margin: "2px 0",
       backgroundColor: state.isSelected
-        ? "#E53888"
+        ? brandColor
         : state.isFocused
-          ? "#f0f0f0"
-          : "white",
-      color: state.isSelected ? "white" : "black",
-      "&:hover": {
-        backgroundColor: state.isSelected ? "#E53888" : "#f5f5f5",
+          ? brandSoftBg
+          : "transparent",
+      cursor: "pointer",
+      transition: "all 0.15s ease",
+      active: {
+        backgroundColor: state.isSelected ? brandColor : brandSoftBg,
       },
-    }),
-    menu: (base) => ({
-      ...base,
-      zIndex: 100,
     }),
   };
 
+  // Buscar el objeto seleccionado si nos pasan un string en `value`
+  const selectedOption = OPTIONS.find((opt) => opt.value === value) || null;
+
   return (
-    <>
-      <Typography textAlign={"start"} color='#E53888'>
-        Elije una comunidad en la que quieres publicar
+    <Box sx={{ width: "100%", mb: 2 }}>
+      <Typography
+        variant='caption'
+        fontWeight={700}
+        color='#D72E7A'
+        sx={{
+          display: "block",
+          mb: 0.8,
+          fontSize: "0.82rem",
+          letterSpacing: "0.2px",
+        }}
+      >
+        ✨ ¿En qué sección quieres publicar?
       </Typography>
+
       <Select
-        onChange={detectarCambiosTypePost}
-        className='basic-single'
-        classNamePrefix='select'
+        onChange={(option) => detectarCambiosTypePost(option?.value)}
+        value={selectedOption}
+        options={OPTIONS}
         styles={customStyles}
-        name='select-state'
-        placeholder='Elije la comunidad'
-        options={
-          status
-            ? status.map((option) => ({
-                label: `${option.name}`,
-                value: `${option.value}`,
-              }))
-            : null
-        }
+        placeholder='Selecciona una categoría...'
+        isSearchable={false}
+        components={{
+          Option: CustomOption,
+          SingleValue: CustomSingleValue,
+        }}
       />
-    </>
+    </Box>
   );
 };
 
