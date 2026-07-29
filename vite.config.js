@@ -9,7 +9,7 @@ export default defineConfig({
     //   key: fs.readFileSync("./localhost-key.pem"),
     //   cert: fs.readFileSync("./localhost.pem"),
     // },
-    allowedHosts: ["basics-berry-alternatively-dramatically.trycloudflare.com"],
+    allowedHosts: ["struck-not-reviewed-mic.trycloudflare.com"],
     port: 5173,
   },
 });

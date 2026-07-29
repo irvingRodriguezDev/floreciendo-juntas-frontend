@@ -258,24 +258,26 @@ export default function CommunityFeed() {
       )}
 
       {/* 5. FAB MÓVIL */}
-      <Tooltip title='Crear Publicación'>
-        <Fab
-          color='primary'
-          onClick={handleClickOpenWritePost}
-          sx={{
-            position: "sticky",
-            bottom: 100,
-            right: 24,
-            bgcolor: colors.primary,
-            "&:hover": { bgcolor: colors.primaryHover },
-            display: { xs: "flex", md: "none" },
-            zIndex: 1000,
-            boxShadow: "0 8px 24px rgba(216, 46, 122, 0.4)",
-          }}
-        >
-          <EditNoteIcon sx={{ fontSize: 28 }} />
-        </Fab>
-      </Tooltip>
+      {autenticado && (
+        <Tooltip title='Crear Publicación'>
+          <Fab
+            color='primary'
+            onClick={handleClickOpenWritePost}
+            sx={{
+              position: "sticky",
+              bottom: 100,
+              right: 24,
+              bgcolor: colors.primary,
+              "&:hover": { bgcolor: colors.primaryHover },
+              display: { xs: "flex", md: "none" },
+              zIndex: 1000,
+              boxShadow: "0 8px 24px rgba(216, 46, 122, 0.4)",
+            }}
+          >
+            <EditNoteIcon sx={{ fontSize: 28 }} />
+          </Fab>
+        </Tooltip>
+      )}
 
       {/* MODAL DE CREACIÓN */}
       <CreatePostModal
