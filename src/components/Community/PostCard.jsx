@@ -187,7 +187,9 @@ const PostCard = ({ post }) => {
             dangerouslySetInnerHTML={{
               __html: DOMPurify.sanitize(post.content, {
                 ADD_ATTR: ["target"],
-              }).replace(
+              })
+              .replace(/&nbsp;/g, " ")
+              .replace(
                 /<a /g,
                 '<a target="_blank" rel="noopener noreferrer" ',
               ),
