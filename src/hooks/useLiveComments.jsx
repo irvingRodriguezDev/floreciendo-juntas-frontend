@@ -19,8 +19,10 @@ export const useLiveComments = (liveId, roomArn, tokenAuth) => {
         const response = await MethodGet(`/lives/comments/${liveId}`);
 
         if (response?.data) {
-          // Tomamos los últimos 20 o los que retorne tu endpoint
-          setComments(response.data.slice(-20));
+          // 💡 .reverse() invierte el arreglo DESC para que quede en orden cronológico ASC
+          // (del más antiguo arriba al más reciente abajo pegado al input)
+          const sortedComments = [...response.data].reverse();
+          setComments(sortedComments);
         }
       } catch (error) {
         console.error("❌ Error cargando comentarios de la BD:", error);

@@ -94,7 +94,10 @@ const AuthState = (props) => {
 
     try {
       const { data } = await MethodGet("/auth/me");
-
+      localStorage.setItem(
+        "savedBirthDate",
+        data.user.birthDate === null ? false : true,
+      );
       dispatch({
         type: types.OBTENER_USUARIO,
         payload: {

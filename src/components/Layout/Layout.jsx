@@ -1,16 +1,7 @@
 import React, { useContext, useEffect, useState } from "react";
-import {
-  Alert,
-  AlertTitle,
-  Box,
-  Button,
-  Stack,
-  Typography,
-  Paper,
-} from "@mui/material";
-import Footer from "./Footer";
-import MobileAppNavigation from "./Header/MobileAppNavigation";
+import { Box, Button, Stack, Typography, Paper } from "@mui/material";
 import Header from "./Header";
+import MobileAppNavigation from "./Header/MobileAppNavigation";
 import SalonCartDrawer from "../Layout/CartSidebar";
 import AuthContext from "../../context/Auth/AuthContext";
 import CartContext from "../../context/Cart/CartContext";
@@ -18,18 +9,46 @@ import { requestNotificationPermission } from "../../utils/requestNotificationPe
 import flor from "../../assets/images/flor.jpeg";
 import PremiumWhatsApp from "../CustomWhatsApp";
 import clienteAxios from "../../config/Axios";
+import FormBirthDate from "./FormBirthDate";
+import BirthdayBanner from "./BirthdayBanner"; // 🎂 Importamos el nuevo banner
+import Swal from "sweetalert2";
+import { alerts } from "../../utils/Alerts";
+import { launchSuccessConfetti } from "../../utils/ShowConfetti";
+
 const Layout = ({ children }) => {
-  // Estado para el carrito del salón
   const [openSalonCart, setOpenSalonCart] = useState(false);
   const { autenticado, usuario } = useContext(AuthContext);
   const { cart, guest_cart, getUserCart } = useContext(CartContext);
+
+  const [openBirthModal, setOpenBirthModal] = useState(false);
+  const [showBirthdayBanner, setShowBirthdayBanner] = useState(false);
+
   useEffect(() => {
-    if (autenticado) getUserCart();
-  }, [autenticado]);
+    if (autenticado) {
+      getUserCart();
+
+      // 🎂 Lógica de Cumpleaños: Confeti y Banner
+      if (usuario?.todayIsBirthDay) {
+        setShowBirthdayBanner(true);
+
+        const todayStr = new Date().toISOString().split("T")[0];
+        const lastConfettiDate = localStorage.getItem(
+          "birthdayConfettiShownDate",
+        );
+
+        // Dispara el confeti solo si no se ha lanzado hoy
+        if (lastConfettiDate !== todayStr) {
+          launchSuccessConfetti();
+          localStorage.setItem("birthdayConfettiShownDate", todayStr);
+        }
+      }
+    }
+  }, [autenticado, usuario]);
 
   const cartCount = autenticado
     ? cart?.items?.reduce((acc, item) => acc + item.quantity, 0) || 0
     : guest_cart?.items?.reduce((acc, item) => acc + item.quantity, 0) || 0;
+
   useEffect(() => {
     if (!autenticado || !usuario) return;
 
@@ -37,16 +56,20 @@ const Layout = ({ children }) => {
     if (token) {
       requestNotificationPermission(token);
     }
-  }, [autenticado]);
-  const subscriptionDetails = usuario?.subscriptionDetails;
 
+    const savedBirthDate = localStorage.getItem("savedBirthDate");
+
+    if (!usuario?.birthDate && savedBirthDate !== "true") {
+      setOpenBirthModal(true);
+    }
+  }, [autenticado, usuario]);
+
+  const subscriptionDetails = usuario?.subscriptionDetails;
   const [loadingPortal, setLoadingPortal] = useState(false);
 
   const handleUpdatePayment = async () => {
     try {
       setLoadingPortal(true);
-
-      // Pasa la URL actual del navegador dinámicamente para evitar hardcodear el dominio
       const { data } = await clienteAxios.post("/billing/portal", {
         returnUrl: window.location.href,
       });
@@ -67,17 +90,43 @@ const Layout = ({ children }) => {
     }
   };
 
+  const handleBirthDateSuccess = () => {
+    localStorage.setItem("savedBirthDate", "true");
+    setOpenBirthModal(false);
+    alerts.success(
+      "¡Exitoso!",
+      "Tu fecha de cumpleaños se ha guardado correctamente.",
+    );
+  };
+
   return (
     <Box display='flex' flexDirection='column' minHeight='100vh'>
       {/* HEADER */}
       <Header />
+
+      {/* 🎂 MODAL PARA CAPTURAR CUMPLEAÑOS */}
+      <FormBirthDate
+        open={openBirthModal}
+        onClose={() => setOpenBirthModal(false)}
+        onSuccess={handleBirthDateSuccess}
+      />
+
+      {/* 🎈 BANNER DE FELIZ CUMPLEAÑOS */}
+      {showBirthdayBanner && (
+        <BirthdayBanner
+          userName={usuario?.name}
+          onClose={() => setShowBirthdayBanner(false)}
+        />
+      )}
+
+      {/* 💳 BANNER DE SUBSCRIPCIÓN VENCIDA */}
       {subscriptionDetails?.status === "past_due" && (
         <Box sx={{ width: "100%", px: { xs: 2, sm: 4 }, mt: 2, mb: 3 }}>
           <Paper
             elevation={0}
             sx={{
               borderRadius: "20px",
-              background: "linear-gradient(135deg, #FFF5F8 0%, #FFEBF3 100%)", // Tonos alineados a la marca
+              background: "linear-gradient(135deg, #FFF5F8 0%, #FFEBF3 100%)",
               border: "1px solid #F3B6D1",
               p: { xs: 2.5, md: 3 },
               display: "flex",
@@ -87,7 +136,6 @@ const Layout = ({ children }) => {
               gap: 2,
             }}
           >
-            {/* Información principal */}
             <Box sx={{ flex: 1 }}>
               <Stack
                 direction='row'
@@ -128,7 +176,7 @@ const Layout = ({ children }) => {
                   lineHeight: 1.5,
                   fontWeight: 500,
                   fontSize: "0.9rem",
-                  pl: { md: "52px" }, // Alinea con el texto del título
+                  pl: { md: "52px" },
                 }}
               >
                 Para mantener tu acceso activo sin interrupciones, por favor
@@ -148,7 +196,6 @@ const Layout = ({ children }) => {
               </Typography>
             </Box>
 
-            {/* Botón de Acción */}
             <Box
               sx={{
                 width: { xs: "100%", md: "auto" },
@@ -183,12 +230,13 @@ const Layout = ({ children }) => {
           </Paper>
         </Box>
       )}
+
       {/* MAIN */}
       <Box
         component='main'
         flex={1}
         sx={{
-          pb: { xs: "96px", md: 0 }, // 🔑 espacio para la app navigation
+          pb: { xs: "96px", md: 0 },
         }}
       >
         {children}
@@ -208,7 +256,7 @@ const Layout = ({ children }) => {
         />
       </Box>
 
-      {/* 👉 Aquí luego montamos SalonCartDrawer / Modal */}
+      {/* DRAWER CARRITO */}
       <SalonCartDrawer
         open={openSalonCart}
         onClose={() => setOpenSalonCart(false)}
