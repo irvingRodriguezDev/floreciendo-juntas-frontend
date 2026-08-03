@@ -14,7 +14,7 @@ import SchoolIcon from "@mui/icons-material/School";
 import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
 import PlayCircleFilledIcon from "@mui/icons-material/PlayCircleFilled";
 import CloseIcon from "@mui/icons-material/Close";
-import image from "../../assets/images/Captura de pantalla 2025-11-24 a la(s) 1.26.37 p.m..png";
+import image from "../../assets/images/Captura-de-pantalla-2025-11-24-a-la_s_-1.26.37 p.m. (1).webp";
 // Datos de las características
 const features = [
   {

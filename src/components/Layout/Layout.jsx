@@ -14,7 +14,6 @@ import BirthdayBanner from "./BirthdayBanner"; // 🎂 Importamos el nuevo banne
 import Swal from "sweetalert2";
 import { alerts } from "../../utils/Alerts";
 import { launchSuccessConfetti } from "../../utils/ShowConfetti";
-
 const Layout = ({ children }) => {
   const [openSalonCart, setOpenSalonCart] = useState(false);
   const { autenticado, usuario } = useContext(AuthContext);
@@ -103,7 +102,6 @@ const Layout = ({ children }) => {
     <Box display='flex' flexDirection='column' minHeight='100vh'>
       {/* HEADER */}
       <Header />
-
       {/* 🎂 MODAL PARA CAPTURAR CUMPLEAÑOS */}
       <FormBirthDate
         open={openBirthModal}
