@@ -18,6 +18,7 @@ import { useNotificationHandler } from "./hooks/useNotificationHandler";
 import NotificationsState from "./context/Notifications/NotificationsState";
 import CertificationsState from "./context/Certifications/CertificationsState";
 import StoresState from "./context/Stores/StoresState";
+import ChatState from "./context/Chat/ChatState";
 import { GoogleMapsProvider } from "./context/GoogleMaps/GoogleMapsProvider";
 // Carga asíncrona de la clave pública
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_KEY);
@@ -41,8 +42,10 @@ function App() {
                               <LivesState>
                                 <CertificationsState>
                                   <StoresState>
-                                    <ScrollTop />
-                                    <AppRouter />
+                                    <ChatState>
+                                      <ScrollTop />
+                                      <AppRouter />
+                                    </ChatState>
                                   </StoresState>
                                 </CertificationsState>
                               </LivesState>

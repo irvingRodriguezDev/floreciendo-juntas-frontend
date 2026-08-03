@@ -28,6 +28,8 @@ import ShopifyCartButton from "../../containers/Store/ShopifyCartButton";
 // import ShopifyCartDrawer from "../../containers/Store/ShopifyCartDrawer";
 import FornitureIcon from "../icons/FornitureIcon";
 import NotificationsBell from "../Notifications/NotificationsBell";
+import HeaderMessageBadge from "../Chat/HeaderMessageBadge";
+import InboxDrawer from "../Chat/InboxDrawer";
 /* Menu items (igual que antes) */
 const menuItems = [
   { name: "Comunidad", path: "/comunidad", auth: "both" },
@@ -218,7 +220,7 @@ const Header = () => {
               }
               alt='Logo Floreciendo Juntas'
               sx={{
-                width: { xs: 180, sm: 180, md: 180 },
+                width: { xs: 120, sm: 180, md: 180 },
                 height: "auto",
                 transition: "transform 0.35s ease, box-shadow 0.35s ease",
                 transformOrigin: "left center",
@@ -320,25 +322,6 @@ const Header = () => {
                 </IconButton>
               </BadgeBox>
 
-              {/* 🛍️ Carrito Tienda (Shopify) */}
-              {/* <IconButton
-                onClick={() => setOpenCartShopify(true)}
-                sx={{
-                  borderRadius: "12px",
-                  transition: "all 0.25s ease",
-                  "&:hover": {
-                    backgroundColor: "rgba(229,56,136,0.08)",
-                  },
-                }}
-              > */}
-              {/* <ShopifyCartButton onClick={() => setOpenCartShopify(true)} /> */}
-              {/* </IconButton> */}
-
-              {/* <ShopifyCartDrawer
-                open={openCartShopify}
-                onClose={() => setOpenCartShopify(false)}
-              /> */}
-
               {/* 🔐 Auth */}
               {!autenticado ? (
                 <Button
@@ -362,6 +345,8 @@ const Header = () => {
                 </Button>
               ) : (
                 <>
+                  {/* <Inbox /> */}
+                  <HeaderMessageBadge />
                   <NotificationsBell />
 
                   <Button
@@ -393,7 +378,12 @@ const Header = () => {
           {/* MOBILE */}
           {isMobile && (
             <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-              {autenticado && <NotificationsBell />}
+              {autenticado && (
+                <>
+                  <HeaderMessageBadge />
+                  <NotificationsBell />
+                </>
+              )}
 
               <IconButton
                 edge='start'
@@ -475,31 +465,6 @@ const Header = () => {
                           />
                         </ListItemButton>
                       </ListItem>
-
-                      {/* 🛍️ Carrito Tienda (Shopify) */}
-                      {/* <ListItem disablePadding>
-                        <ListItemButton
-                          onClick={() => {
-                            setOpen(false);
-                            setOpenCartShopify(true);
-                          }}
-                          sx={{ borderRadius: "12px" }}
-                        >
-                          <ListItemIcon sx={{ minWidth: 40 }}>
-                            <ShopifyCartButton />
-                          </ListItemIcon>
-
-                          <ListItemText
-                            primary='Carrito (Tienda)'
-                            sx={{ color: "#E53888", fontWeight: "bold" }}
-                          />
-                        </ListItemButton>
-
-                        <ShopifyCartDrawer
-                          open={openCartShopify}
-                          onClose={() => setOpenCartShopify(false)}
-                        />
-                      </ListItem> */}
                     </List>
                     <Box
                       sx={{ display: "flex", flexDirection: "column", gap: 1 }}
@@ -559,6 +524,7 @@ const Header = () => {
 
       {/* Sidebar carrito */}
       <CartSidebar open={openCart} onClose={() => setOpenCart(false)} />
+      <InboxDrawer />
     </Box>
   );
 };

@@ -23,7 +23,7 @@ const NotificationsBell = () => {
   } = useContext(NotificationsContext);
   useEffect(() => {
     if (autenticado) {
-      getAllNotifications();
+      getAllNotifications({ unread: true });
       getUnreadNotifications();
     }
   }, [autenticado]);

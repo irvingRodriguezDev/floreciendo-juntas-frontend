@@ -52,7 +52,7 @@ const NotificationsState = ({ children }) => {
   // 📡 REST
   const getAllNotifications = async () => {
     try {
-      const res = await MethodGet("/notifications");
+      const res = await MethodGet(`/notifications?unread=${true}`);
 
       dispatch({
         type: GET_ALL_NOTIFICATIONS,
