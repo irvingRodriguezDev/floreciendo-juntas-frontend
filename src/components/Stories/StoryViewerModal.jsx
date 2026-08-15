@@ -101,7 +101,7 @@ const StoryViewerModal = ({
       MethodPost(`/stories/${storyId}/view`)
         .then(() => {
           setLocalStories((prev) =>
-            prev.map((s) => (s.id === storyId ? { ...s, isSeen: true } : s))
+            prev.map((s) => (s.id === storyId ? { ...s, isSeen: true } : s)),
           );
 
           if (onStoryViewed) {

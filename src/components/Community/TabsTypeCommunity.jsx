@@ -19,7 +19,6 @@ import { useDebounce } from "use-debounce";
 import CreatePostModal from "./CreatePostCommunityModal";
 import PostCard from "./PostCard"; // 👈 Asegúrate de importar tu PostCard actualizado
 import Birtdays from "../../containers/Birthdays/Birtdays";
-import VerifiedIcon from "../icons/VerifiedIcon";
 import Stories from "../../containers/Stories/Stories";
 
 const colors = {
@@ -161,7 +160,6 @@ export default function CommunityFeed() {
               }}
             >
               {usuario?.name?.split(" ")[0] || "creadora"}
-              {usuario?.isVerified && <VerifiedIcon width={17} />}
             </Box>
             ?
           </Typography>
