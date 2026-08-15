@@ -20,7 +20,7 @@ const PRIMARY_PINK = "#E53888";
 
 const Certifications = () => {
   const { certifications, getAllCertificationsAvailable } = useContext(
-    CertificationsContext,
+    CertificationsContext
   );
 
   useEffect(() => {
@@ -153,7 +153,7 @@ const Certifications = () => {
                       {c.name}
                     </Typography>
 
-                    <Typography
+                    {/* <Typography
                       variant='body2'
                       sx={{
                         fontSize: "0.85rem",
@@ -172,7 +172,7 @@ const Certifications = () => {
                         Disponible del:
                       </Box>{" "}
                       {FormatDate(c.start_date)} al {FormatDate(c.end_date)}
-                    </Typography>
+                    </Typography> */}
                   </Box>
 
                   {/* BOTÓN IR AL DETALLE */}

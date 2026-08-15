@@ -20,6 +20,8 @@ import CreatePostModal from "./CreatePostCommunityModal";
 import PostCard from "./PostCard"; // 👈 Asegúrate de importar tu PostCard actualizado
 import Birtdays from "../../containers/Birthdays/Birtdays";
 import VerifiedIcon from "../icons/VerifiedIcon";
+import Stories from "../../containers/Stories/Stories";
+
 const colors = {
   primary: "#D82E7A",
   primaryHover: "#C02567",
@@ -97,6 +99,7 @@ export default function CommunityFeed() {
   return (
     <Box sx={{ width: "100%", pb: 6 }}>
       <Birtdays />
+      <Stories />
       {/* 1. INPUT DE CREACIÓN (TARJETA RED SOCIAL) */}
       <Paper
         elevation={0}

@@ -145,7 +145,7 @@ const CertificationDetail = () => {
               justifyContent='center'
               sx={{ mb: { xs: 13, md: 2 } }}
             >
-              <Chip
+              {/* <Chip
                 label={`Disponible del ${FormatDate(
                   certification.start_date,
                 )} al ${FormatDate(certification.end_date)}`}
@@ -170,7 +170,7 @@ const CertificationDetail = () => {
                     md: "fit-content",
                   },
                 }}
-              />
+              /> */}
             </Box>
           </Box>
         </Box>

@@ -33,6 +33,7 @@ const WishModal = ({
   // Nombre formateado de la persona
   const displayName = targetUser?.name || targetUser?.nombre || "Usuaria";
   const parts = displayName.trim().split(" ");
+  const nombreCompleto = parts.join(" ");
   const firstName = parts.length > 1 ? `${parts[0]} ${parts[1]}` : parts[0];
 
   const isBirthday = type === "BIRTHDAY_WISH";
@@ -42,19 +43,19 @@ const WishModal = ({
       if (isBirthday) {
         // Mensaje por defecto para Cumpleaños
         setMessageText(
-          `¡Feliz cumpleaños, ${firstName}! 🎂🎉 Te deseo un año lleno de mucho éxito, bendiciones y alegría. ¡A seguir floreciendo juntas! ✨💖`,
+          `¡Feliz cumpleaños, ${nombreCompleto}! 🎂🎉 Te deseo un año lleno de mucho éxito, bendiciones y alegría. ¡A seguir floreciendo juntas! ✨💖`
         );
       } else if (defaultContextText) {
         // Mensaje por defecto para Posts/Publicaciones
         setMessageText(
-          `¡Hola ${firstName}! Vi tu publicación sobre "${defaultContextText}" y me pareció muy genial... ✨`,
+          `¡Hola ${firstName}! Vi tu publicación sobre "${defaultContextText}" y me pareció muy genial... ✨`
         );
       } else {
         // Mensaje genérico para Chat Directo
-        setMessageText(`¡Hola ${firstName}! Te envío un mensaje... ✨`);
+        setMessageText(`¡Hola ${nombreCompleto}! Te envío un mensaje... ✨`);
       }
     }
-  }, [targetUser, firstName, type, defaultContextText]);
+  }, [targetUser, nombreCompleto, type, defaultContextText]);
 
   const handleSendMessage = async () => {
     if (!messageText.trim() || !targetUser?.id) return;
@@ -71,8 +72,8 @@ const WishModal = ({
       alerts.success(
         isBirthday ? "¡Abrazo enviado! 🎉" : "¡Mensaje enviado! 💬",
         isBirthday
-          ? `Tu felicitación fue enviada con éxito a ${firstName}.`
-          : `Tu mensaje privado fue enviado a ${firstName}.`,
+          ? `Tu felicitación fue enviada con éxito a ${nombreCompleto}.`
+          : `Tu mensaje privado fue enviado a ${nombreCompleto}.`
       );
 
       if (onSuccess) onSuccess(targetUser.id);
@@ -82,7 +83,7 @@ const WishModal = ({
       console.error("Error al enviar el mensaje:", error);
       alerts.error(
         "Ocurrió un error",
-        error.response?.data?.message || "No pudimos enviar tu mensaje.",
+        error.response?.data?.message || "No pudimos enviar tu mensaje."
       );
     } finally {
       setLoading(false);
@@ -119,7 +120,9 @@ const WishModal = ({
             src={
               targetUser.profileImage
                 ? `${targetUser.profileImage}`
-                : `${import.meta.env.VITE_CDN_URL}/production/statics/FLOR+ROSA+CONVEN.png`
+                : `${
+                    import.meta.env.VITE_CDN_URL
+                  }/production/statics/FLOR+ROSA+CONVEN.png`
             }
             alt={displayName}
             sx={{
@@ -136,8 +139,8 @@ const WishModal = ({
               sx={{ fontWeight: 800, color: MAIN_PINK, lineHeight: 1.2 }}
             >
               {isBirthday
-                ? `¡Celebra a ${firstName}! 🎂`
-                : `Escríbele a ${firstName} 💬`}
+                ? `¡Celebra a ${nombreCompleto}! 🎂`
+                : `Escríbele a ${nombreCompleto} 💬`}
             </Typography>
             <Typography variant='body2' sx={{ color: "#616161", mt: 0.5 }}>
               {isBirthday
@@ -201,8 +204,8 @@ const WishModal = ({
           {loading
             ? "Enviando..."
             : isBirthday
-              ? "Enviar felicitación 💖"
-              : "Enviar mensaje 💬"}
+            ? "Enviar felicitación 💖"
+            : "Enviar mensaje 💬"}
         </Button>
       </DialogActions>
     </Dialog>
