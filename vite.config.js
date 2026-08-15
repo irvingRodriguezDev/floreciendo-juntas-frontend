@@ -94,7 +94,7 @@ export default defineConfig({
     chunkSizeWarningLimit: 5000,
   },
   server: {
-    allowedHosts: ["warner-duke-galaxy-jpeg.trycloudflare.com"],
+    allowedHosts: ["mothers-totally-consistent-assign.trycloudflare.com"],
     port: 5173,
   },
 });

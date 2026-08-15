@@ -11,91 +11,124 @@ const SecretsBanner = () => {
       animate={{ opacity: 1 }}
       transition={{ duration: 0.8 }}
       sx={{
-        minHeight: {
-          xs: "28vh",
-          sm: "34vh",
-          md: "38vh",
-        },
+        minHeight: { xs: "32vh", sm: "38vh", md: "42vh" },
         display: "flex",
         alignItems: "center",
         position: "relative",
         overflow: "hidden",
-        mt: { xs: 5, lg: 2 },
-        background: `
-#FFF4FA
-        `,
+        mt: { xs: 4, lg: 1 },
+        background:
+          "radial-gradient(circle at 50% 30%, #FFF0F6 0%, #FAF7F8 70%)",
       }}
     >
-      {/* 🌿 Glow decorativo */}
-      <Box
-        component={motion.div}
-        animate={{ y: [0, -16, 0] }}
-        transition={{ duration: 10, repeat: Infinity }}
+      {/* 🌸 WATERMARK DE FONDO EDITORIAL */}
+      <Typography
         sx={{
           position: "absolute",
-          top: "12%",
-          left: "8%",
-          width: 140,
-          height: 140,
+          top: "50%",
+          left: "50%",
+          transform: "translate(-50%, -50%)",
+          fontSize: { xs: "16vw", md: "13vw" },
+          fontWeight: 900,
+          color: "#A30B5D",
+          opacity: 0.099,
+          whiteSpace: "nowrap",
+          userSelect: "none",
+          pointerEvents: "none",
+          letterSpacing: "0.08em",
+          zIndex: 0,
+        }}
+      >
+        FLORECER
+      </Typography>
+
+      {/* 🌿 Ambient Glows Refinados */}
+      <Box
+        component={motion.div}
+        animate={{ y: [0, -16, 0], scale: [1, 1.05, 1] }}
+        transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+        sx={{
+          position: "absolute",
+          top: "10%",
+          left: "12%",
+          width: { xs: 140, md: 220 },
+          height: { xs: 140, md: 220 },
           borderRadius: "50%",
-          bgcolor: "rgba(214, 51, 132, 0.18)",
-          filter: "blur(45px)",
+          background:
+            "radial-gradient(circle, rgba(214, 51, 132, 0.25) 0%, rgba(255, 255, 255, 0) 70%)",
+          filter: "blur(40px)",
+          pointerEvents: "none",
         }}
       />
 
       <Box
         component={motion.div}
-        animate={{ y: [0, 22, 0] }}
-        transition={{ duration: 12, repeat: Infinity }}
+        animate={{ y: [0, 20, 0], scale: [1, 1.08, 1] }}
+        transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
         sx={{
           position: "absolute",
-          bottom: "10%",
-          right: "10%",
-          width: 180,
-          height: 180,
+          bottom: "5%",
+          right: "12%",
+          width: { xs: 180, md: 260 },
+          height: { xs: 180, md: 260 },
           borderRadius: "50%",
-          bgcolor: "rgba(255, 205, 220, 0.45)",
-          filter: "blur(55px)",
+          background:
+            "radial-gradient(circle, rgba(255, 182, 193, 0.4) 0%, rgba(255, 255, 255, 0) 70%)",
+          filter: "blur(50px)",
+          pointerEvents: "none",
         }}
       />
 
-      {/* 🌸 Contenido */}
-      <Container maxWidth='lg' sx={{ zIndex: 2 }}>
-        <Stack alignItems='center' spacing={2}>
-          {/* Overline */}
-          <Typography
-            component={motion.p}
-            initial={{ opacity: 0, y: -20 }}
+      {/* 🌸 Contenido Principal */}
+      <Container maxWidth='lg' sx={{ zIndex: 2, py: 4 }}>
+        <Stack alignItems='center' spacing={{ xs: 1.5, sm: 2 }}>
+          {/* Overline / Badge Estilizado */}
+          <Box
+            component={motion.div}
+            initial={{ opacity: 0, y: -15 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2, duration: 0.5 }}
+            transition={{ delay: 0.2, duration: 0.6 }}
             sx={{
-              color: "#d63384",
-              fontWeight: 600,
-              fontSize: { xs: "0.9rem", sm: "1.05rem" },
-              letterSpacing: 3,
-              textAlign: "center",
+              px: 2.5,
+              py: 0.6,
+              borderRadius: "50px",
+              background: "rgba(214, 51, 132, 0.08)",
+              border: "1px solid rgba(214, 51, 132, 0.15)",
+              backdropFilter: "blur(6px)",
             }}
           >
-            LA FÓRMULA DEL ÉXITO
-          </Typography>
+            <Typography
+              sx={{
+                color: "#D63384",
+                fontWeight: 800,
+                fontSize: { xs: "0.75rem", sm: "0.85rem" },
+                letterSpacing: "0.2em",
+                textTransform: "uppercase",
+                textAlign: "center",
+              }}
+            >
+              La Fórmula del Éxito
+            </Typography>
+          </Box>
 
           {/* Título principal */}
           <Typography
             component={motion.h1}
-            initial={{ opacity: 0, scale: 0.92 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.4, duration: 0.6 }}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.35, duration: 0.7, ease: "easeOut" }}
             sx={{
               fontWeight: 900,
               textAlign: "center",
-              color: "#D82E7A",
-              lineHeight: 1.15,
+              color: "#2C1820", // Tono oscuro muy elegante para el texto base
+              lineHeight: { xs: 1.2, md: 1.15 },
               fontSize: {
-                xs: "2.1rem", // 📱 mobile first
-                sm: "2.8rem",
-                md: "3.6rem",
+                xs: "2.1rem",
+                sm: "3rem",
+                md: "3.8rem",
               },
-              maxWidth: 900,
+              maxWidth: 920,
+              letterSpacing: "-0.02em",
             }}
           >
             Descubre los 10 Secretos{" "}
@@ -104,40 +137,47 @@ const SecretsBanner = () => {
               sx={{
                 display: "inline-block",
                 position: "relative",
-                px: 1,
+                color: "#A30B5D", // Destaque magenta/rosa profundo
+                px: 0.5,
               }}
             >
-              para ser exitosa en tu negocio de belleza
+              para ser exitosa en tu negocio
               <Box
                 component='span'
                 sx={{
                   position: "absolute",
                   left: 0,
-                  bottom: -10,
+                  bottom: { xs: -8, sm: -10 },
                   width: "100%",
-                  height: 16,
+                  height: { xs: 12, sm: 16 },
                   backgroundImage: `url(${underline})`,
                   backgroundRepeat: "no-repeat",
                   backgroundSize: "contain",
+                  backgroundPosition: "center",
+                  opacity: 0.95,
                 }}
               />
             </Box>
           </Typography>
 
-          {/* Línea decorativa inferior */}
-          <Box
-            component={motion.div}
-            initial={{ scaleX: 0 }}
-            animate={{ scaleX: 1 }}
-            transition={{ delay: 0.7, duration: 0.5 }}
+          {/* Subtítulo / Bajada complementaria */}
+          <Typography
+            component={motion.p}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.6, duration: 0.6 }}
             sx={{
-              width: 90,
-              height: 4,
-              bgcolor: "#d63384",
-              borderRadius: 10,
-              mt: 3,
+              color: "#6B5860",
+              fontSize: { xs: "0.95rem", sm: "1.1rem" },
+              fontWeight: 400,
+              textAlign: "center",
+              maxWidth: 600,
+              pt: 0.5,
             }}
-          />
+          >
+            Estrategias diseñadas para elevar la gestión, la imagen y los
+            resultados de tu marca de belleza.
+          </Typography>
         </Stack>
       </Container>
     </Box>

@@ -1,97 +1,41 @@
-import React, { use, useContext, useEffect } from "react";
+import React, { useContext, useEffect } from "react";
 import Layout from "../../components/Layout/Layout";
-import { Box, Grid, Stack, Typography, Container } from "@mui/material";
+import { Box, Grid, Typography, Container } from "@mui/material";
 import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
 
-// ASSETS
-import underline from "../../assets/svg/underline.svg";
+// ASSETS & CONTEXT
 import floralPath from "../../assets/svg/floral-path.svg";
 import SecretsBanner from "../../components/Banner/SecretsBanner";
-import { Link } from "react-router-dom";
 import SystemContext from "../../context/System/SystemContext";
+
 // --- VARIANTS DE FRAMER MOTION ---
 const cardVariants = {
-  hidden: { opacity: 0, y: 30, scale: 0.95 },
-  visible: {
+  hidden: { opacity: 0, y: 40 },
+  visible: (i) => ({
     opacity: 1,
     y: 0,
-    scale: 1,
-    transition: { duration: 0.6, ease: "easeOut" },
-  },
+    transition: {
+      delay: i * 0.1,
+      duration: 0.7,
+      ease: [0.215, 0.61, 0.355, 1], // Cubic-bezier premium
+    },
+  }),
 };
 
 const Secrets = () => {
   const { systems, getAllSystems } = useContext(SystemContext);
-  //   {
-  //     num: 1,
-  //     title: "Capacitación Constante",
-  //     description:
-  //       "La capacitación es la base de todo crecimiento profesional. En esta etapa  aprenderás por qué actualizarte no es una opción, sino una estrategia para mantenerte vigente, elevar la calidad de tu trabajo y diferenciarte en un mercado competitivo. La excelencia técnica abre puertas, aumenta tu valor y te permite cobrar mejor.",
-  //     path: "/cursos/bysystem/1",
-  //   },
-  //   {
-  //     num: 2,
-  //     title: "Marca Personal",
-  //     description:
-  //       "Tu marca personal es lo que hace que te elijan a ti y no a otra persona. Aquí aprenderás a construir una identidad clara, auténtica y coherente, para que tu trabajo, tu historia y tus valores se conviertan en tu mayor fortaleza profesional.",
-  //   },
-  //   {
-  //     num: 3,
-  //     title: "Marketing Digital",
-  //     description:
-  //       "No basta con ser buena, necesitas que te conozcan. En este módulo aprenderás a usar las redes sociales y el entorno digital como herramientas de crecimiento, atracción de clientas y generación de oportunidades, incluso si tienes poco tiempo disponible.",
-  //   },
-  //   {
-  //     num: 4,
-  //     title: "Diferenciación",
-  //     description:
-  //       "La diferenciación es lo que te saca de la guerra de precios. Aprenderás a identificar qué te hace única, cómo comunicarlo y cómo transformar tu estilo, tu atención y tu experiencia en un valor que no sea fácil de copiar.",
-  //   },
-  //   {
-  //     num: 5,
-  //     title: "Atención al cliente",
-  //     description:
-  //       "La atención al cliente es parte del servicio, no un extra. Aquí aprenderás a ofrecer una experiencia profesional, cálida y organizada, desde el primer mensaje hasta el seguimiento posterior, logrando que tus clientas se sientan valoradas y seguras.",
-  //   },
-  //   {
-  //     num: 6,
-  //     title: "Incremento de Ticket",
-  //     description:
-  //       "Ganar más no siempre significa trabajar más. Aquí aprenderás a aumentar el valor de cada servicio, ofrecer opciones complementarias y estructurar tus precios de forma inteligente para mejorar tus ingresos sin saturarte de trabajo.",
-  //   },
-  //   {
-  //     num: 7,
-  //     title: "Fidelización",
-  //     description:
-  //       "Una clienta que regresa es un negocio más estable. En este módulo aprenderás estrategias para construir relaciones a largo plazo, generar confianza y convertir clientas ocasionales en clientas fieles que recomienden tu trabajo.",
-  //   },
-  //   {
-  //     num: 8,
-  //     title: "Finanzas",
-  //     description:
-  //       "Aprenderás a entender tu dinero: ingresos, gastos, utilidades y metas. Este módulo te ayudará a dejar de trabajar “a ciegas” y comenzar a tomar decisiones financieras conscientes que te permitan crecer con estabilidad.",
-  //   },
-  //   {
-  //     num: 9,
-  //     title: "Administración",
-  //     description:
-  //       "La organización también es una habilidad profesional. Aquí aprenderás a administrar tu tiempo, tus citas, tus recursos y tu energía, para que tu negocio funcione con orden y no dependa únicamente de ti todo el tiempo.",
-  //   },
-  //   {
-  //     num: 10,
-  //     title: "Autorrealización y Crecimiento",
-  //     description:
-  //       "El éxito no es solo económico. En este módulo conectarás con tu propósito, tu crecimiento personal y tu visión a largo plazo. Porque cuando una mujer se realiza profesionalmente, cambia su forma de verse, de decidir y de proyectar su futuro.",
-  //   },
-  // ];
+
   useEffect(() => {
     getAllSystems();
   }, []);
+
   return (
     <Layout>
       {/* HEADER */}
       <SecretsBanner />
-      {/* SECTION - ESTRUCTURA CUADRADA Y NEUMORFISMO SUAVE */}
+
+      {/* MAIN CONTAINER */}
       <Box
         sx={{
           position: "relative",
@@ -100,13 +44,36 @@ const Secrets = () => {
           overflow: "hidden",
         }}
       >
-        {/* 🪷 CAMINO FLORAL - Animación discreta en el fondo */}
+        {/* 🌸 WATERMARK DE FONDO PRINCIPAL (Efecto BBM2027) */}
+        {/* <Typography
+          sx={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            fontSize: { xs: "12vw", md: "11vw" },
+            fontWeight: 900,
+            color: "#A30B5D",
+            opacity: 0.075,
+            whiteSpace: "nowrap",
+            userSelect: "none",
+            pointerEvents: "none",
+            letterSpacing: "0.05em",
+            textTransform: "uppercase",
+            zIndex: 0,
+          }}
+        >
+          FLORECER <br /> JUNTAS
+        </Typography> */}
+
+        {/* 🪷 CAMINO FLORAL */}
         <Box
           sx={{
             display: { xs: "none", md: "block" },
             position: "absolute",
             top: 0,
-            left: 0,
+            left: "50%",
+            transform: "translateX(-50%)",
             width: "100%",
             height: "100%",
             pointerEvents: "none",
@@ -118,74 +85,116 @@ const Secrets = () => {
             alt='floral path'
             style={{
               position: "absolute",
-              marginTop: 140,
-              left: "42%",
-              transform: "translateX(-50%)",
-              width: "300px",
-              height: "75%",
-              opacity: 0.9,
+              top: "10%",
+              left: "45%",
+              width: "280px",
+              opacity: 0.25,
+              filter: "blur(0.5px)",
             }}
-            animate={{ y: [0, -10, 0] }}
-            transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+            animate={{ y: [0, -15, 0] }}
+            transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
           />
         </Box>
+
         <Container maxWidth='lg' sx={{ position: "relative", zIndex: 2 }}>
-          <Grid container spacing={{ xs: 4, md: 5 }} justifyContent='center'>
+          <Grid container spacing={{ xs: 3, md: 4 }} justifyContent='center'>
             {systems.map((item, index) => (
-              <Grid key={index} size={{ xs: 12, md: 6 }}>
+              <Grid size={{ xs: 12, sm: 6, md: 6 }} key={item.id || index}>
                 <motion.div
+                  custom={index}
                   variants={cardVariants}
                   initial='hidden'
                   whileInView='visible'
-                  viewport={{ once: true, amount: 0.3 }}
-                  style={{
-                    display: "flex",
-                    alignItems: "flex-start",
-                    height: "100%",
-                    background: "rgba(255, 255, 255, 0.9)",
-                    borderRadius: "18px",
-                    padding: "20px",
-                    border: "1px solid rgba(255, 255, 255, 0.9)",
-                    boxShadow:
-                      "5px 5px 15px rgba(220, 160, 180, 0.4), -5px -5px 15px rgba(255, 255, 255, 0.8)",
-                  }}
+                  viewport={{ once: true, amount: 0.2 }}
+                  whileHover={{ y: -8 }}
+                  transition={{ duration: 0.3 }}
+                  style={{ height: "100%" }}
                 >
-                  {/* 🔢 NÚMERO GRANDE Y FIJO */}
                   <Box
+                    component={Link}
+                    to={`/cursos/bysystem/${item.id}`}
                     sx={{
-                      flexShrink: 0, // No permitir que se encoja
-                      width: { xs: 50, sm: 60 },
-                      height: { xs: 50, sm: 60 },
-                      borderRadius: "12px",
-                      mr: 2,
                       display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      fontWeight: 900,
-                      fontSize: { xs: "1.8rem", sm: "2.2rem" },
-                      color: "#fff",
-                      background:
-                        "linear-gradient(45deg, #d63384 30%, #ff69b4 90%)",
-                      boxShadow: "0 5px 15px rgba(214,51,132,0.4)",
-                      transform: "rotate(-5deg)", // Pequeño toque de estilo
+                      flexDirection: "column",
+                      justifyContent: "space-between",
+                      height: "100%",
+                      minHeight: "220px",
+                      position: "relative",
+                      p: { xs: 3.5, md: 4.5 },
+                      borderRadius: "24px",
+                      textDecoration: "none",
+                      backgroundColor: "rgba(255, 255, 255, 0.75)",
+                      backdropFilter: "blur(16px)",
+                      WebkitBackdropFilter: "blur(16px)",
+                      border: "1px solid rgba(255, 255, 255, 0.8)",
+                      boxShadow:
+                        "0 15px 35px -10px rgba(163, 11, 93, 0.07), 0 5px 15px rgba(0, 0, 0, 0.02)",
+                      transition: "all 0.4s cubic-bezier(0.16, 1, 0.3, 1)",
+                      overflow: "hidden",
+                      "&:hover": {
+                        backgroundColor: "rgba(255, 255, 255, 0.95)",
+                        boxShadow:
+                          "0 25px 45px -12px rgba(163, 11, 93, 0.15), 0 10px 20px rgba(0, 0, 0, 0.03)",
+                        borderColor: "rgba(214, 51, 132, 0.3)",
+                        "& .secret-number": {
+                          opacity: 0.12,
+                          transform: "scale(1.05)",
+                          color: "#d63384",
+                        },
+                        "& .secret-title": {
+                          color: "#d63384",
+                        },
+                      },
                     }}
                   >
-                    {index + 1}
-                  </Box>
+                    {/* 🔢 NÚMERO WATERMARK ESTILO EDITORIAL */}
+                    <Typography
+                      className='secret-number'
+                      sx={{
+                        position: "absolute",
+                        top: "-15px",
+                        right: "15px",
+                        fontSize: { xs: "6.5rem", md: "8rem" },
+                        fontWeight: 900,
+                        lineHeight: 1,
+                        color: "#000",
+                        opacity: 0.089,
+                        userSelect: "none",
+                        transition: "all 0.5s ease",
+                        fontFamily: "revert-layer", // Toque sofisticado
+                      }}
+                    >
+                      {String(index + 1).padStart(2, "#")}
+                    </Typography>
 
-                  {/* 📝 CONTENIDO */}
-                  <Link
-                    to={`/cursos/bysystem/${item.id}`}
-                    style={{ textDecoration: "none" }}
-                  >
-                    <Box sx={{ flexGrow: 1, pt: 0.5 }}>
+                    {/* 📝 CONTENIDO PRINCIPAL */}
+                    <Box sx={{ zIndex: 1 }}>
+                      {/* Subtítulo / Tag sutil para enfocar la temática */}
                       <Typography
-                        variant='h6'
+                        variant='caption'
+                        sx={{
+                          textTransform: "uppercase",
+                          letterSpacing: "0.15em",
+                          fontWeight: 700,
+                          color: "#d63384",
+                          display: "block",
+                          mb: 1.5,
+                          fontSize: "0.75rem",
+                        }}
+                      >
+                        Secreto {String(index + 1).padStart(2, "#")}
+                      </Typography>
+
+                      <Typography
+                        className='secret-title'
+                        variant='h5'
                         sx={{
                           fontWeight: 800,
-                          color: "#a30b5d",
-                          mb: 0.5,
+                          color: "#2C1820",
+                          mb: 1.5,
                           lineHeight: 1.2,
+                          fontSize: { xs: "1.25rem", md: "1.45rem" },
+                          transition: "color 0.3s ease",
                         }}
                       >
                         {item.name}
@@ -193,16 +202,54 @@ const Secrets = () => {
 
                       <Typography
                         sx={{
-                          fontSize: "1rem",
-                          fontWeight: 500,
-                          color: "#444",
-                          lineHeight: 1.4,
+                          fontSize: { xs: "0.92rem", md: "0.98rem" },
+                          fontWeight: 400,
+                          color: "#5C4A52",
+                          lineHeight: 1.6,
                         }}
                       >
                         {item.description}
                       </Typography>
                     </Box>
-                  </Link>
+
+                    {/* 🔗 CTA / LINK SUTIL */}
+                    <Box
+                      sx={{
+                        mt: 3,
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 1,
+                        zIndex: 1,
+                      }}
+                    >
+                      <Typography
+                        sx={{
+                          fontSize: "0.85rem",
+                          fontWeight: 700,
+                          color: "#a30b5d",
+                          letterSpacing: "0.05em",
+                        }}
+                      >
+                        Explorar secreto
+                      </Typography>
+                      <Box
+                        component='span'
+                        sx={{
+                          display: "inline-block",
+                          transition: "transform 0.3s ease",
+                          color: "#a30b5d",
+                          fontSize: "1rem",
+                          "&": {
+                            ".MuiBox-root:hover &": {
+                              transform: "translateX(5px)",
+                            },
+                          },
+                        }}
+                      >
+                        →
+                      </Box>
+                    </Box>
+                  </Box>
                 </motion.div>
               </Grid>
             ))}

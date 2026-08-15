@@ -96,7 +96,7 @@ const AuthState = (props) => {
       const { data } = await MethodGet("/auth/me");
       localStorage.setItem(
         "savedBirthDate",
-        data.user.birthDate === null ? false : true,
+        data.user.birthDate === null ? false : true
       );
       dispatch({
         type: types.OBTENER_USUARIO,
@@ -265,7 +265,7 @@ const AuthState = (props) => {
         formData,
         {
           headers: { "Content-Type": "multipart/form-data" },
-        },
+        }
       );
 
       const profileImageUrl = getProfileImageUrl(res.data.profileImage);
@@ -276,12 +276,6 @@ const AuthState = (props) => {
         payload: { profileImage: profileImageUrl },
       });
 
-      //Emitir evento a otros clientes
-      socket?.emit("profileImageUpdated", {
-        userId: state.usuario?.id,
-        profileImage: res.data.profileImage,
-      });
-
       Swal.fire({
         title: "Correcto!!",
         text: res.data.msg,
@@ -290,6 +284,10 @@ const AuthState = (props) => {
         icon: "success",
       });
     } catch (error) {
+      console.log(error, "el error");
+
+      console.log("respuesta incorrecta");
+
       Swal.fire({
         title: "Error",
         icon: "error",

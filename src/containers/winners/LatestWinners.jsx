@@ -1,155 +1,237 @@
-import Grid from "@mui/material/Grid";
-import Typography from "@mui/material/Typography";
 import React, { useEffect, useState } from "react";
-import FormatDate from "../../utils/FormatDate";
-import MethodGet from "../../config/Service";
-import Marquee from "react-fast-marquee";
-import { Avatar, Box, Card, CardContent, Chip, Stack } from "@mui/material";
+import { Box, Typography, Avatar, Chip, Stack } from "@mui/material";
 import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
+import Marquee from "react-fast-marquee";
+import { motion } from "framer-motion";
+import MethodGet from "../../config/Service";
+
 const LatestWinners = () => {
-  const hoy = new Date();
-
-  const anio = hoy.getFullYear();
-  const mes = String(hoy.getMonth()).padStart(2, "0");
-  const formatoFinal = `${anio}-${mes}`;
-
   const [winners, setWinners] = useState([]);
+  const [fullMonth, setFullMonth] = useState();
   useEffect(() => {
+    // 🐛 FIX BUG DE FECHA: En JS, getMonth() devuelve 0-11.
+    // Para el mes actual se debe sumar +1.
+    const hoy = new Date();
+    const anio = hoy.getFullYear();
+    const mes = String(hoy.getMonth()).padStart(2, "0");
+    hoy.setMonth(hoy.getMonth() - 1);
+    setFullMonth(hoy.toLocaleString("es-mx", { month: "long" }));
+
+    const formatoFinal = `${anio}-${mes}`;
+    console.log(formatoFinal);
+
     let url = `/admin/user-winners-current-month?month=${formatoFinal}`;
     MethodGet(url)
       .then((res) => {
-        setWinners(res.data.winners);
+        setWinners(res.data.winners || []);
       })
       .catch((error) => {
-        console.log(error, "ocurrio un error al obtener la lista de ganadores");
+        console.log(error, "ocurrió un error al obtener la lista de ganadores");
       });
   }, []);
 
   return (
     <Box
       sx={{
-        background: "linear-gradient(135deg, #F971AF 0%, #E83E8C 100%)",
-        borderRadius: "20px",
-        padding: { xs: "20px 0px", md: "30px 0px" },
-        boxShadow: "0px 10px 30px rgba(249, 113, 175, 0.3)",
-        overflow: "hidden",
+        width: "100%",
+        background: `
+          linear-gradient(135deg, #E53888 0%, #B82E6B 100%),
+          radial-gradient(circle at top right, rgba(255, 255, 255, 0.2), transparent 60%)
+        `,
+        borderRadius: "32px",
+        py: { xs: 6, md: 8 },
+        px: { xs: 0, sm: 2 },
         position: "relative",
+        overflow: "hidden",
+        boxShadow: "0 20px 50px -10px rgba(229, 56, 136, 0.35)",
       }}
     >
-      {/* Encabezado Principal */}
-      <Box textAlign='center' mb={3}>
-        <Chip
-          icon={<EmojiEventsIcon sx={{ color: "#FFD700 !important" }} />}
-          label='COMUNIDAD FLORECIENDO JUNTAS'
-          sx={{
-            backgroundColor: "rgba(255, 255, 255, 0.2)",
-            color: "#FFF",
-            fontWeight: "bold",
-            fontSize: "0.75rem",
-            letterSpacing: "1px",
-            backdropFilter: "blur(5px)",
-            mb: 1,
-          }}
-        />
-        <Typography
-          variant='h4'
-          sx={{
-            color: "#FFF",
-            fontWeight: 800,
-            fontSize: { xs: "1.5rem", md: "2rem" },
-            textShadow: "0px 2px 4px rgba(0,0,0,0.1)",
-          }}
-        >
-          🎉 Ganadoras del Sorteo Pasado
-        </Typography>
-        <Typography
-          variant='body2'
-          fontFamily='monospace'
-          sx={{ color: "rgba(255, 255, 255, 0.9)", mt: 0.5 }}
-        >
-          ¡Mantén tu membresía activa por $200/mes y sé la próxima en ganar!
-        </Typography>
-      </Box>
+      {/* 💧 TEXTO DE FONDO (MARCA DE AGUA) */}
+      <Typography
+        variant='h1'
+        sx={{
+          position: "absolute",
+          top: { xs: "25px", md: "10px" },
+          left: "50%",
+          transform: "translateX(-50%)",
+          fontWeight: 900,
+          color: "rgba(255, 255, 255, 0.08)",
+          fontSize: { xs: "4.5rem", sm: "7.5rem", md: "11rem", lg: "13rem" },
+          lineHeight: 1,
+          whiteSpace: "nowrap",
+          zIndex: 0,
+          pointerEvents: "none",
+          textTransform: "uppercase",
+          letterSpacing: "-4px",
+        }}
+      >
+        GANADORAS
+      </Typography>
 
-      {/* Marquee Continuo */}
-      <Marquee speed={45} pauseOnHover={true} gradient={false}>
-        {winners.map((win, index) => (
-          <Box
-            key={win.id || index}
+      {/* CONTENEDOR PRINCIPAL */}
+      <Box sx={{ position: "relative", zIndex: 1 }}>
+        {/* 🌸 CABECERA EDITORIAL */}
+        <Stack
+          alignItems='center'
+          sx={{ mb: { xs: 4, md: 5 }, px: 2, textAlign: "center" }}
+          component={motion.div}
+          initial={{ opacity: 0, y: 25 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+        >
+          <Chip
+            icon={
+              <EmojiEventsIcon
+                sx={{ color: "#FFD700 !important", fontSize: "18px" }}
+              />
+            }
+            label='COMUNIDAD FLORECIENDO JUNTAS'
             sx={{
-              minWidth: "260px",
-              maxWidth: "280px",
-              backgroundColor: "rgba(255, 255, 255, 0.95)",
-              backdropFilter: "blur(10px)",
-              borderRadius: "16px",
-              padding: "16px",
-              margin: "0 12px",
-              boxShadow: "0 8px 20px rgba(0,0,0,0.08)",
-              border: "1px solid rgba(255, 255, 255, 0.6)",
-              transition: "transform 0.3s ease",
-              "&:hover": {
-                transform: "translateY(-4px)",
-              },
+              backgroundColor: "rgba(255, 255, 255, 0.18)",
+              color: "#FFFFFF",
+              fontWeight: 800,
+              fontSize: "0.75rem",
+              letterSpacing: "2px",
+              backdropFilter: "blur(12px)",
+              border: "1px solid rgba(255, 255, 255, 0.3)",
+              mb: 2,
+              px: 1,
+            }}
+          />
+
+          <Typography
+            variant='h3'
+            component='h2'
+            sx={{
+              fontWeight: 900,
+              color: "#FFFFFF",
+              lineHeight: 1.15,
+              fontSize: { xs: "2.1rem", sm: "2.8rem", md: "3.4rem" },
+              letterSpacing: "-1px",
+              textShadow: "0 4px 12px rgba(0,0,0,0.15)",
             }}
           >
-            <Stack direction='row' spacing={2} alignItems='center'>
-              {/* Avatar con borde destacado */}
-              <Avatar
-                src={win.user?.profileImageUrl}
-                alt={win.user?.name}
+            🎉 Sorteo Mes de {fullMonth}
+          </Typography>
+
+          <Typography
+            variant='body1'
+            sx={{
+              color: "rgba(255, 255, 255, 0.9)",
+              mt: 1,
+              fontWeight: 500,
+              fontSize: { xs: "0.9rem", sm: "1rem" },
+              maxWidth: "600px",
+            }}
+          >
+            ¡Mantén tu membresía activa por $200/mes y sé la próxima en ganar!
+          </Typography>
+        </Stack>
+
+        {/* 🎠 MARQUEE CONTINUO PREMIUM */}
+        {winners.length > 0 ? (
+          <Marquee speed={40} pauseOnHover={true} gradient={false}>
+            {winners.map((win, index) => (
+              <Box
+                key={win.id || index}
                 sx={{
-                  width: 56,
-                  height: 56,
-                  border: "3px solid #F971AF",
-                  boxShadow: "0 4px 10px rgba(249, 113, 175, 0.3)",
+                  minWidth: "280px",
+                  maxWidth: "300px",
+                  backgroundColor: "rgba(255, 255, 255, 0.92)",
+                  backdropFilter: "blur(16px)",
+                  borderRadius: "24px",
+                  padding: "18px 20px",
+                  margin: "10px 12px",
+                  border: "1px solid rgba(255, 255, 255, 0.9)",
+                  boxShadow: "0 12px 30px rgba(0, 0, 0, 0.12)",
+                  transition: "all 0.35s cubic-bezier(0.16, 1, 0.3, 1)",
+                  "&:hover": {
+                    transform: "translateY(-6px) scale(1.02)",
+                    backgroundColor: "#FFFFFF",
+                    boxShadow: "0 20px 40px rgba(0, 0, 0, 0.2)",
+                  },
                 }}
-              />
+              >
+                <Stack direction='row' spacing={2} alignItems='center'>
+                  {/* AVATAR DE IMPACTO CON BORDE DORADO/MAGENTA */}
+                  <Avatar
+                    src={win.user?.profileImageUrl}
+                    alt={win.user?.name}
+                    sx={{
+                      width: 58,
+                      height: 58,
+                      border: "3px solid #E53888",
+                      boxShadow: "0 4px 14px rgba(229, 56, 136, 0.3)",
+                      flexShrink: 0,
+                    }}
+                  />
 
-              {/* Información de la Ganadora */}
-              <Box sx={{ overflow: "hidden" }}>
-                <Typography
-                  variant='subtitle1'
-                  sx={{
-                    fontWeight: "bold",
-                    color: "#2C2C2C",
-                    lineHeight: 1.2,
-                    whiteSpace: "nowrap",
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                  }}
-                >
-                  {win.user?.name || "Usuaria VIP"}
-                </Typography>
+                  {/* INFORMACIÓN DE LA GANADORA */}
+                  <Box sx={{ overflow: "hidden", width: "100%" }}>
+                    <Typography
+                      variant='subtitle1'
+                      sx={{
+                        fontWeight: 800,
+                        color: "#1F2937",
+                        lineHeight: 1.2,
+                        whiteSpace: "nowrap",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        fontSize: "0.98rem",
+                      }}
+                    >
+                      {win.user?.name || "Usuaria VIP"}
+                    </Typography>
 
-                <Typography
-                  variant='caption'
-                  sx={{
-                    color: "#666",
-                    display: "block",
-                    fontWeight: 500,
-                    mt: 0.3,
-                  }}
-                >
-                  🏆 Premio: {win.prize?.name || "Kit Wapizima"}
-                </Typography>
+                    <Typography
+                      variant='caption'
+                      sx={{
+                        color: "#4B5563",
+                        display: "block",
+                        fontWeight: 600,
+                        mt: 0.4,
+                        whiteSpace: "nowrap",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                      }}
+                    >
+                      🏆 Premio: {win.prize?.name || "Kit Wapizima"}
+                    </Typography>
 
-                <Chip
-                  label='Ganadora Oficial'
-                  size='small'
-                  sx={{
-                    height: "18px",
-                    fontSize: "0.65rem",
-                    backgroundColor: "#FFF0F5",
-                    color: "#E83E8C",
-                    fontWeight: "bold",
-                    mt: 0.8,
-                  }}
-                />
+                    <Chip
+                      label='Ganadora Oficial'
+                      size='small'
+                      sx={{
+                        height: "20px",
+                        fontSize: "0.65rem",
+                        backgroundColor: "rgba(229, 56, 136, 0.1)",
+                        color: "#E53888",
+                        fontWeight: 800,
+                        letterSpacing: "0.5px",
+                        mt: 1,
+                        border: "1px solid rgba(229, 56, 136, 0.2)",
+                      }}
+                    />
+                  </Box>
+                </Stack>
               </Box>
-            </Stack>
-          </Box>
-        ))}
-      </Marquee>
+            ))}
+          </Marquee>
+        ) : (
+          <Typography
+            variant='body2'
+            sx={{
+              textAlign: "center",
+              color: "rgba(255, 255, 255, 0.8)",
+              py: 2,
+              fontStyle: "italic",
+            }}
+          >
+            Cargando lista de ganadoras...
+          </Typography>
+        )}
+      </Box>
     </Box>
   );
 };
