@@ -21,6 +21,8 @@ import Swal from "sweetalert2";
 import ModalUpdateUser from "./ModalUpdateInformation";
 import SubscriptionCard from "./Subscription/CardSubscription";
 import Capullo from "../../assets/images/capullo.png";
+// import { VerifiedIcon } from "lucide-react";
+import VerifiedIcon from "../../components/icons/VerifiedIcon";
 const PRIMARY_PINK = "#E53888";
 
 const ProfileMain = () => {
@@ -223,7 +225,9 @@ const ProfileMain = () => {
                         letterSpacing: "-0.5px",
                       }}
                     >
-                      {usuario?.name || "Alumna"}
+                      {usuario?.name || "Alumna"}{" "}
+                      {/* <VerifiedIcon style={{ color: "#E43887" }} /> */}
+                      {usuario.isVerified && <VerifiedIcon width={25} />}
                     </Typography>
                   </Box>
 

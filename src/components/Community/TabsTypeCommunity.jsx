@@ -19,7 +19,7 @@ import { useDebounce } from "use-debounce";
 import CreatePostModal from "./CreatePostCommunityModal";
 import PostCard from "./PostCard"; // 👈 Asegúrate de importar tu PostCard actualizado
 import Birtdays from "../../containers/Birthdays/Birtdays";
-
+import VerifiedIcon from "../icons/VerifiedIcon";
 const colors = {
   primary: "#D82E7A",
   primaryHover: "#C02567",
@@ -148,9 +148,18 @@ export default function CommunityFeed() {
             }}
           >
             ¿Qué quieres compartir hoy,{" "}
-            <b style={{ color: colors.primary }}>
+            <Box
+              component='b'
+              sx={{
+                color: colors.primary,
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "4px",
+              }}
+            >
               {usuario?.name?.split(" ")[0] || "creadora"}
-            </b>
+              {usuario?.isVerified && <VerifiedIcon width={17} />}
+            </Box>
             ?
           </Typography>
         </Box>

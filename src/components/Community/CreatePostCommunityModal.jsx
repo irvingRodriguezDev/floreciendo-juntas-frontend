@@ -26,6 +26,7 @@ import PinnedPostOptions from "./PinnedPostOptions";
 import MediaPreviewList from "./MediaPreviewList";
 import { colors } from "../../utils/QuillModules";
 import { alerts } from "../../utils/Alerts";
+import VerifiedIcon from "../icons/VerifiedIcon";
 
 // Custom Link para ReactQuill
 const Link = ReactQuill.Quill.import("formats/link");
@@ -231,7 +232,19 @@ export default function CreatePostModal({ open, handleClose, defaultType }) {
                     Crear Publicación
                   </Typography>
                   <Typography variant='body2' color='text.secondary'>
-                    Publicando como <b>{usuario?.name?.split(" ")[0]}</b>
+                    Publicando como{" "}
+                    <Box
+                      component='b'
+                      sx={{
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: "3px",
+                        color: "text.primary", // O el color que prefieras para el nombre
+                      }}
+                    >
+                      {usuario?.name?.split(" ")[0] || "Usuario"}
+                      {usuario?.isVerified && <VerifiedIcon width={17} />}
+                    </Box>
                   </Typography>
                 </Box>
               </Box>

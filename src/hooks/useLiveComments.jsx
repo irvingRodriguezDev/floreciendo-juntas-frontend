@@ -125,7 +125,7 @@ export const useLiveComments = (liveId, roomArn, tokenAuth) => {
 
     const trimmedMessage = message.trim();
     const currentUserName = usuario?.name || "Alumna";
-
+    const userVerified = usuario?.isVerified;
     // A) Enviar por IVS Chat
     if (socketRef.current && isConnected) {
       const payload = {
@@ -133,6 +133,7 @@ export const useLiveComments = (liveId, roomArn, tokenAuth) => {
         Content: trimmedMessage,
         Attributes: {
           username: currentUserName,
+          isVerified: userVerified,
           // Mandamos la mención en los atributos de AWS IVS
           replyToUser: replyTo?.userName || "",
           replyToUserId: replyTo?.userId ? String(replyTo.userId) : "",

@@ -25,6 +25,7 @@ import CommentComposer from "./CommentComposer";
 import CommunityContext from "../../context/Community/CommunityContext";
 import AuthContext from "../../context/Auth/AuthContext";
 import WishModal from "../../containers/Birthdays/WishModal";
+import VerifiedIcon from "../icons/VerifiedIcon";
 
 dayjs.extend(relativeTime);
 dayjs.locale("es");
@@ -106,8 +107,14 @@ const PostCard = ({ post }) => {
             />
           }
           title={
-            <Typography fontWeight={700} color='#D72E7A' fontSize='0.95rem'>
-              {post.user?.name || post.user?.nombre}
+            <Typography
+              fontWeight={700}
+              color='#D72E7A'
+              fontSize='0.95rem'
+              display='inline-flex'
+            >
+              {post.user?.name || post.user?.nombre}{" "}
+              {post.user.isVerified && <VerifiedIcon width={18} />}
             </Typography>
           }
           subheader={

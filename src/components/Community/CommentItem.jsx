@@ -2,6 +2,7 @@ import { Avatar, Box, Typography } from "@mui/material";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import PostMediaSwiper from "./PostMediaSwipper";
+import VerifiedIcon from "../icons/VerifiedIcon";
 
 dayjs.extend(relativeTime);
 dayjs.locale("es");
@@ -43,8 +44,10 @@ const CommentItem = ({ comment }) => {
             fontSize='0.8rem'
             color='#D72E7A'
             sx={{ mb: 0.2 }}
+            display='inline-flex'
           >
-            {comment.user?.name || "Usuario de la comunidad"}
+            {comment.user?.name || "Usuario de la comunidad"}{" "}
+            {comment.user?.isVerified && <VerifiedIcon width={18} />}
           </Typography>
 
           {/* CONTENIDO DEL COMENTARIO */}
