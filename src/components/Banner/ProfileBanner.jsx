@@ -8,7 +8,6 @@ import { useNavigate } from "react-router-dom";
 const ProfileBanner = () => {
   const { usuario, cerrarSesion } = useContext(AuthContext);
   const navigate = useNavigate();
-  console.log(usuario, "el usuario ya autenticado");
 
   // Tomamos el primer nombre de la alumna
   const nombreUsuario = usuario?.name ? usuario.name.split(" ")[0] : "Alumna";
