@@ -106,8 +106,13 @@ const PostCard = ({ post }) => {
             />
           }
           title={
-            <Typography fontWeight={700} color='#D72E7A' fontSize='0.95rem'>
-              {post.user?.name || post.user?.nombre}
+            <Typography
+              fontWeight={700}
+              color='#D72E7A'
+              fontSize='0.95rem'
+              display='inline-flex'
+            >
+              {post.user?.name || post.user?.nombre}{" "}
             </Typography>
           }
           subheader={

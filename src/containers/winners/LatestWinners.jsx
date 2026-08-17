@@ -51,12 +51,18 @@ const LatestWinners = () => {
         variant='h1'
         sx={{
           position: "absolute",
-          top: { xs: "25px", md: "10px" },
+          top: { xs: "75px", sm: "70px", md: "60px" },
           left: "50%",
           transform: "translateX(-50%)",
           fontWeight: 900,
-          color: "rgba(255, 255, 255, 0.08)",
-          fontSize: { xs: "4.5rem", sm: "7.5rem", md: "11rem", lg: "13rem" },
+          color: "rgba(255, 255, 255, 0.098)",
+          fontSize: {
+            xs: "4.5rem",
+            sm: "5.5rem",
+            md: "7rem",
+            lg: "9rem",
+            xl: "10rem",
+          },
           lineHeight: 1,
           whiteSpace: "nowrap",
           zIndex: 0,

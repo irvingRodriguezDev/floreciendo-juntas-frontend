@@ -231,7 +231,18 @@ export default function CreatePostModal({ open, handleClose, defaultType }) {
                     Crear Publicación
                   </Typography>
                   <Typography variant='body2' color='text.secondary'>
-                    Publicando como <b>{usuario?.name?.split(" ")[0]}</b>
+                    Publicando como{" "}
+                    <Box
+                      component='b'
+                      sx={{
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: "3px",
+                        color: "text.primary", // O el color que prefieras para el nombre
+                      }}
+                    >
+                      {usuario?.name?.split(" ")[0] || "Usuario"}
+                    </Box>
                   </Typography>
                 </Box>
               </Box>

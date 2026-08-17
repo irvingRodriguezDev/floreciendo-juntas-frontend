@@ -150,9 +150,17 @@ export default function CommunityFeed() {
             }}
           >
             ¿Qué quieres compartir hoy,{" "}
-            <b style={{ color: colors.primary }}>
+            <Box
+              component='b'
+              sx={{
+                color: colors.primary,
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "4px",
+              }}
+            >
               {usuario?.name?.split(" ")[0] || "creadora"}
-            </b>
+            </Box>
             ?
           </Typography>
         </Box>

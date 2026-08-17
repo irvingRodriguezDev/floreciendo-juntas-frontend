@@ -43,8 +43,9 @@ const CommentItem = ({ comment }) => {
             fontSize='0.8rem'
             color='#D72E7A'
             sx={{ mb: 0.2 }}
+            display='inline-flex'
           >
-            {comment.user?.name || "Usuario de la comunidad"}
+            {comment.user?.name || "Usuario de la comunidad"}{" "}
           </Typography>
 
           {/* CONTENIDO DEL COMENTARIO */}

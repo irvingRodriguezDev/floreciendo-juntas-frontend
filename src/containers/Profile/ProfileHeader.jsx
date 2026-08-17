@@ -223,7 +223,7 @@ const ProfileMain = () => {
                         letterSpacing: "-0.5px",
                       }}
                     >
-                      {usuario?.name || "Alumna"}
+                      {usuario?.name || "Alumna"}{" "}
                     </Typography>
                   </Box>
 

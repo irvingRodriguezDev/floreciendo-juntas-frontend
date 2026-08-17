@@ -125,7 +125,6 @@ export const useLiveComments = (liveId, roomArn, tokenAuth) => {
 
     const trimmedMessage = message.trim();
     const currentUserName = usuario?.name || "Alumna";
-
     // A) Enviar por IVS Chat
     if (socketRef.current && isConnected) {
       const payload = {
