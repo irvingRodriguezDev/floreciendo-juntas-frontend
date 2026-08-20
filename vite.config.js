@@ -94,7 +94,7 @@ export default defineConfig({
     chunkSizeWarningLimit: 5000,
   },
   server: {
-    allowedHosts: ["mothers-totally-consistent-assign.trycloudflare.com"],
+    allowedHosts: ["sum-thanksgiving-navy-autumn.trycloudflare.com"],
     port: 5173,
   },
 });

@@ -14,6 +14,7 @@ import AuthContext from "../../context/Auth/AuthContext";
 import LivesContext from "../../context/Lives/LivesContext";
 import { useLiveComments } from "../../hooks/useLiveComments";
 import { useIvsViewers } from "../../hooks/useIvsViewers";
+import { getSocket } from "../../socket";
 
 // Components
 import Layout from "../../components/Layout/Layout";
@@ -103,13 +104,13 @@ const LiveDetalle = () => {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [commentsVisible, setCommentsVisible] = useState(true);
 
-  // ── Hooks de IVR Viewers & Comentarios ──
+  // ── Hooks de IVS Viewers & Comentarios ──
   const viewers = useIvsViewers(id, live?.aws_channel_arn);
   const tokenAuth = localStorage.getItem("token");
   const { comments, sendComment, isConnected } = useLiveComments(
     live?.id,
     live?.chatRoomArn || import.meta.env.VITE_AWS_IVS_CHAT_ROOM_ARN,
-    tokenAuth,
+    tokenAuth
   );
 
   // ── Refs ──
@@ -122,31 +123,68 @@ const LiveDetalle = () => {
     }
   }, [id, live, getLiveById]);
 
-  // ── Máquina de estados del live ──
+  // ── Sincronización inicial con la DB ──
   useEffect(() => {
     if (!live?.status) return;
 
     if (live.status === "live" && livePhase !== "live") {
       setLivePhase("live");
-      return;
-    }
-
-    if (live.status === "ended" && livePhase === "live") {
-      setLivePhase("ending");
-      const timer = setTimeout(() => setLivePhase("ended"), 900);
-      return () => clearTimeout(timer);
-    }
-
-    if (live.status === "ended" && livePhase === "scheduled") {
+    } else if (live.status === "ended" && livePhase !== "ended") {
       setLivePhase("ended");
     }
   }, [live?.status, livePhase]);
+
+  // ── Escucha de eventos de Socket en tiempo real (Grace Period / Lifecycle) ──
+  useEffect(() => {
+    const socket = getSocket();
+    if (!socket || !id) return;
+
+    // Unirse a la sala Socket del Live
+    socket.emit("join_room", { room: `live_${id}` });
+
+    // 1. Evento: Transmisión iniciada o reanudada
+    const handleLiveStarted = (data) => {
+      if (String(data?.liveId) === String(id)) {
+        console.log("🟢 Transmisión iniciada/reanudada por Socket.");
+        setLivePhase("live");
+      }
+    };
+
+    // 2. Evento: Cierre definitivo (tras agotar el Grace Period)
+    const handleLiveEnded = (data) => {
+      if (String(data?.liveId) === String(id)) {
+        console.log("🔴 Transmisión finalizada definitivamente.");
+        setLivePhase("ending");
+        setTimeout(() => setLivePhase("ended"), 900);
+      }
+    };
+
+    // 3. Evento: Error fatal en la transmisión
+    const handleLiveError = (data) => {
+      if (String(data?.liveId) === String(id)) {
+        console.warn("⚠️ Error en transmisión.");
+        setLivePhase("ending");
+        setTimeout(() => setLivePhase("ended"), 900);
+      }
+    };
+
+    socket.on("live_started", handleLiveStarted);
+    socket.on("live_ended", handleLiveEnded);
+    socket.on("live_error", handleLiveError);
+
+    return () => {
+      socket.emit("leave_room", { room: `live_${id}` });
+      socket.off("live_started", handleLiveStarted);
+      socket.off("live_ended", handleLiveEnded);
+      socket.off("live_error", handleLiveError);
+    };
+  }, [id]);
 
   // ── Escuchador de Fullscreen ──
   useEffect(() => {
     const handleFullscreenChange = () => {
       const isFull = Boolean(
-        document.fullscreenElement || document.webkitFullscreenElement,
+        document.fullscreenElement || document.webkitFullscreenElement
       );
       setIsFullscreen(isFull);
     };
@@ -158,7 +196,7 @@ const LiveDetalle = () => {
       document.removeEventListener("fullscreenchange", handleFullscreenChange);
       document.removeEventListener(
         "webkitfullscreenchange",
-        handleFullscreenChange,
+        handleFullscreenChange
       );
     };
   }, []);
@@ -198,8 +236,9 @@ const LiveDetalle = () => {
 
   // ── Datos derivados ──
   const isSubscribed = Boolean(usuario?.isSubscribed);
-  const isScheduled = live.status === "scheduled";
-  const isActive = live.status === "live" || live.status === "ended";
+  const isScheduled = livePhase === "scheduled" && live.status === "scheduled";
+  const isActive =
+    livePhase === "live" || livePhase === "ending" || livePhase === "ended";
 
   return (
     <Layout>
@@ -232,9 +271,12 @@ const LiveDetalle = () => {
             </Box>
           )}
 
-          {/* Estado: En Vivo o Finalizado */}
+          {/* Estado: En Vivo, Reconectando o Finalizado */}
           {isActive && (
-            <Box ref={containerRef} sx={fullscreenContainerSx(commentsVisible)}>
+            <Box
+              ref={containerRef}
+              sx={fullscreenContainerSx(livePhase === "live")}
+            >
               {/* Columna Player de Video */}
               <Box
                 className='player-col'
@@ -258,11 +300,11 @@ const LiveDetalle = () => {
                 </motion.div>
 
                 {/* Bloqueo para no suscriptoras */}
-                {live.status === "live" && (!autenticado || !isSubscribed) && (
+                {livePhase === "live" && (!autenticado || !isSubscribed) && (
                   <LiveBlocked autenticado={autenticado} usuario={usuario} />
                 )}
 
-                {/* Overlay al finalizar transmisión */}
+                {/* Overlay al finalizar transmisión definitivamente */}
                 <AnimatePresence>
                   {(livePhase === "ending" || livePhase === "ended") && (
                     <motion.div
@@ -286,12 +328,10 @@ const LiveDetalle = () => {
                 </AnimatePresence>
               </Box>
 
-              {/* Sidebar de comentarios */}
-
+              {/* Sidebar de comentarios (solo se renderiza y ocupa espacio si livePhase es "live") */}
               {livePhase === "live" && (
                 <Box className='comments-sidebar'>
                   {!autenticado || !isSubscribed ? (
-                    /* Mensaje visual de chat bloqueado */
                     <Box
                       sx={{
                         display: "flex",
@@ -331,7 +371,6 @@ const LiveDetalle = () => {
                       </Typography>
                     </Box>
                   ) : (
-                    /* Chat Normal para suscriptoras */
                     <LiveCommentsSidebar
                       liveId={live.id}
                       comments={comments}

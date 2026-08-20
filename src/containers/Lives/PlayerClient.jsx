@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useCallback } from "react";
 import Plyr from "plyr";
 import "plyr/dist/plyr.css";
 import {
@@ -8,6 +8,7 @@ import {
   useMediaQuery,
   useTheme,
   Tooltip,
+  CircularProgress,
 } from "@mui/material";
 import FullscreenIcon from "@mui/icons-material/Fullscreen";
 import FullscreenExitIcon from "@mui/icons-material/FullscreenExit";
@@ -16,8 +17,9 @@ import VolumeUpIcon from "@mui/icons-material/VolumeUp";
 import PeopleIcon from "@mui/icons-material/People";
 import ChatBubbleOutlineIcon from "@mui/icons-material/ChatBubbleOutline";
 import ChatBubbleIcon from "@mui/icons-material/ChatBubble";
+import SyncIcon from "@mui/icons-material/Sync";
 import { getSocket } from "../../socket";
-import MethodGet from "../../config/Service";
+
 const PlayerCliente = ({
   playbackUrl,
   liveId,
@@ -29,22 +31,86 @@ const PlayerCliente = ({
 }) => {
   const videoRef = useRef(null);
   const ivsPlayerRef = useRef(null);
+  const reconnectIntervalRef = useRef(null);
 
-  // const [viewerCount, setViewerCount] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [isReconnecting, setIsReconnecting] = useState(false);
   const [videoOrientation, setVideoOrientation] = useState("landscape");
   const [muted, setMuted] = useState(false);
 
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
-  // ── IVS + Plyr ──────────────────────────────────────────────────────────
+  // ── Función para forzar recarga del manifiesto HLS ───────────────────────
+  const reloadStream = useCallback(() => {
+    const player = ivsPlayerRef.current;
+    if (!player || !playbackUrl) return;
+
+    try {
+      console.log("🔄 Re-cargando manifiesto IVS...");
+      player.load(playbackUrl);
+      player.play();
+    } catch (err) {
+      console.error("❌ Error recargando IVS Stream:", err);
+    }
+  }, [playbackUrl]);
+
+  // ── Iniciar/Detener reintentos continuos de HLS ──────────────────────────
+  const startHlsReconnectionLoop = useCallback(() => {
+    if (reconnectIntervalRef.current) return;
+
+    setIsReconnecting(true);
+    // Intenta recargar el manifiesto HLS cada 5 segundos hasta que el stream vuelva
+    reconnectIntervalRef.current = setInterval(() => {
+      reloadStream();
+    }, 5000);
+  }, [reloadStream]);
+
+  const stopHlsReconnectionLoop = useCallback(() => {
+    if (reconnectIntervalRef.current) {
+      clearInterval(reconnectIntervalRef.current);
+      reconnectIntervalRef.current = null;
+    }
+    setIsReconnecting(false);
+  }, []);
+
+  // ── Escucha de Sockets (live_reconnecting / live_reconnected) ───────────
+  useEffect(() => {
+    const socket = getSocket();
+    if (!socket) return;
+
+    const handleReconnecting = (data) => {
+      if (String(data?.liveId) === String(liveId)) {
+        console.warn("⚠️ Evento Socket: Transmisión reconectando...");
+        startHlsReconnectionLoop();
+      }
+    };
+
+    const handleReconnected = (data) => {
+      if (String(data?.liveId) === String(liveId)) {
+        console.log("✅ Evento Socket: Transmisión reanudada.");
+        stopHlsReconnectionLoop();
+        reloadStream();
+      }
+    };
+
+    socket.on("live_reconnecting", handleReconnecting);
+    socket.on("live_reconnected", handleReconnected);
+
+    return () => {
+      socket.off("live_reconnecting", handleReconnecting);
+      socket.off("live_reconnected", handleReconnected);
+    };
+  }, [liveId, startHlsReconnectionLoop, stopHlsReconnectionLoop, reloadStream]);
+
+  // ── IVS + Plyr Setup ────────────────────────────────────────────────────
   useEffect(() => {
     let plyrPlayer = null;
 
     const initPlayer = () => {
       if (!window.IVSPlayer || !videoRef.current) return;
       try {
+        const { PlayerState, PlayerEventType } = window.IVSPlayer;
         const ivsPlayer = window.IVSPlayer.create();
         ivsPlayerRef.current = ivsPlayer;
 
@@ -54,15 +120,32 @@ const PlayerCliente = ({
         ivsPlayer.setVolume(1.0);
         ivsPlayer.play();
 
-        ivsPlayer.addEventListener(
-          window.IVSPlayer.PlayerEventType.INITIALIZED,
-          () => {
-            const quality = ivsPlayer.getQuality();
+        // Detectar orientación del video
+        ivsPlayer.addEventListener(PlayerEventType.INITIALIZED, () => {
+          const quality = ivsPlayer.getQuality();
+          if (quality) {
             setVideoOrientation(
-              quality.height > quality.width ? "portrait" : "landscape",
+              quality.height > quality.width ? "portrait" : "landscape"
             );
-          },
-        );
+          }
+        });
+
+        // Manejo de eventos de salud / estado del reproductor IVS
+        ivsPlayer.addEventListener(PlayerEventType.STATE_CHANGED, (state) => {
+          if (state === PlayerState.PLAYING) {
+            // Si el video volvió a reproducirse correctamente, cancelamos el loop de reintento
+            stopHlsReconnectionLoop();
+          } else if (state === PlayerState.ENDED) {
+            // El reproductor llegó al final del stream por microcorte
+            startHlsReconnectionLoop();
+          }
+        });
+
+        ivsPlayer.addEventListener(PlayerEventType.ERROR, (err) => {
+          console.warn("⚠️ IVS Player Error:", err);
+          // Errores de red o de carga del manifiesto activan la reconexión
+          startHlsReconnectionLoop();
+        });
 
         plyrPlayer = new Plyr(videoRef.current, {
           controls: [],
@@ -72,7 +155,7 @@ const PlayerCliente = ({
 
         setLoading(false);
       } catch (err) {
-        console.error("IVS Player error:", err);
+        console.error("IVS Player initialization error:", err);
       }
     };
 
@@ -80,13 +163,14 @@ const PlayerCliente = ({
 
     return () => {
       clearTimeout(timer);
+      stopHlsReconnectionLoop();
       if (plyrPlayer) plyrPlayer.destroy();
       if (ivsPlayerRef.current) {
         ivsPlayerRef.current.pause();
         ivsPlayerRef.current.delete();
       }
     };
-  }, [playbackUrl]);
+  }, [playbackUrl, startHlsReconnectionLoop, stopHlsReconnectionLoop]);
 
   // ── Handlers ────────────────────────────────────────────────────────────
   const toggleMute = () => {
@@ -118,15 +202,9 @@ const PlayerCliente = ({
   const boxAspectRatio = isFullscreen
     ? "unset"
     : isPortraitMobile
-      ? "9/16"
-      : "16/9";
+    ? "9/16"
+    : "16/9";
 
-  // Cuánto espacio necesita la esquina derecha según lo que está visible
-  // [fullscreen_btn=36] + gap=8 + [viewers_pill~=70] + gap=8 = ~122
-  // Si además hay toggle de comentarios: + 36 + 8 = ~166
-  const rightOffsetViewers = isFullscreen ? 166 : 56;
-
-  // ── Estilos compartidos de los botones HUD ───────────────────────────────
   const hudBtn = {
     color: "white",
     bgcolor: "rgba(0,0,0,0.55)",
@@ -165,11 +243,46 @@ const PlayerCliente = ({
         />
       </div>
 
+      {/* ── Overlay de Reconexión (Grace Period) ── */}
+      {isReconnecting && (
+        <Box
+          sx={{
+            position: "absolute",
+            inset: 0,
+            bgcolor: "rgba(0, 0, 0, 0.65)",
+            backdropFilter: "blur(4px)",
+            zIndex: 1300,
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 1.5,
+            px: 2,
+            textAlign: "center",
+          }}
+        >
+          <CircularProgress size={38} sx={{ color: "#E53888" }} />
+          <Typography
+            variant='body2'
+            sx={{
+              color: "white",
+              fontWeight: 600,
+              display: "flex",
+              alignItems: "center",
+              gap: 1,
+            }}
+          >
+            <SyncIcon
+              sx={{ animation: "spin 2s linear infinite", fontSize: 18 }}
+            />
+            Transmisión inestable. Intentando reconectar...
+          </Typography>
+        </Box>
+      )}
+
       {/* ── HUD — solo cuando cargó ── */}
       {!loading && (
         <>
-          {/* ── Columna izquierda (top: mute / abajo: toggle comentarios) ── */}
-
           {/* Mute */}
           <Tooltip
             title={muted ? "Activar sonido" : "Silenciar"}
@@ -194,7 +307,7 @@ const PlayerCliente = ({
             </IconButton>
           </Tooltip>
 
-          {/* Toggle comentarios — debajo de la bocina, solo fullscreen desktop */}
+          {/* Toggle comentarios — solo fullscreen desktop */}
           {isFullscreen && !isMobile && (
             <Tooltip
               title={
@@ -208,7 +321,7 @@ const PlayerCliente = ({
                 sx={{
                   ...hudBtn,
                   position: "absolute",
-                  top: 54, // 10 (top) + 36 (botón) + 8 (gap)
+                  top: 54,
                   left: 10,
                   zIndex: 1200,
                   ...(commentsVisible && {
@@ -226,15 +339,13 @@ const PlayerCliente = ({
             </Tooltip>
           )}
 
-          {/* ── Columna derecha (viewers + fullscreen) ── */}
-
-          {/* Viewers — esquina superior derecha */}
+          {/* Viewers */}
           {viewers >= 0 && (
             <Box
               sx={{
                 position: "absolute",
                 top: 10,
-                right: 54, // deja espacio al botón fullscreen (36 + 8 + 10)
+                right: 54,
                 zIndex: 1250,
                 display: "flex",
                 alignItems: "center",
@@ -262,7 +373,7 @@ const PlayerCliente = ({
             </Box>
           )}
 
-          {/* Fullscreen — esquina superior derecha */}
+          {/* Fullscreen */}
           <Tooltip
             title={
               isFullscreen ? "Salir de pantalla completa" : "Pantalla completa"
