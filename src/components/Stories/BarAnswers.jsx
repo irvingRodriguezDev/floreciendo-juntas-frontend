@@ -15,6 +15,7 @@ const BarAnswers = ({
   setIsTyping,
   replyText,
   storyGroup,
+  sendingMessage,
 }) => {
   return (
     <Box

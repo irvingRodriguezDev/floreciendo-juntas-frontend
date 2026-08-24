@@ -94,7 +94,7 @@ export default defineConfig({
     chunkSizeWarningLimit: 5000,
   },
   server: {
-    allowedHosts: ["sum-thanksgiving-navy-autumn.trycloudflare.com"],
+    allowedHosts: ["analyzed-budapest-waterproof-loading.trycloudflare.com"],
     port: 5173,
   },
 });

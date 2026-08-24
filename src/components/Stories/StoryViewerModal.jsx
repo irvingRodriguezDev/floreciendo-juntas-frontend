@@ -346,6 +346,7 @@ const StoryViewerModal = ({
             handleSendReply={handleSendReply}
             setReplyText={setReplyText}
             storyGroup={storyGroup}
+            sendingMessage={sendingMessage}
           />
         )}
 
