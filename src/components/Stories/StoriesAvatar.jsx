@@ -73,7 +73,7 @@ const StoriesAvatar = ({ story, isAddButton = false, onClick }) => {
             width: "100%",
           }}
         >
-          Mi Historia
+          + Historia
         </Typography>
       </Box>
     );

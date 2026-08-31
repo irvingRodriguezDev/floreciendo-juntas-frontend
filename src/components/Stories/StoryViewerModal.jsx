@@ -5,22 +5,15 @@ import React, {
   useRef,
   useContext,
 } from "react";
-import {
-  Modal,
-  Box,
-  Typography,
-  Avatar,
-  IconButton,
-  TextField,
-  InputAdornment,
-} from "@mui/material";
-import CloseIcon from "@mui/icons-material/Close";
-import SendIcon from "@mui/icons-material/Send";
+import { Modal, Box, Typography } from "@mui/material";
 import { MethodPost } from "../../config/Service";
-import { DeleteIcon } from "lucide-react";
-import MenuOptionsStory from "./MenuOptionsStory";
 import AuthContext from "../../context/Auth/AuthContext";
-const STORY_DURATION = 5000;
+import HeaderViewModal from "./HeaderViewModal";
+import ViewersFloating from "./ViewersFloating";
+import ViewersCounter from "./ViewersCounter";
+import BarAnswers from "./BarAnswers";
+
+const STORY_DURATION = 7000;
 const QUICK_REACTIONS = ["❤️", "🌸", "😍", "👏", "😮"];
 
 const StoryViewerModal = ({
@@ -28,7 +21,7 @@ const StoryViewerModal = ({
   onClose,
   storyGroup,
   onStoryViewed,
-  onAllStoriesViewed, // Callback opcional para notificar fin de grupo
+  onAllStoriesViewed,
   fetchStories,
 }) => {
   const { usuario } = useContext(AuthContext);
@@ -41,6 +34,9 @@ const StoryViewerModal = ({
   const [isTyping, setIsTyping] = useState(false);
   const [sendingMessage, setSendingMessage] = useState(false);
 
+  // Estado para controlar las burbujas flotantes temporales
+  const [floatingViewers, setFloatingViewers] = useState([]);
+
   const viewedStoriesRef = useRef(new Set());
 
   useEffect(() => {
@@ -51,23 +47,59 @@ const StoryViewerModal = ({
       setIsImageLoaded(false);
       setReplyText("");
       setIsTyping(false);
+      setFloatingViewers([]);
       viewedStoriesRef.current.clear();
     }
   }, [open, storyGroup]);
 
   const currentStory = localStories[currentIndex];
 
-  // Avanzar a la siguiente historia (Manual y Automático)
+  // Disparar las burbujas flotantes al cambiar de historia si hay espectadores
+  useEffect(() => {
+    if (!open || !currentStory?.viewers?.length) {
+      setFloatingViewers([]);
+      return;
+    }
+
+    const maxViewers = 13;
+    const staggerDelay = 400; // Delay entre cada espectador
+    const animDuration = 2400; // Duración de la animación CSS floatUp
+
+    const viewersToFloat = currentStory.viewers
+      .slice(0, maxViewers)
+      .map((viewer, index) => ({
+        ...viewer,
+        floatId: `float-${viewer.id || index}-${Date.now()}-${Math.random()
+          .toString(36)
+          .substring(2, 6)}`,
+        delay: index * staggerDelay,
+        offsetX: Math.floor(Math.random() * 40) - 20,
+      }));
+
+    setFloatingViewers(viewersToFloat);
+
+    // Cálculo dinámico para esperar a que la última burbuja complete su ciclo de animación
+    const totalDuration =
+      (viewersToFloat.length - 1) * staggerDelay + animDuration;
+
+    const cleanupTimer = setTimeout(() => {
+      setFloatingViewers([]);
+    }, totalDuration);
+
+    return () => clearTimeout(cleanupTimer);
+  }, [open, currentIndex, currentStory?.id]);
+
+  // Avanzar a la siguiente historia
   const handleNext = useCallback(() => {
     setProgress(0);
     setIsImageLoaded(false);
     setReplyText("");
     setIsTyping(false);
+    setFloatingViewers([]);
 
     if (currentIndex < localStories.length - 1) {
       setCurrentIndex((prev) => prev + 1);
     } else {
-      // Si era la última historia del grupo, notificamos al padre y cerramos
       if (onAllStoriesViewed && storyGroup?.userId) {
         onAllStoriesViewed(storyGroup.userId);
       }
@@ -86,6 +118,7 @@ const StoryViewerModal = ({
     setIsImageLoaded(false);
     setReplyText("");
     setIsTyping(false);
+    setFloatingViewers([]);
     setCurrentIndex((prev) => (prev > 0 ? prev - 1 : 0));
   }, []);
 
@@ -101,7 +134,7 @@ const StoryViewerModal = ({
       MethodPost(`/stories/${storyId}/view`)
         .then(() => {
           setLocalStories((prev) =>
-            prev.map((s) => (s.id === storyId ? { ...s, isSeen: true } : s)),
+            prev.map((s) => (s.id === storyId ? { ...s, isSeen: true } : s))
           );
 
           if (onStoryViewed) {
@@ -115,7 +148,7 @@ const StoryViewerModal = ({
     }
   }, [open, currentIndex, currentStory, storyGroup?.userId, onStoryViewed]);
 
-  // Temporizador Automático con soporte de Pausa (isTyping)
+  // Temporizador Automático con pausa
   useEffect(() => {
     if (!open || !currentStory || !isImageLoaded || isTyping) return;
 
@@ -162,6 +195,9 @@ const StoryViewerModal = ({
   };
 
   if (!open || !currentStory) return null;
+
+  const isOwner = usuario && usuario.id === storyGroup.userId;
+
   return (
     <Modal
       open={open}
@@ -241,32 +277,13 @@ const StoryViewerModal = ({
             justifyContent: "space-between",
           }}
         >
-          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-            <Avatar
-              src={storyGroup?.profileImage || storyGroup?.profileimage}
-              sx={{ width: 36, height: 36, border: "1.5px solid #C02567" }}
-            >
-              {storyGroup?.userName?.charAt(0)}
-            </Avatar>
-            <Typography
-              variant='subtitle2'
-              sx={{ color: "#fff", fontWeight: "bold", fontSize: "18px" }}
-            >
-              {storyGroup?.userName}
-            </Typography>
-          </Box>
-          <Box sx={{ display: "flex", direction: "row" }}>
-            {usuario && usuario.id === storyGroup.userId && (
-              <MenuOptionsStory
-                storyId={currentStory.id}
-                closeModal={onClose}
-                fetchStories={fetchStories}
-              />
-            )}
-            <IconButton onClick={onClose} sx={{ color: "white" }}>
-              <CloseIcon />
-            </IconButton>
-          </Box>
+          <HeaderViewModal
+            storyGroup={storyGroup}
+            onClose={onClose}
+            fetchStories={fetchStories}
+            isOwner={isOwner}
+            currentStory={currentStory}
+          />
         </Box>
 
         {/* IMAGEN DE LA HISTORIA */}
@@ -289,7 +306,7 @@ const StoryViewerModal = ({
           <Box
             sx={{
               position: "absolute",
-              bottom: 110,
+              bottom: isOwner ? 70 : 120,
               left: 16,
               right: 16,
               p: 1.5,
@@ -309,85 +326,29 @@ const StoryViewerModal = ({
           </Box>
         )}
 
-        {/* BARRA INFERIOR DE RESPUESTAS */}
-        <Box
-          sx={{
-            position: "absolute",
-            bottom: 12,
-            left: 12,
-            right: 12,
-            zIndex: 10,
-            display: "flex",
-            flexDirection: "column",
-            gap: 1,
-          }}
-        >
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "space-around",
-              bgcolor: "rgba(0, 0, 0, 0.4)",
-              backdropFilter: "blur(6px)",
-              borderRadius: "20px",
-              py: 0.5,
-            }}
-          >
-            {QUICK_REACTIONS.map((emoji) => (
-              <Typography
-                key={emoji}
-                onClick={() => handleSendReply(emoji)}
-                sx={{
-                  fontSize: "22px",
-                  cursor: "pointer",
-                  transition: "transform 0.1s",
-                  "&:hover": { transform: "scale(1.3)" },
-                }}
-              >
-                {emoji}
-              </Typography>
-            ))}
-          </Box>
+        {/* CAPA DE ESPECTADORES FLOTANTES (EFECTO FLY-UP HASTA 40%) */}
+        {isOwner && floatingViewers.length > 0 && (
+          <ViewersFloating
+            floatingViewers={floatingViewers}
+            isTyping={isTyping}
+          />
+        )}
 
-          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-            <TextField
-              fullWidth
-              size='small'
-              placeholder={`Responder a ${
-                storyGroup?.userName || "historia"
-              }...`}
-              value={replyText}
-              onChange={(e) => setReplyText(e.target.value)}
-              onFocus={() => setIsTyping(true)}
-              onBlur={() => {
-                if (!replyText) setIsTyping(false);
-              }}
-              sx={{
-                "& .MuiOutlinedInput-root": {
-                  color: "white",
-                  bgcolor: "rgba(0, 0, 0, 0.5)",
-                  backdropFilter: "blur(6px)",
-                  borderRadius: "25px",
-                  "& fieldset": { borderColor: "rgba(255, 255, 255, 0.4)" },
-                  "&:hover fieldset": { borderColor: "white" },
-                  "&.Mui-focused fieldset": { borderColor: "#D82E7A" },
-                },
-              }}
-              InputProps={{
-                endAdornment: replyText.trim() ? (
-                  <InputAdornment position='end'>
-                    <IconButton
-                      onClick={() => handleSendReply()}
-                      disabled={sendingMessage}
-                      sx={{ color: "#D82E7A" }}
-                    >
-                      <SendIcon fontSize='small' />
-                    </IconButton>
-                  </InputAdornment>
-                ) : null,
-              }}
-            />
-          </Box>
-        </Box>
+        {/* CONTEO DE VISTAS ESTÁTICO ESTILO TIKTOK */}
+        {isOwner && <ViewersCounter currentStory={currentStory} />}
+
+        {/* BARRA INFERIOR DE RESPUESTAS (Oculta si es el propietario) */}
+        {!isOwner && (
+          <BarAnswers
+            QUICK_REACTIONS={QUICK_REACTIONS}
+            setIsTyping={setIsTyping}
+            replyText={replyText}
+            handleSendReply={handleSendReply}
+            setReplyText={setReplyText}
+            storyGroup={storyGroup}
+            sendingMessage={sendingMessage}
+          />
+        )}
 
         {/* ZONAS TÁCTILES */}
         <Box
@@ -395,7 +356,7 @@ const StoryViewerModal = ({
           sx={{
             position: "absolute",
             top: 0,
-            bottom: 120,
+            bottom: isOwner ? 60 : 120,
             left: 0,
             width: "35%",
             zIndex: 5,
@@ -407,7 +368,7 @@ const StoryViewerModal = ({
           sx={{
             position: "absolute",
             top: 0,
-            bottom: 120,
+            bottom: isOwner ? 60 : 120,
             right: 0,
             width: "65%",
             zIndex: 5,

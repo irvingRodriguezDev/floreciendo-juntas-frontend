@@ -129,8 +129,9 @@ const LiveDetalle = () => {
   }
 
   const isSubscribed = Boolean(usuario?.isSubscribed);
-  const isScheduled = live.status === "scheduled";
-  const isActive = live.status === "live" || live.status === "ended";
+  const isScheduled = livePhase === "scheduled" && live.status === "scheduled";
+  const isActive =
+    livePhase === "live" || livePhase === "ending" || livePhase === "ended";
 
   return (
     <Layout>
