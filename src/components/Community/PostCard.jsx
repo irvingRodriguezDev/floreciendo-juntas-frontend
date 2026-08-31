@@ -16,8 +16,10 @@ import LocalFloristIcon from "@mui/icons-material/LocalFlorist";
 import PushPinIcon from "@mui/icons-material/PushPin";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
+import "dayjs/locale/es";
 import DOMPurify from "dompurify";
 import ChatBubbleOutlineOutlinedIcon from "@mui/icons-material/ChatBubbleOutlineOutlined";
+
 import PostMediaSwiper from "./PostMediaSwipper";
 import CommentItem from "./CommentItem";
 import MessageIcon from "../icons/MessageIcon";
@@ -25,7 +27,7 @@ import CommentComposer from "./CommentComposer";
 import CommunityContext from "../../context/Community/CommunityContext";
 import AuthContext from "../../context/Auth/AuthContext";
 import WishModal from "../../containers/Birthdays/WishModal";
-
+import FavoriteIcon from "@mui/icons-material/Favorite";
 dayjs.extend(relativeTime);
 dayjs.locale("es");
 
@@ -34,7 +36,7 @@ const isHtmlContent = (text) => {
   return /<\/?[a-z][\s\S]*>/i.test(text);
 };
 
-// 🏷️ Mapeo visual de categorías para el Chip identificador
+// 🏷️ Mapeo visual de categorías
 const CATEGORY_MAP = {
   "floreciendo-juntas": { label: "General", color: "#D72E7A", bg: "#FFF1F6" },
   servicios: { label: "Servicio", color: "#0284C7", bg: "#F0F9FF" },
@@ -43,21 +45,43 @@ const CATEGORY_MAP = {
 
 const PostCard = ({ post }) => {
   const { createToogleReaction } = useContext(CommunityContext);
-  const [showComments, setShowComments] = useState(false);
   const { usuario } = useContext(AuthContext);
 
-  const postId = post.id || post._id;
-  const categoryConfig =
-    CATEGORY_MAP[post.type] || CATEGORY_MAP["floreciendo-juntas"];
+  const [showComments, setShowComments] = useState(false);
 
-  // 💬 Estados para el Modal de Mensaje Directo
+  // 💬 Estado para controlar a quién se le está respondiendo en el composer
+  // Formato: { parentId, replyToUserId, userName }
+  const [replyTo, setReplyTo] = useState(null);
+
+  // 💬 Estado para Modal de Mensaje Directo
   const [selectedUser, setSelectedUser] = useState(null);
   const [openModal, setOpenModal] = useState(false);
 
-  // Abrir el modal pasando el usuario autor del post
-  const handleOpenMessageModal = (user) => {
-    setSelectedUser(user);
+  const postId = post.id || post._id;
+  const isLiked = post.likedByMe ?? post.isLikedByMe ?? false;
+  const categoryConfig =
+    CATEGORY_MAP[post.type] || CATEGORY_MAP["floreciendo-juntas"];
+
+  const handleOpenMessageModal = (userTarget) => {
+    setSelectedUser(userTarget);
     setOpenModal(true);
+  };
+
+  // 🔥 Handler llamado desde CommentItem cuando el usuario hace clic en "Responder"
+  const handleInitiateReply = (rootComment, targetReply = null) => {
+    const target = targetReply || rootComment;
+    setReplyTo({
+      parentId: rootComment.id, // Siempre es el ID del comentario raíz
+      replyToUserId: target.userId || target.user?.id,
+      userName: target.user?.name || target.user?.nombre || "Usuario",
+    });
+
+    // Aseguramos que los comentarios estén desplegados
+    if (!showComments) setShowComments(true);
+  };
+
+  const handleCancelReply = () => {
+    setReplyTo(null);
   };
 
   return (
@@ -76,7 +100,7 @@ const PostCard = ({ post }) => {
           },
         }}
       >
-        {/* BANNER / PIN DE PUBLICACIÓN DESTACADA */}
+        {/* PIN DE PUBLICACIÓN DESTACADA */}
         {post.isPinned && (
           <Box
             sx={{
@@ -97,7 +121,7 @@ const PostCard = ({ post }) => {
           </Box>
         )}
 
-        {/* CABECERA CON USUARIO, MENSAJE DIRECTO Y CHIP DE CATEGORÍA */}
+        {/* CABECERA */}
         <CardHeader
           avatar={
             <Avatar
@@ -112,7 +136,7 @@ const PostCard = ({ post }) => {
               fontSize='0.95rem'
               display='inline-flex'
             >
-              {post.user?.name || post.user?.nombre}{" "}
+              {post.user?.name || post.user?.nombre}
             </Typography>
           }
           subheader={
@@ -130,13 +154,11 @@ const PostCard = ({ post }) => {
                 alignItems: "center",
               }}
             >
-              {/* 💬 BOTÓN MENSAJE DIRECTO (Solo si no es mi propio post) */}
+              {/* BOTÓN MENSAJE DIRECTO */}
               {post.userId !== usuario?.id && post?.user && (
                 <Tooltip
                   title={`Enviar mensaje privado a ${
-                    post.user.name?.split(" ")[0] ||
-                    post.user.nombre?.split(" ")[0] ||
-                    "usuaria"
+                    post.user.name?.split(" ")[0] || "usuaria"
                   }`}
                 >
                   <IconButton
@@ -161,7 +183,7 @@ const PostCard = ({ post }) => {
                 </Tooltip>
               )}
 
-              {/* 🏷️ CHIP INDICADOR DE CATEGORÍA */}
+              {/* CHIP CATEGORÍA */}
               {categoryConfig?.label && (
                 <Chip
                   label={categoryConfig.label}
@@ -181,7 +203,7 @@ const PostCard = ({ post }) => {
         />
 
         <CardContent sx={{ pt: 1 }}>
-          {/* TÍTULO DEL POST */}
+          {/* TÍTULO */}
           {post.title && (
             <Typography
               mb={1.5}
@@ -211,9 +233,7 @@ const PostCard = ({ post }) => {
                   margin: "0 0 12px 0 !important",
                   lineHeight: "1.6 !important",
                 },
-                "& p:last-child": {
-                  marginBottom: "0 !important",
-                },
+                "& p:last-child": { marginBottom: "0 !important" },
                 "& h1": {
                   fontSize: { xs: "1.3rem", sm: "1.5rem" },
                   fontWeight: 700,
@@ -233,15 +253,11 @@ const PostCard = ({ post }) => {
                   color: "#D72E7A",
                   fontWeight: 600,
                   textDecoration: "underline",
-                  overflowWrap: "anywhere !important",
                 },
                 "& ul, & ol": {
                   paddingLeft: "20px !important",
                   marginBottom: "12px !important",
                 },
-                "& .ql-align-center": { textAlign: "center !important" },
-                "& .ql-align-right": { textAlign: "right !important" },
-                "& .ql-align-justify": { textAlign: "justify !important" },
               }}
               dangerouslySetInnerHTML={{
                 __html: DOMPurify.sanitize(post.content, {
@@ -270,21 +286,21 @@ const PostCard = ({ post }) => {
             </Typography>
           )}
 
-          {/* ADJUNTOS DE MEDIOS (CARRUSEL O FOTOS) */}
+          {/* MULTIMEDIA */}
           {post.media?.length > 0 && (
             <Box sx={{ mb: 2, borderRadius: "12px", overflow: "hidden" }}>
               <PostMediaSwiper media={post.media} />
             </Box>
           )}
 
-          {/* BARRA DE ACCIONES (LIKES / COMENTARIOS) */}
+          {/* ACCIONES (ME GUSTA / COMENTARIOS) */}
           <Stack
             direction='row'
             spacing={2}
             alignItems='center'
             sx={{ pt: 1, borderTop: "1px solid #F5F5F5" }}
           >
-            {/* BOTÓN LIKES */}
+            {/* LIKES */}
             <Stack
               direction='row'
               spacing={0.8}
@@ -297,32 +313,26 @@ const PostCard = ({ post }) => {
                 py: 0.5,
                 borderRadius: "20px",
                 transition: "all 0.2s ease",
-                "&:hover": {
-                  backgroundColor: "#FFF1F6",
-                },
+                "&:hover": { backgroundColor: "#FFF1F6" },
               }}
             >
               <IconButton
                 size='small'
                 disableRipple
-                sx={{
-                  p: 0,
-                  color: post.likedByMe ? "#D72E7A" : "text.secondary",
-                }}
+                sx={{ p: 0, color: isLiked ? "#D72E7A" : "text.secondary" }}
               >
-                <LocalFloristIcon fontSize='small' />
+                <FavoriteIcon fontSize='small' />
               </IconButton>
-
               <Typography
                 fontSize='0.85rem'
                 fontWeight={600}
-                color={post.likedByMe ? "#D72E7A" : "text.secondary"}
+                color={isLiked ? "#D72E7A" : "text.secondary"}
               >
-                {post.likesCount || 0} Me gusta
+                {post.likesCount || 0} Me Encanta
               </Typography>
             </Stack>
 
-            {/* BOTÓN COMENTARIOS */}
+            {/* COMENTARIOS */}
             <Stack
               direction='row'
               spacing={0.8}
@@ -335,9 +345,7 @@ const PostCard = ({ post }) => {
                 py: 0.5,
                 borderRadius: "20px",
                 transition: "all 0.2s ease",
-                "&:hover": {
-                  backgroundColor: "#FFF1F6",
-                },
+                "&:hover": { backgroundColor: "#FFF1F6" },
               }}
             >
               <IconButton
@@ -350,7 +358,6 @@ const PostCard = ({ post }) => {
               >
                 <MessageIcon width={18} />
               </IconButton>
-
               <Typography
                 fontSize='0.85rem'
                 fontWeight={600}
@@ -362,7 +369,7 @@ const PostCard = ({ post }) => {
             </Stack>
           </Stack>
 
-          {/* SECCIÓN DESPLEGABLE DE COMENTARIOS */}
+          {/* SECCIÓN DE COMENTARIOS */}
           {showComments && (
             <Box sx={{ mt: 2 }}>
               <Divider sx={{ mb: 2, borderColor: "#F5F5F5" }} />
@@ -372,17 +379,25 @@ const PostCard = ({ post }) => {
                   <CommentItem
                     key={comment.id || comment._id}
                     comment={comment}
+                    onReply={(targetReply) =>
+                      handleInitiateReply(comment, targetReply)
+                    }
                   />
                 ))}
               </Stack>
 
-              <CommentComposer post_id={postId} />
+              {/* COMPOSITOR DE COMENTARIOS UNIFICADO */}
+              <CommentComposer
+                post_id={postId}
+                replyTo={replyTo}
+                onCancelReply={handleCancelReply}
+              />
             </Box>
           )}
         </CardContent>
       </Card>
 
-      {/* 💬 MODAL DE MENSAJE DIRECTO */}
+      {/* MODAL DE MENSAJE DIRECTO */}
       <WishModal
         open={openModal}
         onClose={() => setOpenModal(false)}

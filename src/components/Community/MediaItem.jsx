@@ -14,12 +14,10 @@ const MediaItem = ({ item, isActive }) => {
     <Box
       sx={{
         width: "100%",
-        maxHeight: "450px", // 👈 Limite controlado para la tarjeta
+        minHeight: item.type === "video" ? "300px" : "auto",
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
-        overflow: "hidden",
-        backgroundColor: item.type === "image" ? "#FAF8F9" : "#000000",
       }}
     >
       {item.type === "image" ? (
@@ -27,29 +25,20 @@ const MediaItem = ({ item, isActive }) => {
           <Box
             component='img'
             src={item.url}
-            alt={
-              item.title || item.alt || "Archivo multimedia de la publicación"
-            }
-            loading='lazy'
+            alt='Post'
             sx={{
               width: "100%",
-              height: "100%",
-              maxHeight: "450px", // 👈 Altura máxima uniforme
-              objectFit: "cover", // 👈 Recorte estético encuadrado
-              objectPosition: "center",
+              height: "auto",
+              borderRadius: 2,
               cursor: "zoom-in",
               display: "block",
-              transition: "transform 0.3s ease",
-              "&:hover": {
-                transform: "scale(1.01)", // Micro-interacción al pasar el cursor
-              },
+              // Aquí no importa el overflow del padre,
+              // porque la librería crea un clon de la imagen fuera del Swiper
             }}
           />
         </Zoom>
       ) : (
-        <Box sx={{ width: "100%", maxHeight: "450px" }}>
-          <VideoPlayerCommunity src={item.url} isActive={isActive} />
-        </Box>
+        <VideoPlayerCommunity src={item.url} isActive={isActive} />
       )}
     </Box>
   );

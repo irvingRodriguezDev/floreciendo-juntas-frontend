@@ -3,7 +3,7 @@ import { IconButton, Badge } from "@mui/material";
 import ChatBubbleOutlineIcon from "@mui/icons-material/ChatBubbleOutline";
 import ChatContext from "../../context/Chat/ChatContext";
 import ChatsIcon from "../icons/ChatsIcon";
-
+import ForumIcon from "@mui/icons-material/Forum";
 const MAIN_PINK = "#D72E79";
 
 const HeaderMessageBadge = () => {
@@ -18,12 +18,12 @@ const HeaderMessageBadge = () => {
     <IconButton
       onClick={() => toggleInboxDrawer(true)}
       sx={{
-        color: "#424242",
+        color: MAIN_PINK,
         "&:hover": { color: MAIN_PINK },
       }}
     >
       <Badge badgeContent={unreadCount} color='error'>
-        <ChatsIcon width={30} />
+        <ForumIcon width={30} />
       </Badge>
     </IconButton>
   );

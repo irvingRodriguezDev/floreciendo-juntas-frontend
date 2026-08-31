@@ -2,6 +2,7 @@ import {
   Avatar,
   Box,
   Button,
+  Chip,
   CircularProgress,
   IconButton,
   Stack,
@@ -10,6 +11,7 @@ import {
   Typography,
 } from "@mui/material";
 import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate";
+import CloseIcon from "@mui/icons-material/Close";
 import { useContext, useRef, useState } from "react";
 import AuthContext from "../../context/Auth/AuthContext";
 import CommunityContext from "../../context/Community/CommunityContext";
@@ -20,7 +22,7 @@ import Swal from "sweetalert2";
 const MAX_FILES = 4;
 const MAX_FILE_SIZE_MB = 25;
 
-const CommentComposer = ({ post_id }) => {
+const CommentComposer = ({ post_id, replyTo = null, onCancelReply }) => {
   const { usuario } = useContext(AuthContext);
   const { createCommentPostCommunity } = useContext(CommunityContext);
 
@@ -96,14 +98,23 @@ const CommentComposer = ({ post_id }) => {
     try {
       setIsSubmitting(true);
 
-      await createCommentPostCommunity(post_id, {
+      const payload = {
         content,
         files,
         user: usuario,
-      });
+        // 🔥 Si existe un contexto de respuesta, enviamos parentId y replyToUserId
+        parentId: replyTo ? replyTo.parentId : null,
+        replyToUserId: replyTo ? replyTo.replyToUserId : null,
+      };
 
+      await createCommentPostCommunity(post_id, payload);
+
+      // Limpiar formulario y cerrar modo respuesta
       setContent("");
       setFiles([]);
+      if (replyTo && onCancelReply) {
+        onCancelReply();
+      }
     } catch (error) {
       console.error("Error al publicar comentario:", error);
     } finally {
@@ -111,7 +122,6 @@ const CommentComposer = ({ post_id }) => {
     }
   };
 
-  // Permitir enviar con Ctrl + Enter / Cmd + Enter
   const handleKeyDown = (e) => {
     if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
       handleSubmit();
@@ -120,8 +130,41 @@ const CommentComposer = ({ post_id }) => {
 
   return (
     <Box sx={{ mt: 1.5 }}>
+      {/* 🏷️ CHIP INDICADOR DE MODO RESPUESTA */}
+      {replyTo && (
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            backgroundColor: "#FFF0F6",
+            borderLeft: "3px solid #D72E7A",
+            px: 1.5,
+            py: 0.6,
+            borderRadius: "8px 8px 0 0",
+            mb: 0.8,
+          }}
+        >
+          <Typography fontSize='0.75rem' fontWeight={600} color='#D72E7A'>
+            Respondiendo a <strong>@{replyTo.userName}</strong>
+          </Typography>
+
+          <IconButton
+            size='small'
+            onClick={onCancelReply}
+            sx={{
+              p: 0.2,
+              color: "#D72E7A",
+              "&:hover": { backgroundColor: "rgba(215, 46, 122, 0.1)" },
+            }}
+          >
+            <CloseIcon sx={{ fontSize: "16px" }} />
+          </IconButton>
+        </Box>
+      )}
+
       <Stack direction='row' spacing={1.2} alignItems='flex-start'>
-        {/* AVATAR DEL USUARIO ACTUAL CON FALLBACK */}
+        {/* AVATAR DEL USUARIO */}
         <Avatar
           src={usuario?.profileImage}
           alt={usuario?.name || "Usuario"}
@@ -142,14 +185,18 @@ const CommentComposer = ({ post_id }) => {
             multiline
             minRows={1}
             maxRows={4}
-            placeholder={`${usuario?.name ? usuario.name.split(" ")[0] : "Hola"}, escribe un comentario…`}
+            placeholder={
+              replyTo
+                ? `Escribe tu respuesta a @${replyTo.userName}…`
+                : `${usuario?.name ? usuario.name.split(" ")[0] : "Hola"}, escribe un comentario…`
+            }
             value={content}
             onChange={(e) => setContent(e.target.value)}
             onKeyDown={handleKeyDown}
             disabled={isSubmitting}
             sx={{
               "& .MuiOutlinedInput-root": {
-                borderRadius: "16px",
+                borderRadius: replyTo ? "0 0 16px 16px" : "16px",
                 backgroundColor: "#FAF8F9",
                 fontSize: "0.88rem",
                 "& fieldset": {
@@ -164,7 +211,7 @@ const CommentComposer = ({ post_id }) => {
             }}
           />
 
-          {/* VISTA PREVIA DE ARCHIVOS ADJUNTOS */}
+          {/* VISTA PREVIA DE ARCHIVOS */}
           {files.length > 0 && (
             <Stack direction='row' spacing={1} mt={1} flexWrap='wrap'>
               {files.map((file, index) => (
@@ -177,7 +224,7 @@ const CommentComposer = ({ post_id }) => {
             </Stack>
           )}
 
-          {/* BARRA DE ACCIONES ABAJO DEL INPUT */}
+          {/* BARRA DE ACCIONES */}
           <Stack
             direction='row'
             justifyContent='space-between'
@@ -252,7 +299,11 @@ const CommentComposer = ({ post_id }) => {
                 "&.Mui-disabled": { backgroundColor: "#E0E0E0" },
               }}
             >
-              {isSubmitting ? "Enviando..." : "Comentar"}
+              {isSubmitting
+                ? "Enviando..."
+                : replyTo
+                  ? "Responder"
+                  : "Comentar"}
             </Button>
           </Stack>
         </Box>

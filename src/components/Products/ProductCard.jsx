@@ -50,7 +50,7 @@ const ProductCard = ({ product }) => {
 
   // Detectar si está en carrito (elige la fuente según autenticado)
   const itemInCart = autenticado
-    ? cart.items?.find((i) => i.productId === product.id)
+    ? cart?.items?.find((i) => i.productId === product.id)
     : guest_cart.items?.find((i) => i.product.product_id === product.id);
 
   // Helper para agregar al guest: mandamos objeto completo para localStorage/preview

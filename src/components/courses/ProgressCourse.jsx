@@ -1,38 +1,35 @@
-import * as React from "react";
+import React from "react";
 import { styled } from "@mui/material/styles";
-import Stack from "@mui/material/Stack";
-import LinearProgress, {
+import {
+  Box,
+  Typography,
+  LinearProgress,
   linearProgressClasses,
-} from "@mui/material/LinearProgress";
-import { Typography, Box } from "@mui/material";
+  Stack,
+} from "@mui/material";
 import { motion, AnimatePresence } from "framer-motion";
 
-// 💖 Barra estilizada con fix de transform para MUI
-const PremiumLinearProgress = styled(LinearProgress)(({ theme }) => ({
+const PremiumLinearProgress = styled(LinearProgress)(() => ({
   height: 8,
   borderRadius: 10,
   backgroundColor: "#FCE4EC",
   overflow: "hidden",
-  // Modificamos directamente la barra interna de tipo determinate
   [`& .${linearProgressClasses.bar1Determinate}`]: {
     borderRadius: 10,
     background:
       "linear-gradient(90deg, #E91E63 0%, #FF4081 50%, #C2185B 100%) !important",
     boxShadow: "0px 2px 8px rgba(233, 30, 99, 0.4)",
-    // Aseguramos que la transición interna de MUI no colisione
     transition: "transform .0001s linear",
   },
 }));
 
-export default function Progress({ progress = 0 }) {
-  // Aseguramos que el valor no pase de 100 ni baje de 0
+const ProgressCourse = ({ progress = 0 }) => {
   const normalizedProgress = Math.min(100, Math.max(0, Number(progress) || 0));
   const roundedProgress = Math.round(normalizedProgress);
   const isCompleted = roundedProgress >= 100;
 
   return (
     <Stack spacing={0.8} sx={{ flexGrow: 1, width: "100%" }}>
-      {/* Encabezado e indicador del porcentaje */}
       <Box display='flex' justifyContent='space-between' alignItems='center'>
         <Typography
           variant='caption'
@@ -47,7 +44,6 @@ export default function Progress({ progress = 0 }) {
           {isCompleted ? "Completado" : "Tu Progreso"}
         </Typography>
 
-        {/* Badge para el porcentaje */}
         <Box
           sx={{
             background: isCompleted
@@ -86,8 +82,9 @@ export default function Progress({ progress = 0 }) {
         </Box>
       </Box>
 
-      {/* Barra de progreso */}
       <PremiumLinearProgress variant='determinate' value={normalizedProgress} />
     </Stack>
   );
-}
+};
+
+export default ProgressCourse;

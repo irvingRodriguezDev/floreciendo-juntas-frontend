@@ -1,6 +1,8 @@
 import Hls from "hls.js";
 import { useEffect, useRef, useState } from "react";
 import { Box } from "@mui/material";
+import VolumeOffIcon from "@mui/icons-material/VolumeOff";
+import VolumeUpIcon from "@mui/icons-material/VolumeUp";
 
 const VideoPlayerCommunity = ({ src, isActive }) => {
   const videoRef = useRef(null);
@@ -8,7 +10,7 @@ const VideoPlayerCommunity = ({ src, isActive }) => {
   const [muted, setMuted] = useState(true);
   const [isLoaded, setIsLoaded] = useState(false);
 
-  // 🔹 Setup video + HLS
+  // Setup video + HLS
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
@@ -17,7 +19,7 @@ const VideoPlayerCommunity = ({ src, isActive }) => {
     video.playsInline = true;
     video.setAttribute("playsinline", "");
     video.setAttribute("webkit-playsinline", "");
-    video.setAttribute("x5-playsinline", ""); // Para WeChat/QQ browsers
+    video.setAttribute("x5-playsinline", "");
     video.setAttribute("x5-video-player-type", "h5");
 
     const handleLoadedMetadata = () => {
@@ -26,12 +28,9 @@ const VideoPlayerCommunity = ({ src, isActive }) => {
 
     video.addEventListener("loadedmetadata", handleLoadedMetadata);
 
-    // Safari (HLS nativo)
     if (video.canPlayType("application/vnd.apple.mpegurl")) {
       video.src = src;
-    }
-    // Chrome / Android
-    else if (Hls.isSupported()) {
+    } else if (Hls.isSupported()) {
       const hls = new Hls({
         lowLatencyMode: true,
         enableWorker: true,
@@ -57,7 +56,7 @@ const VideoPlayerCommunity = ({ src, isActive }) => {
     };
   }, [src]);
 
-  // 🔹 Play / pause según slide activo
+  // Reproducción por slide activo
   useEffect(() => {
     const video = videoRef.current;
     if (!video || !isLoaded) return;
@@ -65,9 +64,7 @@ const VideoPlayerCommunity = ({ src, isActive }) => {
     if (isActive) {
       const playPromise = video.play();
       if (playPromise !== undefined) {
-        playPromise.catch(() => {
-          // Error de reproducción automática - ignorar
-        });
+        playPromise.catch(() => {});
       }
     } else {
       video.pause();
@@ -77,7 +74,7 @@ const VideoPlayerCommunity = ({ src, isActive }) => {
     }
   }, [isActive, isLoaded]);
 
-  // 🔊 Toggle audio (user gesture)
+  // Toggle de Mute
   const toggleMute = () => {
     const video = videoRef.current;
     if (!video) return;
@@ -93,10 +90,12 @@ const VideoPlayerCommunity = ({ src, isActive }) => {
         position: "relative",
         cursor: "pointer",
         width: "100%",
+        borderRadius: "14px",
+        overflow: "hidden",
+        backgroundColor: "#000000",
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
-        minHeight: "300px",
       }}
       onClick={toggleMute}
     >
@@ -109,34 +108,35 @@ const VideoPlayerCommunity = ({ src, isActive }) => {
         style={{
           width: "100%",
           height: "auto",
-          minHeight: "300px",
-          maxHeight: "80vh",
+          maxHeight: "75vh",
           objectFit: "contain",
           display: "block",
-          borderRadius: "8px",
         }}
       />
 
-      {/* 🔇 Overlay mute */}
-      {muted && (
-        <Box
-          sx={{
-            position: "absolute",
-            bottom: 12,
-            right: 12,
-            backgroundColor: "rgba(0,0,0,0.6)",
-            color: "#fff",
-            borderRadius: "50%",
-            px: 1,
-            py: 0.5,
-            fontSize: 12,
-            userSelect: "none",
-            pointerEvents: "none",
-          }}
-        >
-          🔇
-        </Box>
-      )}
+      {/* Indicador de Audio */}
+      <Box
+        sx={{
+          position: "absolute",
+          bottom: 12,
+          right: 12,
+          backgroundColor: "rgba(0, 0, 0, 0.65)",
+          color: "#FFFFFF",
+          borderRadius: "50%",
+          p: 0.8,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          pointerEvents: "none",
+          transition: "transform 0.15s ease",
+        }}
+      >
+        {muted ? (
+          <VolumeOffIcon sx={{ fontSize: 18 }} />
+        ) : (
+          <VolumeUpIcon sx={{ fontSize: 18 }} />
+        )}
+      </Box>
     </Box>
   );
 };

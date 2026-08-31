@@ -3,9 +3,11 @@ import { Grid, Box, CardMedia, Typography, Stack } from "@mui/material";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import PlayCircleIcon from "@mui/icons-material/PlayCircle";
+import Progress from "../../Progress/Progress";
 
 const TopCourseCard = ({ course, index }) => {
   if (!course) return null;
+
   return (
     <Grid size={{ xs: 12, sm: 6, md: 4, lg: 3 }} key={index}>
       <Link
@@ -106,6 +108,11 @@ const TopCourseCard = ({ course, index }) => {
             >
               {course.title}
             </Typography>
+            {course.user_progress_percentage >= 1 && (
+              <Box sx={{ width: "100%", mb: 1.5 }}>
+                <Progress progress={course?.user_progress_percentage ?? 0} />
+              </Box>
+            )}
 
             {/* Footer de la tarjeta */}
             <Stack

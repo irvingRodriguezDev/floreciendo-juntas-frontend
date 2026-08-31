@@ -165,7 +165,7 @@ const LiveCommentsSidebar = ({
               width: 7,
               height: 7,
               borderRadius: "50%",
-              bgcolor: isConnected ? "#e53888" : "#ff9800",
+              bgcolor: isConnected ? "#31c358" : "#ff9800",
             }}
           />
         </Box>
@@ -332,6 +332,7 @@ const LiveCommentsSidebar = ({
               replyTo ? `Responde a @${replyTo.userName}...` : "Comentar..."
             }
             value={message}
+            autoComplete='off'
             disabled={!isConnected}
             onChange={(e) => setMessage(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleSend()}

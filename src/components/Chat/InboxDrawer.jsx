@@ -20,16 +20,17 @@ import {
 import CloseIcon from "@mui/icons-material/Close";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import SendIcon from "@mui/icons-material/Send";
+import DoneAllIcon from "@mui/icons-material/DoneAll"; // 👈 Icono para palomitas dobles
 import ChatContext from "../../context/Chat/ChatContext";
 import AuthContext from "../../context/Auth/AuthContext";
-import clienteAxios from "../../config/Axios";
 import dayjs from "dayjs";
 import { MethodPost } from "../../config/Service";
+
 const inputStyles = {
   mb: 1,
   "& .MuiOutlinedInput-root": {
     borderRadius: "16px",
-    backgroundColor: "#FFFFFF", // Fondo blanco sólido para lectura perfecta
+    backgroundColor: "#FFFFFF",
     transition: "all 0.2s ease-in-out",
     "& fieldset": {
       borderColor: "#FCE7F3",
@@ -45,23 +46,12 @@ const inputStyles = {
   },
   "& .MuiInputBase-input": {
     color: "#1F2937",
-    padding: "16px 18px",
-    fontSize: "15px",
+    padding: "12px 16px",
+    fontSize: "14px",
     fontWeight: "500",
   },
-  "& .MuiInputLabel-root": {
-    color: "#6B7280",
-    fontSize: "15px",
-  },
-  "& .MuiInputLabel-root.Mui-focused": {
-    color: "#E53888",
-    fontWeight: "700",
-  },
-  "& .MuiFormHelperText-root": {
-    fontSize: "13px",
-    marginLeft: "6px",
-  },
 };
+
 const MAIN_PINK = "#D72E79";
 
 const InboxDrawer = () => {
@@ -80,7 +70,6 @@ const InboxDrawer = () => {
   const [replyText, setReplyText] = useState("");
   const [sending, setSending] = useState(false);
 
-  // Cargar lista de conversaciones cuando se abre el drawer
   useEffect(() => {
     if (openInboxDrawer) {
       getConversations();
@@ -101,7 +90,6 @@ const InboxDrawer = () => {
       });
 
       setReplyText("");
-      // Recargar lista de conversaciones y mensajes
       setActiveConversation(activeConversation);
       getConversations();
     } catch (error) {
@@ -109,6 +97,35 @@ const InboxDrawer = () => {
     } finally {
       setSending(false);
     }
+  };
+
+  // Helper para renderizar los iconos de lectura tipo WhatsApp
+  const renderStatusIcon = (status) => {
+    if (status === "sent_unread") {
+      return (
+        <DoneAllIcon
+          sx={{
+            fontSize: 16,
+            color: "#9E9E9E",
+            mr: 0.5,
+            verticalAlign: "middle",
+          }}
+        />
+      );
+    }
+    if (status === "sent_read") {
+      return (
+        <DoneAllIcon
+          sx={{
+            fontSize: 16,
+            color: MAIN_PINK,
+            mr: 0.5,
+            verticalAlign: "middle",
+          }}
+        />
+      );
+    }
+    return null;
   };
 
   return (
@@ -151,7 +168,7 @@ const InboxDrawer = () => {
 
           <Typography variant='h6' sx={{ fontWeight: 800, color: MAIN_PINK }}>
             {activeConversation
-              ? activeConversation.otherUser?.nombre || "Chat"
+              ? activeConversation.otherUser?.name || "Chat"
               : "Bandeja de Entrada 💬"}
           </Typography>
         </Stack>
@@ -198,7 +215,7 @@ const InboxDrawer = () => {
             }}
           >
             {messages.map((msg) => {
-              const isMine = msg.senderId === usuario?.id;
+              const isMine = Number(msg.senderId) === Number(usuario?.id);
 
               return (
                 <Box
@@ -251,13 +268,13 @@ const InboxDrawer = () => {
                   variant='body2'
                   sx={{ color: "#757575", fontWeight: 500 }}
                 >
-                  Aún no tienes mensajes recibidos ni enviados. ¡Sé la primera
-                  en felicitar a tus compañeras! 🎉
+                  Aún no tienes mensajes recibidos ni enviados.
                 </Typography>
               </Box>
             ) : (
               conversations.map((conv) => {
                 const other = conv.otherUser;
+                const isUnread = conv.isUnread;
 
                 return (
                   <React.Fragment key={conv.id}>
@@ -267,25 +284,28 @@ const InboxDrawer = () => {
                       sx={{
                         py: 1.5,
                         px: 2,
-                        transition: "bgcolor 0.2s",
-                        "&:hover": { bgcolor: "#FFF0F6" },
+                        bgcolor: isUnread ? "#FFF0F5" : "transparent", // 🌟 Fondo rosa claro si NO está leído
+                        transition: "background-color 0.2s",
+                        "&:hover": {
+                          bgcolor: isUnread ? "#FFE4E1" : "#FFF0F6",
+                        },
                       }}
                     >
                       <ListItemAvatar>
                         <Avatar
                           src={
-                            other?.profileImage
-                              ? `${import.meta.env.VITE_CDN_URL}${other.profileImage}`
-                              : `${import.meta.env.VITE_CDN_URL}/production/statics/FLOR+ROSA+CONVEN.png`
+                            other?.profileImage ||
+                            "https://cdn.floreciendojuntas.com/production/statics/FLOR+ROSA+CONVEN.png"
                           }
                           sx={{ border: `2px solid ${MAIN_PINK}` }}
                         />
                       </ListItemAvatar>
+
                       <ListItemText
                         primary={
                           <Typography
                             variant='subtitle2'
-                            sx={{ fontWeight: 700 }}
+                            sx={{ fontWeight: isUnread ? 800 : 600 }}
                           >
                             {other?.name || "Usuaria"}
                           </Typography>
@@ -294,18 +314,49 @@ const InboxDrawer = () => {
                           <Typography
                             variant='body2'
                             noWrap
-                            sx={{ color: "#616161", fontSize: "0.82rem" }}
+                            sx={{
+                              color: isUnread ? "#212121" : "#616161",
+                              fontWeight: isUnread ? 700 : 400,
+                              fontSize: "0.82rem",
+                              display: "flex",
+                              alignItems: "center",
+                            }}
                           >
-                            {conv.lastMessage}
+                            {/* Renderizar palomita gris / rosa si el mensaje fue enviado por mí */}
+                            {renderStatusIcon(conv.status)}
+                            {conv.lastMessage?.body || "Mensaje enviado"}
                           </Typography>
                         }
                       />
-                      <Typography
-                        variant='caption'
-                        sx={{ color: "#9E9E9E", fontSize: "0.72rem", ml: 1 }}
-                      >
-                        {dayjs(conv.lastMessageAt).format("DD/MM")}
-                      </Typography>
+
+                      <Stack alignItems='flex-end' spacing={0.5} sx={{ ml: 1 }}>
+                        <Typography
+                          variant='caption'
+                          sx={{
+                            color: isUnread ? MAIN_PINK : "#9E9E9E",
+                            fontWeight: isUnread ? 700 : 400,
+                            fontSize: "0.72rem",
+                          }}
+                        >
+                          {dayjs(conv.lastMessageAt).format("DD/MM")}
+                        </Typography>
+
+                        {/* 🔴 Indicador rosa pulsante para mensajes sin leer */}
+                        {isUnread && (
+                          <Badge
+                            color='primary'
+                            variant='dot'
+                            sx={{
+                              "& .MuiBadge-badge": {
+                                backgroundColor: MAIN_PINK,
+                                width: 10,
+                                height: 10,
+                                borderRadius: "50%",
+                              },
+                            }}
+                          />
+                        )}
+                      </Stack>
                     </ListItem>
                     <Divider component='li' sx={{ borderColor: "#F8BBD0" }} />
                   </React.Fragment>

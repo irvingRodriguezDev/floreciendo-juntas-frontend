@@ -1,4 +1,10 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, {
+  useContext,
+  useEffect,
+  useState,
+  useRef,
+  useCallback,
+} from "react";
 import {
   Box,
   Paper,
@@ -9,19 +15,20 @@ import {
   Fab,
   Tooltip,
   CircularProgress,
-  Pagination, // 👈 1. Importamos la Paginación
 } from "@mui/material";
 import EditNoteIcon from "@mui/icons-material/EditNote";
 import AuthContext from "../../context/Auth/AuthContext";
 import CommunityContext from "../../context/Community/CommunityContext";
 import { useDebounce } from "use-debounce";
-
 import CreatePostModal from "./CreatePostCommunityModal";
-import PostCard from "./PostCard"; // 👈 Asegúrate de importar tu PostCard actualizado
+import PostCard from "./PostCard";
 import Birtdays from "../../containers/Birthdays/Birtdays";
 import Stories from "../../containers/Stories/Stories";
 
-const colors = {
+// Limite recomendado de 6 elementos para evitar saturación de RAM en móviles
+const ROWS_PER_PAGE = 6;
+
+const COLORS = {
   primary: "#D82E7A",
   primaryHover: "#C02567",
   primarySoft: "rgba(216, 46, 122, 0.08)",
@@ -38,37 +45,29 @@ const CATEGORIES = [
 
 export default function CommunityFeed() {
   const [openWritePost, setOpenWritePost] = useState(false);
-  const { community_posts, getFeed, totalPages } = useContext(CommunityContext);
+  const { community_posts, getFeed, totalPages, currentPage } =
+    useContext(CommunityContext);
   const { usuario, autenticado } = useContext(AuthContext);
 
   const [search, setSearch] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
+  const [fetchingMore, setFetchingMore] = useState(false);
 
-  const rowsPerPage = 10;
   const [debounceSearch] = useDebounce(search, 600);
+  const observerRef = useRef(null);
 
   const handleClickOpenWritePost = () => setOpenWritePost(true);
   const handleCloseWritePost = () => setOpenWritePost(false);
 
+  // 1. Cambio de categoría: Resetea paginación
   const handleCategoryChange = (categoryId) => {
     setSelectedCategory(categoryId);
     setPage(1);
   };
 
-  // Handler para la Paginación con scroll suave hacia arriba
-  const handlePageChange = (event, value) => {
-    setPage(value);
-    window.scrollTo({ top: 80, behavior: "smooth" });
-  };
-
-  // Reset de página al buscar
-  useEffect(() => {
-    if (page !== 1) setPage(1);
-  }, [debounceSearch]);
-
-  // Carga unificada de Feed
+  // 2. Carga inicial / Reset por búsqueda o cambio de categoría
   useEffect(() => {
     let active = true;
 
@@ -77,10 +76,9 @@ export default function CommunityFeed() {
       setLoading(true);
 
       try {
-        if (active) {
-          const typeParam = selectedCategory === "all" ? "" : selectedCategory;
-          await getFeed(page, rowsPerPage, debounceSearch, typeParam);
-        }
+        const typeParam = selectedCategory === "all" ? "" : selectedCategory;
+        setPage(1);
+        await getFeed(1, ROWS_PER_PAGE, debounceSearch, typeParam);
       } catch (error) {
         console.error("Error al cargar la comunidad:", error);
       } finally {
@@ -93,13 +91,59 @@ export default function CommunityFeed() {
     return () => {
       active = false;
     };
-  }, [page, debounceSearch, autenticado, selectedCategory]);
+  }, [debounceSearch, selectedCategory, autenticado]);
+
+  // 3. Cargar más publicaciones al hacer Scroll
+  const loadMorePosts = useCallback(async () => {
+    if (loading || fetchingMore || page >= totalPages || !autenticado) return;
+
+    setFetchingMore(true);
+    const nextPage = page + 1;
+    const typeParam = selectedCategory === "all" ? "" : selectedCategory;
+
+    try {
+      await getFeed(nextPage, ROWS_PER_PAGE, debounceSearch, typeParam);
+      setPage(nextPage);
+    } catch (error) {
+      console.error("Error al cargar más publicaciones:", error);
+    } finally {
+      setFetchingMore(false);
+    }
+  }, [
+    loading,
+    fetchingMore,
+    page,
+    totalPages,
+    autenticado,
+    selectedCategory,
+    debounceSearch,
+    getFeed,
+  ]);
+
+  // 4. Observer Callback para centinela al final de la pantalla
+  const lastPostElementRef = useCallback(
+    (node) => {
+      if (loading || fetchingMore) return;
+      if (observerRef.current) observerRef.current.disconnect();
+
+      observerRef.current = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting && page < totalPages) {
+          loadMorePosts();
+        }
+      });
+
+      if (node) observerRef.current.observe(node);
+    },
+    [loading, fetchingMore, page, totalPages, loadMorePosts],
+  );
 
   return (
     <Box sx={{ width: "100%", pb: 6 }}>
+      {/* 1. SECCIONES SUPERIORES */}
       <Birtdays />
       <Stories />
-      {/* 1. INPUT DE CREACIÓN (TARJETA RED SOCIAL) */}
+
+      {/* 2. CREAR PUBLICACIÓN (TRIGGER) */}
       <Paper
         elevation={0}
         onClick={handleClickOpenWritePost}
@@ -112,11 +156,11 @@ export default function CommunityFeed() {
           borderRadius: "18px",
           cursor: "pointer",
           bgcolor: "#FFFFFF",
-          border: `1px solid ${colors.borderLight}`,
+          border: `1px solid ${COLORS.borderLight}`,
           boxShadow: "0 2px 12px rgba(216, 46, 122, 0.04)",
           transition: "all 0.2s ease-in-out",
           "&:hover": {
-            borderColor: colors.primary,
+            borderColor: COLORS.primary,
             boxShadow: "0 4px 18px rgba(216, 46, 122, 0.1)",
             transform: "translateY(-1px)",
           },
@@ -128,7 +172,7 @@ export default function CommunityFeed() {
           sx={{
             width: { xs: 40, sm: 44 },
             height: { xs: 40, sm: 44 },
-            border: `2px solid ${colors.primarySoft}`,
+            border: `2px solid ${COLORS.primarySoft}`,
           }}
         />
 
@@ -145,7 +189,7 @@ export default function CommunityFeed() {
           <Typography
             variant='body2'
             sx={{
-              color: colors.textMuted,
+              color: COLORS.textMuted,
               fontSize: { xs: "0.85rem", sm: "0.92rem" },
             }}
           >
@@ -153,7 +197,7 @@ export default function CommunityFeed() {
             <Box
               component='b'
               sx={{
-                color: colors.primary,
+                color: COLORS.primary,
                 display: "inline-flex",
                 alignItems: "center",
                 gap: "4px",
@@ -166,9 +210,9 @@ export default function CommunityFeed() {
         </Box>
       </Paper>
 
-      {/* 2. FILTROS RÁPIDOS (CHIPS ORGÁNICOS) */}
+      {/* 3. FILTROS RÁPIDOS */}
       <Stack
-        direction={{ xs: "column", sm: "row", md: "row" }}
+        direction='row'
         spacing={1}
         sx={{
           mb: 3,
@@ -191,7 +235,7 @@ export default function CommunityFeed() {
                 px: 1,
                 py: 2.2,
                 borderRadius: "12px",
-                bgcolor: isSelected ? colors.primary : "#FFFFFF",
+                bgcolor: isSelected ? COLORS.primary : "#FFFFFF",
                 color: isSelected ? "#FFFFFF" : "#4B5563",
                 border: isSelected ? "none" : "1px solid #E5E7EB",
                 boxShadow: isSelected
@@ -199,7 +243,7 @@ export default function CommunityFeed() {
                   : "none",
                 transition: "all 0.2s ease",
                 "&:hover": {
-                  bgcolor: isSelected ? colors.primaryHover : "#F3F4F6",
+                  bgcolor: isSelected ? COLORS.primaryHover : "#F3F4F6",
                 },
               }}
             />
@@ -207,11 +251,11 @@ export default function CommunityFeed() {
         })}
       </Stack>
 
-      {/* 3. FEED DE PUBLICACIONES */}
+      {/* 4. FEED DE PUBLICACIONES */}
       <Box sx={{ position: "relative", minHeight: 300 }}>
         {loading ? (
           <Box sx={{ display: "flex", justifyContent: "center", py: 6 }}>
-            <CircularProgress sx={{ color: colors.primary }} />
+            <CircularProgress sx={{ color: COLORS.primary }} />
           </Box>
         ) : community_posts && community_posts.length > 0 ? (
           <Stack spacing={2.5}>
@@ -235,39 +279,31 @@ export default function CommunityFeed() {
             </Typography>
           </Paper>
         )}
-      </Box>
 
-      {/* 4. CONTROL DE PAGINACIÓN */}
-      {!loading && totalPages > 1 && (
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "center",
-            mt: 4,
-            pt: 2,
-          }}
-        >
-          <Pagination
-            count={totalPages}
-            page={page}
-            onChange={handlePageChange}
-            color='primary'
-            shape='rounded'
-            size='medium'
-            sx={{
-              "& .MuiPaginationItem-root": {
-                fontWeight: 600,
-                borderRadius: "10px",
-              },
-              "& .Mui-selected": {
-                bgcolor: `${colors.primary} !important`,
-                color: "#FFFFFF",
-                boxShadow: "0 2px 8px rgba(216, 46, 122, 0.3)",
-              },
-            }}
-          />
-        </Box>
-      )}
+        {/* INDICADOR DE CARGA SUCESIVA (SCROLL) */}
+        {fetchingMore && (
+          <Box sx={{ display: "flex", justifyContent: "center", py: 4 }}>
+            <CircularProgress size={30} sx={{ color: COLORS.primary }} />
+          </Box>
+        )}
+
+        {/* CENTINELA INVISIBLE PARA INTERSECTION OBSERVER */}
+        {!loading && page < totalPages && (
+          <Box ref={lastPostElementRef} sx={{ height: 20, my: 1 }} />
+        )}
+
+        {/* MENSAJE DE FIN DE CONTENIDO */}
+        {!loading && page >= totalPages && community_posts?.length > 0 && (
+          <Typography
+            variant='body2'
+            color='text.secondary'
+            align='center'
+            sx={{ mt: 4, mb: 2, fontWeight: 500 }}
+          >
+            🌸 ¡Has llegado al final de las publicaciones!
+          </Typography>
+        )}
+      </Box>
 
       {/* 5. FAB MÓVIL */}
       {autenticado && (
@@ -276,11 +312,11 @@ export default function CommunityFeed() {
             color='primary'
             onClick={handleClickOpenWritePost}
             sx={{
-              position: "sticky",
-              bottom: 100,
+              position: "fixed",
+              bottom: 24,
               right: 24,
-              bgcolor: colors.primary,
-              "&:hover": { bgcolor: colors.primaryHover },
+              bgcolor: COLORS.primary,
+              "&:hover": { bgcolor: COLORS.primaryHover },
               display: { xs: "flex", md: "none" },
               zIndex: 1000,
               boxShadow: "0 8px 24px rgba(216, 46, 122, 0.4)",

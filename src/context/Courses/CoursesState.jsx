@@ -118,8 +118,10 @@ const CoursesState = ({ children }) => {
       });
   };
 
-  const getTopTenCourses = () => {
-    let url = "/courses/top-viewed-courses";
+  const getTopTenCourses = (usuario, autenticado) => {
+    let url = autenticado
+      ? `/courses/top-viewed-courses?userId=${usuario.id}`
+      : "/courses/top-viewed-courses";
     MethodGet(url)
       .then((res) => {
         dispatch({

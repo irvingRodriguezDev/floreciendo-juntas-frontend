@@ -7,14 +7,19 @@ import { Link } from "react-router-dom";
 
 import CoursesContext from "../../../context/Courses/CoursesContext";
 import TopCourseCard from "./TopCourseCard";
-
+import AuthContext from "../../../context/Auth/AuthContext";
 const TopCourses = () => {
+  const { usuario, autenticado } = useContext(AuthContext);
   const { getTopTenCourses, topCourses } = useContext(CoursesContext);
   const theme = useTheme();
 
   useEffect(() => {
-    getTopTenCourses();
-  }, []);
+    if (usuario && autenticado) {
+      getTopTenCourses(usuario, autenticado);
+    } else {
+      getTopTenCourses(null, false);
+    }
+  }, [usuario, autenticado]);
 
   return (
     <Box
@@ -121,13 +126,15 @@ const TopCourses = () => {
           }}
         >
           {topCourses &&
-            topCourses.map((course, index) => (
-              <TopCourseCard
-                key={course.id || index}
-                course={course}
-                index={index}
-              />
-            ))}
+            topCourses.map((course, index) => {
+              return (
+                <TopCourseCard
+                  key={course.id || index}
+                  course={course}
+                  index={index}
+                />
+              );
+            })}
         </Grid>
 
         {/* 🚀 BOTÓN CTA PARA EXPLORAR TODO EL CATÁLOGO */}

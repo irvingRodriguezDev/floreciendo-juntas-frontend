@@ -94,7 +94,7 @@ export default defineConfig({
     chunkSizeWarningLimit: 5000,
   },
   server: {
-    allowedHosts: ["mothers-totally-consistent-assign.trycloudflare.com"],
+    allowedHosts: ["contacts-sequence-cleaner-popularity.trycloudflare.com"],
     port: 5173,
   },
 });

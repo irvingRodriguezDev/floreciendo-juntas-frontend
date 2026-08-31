@@ -16,17 +16,6 @@ const PostMediaSwiper = ({ media = [] }) => {
 
   const [activeIndex, setActiveIndex] = useState(0);
 
-  const hasOnlyImages = useMemo(() => {
-    return (
-      sortedMedia.length > 0 &&
-      sortedMedia.every((item) => item.type === "image")
-    );
-  }, [sortedMedia]);
-
-  const hasVideo = useMemo(() => {
-    return sortedMedia.some((item) => item.type === "video");
-  }, [sortedMedia]);
-
   if (sortedMedia.length === 0) return null;
 
   return (
@@ -34,28 +23,27 @@ const PostMediaSwiper = ({ media = [] }) => {
       <GlobalStyles
         styles={{
           ".post-media-swiper": {
-            borderRadius: "12px",
+            width: "100%",
+            borderRadius: "14px",
             overflow: "hidden",
-            maxHeight: "480px",
           },
           ".post-media-swiper .swiper-wrapper": {
-            alignItems: "center",
-            transitionProperty: "transform, height",
-            transitionDuration: "300ms",
-            transitionTimingFunction: "ease",
+            transitionProperty: "transform, height !important",
+            transitionDuration: "300ms !important",
+            transitionTimingFunction: "ease !important",
+            alignItems: "flex-start",
           },
           ".post-media-swiper .swiper-slide": {
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            maxHeight: "480px",
-            backgroundColor: "#000000",
+            width: "100%",
+            height: "auto",
+            display: "block",
+            backgroundColor: "transparent",
           },
           ".post-media-swiper .swiper-pagination": {
             bottom: "8px !important",
           },
           ".post-media-swiper .swiper-pagination-bullet": {
-            boxShadow: "0 1px 3px rgba(0,0,0,0.3)",
+            boxShadow: "0 1px 4px rgba(0,0,0,0.4)",
           },
         }}
       />
@@ -65,9 +53,7 @@ const PostMediaSwiper = ({ media = [] }) => {
           width: "100%",
           my: 1.5,
           position: "relative",
-          borderRadius: "12px",
-          overflow: "hidden",
-          "--swiper-pagination-color": "#D72E7A",
+          "--swiper-pagination-color": "#D82E7A",
           "--swiper-pagination-bullet-inactive-color": "#FFFFFF",
           "--swiper-pagination-bullet-inactive-opacity": "0.6",
         }}
@@ -75,11 +61,16 @@ const PostMediaSwiper = ({ media = [] }) => {
         <Swiper
           className='post-media-swiper'
           modules={[Pagination]}
-          pagination={{ clickable: true, dynamicBullets: true }}
+          pagination={
+            sortedMedia.length > 1
+              ? { clickable: true, dynamicBullets: true }
+              : false
+          }
           slidesPerView={1}
           spaceBetween={0}
-          autoHeight={hasOnlyImages}
-          style={hasVideo ? { minHeight: "280px" } : {}}
+          autoHeight={true}
+          observer={true} // Recalcula dimensiones si cambia el DOM interno
+          observeParents={true} // Recalcula si cambia el contenedor padre
           onSlideChange={(swiper) => {
             setActiveIndex(swiper.realIndex);
           }}

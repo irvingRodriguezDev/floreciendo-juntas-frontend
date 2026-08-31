@@ -100,7 +100,7 @@ const Community = () => {
 
         {/* CONTENIDO PRINCIPAL */}
         <Grid container justifyContent='center'>
-          <Grid size={{ xs: 12, md: 10, lg: 9 }}>
+          <Grid size={{ xs: 12, md: 10, lg: 7 }}>
             <TabsTypeCommunity />
           </Grid>
         </Grid>

@@ -1,126 +1,192 @@
 import {
-  GET_POSTS_COMMUNITY,
-  CREATE_POST_COMMUNITY,
   CREATE_COMMENT_POST_COMMUNITY,
+  CREATE_POST_COMMUNITY,
+  GET_POSTS_COMMUNITY,
   REMOVE_OPTIMISTIC_COMMENT,
+  TOGGLE_COMMENT_LIKE_COMMUNITY,
   TOOGLE_REACTION_POST_COMMUNITY,
 } from "../../types";
 
-export default (state, action) => {
+const CommunityReducer = (state, action) => {
   switch (action.type) {
-    case GET_POSTS_COMMUNITY:
+    //esta caso obtiene el feed de la comunidad
+    case GET_POSTS_COMMUNITY: {
+      const { community_posts, currentPage, totalPages } = action.payload;
+
       return {
         ...state,
-        community_posts: action.payload.community_posts,
-        currentPage: action.payload.currentPage,
-        totalPages: action.payload.totalPages,
+        // 🔥 Si es la página 1, reemplazamos el array. Si es página > 1, concatenamos.
+        community_posts:
+          currentPage === 1
+            ? community_posts
+            : [...state.community_posts, ...community_posts],
+        currentPage,
+        totalPages,
       };
-
+    }
+    //este caso se ejecuta cuando se crea un nuevo post en la comunidad
     case CREATE_POST_COMMUNITY:
-      const exists = state.community_posts.some(
-        (p) => p.id === action.payload.id,
-      );
-      if (exists) return state;
-
-      const newPosts = [action.payload, ...state.community_posts];
-
-      // Ordenamos el estado local igual que en el Backend
-      const sortedPosts = newPosts.sort((a, b) => {
-        // 1. Primero por isPinned (true primero)
-        if (a.isPinned !== b.isPinned) {
-          return a.isPinned ? -1 : 1;
-        }
-        // 2. Si ambos tienen isPinned, ordenamos por pinnedUntil (más reciente primero)
-        if (a.isPinned && b.isPinned) {
-          return new Date(b.pinnedUntil) - new Date(a.pinnedUntil);
-        }
-        // 3. Si ninguno está anclado, ordenamos por createdAt
-        return new Date(b.createdAt) - new Date(a.createdAt);
-      });
-
       return {
         ...state,
-        community_posts: sortedPosts,
+        community_posts: [action.payload, ...state.community_posts],
       };
-    case TOOGLE_REACTION_POST_COMMUNITY:
+    // Este caso se ejecuta cuando alguien comenta un post
+    case CREATE_COMMENT_POST_COMMUNITY: {
+      const { postId, comment, parentId, replaceTemp } = action.payload;
+
       return {
         ...state,
         community_posts: state.community_posts.map((post) => {
-          if (post.id !== action.payload.postId) return post;
+          if ((post.id || post._id) !== postId) return post;
 
-          // Si viene 'liked' en el payload (desde socket), usamos ese valor.
-          // Si NO viene (clic optimista), invertimos el que ya tenemos.
-          const isSocketUpdate = typeof action.payload.liked !== "undefined";
-          const newLikedByMe = isSocketUpdate
-            ? action.payload.liked
-            : !post.likedByMe;
+          let updatedComments = [...(post.comments || [])];
 
-          // Solo sumamos/restamos si el estado realmente cambió
-          if (newLikedByMe === post.likedByMe && isSocketUpdate) return post;
+          if (parentId) {
+            updatedComments = updatedComments.map((parentComm) => {
+              if ((parentComm.id || parentComm._id) !== parentId)
+                return parentComm;
 
-          return {
-            ...post,
-            likedByMe: newLikedByMe,
-            likesCount: newLikedByMe
-              ? (post.likesCount || 0) +
-                (isSocketUpdate && post.likedByMe ? 0 : 1)
-              : Math.max(
-                  (post.likesCount || 0) -
-                    (isSocketUpdate && !post.likedByMe ? 0 : 1),
-                  0,
-                ),
-          };
-        }),
-      };
-    case CREATE_COMMENT_POST_COMMUNITY:
-      return {
-        ...state,
-        community_posts: state.community_posts.map((post) => {
-          if (post.id !== action.payload.postId) return post;
+              let updatedReplies = [...(parentComm.replies || [])];
 
-          let newComments;
-          const { comment, replaceTemp } = action.payload;
+              if (replaceTemp) {
+                updatedReplies = updatedReplies.map((r) =>
+                  r.id === replaceTemp ? comment : r,
+                );
+              } else {
+                updatedReplies.push(comment);
+              }
 
-          if (replaceTemp) {
-            // 1. REEMPLAZO: El usuario actual ve su comentario temporal convertirse en real
-            newComments = (post.comments || []).map((c) =>
-              c.id === replaceTemp ? comment : c,
-            );
+              return { ...parentComm, replies: updatedReplies };
+            });
           } else {
-            // 2. SOCKET / OTROS: Verificamos si ya existe por ID
-            const exists = post.comments?.some((c) => c.id === comment.id);
-            if (exists) return post;
-
-            // 3. ORDEN: Insertamos al principio (o al final, según tu diseño)
-            // Usualmente: [nuevo, ...viejos]
-            newComments = [comment, ...(post.comments || [])];
+            if (replaceTemp) {
+              updatedComments = updatedComments.map((c) =>
+                c.id === replaceTemp ? comment : c,
+              );
+            } else {
+              updatedComments.push(comment);
+            }
           }
 
           return {
             ...post,
-            comments: newComments,
-            // Solo aumentamos el contador si no es un reemplazo de uno que ya sumamos
-            commentsCount: replaceTemp
-              ? post.commentsCount
-              : (post.commentsCount || 0) + 1,
+            comments: updatedComments,
+            commentsCount: (post.commentsCount || 0) + 1,
           };
         }),
       };
-    case REMOVE_OPTIMISTIC_COMMENT:
+    }
+    //este caso es la simulacion de un comentario
+    case REMOVE_OPTIMISTIC_COMMENT: {
+      const { postId, tempId, parentId } = action.payload;
+
       return {
         ...state,
         community_posts: state.community_posts.map((post) => {
-          if (post.id !== action.payload.postId) return post;
+          if ((post.id || post._id) !== postId) return post;
+
+          let updatedComments = [...(post.comments || [])];
+
+          if (parentId) {
+            updatedComments = updatedComments.map((parentComm) => {
+              if ((parentComm.id || parentComm._id) !== parentId)
+                return parentComm;
+              return {
+                ...parentComm,
+                replies: (parentComm.replies || []).filter(
+                  (r) => r.id !== tempId,
+                ),
+              };
+            });
+          } else {
+            updatedComments = updatedComments.filter((c) => c.id !== tempId);
+          }
+
           return {
             ...post,
-            comments: post.comments.filter(
-              (c) => c.id !== action.payload.tempId,
-            ),
-            commentsCount: Math.max((post.commentsCount || 1) - 1, 0),
+            comments: updatedComments,
+            commentsCount: Math.max(0, (post.commentsCount || 1) - 1),
           };
         }),
       };
+    }
+    //este es el caso de las reacciones
+    case TOOGLE_REACTION_POST_COMMUNITY: {
+      const { postId, likesCount, isLikedByMe, likedByMe, userId } =
+        action.payload;
+
+      return {
+        ...state,
+        community_posts: state.community_posts.map((post) => {
+          // Normalización de IDs a String para evitar fallos de tipo (Int vs String)
+          if (String(post.id || post._id) !== String(postId)) return post;
+
+          // Si el evento viene del socket de OTRO usuario, actualizamos solo el conteo total
+          const isMyOwnAction = userId
+            ? String(userId) === String(state.currentUserId)
+            : true;
+          const newIsLiked = isMyOwnAction
+            ? (isLikedByMe ?? likedByMe ?? !post.isLikedByMe)
+            : (post.isLikedByMe ?? post.likedByMe);
+
+          return {
+            ...post,
+            isLikedByMe: newIsLiked,
+            likedByMe: newIsLiked,
+            // Si el payload trae likesCount del backend (Socket), lo usamos directamente.
+            // Si no, incrementamos/decrementamos manualmente.
+            likesCount:
+              typeof likesCount === "number"
+                ? likesCount
+                : newIsLiked
+                  ? post.likesCount + 1
+                  : post.likesCount - 1,
+          };
+        }),
+      };
+    }
+    // Nuevo caso para actualizar likes de comentarios recibidos por Sockets
+    case TOGGLE_COMMENT_LIKE_COMMUNITY: {
+      const { postId, commentId, likesCount, parentId } = action.payload;
+
+      return {
+        ...state,
+        community_posts: state.community_posts.map((post) => {
+          if (String(post.id || post._id) !== String(postId)) return post;
+
+          const updatedComments = (post.comments || []).map((parentComm) => {
+            // Si es una respuesta dentro de un comentario padre
+            if (
+              parentId &&
+              String(parentComm.id || parentComm._id) === String(parentId)
+            ) {
+              const updatedReplies = (parentComm.replies || []).map((reply) => {
+                if (String(reply.id || reply._id) === String(commentId)) {
+                  return { ...reply, likesCount };
+                }
+                return reply;
+              });
+              return { ...parentComm, replies: updatedReplies };
+            }
+
+            // Si es un comentario principal
+            if (String(parentComm.id || parentComm._id) === String(commentId)) {
+              return { ...parentComm, likesCount };
+            }
+
+            return parentComm;
+          });
+
+          return {
+            ...post,
+            comments: updatedComments,
+          };
+        }),
+      };
+    }
     default:
       return state;
   }
 };
+
+export default CommunityReducer;

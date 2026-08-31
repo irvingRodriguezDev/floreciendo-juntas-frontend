@@ -1,4 +1,4 @@
-import React, { useEffect, useReducer, useContext, use } from "react";
+import React, { useEffect, useReducer, useContext } from "react";
 import CommunityContext from "./CommunityContext";
 import CommunityReducer from "./CommunityReducer";
 import MethodGet, { MethodPost } from "../../config/Service";
@@ -7,6 +7,7 @@ import {
   CREATE_POST_COMMUNITY,
   GET_POSTS_COMMUNITY,
   REMOVE_OPTIMISTIC_COMMENT,
+  TOGGLE_COMMENT_LIKE_COMMUNITY,
   TOOGLE_REACTION_POST_COMMUNITY,
 } from "../../types";
 import clienteAxios from "../../config/Axios";
@@ -15,6 +16,7 @@ import Swal from "sweetalert2";
 import AuthContext from "../Auth/AuthContext";
 import { useSound } from "../../hooks/useSound";
 import notificationSound from "../../assets/sounds/A soft, bubbly pop sound for a notification popping up..wav";
+
 const CommunityState = ({ children }) => {
   const initialState = {
     community_posts: [],
@@ -27,81 +29,84 @@ const CommunityState = ({ children }) => {
   const { autenticado, usuario } = useContext(AuthContext);
   const usuarioId = usuario?.id;
 
-  // 👂 SOCKET EVENTS (SIN MANEJAR CONEXIÓN)
-
+  // 👂 SOCKET EVENTS
   useEffect(() => {
-    // Solo intentamos conectar si el usuario está autenticado
     if (!autenticado || !usuarioId) return;
 
     const socket = getSocket();
-
-    // Si por un microsegundo no hay socket, el siguiente render lo atrapará
     if (!socket) return;
 
-    console.log("📝 Socket vinculado a la Comunidad");
-
+    // 1. Nuevo Post en vivo
     const onPostCreated = (post) => {
-      // Si el post lo creé yo, mi reducer ya lo gestionó localmente (optimistic update)
-      if (post.userId === usuarioId) return;
-      if (post.type !== type) {
-        console.log(
-          `Post ignorado: es de tipo ${post.type} y mi filtro actual es ${type}`,
-        );
+      if (
+        String(post.userId) === String(usuarioId) ||
+        String(post.user?.id) === String(usuarioId)
+      )
         return;
-      }
-
       dispatch({ type: CREATE_POST_COMMUNITY, payload: post });
     };
 
-    const onCommentCreated = ({ postId, comment, userId }) => {
-      if (userId === usuarioId) return;
+    // 2. Nuevo Comentario o Respuesta en vivo
+    const onCommentCreated = ({ postId, comment, userId, parentId }) => {
+      if (String(userId) === String(usuarioId)) return;
       dispatch({
         type: CREATE_COMMENT_POST_COMMUNITY,
-        payload: { postId, comment },
+        payload: { postId: Number(postId), comment, parentId },
       });
     };
 
-    const onReactionToggled = ({ postId, userId, liked }) => {
-      if (userId === usuarioId) return;
+    // 3. Like a Post en vivo (recibe { postId, userId, liked, likesCount })
+    const onPostLikeToggled = (payload) => {
+      if (String(payload.userId) === String(usuarioId)) return;
       dispatch({
         type: TOOGLE_REACTION_POST_COMMUNITY,
-        payload: { postId, liked },
+        payload,
       });
     };
 
-    // Registrar eventos
+    // 4. Like a Comentario en vivo (recibe { commentId, postId, userId, liked, likesCount, parentId })
+    const onCommentLikeToggled = (payload) => {
+      if (String(payload.userId) === String(usuarioId)) return;
+      dispatch({
+        type: TOGGLE_COMMENT_LIKE_COMMUNITY,
+        payload,
+      });
+    };
+
     socket.on("postCommunityCreated", onPostCreated);
     socket.on("createCommentPostCommunity", onCommentCreated);
-    socket.on("postLikeToggled", onReactionToggled);
+    socket.on("postLikeToggled", onPostLikeToggled);
+    socket.on("toggleCommentLike", onCommentLikeToggled);
 
-    // Limpieza
     return () => {
       socket.off("postCommunityCreated", onPostCreated);
       socket.off("createCommentPostCommunity", onCommentCreated);
-      socket.off("postLikeToggled", onReactionToggled);
+      socket.off("postLikeToggled", onPostLikeToggled);
+      socket.off("toggleCommentLike", onCommentLikeToggled);
     };
-
-    // 💡 Depender de 'autenticado' asegura que cuando el login se complete,
-    // este efecto se ejecute con el socket ya inicializado.
   }, [autenticado, usuarioId]);
 
   // 📡 FEED
-  const getFeed = (page, limit, search = "", type) => {
+  const getFeed = (page, limit, search = "", type = "general") => {
     let url = `/posts?type=${type}&page=${page}&limit=${limit}`;
     if (search.trim() !== "") url += `&search=${encodeURIComponent(search)}`;
 
-    MethodGet(url)
+    return MethodGet(url)
       .then((res) => {
         dispatch({
           type: GET_POSTS_COMMUNITY,
           payload: {
             community_posts: res.data.data,
-            currentPage: res.data.pagination?.page,
-            totalPages: res.data.pagination?.totalPages,
+            currentPage: res.data.pagination?.page || page,
+            totalPages: res.data.pagination?.totalPages || 1,
           },
         });
+        return res.data;
       })
-      .catch((error) => console.error(error));
+      .catch((error) => {
+        console.error("Error fetching feed:", error);
+        throw error;
+      });
   };
 
   // 📝 CREAR POST
@@ -109,13 +114,10 @@ const CommunityState = ({ children }) => {
     Swal.fire({
       title: "Publicando...",
       allowOutsideClick: false,
-      // 🔥 Esto pone la alerta por encima del modal de MUI
       didOpen: () => {
         Swal.showLoading();
         const container = Swal.getContainer();
-        if (container) {
-          container.style.zIndex = "1500";
-        }
+        if (container) container.style.zIndex = "1500";
       },
     });
 
@@ -141,7 +143,6 @@ const CommunityState = ({ children }) => {
         payload: res.data.post,
       });
     } catch (error) {
-      // Si falla, cerramos la carga y mostramos el error arriba también
       Swal.fire({
         icon: "error",
         title: "Error",
@@ -153,10 +154,13 @@ const CommunityState = ({ children }) => {
     }
   };
 
-  // 💬 COMENTARIO (OPTIMISTIC UI)
+  // 💬 COMENTARIO (SOPORTA RESPUESTAS Y ANIDADOS CON OPTIMISTIC UI)
   const createCommentPostCommunity = async (postId, data) => {
     const formData = new FormData();
     if (data.content) formData.append("content", data.content);
+    if (data.parentId) formData.append("parentId", data.parentId);
+    if (data.replyToUserId)
+      formData.append("replyToUserId", data.replyToUserId);
 
     if (data.files?.length) {
       data.files.forEach((file) => formData.append("files", file));
@@ -167,29 +171,21 @@ const CommunityState = ({ children }) => {
       id: tempId,
       content: data.content,
       user: data.user,
+      parentId: data.parentId || null,
+      replyToUserId: data.replyToUserId || null,
       createdAt: new Date(),
       optimistic: true,
       media: data.files?.map((file) => ({
         url: URL.createObjectURL(file),
         type: file.type.startsWith("video") ? "video" : "image",
       })),
+      replies: [],
     };
 
     // 🚀 Optimistic UI
     dispatch({
       type: CREATE_COMMENT_POST_COMMUNITY,
-      payload: { postId, comment: optimisticComment },
-    });
-
-    // 🔄 Swal loading
-    Swal.fire({
-      title: "Publicando comentario",
-      text: "Por favor espera…",
-      allowOutsideClick: false,
-      allowEscapeKey: false,
-      didOpen: () => {
-        Swal.showLoading();
-      },
+      payload: { postId, comment: optimisticComment, parentId: data.parentId },
     });
 
     try {
@@ -203,37 +199,28 @@ const CommunityState = ({ children }) => {
 
       optimisticComment.media?.forEach((m) => URL.revokeObjectURL(m.url));
 
-      Swal.close(); // ✅ cerrar spinner
-
       dispatch({
         type: CREATE_COMMENT_POST_COMMUNITY,
         payload: {
           postId,
           comment: res.data.data,
+          parentId: data.parentId,
           replaceTemp: tempId,
         },
       });
-      Swal.fire({
-        title: "Publicado",
-        text: "El comentario, se ha publicado exitosamente!",
-        icon: "success",
-        timer: 2000,
-        showConfirmButton: false,
-      });
+
       playSound();
     } catch (error) {
-      Swal.close(); // ✅ cerrar spinner incluso si falla
-
       dispatch({
         type: REMOVE_OPTIMISTIC_COMMENT,
-        payload: { postId, tempId },
+        payload: { postId, tempId, parentId: data.parentId },
       });
 
       Swal.fire({
         title: "Error",
         text:
-          error.response.data.message ||
-          "Ocurrio un problema al publicar el comentario",
+          error.response?.data?.message ||
+          "Ocurrió un problema al publicar el comentario",
         icon: "error",
         timer: 2500,
         showConfirmButton: false,
@@ -241,26 +228,31 @@ const CommunityState = ({ children }) => {
     }
   };
 
-  // ❤️ TOGGLE REACTION
+  // ❤️ TOGGLE REACTION EN POST
   const createToogleReaction = async (postId) => {
-    // UI Optimista inmediata
     dispatch({
       type: TOOGLE_REACTION_POST_COMMUNITY,
       payload: { postId },
     });
 
     try {
-      const res = await MethodPost(`/posts/${postId}/reaction`);
-      // Si el server nos confirma el estado, podrías usar res.data.liked
-      // pero por ahora solo activamos sonido si todo sale bien
+      await MethodPost(`/posts/${postId}/reaction`);
       playSound();
     } catch (error) {
-      // Rollback si falla la red
       dispatch({
         type: TOOGLE_REACTION_POST_COMMUNITY,
         payload: { postId },
       });
       console.error("Error toggling reaction", error);
+    }
+  };
+
+  // ❤️ TOGGLE LIKE EN COMENTARIOS
+  const toggleCommentLike = async (commentId) => {
+    try {
+      await MethodPost(`/posts/comments/${commentId}/reaction`);
+    } catch (error) {
+      console.error("Error toggling comment like", error);
     }
   };
 
@@ -272,6 +264,7 @@ const CommunityState = ({ children }) => {
         createPostCommunity,
         createCommentPostCommunity,
         createToogleReaction,
+        toggleCommentLike,
       }}
     >
       {children}

@@ -1,12 +1,6 @@
-import React, {
-  useContext,
-  useEffect,
-  useState,
-  useRef,
-  useCallback,
-} from "react";
-import { Box, Typography, useMediaQuery, useTheme } from "@mui/material";
-import { motion, AnimatePresence } from "framer-motion";
+import React, { useContext, useEffect, useState } from "react";
+import { Box, useMediaQuery, useTheme } from "@mui/material";
+import { motion } from "framer-motion";
 import { useParams, useNavigate } from "react-router-dom";
 
 // Contexts & Hooks
@@ -14,19 +8,20 @@ import AuthContext from "../../context/Auth/AuthContext";
 import LivesContext from "../../context/Lives/LivesContext";
 import { useLiveComments } from "../../hooks/useLiveComments";
 import { useIvsViewers } from "../../hooks/useIvsViewers";
+import { useLiveState } from "../../hooks/useLiveState";
+import { useFullscreenHandler } from "../../hooks/useFullscreenHandler";
 
 // Components
 import Layout from "../../components/Layout/Layout";
 import PinkSpinner from "../../components/Loading/PinkSpinner";
 import PlayerCliente from "./PlayerClient";
 import LiveCountdown from "../../components/lives/Counter";
-import LiveEndedOverlay from "../../components/lives/LiveEndedOverlay";
 import LiveHeader from "../../components/lives/LiveHeader";
 import LiveInfoCard from "../../components/lives/LiveInfoCard";
 import LiveBlocked from "../../components/lives/LiveBlocked";
+import LiveEndedOverlayContainer from "../../components/lives/LiveEndedOverlayContainer";
+import ChatBlockedState from "../../components/lives/ChatBlockedState";
 import LiveCommentsSidebar from "./LiveCommentsSidebar";
-
-// ─── Variantes de animación del player ───────────────────────────────────────
 const videoVariants = {
   live: { scale: 1, filter: "blur(0px)" },
   ending: {
@@ -37,16 +32,19 @@ const videoVariants = {
   ended: { scale: 1.05, filter: "blur(20px) brightness(0.5)" },
 };
 
-// ─── Estilos integrados para la vista de video y Fullscreen ─────────────────
-const fullscreenContainerSx = (commentsVisible) => ({
+const fullscreenContainerSx = (commentsVisible, isLiveActive) => ({
   display: "grid",
-  gridTemplateColumns: { xs: "1fr", md: "3fr 1fr" },
+  // 🎯 Si el live NO está activo (finalizó), obligamos a 1 sola columna ("1fr")
+  gridTemplateColumns: isLiveActive
+    ? { xs: "1fr", md: commentsVisible ? "3fr 1fr" : "1fr" }
+    : "1fr",
   borderRadius: { xs: 0, sm: 4 },
   overflow: "hidden",
   bgcolor: "#000",
   position: "relative",
+  border: "1px solid rgba(255,255,255,0.08)",
+  transition: "grid-template-columns 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
 
-  // Fullscreen Estándar y Webkit
   "&:fullscreen, &:-webkit-full-screen": {
     height: "100vh",
     width: "100vw",
@@ -69,7 +67,6 @@ const fullscreenContainerSx = (commentsVisible) => ({
       aspectRatio: "unset !important",
     },
 
-    // Sidebar Flotante translúcido en pantalla completa
     "& .comments-sidebar": {
       position: "absolute",
       top: 0,
@@ -92,18 +89,18 @@ const LiveDetalle = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   // ── Contexts ──
   const { getLiveById, live } = useContext(LivesContext);
   const { usuario, isAuthenticating, autenticado } = useContext(AuthContext);
 
-  // ── States ──
-  const [livePhase, setLivePhase] = useState("scheduled");
-  const [isFullscreen, setIsFullscreen] = useState(false);
+  // ── Custom Hooks ──
+  const { containerRef, isFullscreen, handleFullscreen } =
+    useFullscreenHandler();
+  const livePhase = useLiveState(live?.status);
   const [commentsVisible, setCommentsVisible] = useState(true);
 
-  // ── Hooks de IVR Viewers & Comentarios ──
+  // ── IVS Viewers & Comentarios ──
   const viewers = useIvsViewers(id, live?.aws_channel_arn);
   const tokenAuth = localStorage.getItem("token");
   const { comments, sendComment, isConnected } = useLiveComments(
@@ -112,78 +109,13 @@ const LiveDetalle = () => {
     tokenAuth,
   );
 
-  // ── Refs ──
-  const containerRef = useRef(null);
-
-  // ── Cargar live de forma segura ──
+  // ── Fetch Inicial ──
   useEffect(() => {
     if (id && (!live || String(live.id) !== String(id))) {
       getLiveById(id);
     }
   }, [id, live, getLiveById]);
 
-  // ── Máquina de estados del live ──
-  useEffect(() => {
-    if (!live?.status) return;
-
-    if (live.status === "live" && livePhase !== "live") {
-      setLivePhase("live");
-      return;
-    }
-
-    if (live.status === "ended" && livePhase === "live") {
-      setLivePhase("ending");
-      const timer = setTimeout(() => setLivePhase("ended"), 900);
-      return () => clearTimeout(timer);
-    }
-
-    if (live.status === "ended" && livePhase === "scheduled") {
-      setLivePhase("ended");
-    }
-  }, [live?.status, livePhase]);
-
-  // ── Escuchador de Fullscreen ──
-  useEffect(() => {
-    const handleFullscreenChange = () => {
-      const isFull = Boolean(
-        document.fullscreenElement || document.webkitFullscreenElement,
-      );
-      setIsFullscreen(isFull);
-    };
-
-    document.addEventListener("fullscreenchange", handleFullscreenChange);
-    document.addEventListener("webkitfullscreenchange", handleFullscreenChange);
-
-    return () => {
-      document.removeEventListener("fullscreenchange", handleFullscreenChange);
-      document.removeEventListener(
-        "webkitfullscreenchange",
-        handleFullscreenChange,
-      );
-    };
-  }, []);
-
-  // ── Alternar Fullscreen ──
-  const handleFullscreen = useCallback(() => {
-    const el = containerRef.current;
-    if (!el) return;
-
-    if (!document.fullscreenElement && !document.webkitFullscreenElement) {
-      if (el.requestFullscreen) {
-        el.requestFullscreen();
-      } else if (el.webkitRequestFullscreen) {
-        el.webkitRequestFullscreen();
-      }
-    } else {
-      if (document.exitFullscreen) {
-        document.exitFullscreen();
-      } else if (document.webkitExitFullscreen) {
-        document.webkitExitFullscreen();
-      }
-    }
-  }, []);
-
-  // ── Guard de carga inicial ──
   if (isAuthenticating || !live) {
     return (
       <PinkSpinner
@@ -196,7 +128,6 @@ const LiveDetalle = () => {
     );
   }
 
-  // ── Datos derivados ──
   const isSubscribed = Boolean(usuario?.isSubscribed);
   const isScheduled = live.status === "scheduled";
   const isActive = live.status === "live" || live.status === "ended";
@@ -211,12 +142,12 @@ const LiveDetalle = () => {
           py: { xs: 0, sm: 2 },
         }}
       >
-        {/* ── Encabezado ── */}
+        {/* Encabezado */}
         <Box sx={{ px: { xs: 2, sm: 0 }, mt: { xs: 2, sm: 0 } }}>
           <LiveHeader live={live} onFullscreen={handleFullscreen} />
         </Box>
 
-        {/* ── Área principal ── */}
+        {/* Reproductor / Contenido Principal */}
         <Box
           sx={{
             mt: { xs: 2, sm: 3 },
@@ -225,17 +156,17 @@ const LiveDetalle = () => {
             overflow: "hidden",
           }}
         >
-          {/* Estado: Programado */}
           {isScheduled && (
             <Box sx={{ py: 8, display: "flex", justifyContent: "center" }}>
               <LiveCountdown startTime={live.start_time} />
             </Box>
           )}
 
-          {/* Estado: En Vivo o Finalizado */}
           {isActive && (
-            <Box ref={containerRef} sx={fullscreenContainerSx(commentsVisible)}>
-              {/* Columna Player de Video */}
+            <Box
+              ref={containerRef}
+              sx={fullscreenContainerSx(commentsVisible, livePhase === "live")}
+            >
               <Box
                 className='player-col'
                 sx={{ position: "relative", width: "100%" }}
@@ -257,86 +188,31 @@ const LiveDetalle = () => {
                   />
                 </motion.div>
 
-                {/* Bloqueo para no suscriptoras */}
+                {/* Paywall Overlay */}
                 {live.status === "live" && (!autenticado || !isSubscribed) && (
                   <LiveBlocked autenticado={autenticado} usuario={usuario} />
                 )}
 
-                {/* Overlay al finalizar transmisión */}
-                <AnimatePresence>
-                  {(livePhase === "ending" || livePhase === "ended") && (
-                    <motion.div
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
-                      style={{
-                        position: "absolute",
-                        inset: 0,
-                        zIndex: 1000,
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        backgroundColor: "rgba(0, 0, 0, 0.75)",
-                        backdropFilter: "blur(8px)",
-                      }}
-                    >
-                      <LiveEndedOverlay onGoHome={() => navigate("/lives")} />
-                    </motion.div>
-                  )}
-                </AnimatePresence>
+                {/* Overlay transmisión finalizada */}
+                <LiveEndedOverlayContainer
+                  livePhase={livePhase}
+                  onGoHome={() => navigate("/lives")}
+                />
               </Box>
 
-              {/* Sidebar de comentarios */}
-
+              {/* Sidebar de comentarios o Paywall State */}
               {livePhase === "live" && (
                 <Box className='comments-sidebar'>
                   {!autenticado || !isSubscribed ? (
-                    /* Mensaje visual de chat bloqueado */
-                    <Box
-                      sx={{
-                        display: "flex",
-                        flexDirection: "column",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        height: "100%",
-                        bgcolor: "#1a1a1a",
-                        borderRadius: "12px",
-                        p: 3,
-                        textAlign: "center",
-                        color: "white",
-                        border: "1px solid rgba(255,255,255,0.08)",
-                      }}
-                    >
-                      <Typography
-                        variant='h6'
-                        sx={{
-                          fontSize: "1rem",
-                          fontWeight: 600,
-                          mb: 1,
-                          color: "#e53888",
-                        }}
-                      >
-                        Chat exclusivo para suscriptoras
-                      </Typography>
-                      <Typography
-                        variant='body2'
-                        sx={{
-                          color: "rgba(255,255,255,0.6)",
-                          fontSize: "0.85rem",
-                        }}
-                      >
-                        {!autenticado
-                          ? "Inicia sesión para poder interactuar en la transmisión en vivo."
-                          : "Suscríbete a la plataforma para unirte al chat en vivo."}
-                      </Typography>
-                    </Box>
+                    <ChatBlockedState autenticado={autenticado} />
                   ) : (
-                    /* Chat Normal para suscriptoras */
                     <LiveCommentsSidebar
                       liveId={live.id}
                       comments={comments}
                       sendComment={sendComment}
                       isConnected={isConnected}
+                      isFullscreen={isFullscreen}
+                      commentsVisible={commentsVisible}
                     />
                   )}
                 </Box>
@@ -345,7 +221,7 @@ const LiveDetalle = () => {
           )}
         </Box>
 
-        {/* ── Detalles e Información adicional ── */}
+        {/* Información adicional */}
         <Box sx={{ mt: 4, px: { xs: 2, sm: 0 }, pb: 4 }}>
           <LiveInfoCard
             title='Qué aprenderás en este live'
