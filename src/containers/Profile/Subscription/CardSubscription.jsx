@@ -77,8 +77,15 @@ const SubscriptionCard = ({
             bgcolor:
               subscription.status === "active"
                 ? "rgba(121, 212, 142, 0.25)"
-                : "rgba(255, 120, 120, 0.25)",
-            color: subscription.status === "active" ? "#2D8A4E" : "#A33636",
+                : subscription.status === "trialing"
+                  ? "rgba(56, 117, 125, 0.25)"
+                  : "rgba(255, 120, 120, 0.25)",
+            color:
+              subscription.status === "active"
+                ? "#2D8A4E"
+                : subscription.status === "trialing"
+                  ? "#117d93aa"
+                  : "#A33636",
             fontWeight: 700,
             fontSize: "0.9rem",
           }}
@@ -87,13 +94,15 @@ const SubscriptionCard = ({
             ? "Activa"
             : subscription.status === "past_due"
               ? "vencida"
-              : subscription.status === "incomplete"
-                ? "incompleto"
-                : subscription.status === "pending"
-                  ? "pendiente"
-                  : subscription.status === "canceled"
-                    ? "Cancelada"
-                    : "Inactiva"}
+              : subscription.status === "trialing"
+                ? "Periodo de prueba"
+                : subscription.status === "incomplete"
+                  ? "incompleto"
+                  : subscription.status === "pending"
+                    ? "pendiente"
+                    : subscription.status === "canceled"
+                      ? "Cancelada"
+                      : "Inactiva"}
         </Box>
       </Box>
 

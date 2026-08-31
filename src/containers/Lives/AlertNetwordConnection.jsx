@@ -57,8 +57,8 @@ const AlertNetwordConnection = ({ isSlowConnection, handleReloadPlayer }) => {
         >
           Conexión inestable detectada
         </AlertTitle>
-        Tu red está fluctuando. Si la transmisión se traba, reconecta o cambia a
-        WiFi.
+        Tu red está presentando problemas. Si la transmisión se traba, reconecta
+        o cambia a WiFi.
       </Alert>
     </Collapse>
   );

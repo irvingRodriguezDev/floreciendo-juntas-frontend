@@ -1,5 +1,13 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Box, useMediaQuery, useTheme } from "@mui/material";
+import {
+  Box,
+  Typography,
+  CircularProgress,
+  useMediaQuery,
+  useTheme,
+} from "@mui/material";
+import { motion, AnimatePresence } from "framer-motion";
+import WifiOffRoundedIcon from "@mui/icons-material/WifiOffRounded";
 
 import DetailsInfoLive from "./DetailsInfoLive";
 import MutedOptions from "./MutedOptions";
@@ -30,6 +38,7 @@ const PlayerCliente = ({
   commentsVisible,
   onToggleComments,
   viewers,
+  isReconnecting = false, // Prop para sincronizar con la fase reconnecting de LiveDetalle
 }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
@@ -46,6 +55,14 @@ const PlayerCliente = ({
     isSlowConnection,
     handleReloadPlayer,
   } = useIvsLivePlayer(playbackUrl);
+
+  // Manejar el reinicio/sincronización del reproductor al reconectar la señal
+  useEffect(() => {
+    if (!isReconnecting && ivsPlayerRef.current) {
+      // Re-sincronizar el player con el borde en vivo cuando vuelve la señal
+      handleReloadPlayer();
+    }
+  }, [isReconnecting, handleReloadPlayer]);
 
   // Manejo de temporizador del aviso de mute
   const startMuteNoticeTimer = () => {
@@ -135,6 +152,66 @@ const PlayerCliente = ({
           }}
         />
       </div>
+
+      {/* Overlay cuando el host pierde la conexión (Grace Period) */}
+      <AnimatePresence>
+        {isReconnecting && (
+          <Box
+            component={motion.div}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            sx={{
+              position: "absolute",
+              inset: 0,
+              zIndex: 10,
+              bgcolor: "rgba(0, 0, 0, 0.65)",
+              backdropFilter: "blur(8px)",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 2,
+              px: 3,
+              textAlign: "center",
+            }}
+          >
+            <Box sx={{ position: "relative", display: "inline-flex" }}>
+              <CircularProgress
+                size={56}
+                sx={{ color: "primary.main" }}
+                thickness={4}
+              />
+              <Box
+                sx={{
+                  top: 0,
+                  left: 0,
+                  bottom: 0,
+                  right: 0,
+                  position: "absolute",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <WifiOffRoundedIcon sx={{ color: "#FFF", fontSize: 22 }} />
+              </Box>
+            </Box>
+            <Typography
+              variant='subtitle1'
+              sx={{ color: "#FFF", fontWeight: 600 }}
+            >
+              Conexión inestable del anfitrión...
+            </Typography>
+            <Typography
+              variant='caption'
+              sx={{ color: "rgba(255, 255, 255, 0.7)", maxWidth: 300 }}
+            >
+              Reconectando con la transmisión. Por favor espera un momento.
+            </Typography>
+          </Box>
+        )}
+      </AnimatePresence>
 
       <AlertNetwordConnection
         isSlowConnection={isSlowConnection}

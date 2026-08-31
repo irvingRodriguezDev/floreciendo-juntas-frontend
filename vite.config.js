@@ -94,7 +94,7 @@ export default defineConfig({
     chunkSizeWarningLimit: 5000,
   },
   server: {
-    allowedHosts: ["contacts-sequence-cleaner-popularity.trycloudflare.com"],
+    allowedHosts: ["cam-consolidated-blogging-meat.trycloudflare.com"],
     port: 5173,
   },
 });

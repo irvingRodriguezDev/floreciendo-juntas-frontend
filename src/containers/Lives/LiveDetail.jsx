@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import { Box, useMediaQuery, useTheme } from "@mui/material";
+import { Box, useTheme } from "@mui/material";
 import { motion } from "framer-motion";
 import { useParams, useNavigate } from "react-router-dom";
 
@@ -8,8 +8,8 @@ import AuthContext from "../../context/Auth/AuthContext";
 import LivesContext from "../../context/Lives/LivesContext";
 import { useLiveComments } from "../../hooks/useLiveComments";
 import { useIvsViewers } from "../../hooks/useIvsViewers";
-import { useLiveState } from "../../hooks/useLiveState";
 import { useFullscreenHandler } from "../../hooks/useFullscreenHandler";
+import { useLiveSockets } from "../../hooks/useLiveSockets";
 
 // Components
 import Layout from "../../components/Layout/Layout";
@@ -22,8 +22,15 @@ import LiveBlocked from "../../components/lives/LiveBlocked";
 import LiveEndedOverlayContainer from "../../components/lives/LiveEndedOverlayContainer";
 import ChatBlockedState from "../../components/lives/ChatBlockedState";
 import LiveCommentsSidebar from "./LiveCommentsSidebar";
+
+// ── Variantes de animación del player (Incluye reconexión) ───────────────────
 const videoVariants = {
   live: { scale: 1, filter: "blur(0px)" },
+  reconnecting: {
+    scale: 1,
+    filter: "blur(4px) brightness(0.8)",
+    transition: { duration: 0.4 },
+  },
   ending: {
     scale: 1.05,
     filter: "blur(15px) brightness(0.7)",
@@ -32,10 +39,10 @@ const videoVariants = {
   ended: { scale: 1.05, filter: "blur(20px) brightness(0.5)" },
 };
 
-const fullscreenContainerSx = (commentsVisible, isLiveActive) => ({
+// ── Estilos dinámicos para el contenedor principal ──────────────────────────
+const fullscreenContainerSx = (commentsVisible, showSidebar) => ({
   display: "grid",
-  // 🎯 Si el live NO está activo (finalizó), obligamos a 1 sola columna ("1fr")
-  gridTemplateColumns: isLiveActive
+  gridTemplateColumns: showSidebar
     ? { xs: "1fr", md: commentsVisible ? "3fr 1fr" : "1fr" }
     : "1fr",
   borderRadius: { xs: 0, sm: 4 },
@@ -97,7 +104,10 @@ const LiveDetalle = () => {
   // ── Custom Hooks ──
   const { containerRef, isFullscreen, handleFullscreen } =
     useFullscreenHandler();
-  const livePhase = useLiveState(live?.status);
+
+  // Hook aislado para socket y estados de transmisión ( live | reconnecting | ending | ended )
+  const livePhase = useLiveSockets(id, live?.status);
+
   const [commentsVisible, setCommentsVisible] = useState(true);
 
   // ── IVS Viewers & Comentarios ──
@@ -130,8 +140,16 @@ const LiveDetalle = () => {
 
   const isSubscribed = Boolean(usuario?.isSubscribed);
   const isScheduled = livePhase === "scheduled" && live.status === "scheduled";
+
+  // Modos donde el reproductor sigue visible
   const isActive =
-    livePhase === "live" || livePhase === "ending" || livePhase === "ended";
+    livePhase === "live" ||
+    livePhase === "reconnecting" ||
+    livePhase === "ending" ||
+    livePhase === "ended";
+
+  // Mostrar chat únicamente en vivo o reconectando
+  const showSidebar = livePhase === "live" || livePhase === "reconnecting";
 
   return (
     <Layout>
@@ -166,7 +184,7 @@ const LiveDetalle = () => {
           {isActive && (
             <Box
               ref={containerRef}
-              sx={fullscreenContainerSx(commentsVisible, livePhase === "live")}
+              sx={fullscreenContainerSx(commentsVisible, showSidebar)}
             >
               <Box
                 className='player-col'
@@ -186,11 +204,12 @@ const LiveDetalle = () => {
                     onFullscreen={handleFullscreen}
                     onToggleComments={() => setCommentsVisible((prev) => !prev)}
                     viewers={viewers}
+                    isReconnecting={livePhase === "reconnecting"}
                   />
                 </motion.div>
 
                 {/* Paywall Overlay */}
-                {live.status === "live" && (!autenticado || !isSubscribed) && (
+                {showSidebar && (!autenticado || !isSubscribed) && (
                   <LiveBlocked autenticado={autenticado} usuario={usuario} />
                 )}
 
@@ -202,7 +221,7 @@ const LiveDetalle = () => {
               </Box>
 
               {/* Sidebar de comentarios o Paywall State */}
-              {livePhase === "live" && (
+              {showSidebar && (
                 <Box className='comments-sidebar'>
                   {!autenticado || !isSubscribed ? (
                     <ChatBlockedState autenticado={autenticado} />
