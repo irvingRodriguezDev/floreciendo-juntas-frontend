@@ -1,5 +1,4 @@
-// pages/PostShowPage.jsx
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Box, Typography, Grid, Button, Stack, Paper } from "@mui/material";
 import { Link, Navigate, useParams, useSearchParams } from "react-router-dom";
 
@@ -14,20 +13,42 @@ const ShowPost = () => {
   const commentId = searchParams.get("commentId");
 
   const { post, loading, error } = usePostShow(postId);
+  const [highlightedCommentId, setHighlightedCommentId] = useState(null);
 
-  // 🔽 Scroll automático al comentario (cuando viene desde notificación)
+  // 1. Cambiar el título del documento dinámicamente
+  useEffect(() => {
+    if (post) {
+      document.title =
+        post.title || `Publicación de ${post.user?.name || "Comunidad"}`;
+    }
+    return () => {
+      document.title = "Comunidad";
+    };
+  }, [post]);
+
+  // 2. Scroll dinámico + Resaltado del comentario objetivo
   useEffect(() => {
     if (!post || !commentId) return;
 
-    const timeout = setTimeout(() => {
-      const el = document.getElementById(`comment-${commentId}`);
-      el?.scrollIntoView({ behavior: "smooth", block: "center" });
-    }, 300);
+    let highlightTimer;
 
-    return () => clearTimeout(timeout);
+    const timer = setTimeout(() => {
+      const el = document.getElementById(`comment-${commentId}`);
+      if (el) {
+        el.scrollIntoView({ behavior: "smooth", block: "center" });
+        setHighlightedCommentId(commentId);
+
+        highlightTimer = setTimeout(() => setHighlightedCommentId(null), 3500);
+      }
+    }, 400);
+
+    return () => {
+      clearTimeout(timer);
+      if (highlightTimer) clearTimeout(highlightTimer);
+    };
   }, [post, commentId]);
 
-  // 🔄 Loading
+  // 🔄 Estado de carga
   if (loading) {
     return (
       <Layout>
@@ -36,12 +57,24 @@ const ShowPost = () => {
     );
   }
 
+  // ⚠️ Error de red o servidor (diferente de 404)
   if (error && error.status !== 404) {
     return (
       <Layout>
-        <Typography textAlign='center'>
-          Ocurrió un error al cargar la publicación 😕
-        </Typography>
+        <Box sx={{ textAlign: "center", py: 8 }}>
+          <Typography textAlign='center' variant='h6' color='text.secondary'>
+            Ocurrió un error al cargar la publicación 😕
+          </Typography>
+          <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
+            <Button
+              variant='outlined'
+              onClick={() => window.location.reload()}
+              sx={{ color: "#D72E7A", borderColor: "#D72E7A" }}
+            >
+              Reintentar
+            </Button>
+          </Box>
+        </Box>
       </Layout>
     );
   }
@@ -57,9 +90,9 @@ const ShowPost = () => {
         container
         justifyContent='center'
         spacing={3}
-        sx={{ px: { xs: 1, sm: 2 } }}
+        sx={{ px: { xs: 1, sm: 2 }, py: 2 }}
       >
-        {/* Título */}
+        {/* Encabezado */}
         <Grid size={12}>
           <Typography
             variant='h6'
@@ -71,36 +104,44 @@ const ShowPost = () => {
           </Typography>
         </Grid>
 
-        {/* Contenido */}
-        <Grid size={{ xs: 12, sm: 8, md: 6 }}>
+        {/* Tarjeta Principal */}
+        <Grid size={{ xs: 12, sm: 10, md: 7, lg: 6 }}>
           <Paper
             elevation={0}
             sx={{
               borderRadius: 3,
-              p: { xs: 1, sm: 2 },
+              p: { xs: 0, sm: 1 },
               bgcolor: "transparent",
             }}
           >
             <Stack spacing={3}>
-              <PostCard post={post} />
+              <PostCard
+                post={post}
+                isSingleView={true}
+                highlightedCommentId={highlightedCommentId}
+                hiddenShow={true}
+              />
 
-              {/* Botón volver */}
-              <Box sx={{ display: "flex", justifyContent: "center" }}>
-                <Link to='/comunidad' style={{ textDecoration: "none" }}>
-                  <Button
-                    variant='contained'
-                    sx={{
-                      borderRadius: "14px",
-                      px: 4,
-                      bgcolor: "#D72E7A",
-                      "&:hover": {
-                        bgcolor: "#C2185B",
-                      },
-                    }}
-                  >
-                    Volver a la comunidad
-                  </Button>
-                </Link>
+              {/* Botón Volver */}
+              <Box sx={{ display: "flex", justifyContent: "center", pb: 4 }}>
+                <Button
+                  component={Link}
+                  to='/comunidad'
+                  variant='contained'
+                  sx={{
+                    borderRadius: "14px",
+                    px: 4,
+                    py: 1.2,
+                    textTransform: "none",
+                    fontWeight: 600,
+                    bgcolor: "#D72E7A",
+                    "&:hover": {
+                      bgcolor: "#C2185B",
+                    },
+                  }}
+                >
+                  Volver a la comunidad
+                </Button>
               </Box>
             </Stack>
           </Paper>

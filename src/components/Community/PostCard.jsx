@@ -12,14 +12,13 @@ import {
   Typography,
 } from "@mui/material";
 import { useContext, useState } from "react";
-import LocalFloristIcon from "@mui/icons-material/LocalFlorist";
 import PushPinIcon from "@mui/icons-material/PushPin";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import "dayjs/locale/es";
 import DOMPurify from "dompurify";
 import ChatBubbleOutlineOutlinedIcon from "@mui/icons-material/ChatBubbleOutlineOutlined";
-
+import RemoveRedEyeIcon from "@mui/icons-material/RemoveRedEye";
 import PostMediaSwiper from "./PostMediaSwipper";
 import CommentItem from "./CommentItem";
 import MessageIcon from "../icons/MessageIcon";
@@ -28,6 +27,7 @@ import CommunityContext from "../../context/Community/CommunityContext";
 import AuthContext from "../../context/Auth/AuthContext";
 import WishModal from "../../containers/Birthdays/WishModal";
 import FavoriteIcon from "@mui/icons-material/Favorite";
+import { Link } from "react-router-dom";
 dayjs.extend(relativeTime);
 dayjs.locale("es");
 
@@ -43,7 +43,7 @@ const CATEGORY_MAP = {
   productos: { label: "Producto", color: "#7C3AED", bg: "#F5F3FF" },
 };
 
-const PostCard = ({ post }) => {
+const PostCard = ({ post, hiddenShow = false }) => {
   const { createToogleReaction } = useContext(CommunityContext);
   const { usuario } = useContext(AuthContext);
 
@@ -155,6 +155,32 @@ const PostCard = ({ post }) => {
               }}
             >
               {/* BOTÓN MENSAJE DIRECTO */}
+              {post.userId !== usuario?.id && post?.user && !hiddenShow && (
+                <Tooltip
+                  title={`ver post completo ${
+                    post.user.name?.split(" ")[0] || "usuaria"
+                  }`}
+                >
+                  <Link to={`/comunidad/${post.id}`}>
+                    <IconButton
+                      size='small'
+                      sx={{
+                        color: "#D72E79",
+                        bgcolor: "#FFF0F6",
+                        width: 32,
+                        height: 32,
+                        transition: "all 0.2s",
+                        "&:hover": {
+                          bgcolor: "#FCE4EC",
+                          transform: "scale(1.08)",
+                        },
+                      }}
+                    >
+                      <RemoveRedEyeIcon sx={{ fontSize: "1.1rem" }} />
+                    </IconButton>
+                  </Link>
+                </Tooltip>
+              )}
               {post.userId !== usuario?.id && post?.user && (
                 <Tooltip
                   title={`Enviar mensaje privado a ${

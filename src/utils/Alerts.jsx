@@ -5,7 +5,7 @@ const MySwal = withReactContent(Swal);
 
 // Configuración base para el diseño Premium (Rosa/Elegante)
 const premiumConfig = {
-  confirmButtonColor: "#f06292", // Tu rosa principal
+  confirmButtonColor: "#f06292", // Tu rosa principal (#f06292 o #D82E7A)
   cancelButtonColor: "#cfd8dc",
   reverseButtons: true,
   customClass: {
@@ -43,6 +43,7 @@ export const alerts = {
       target: document.body,
     });
   },
+
   // Confirmación de acción (Ej: Borrar algo)
   confirm: async (title, text) => {
     return MySwal.fire({
@@ -66,5 +67,33 @@ export const alerts = {
       showConfirmButton: false,
       timer: 2500,
     });
+  },
+
+  // Loader de carga con spinner rosa integrado directamente
+  loading: (
+    title = "Subiendo Contenido",
+    text = "Espera un momento, no cierres la página...",
+  ) => {
+    return MySwal.fire({
+      ...premiumConfig,
+      title,
+      text,
+      allowOutsideClick: false,
+      allowEscapeKey: false,
+      showConfirmButton: false,
+      didOpen: () => {
+        Swal.showLoading();
+        // Inyección directa del color rosa en el spinner sin requerir CSS externo
+        const loader = Swal.getPopup()?.querySelector(".swal2-loader");
+        if (loader) {
+          loader.style.borderColor = "#f06292 transparent #f06292 transparent";
+        }
+      },
+    });
+  },
+
+  // Método utilitario para cerrar cualquier alerta o loader activo
+  close: () => {
+    Swal.close();
   },
 };

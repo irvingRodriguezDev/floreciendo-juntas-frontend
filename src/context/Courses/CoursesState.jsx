@@ -13,6 +13,7 @@ import {
 } from "../../types";
 import clienteAxios from "../../config/Axios";
 import Swal from "sweetalert2";
+import { alerts } from "../../utils/Alerts";
 /**Importar componente token headers */
 
 const CoursesState = ({ children }) => {
@@ -189,15 +190,7 @@ const CoursesState = ({ children }) => {
     // ========================================================
     // ⏳ PROCESO DE DESCARGA (SPINNER)
     // ========================================================
-    Swal.fire({
-      title: "Generando reconocimiento...",
-      text: "Por favor espera un momento.",
-      allowOutsideClick: false,
-      allowEscapeKey: false,
-      didOpen: () => {
-        Swal.showLoading();
-      },
-    });
+    alerts.loading("Generando reconocimiento", "Por favor espera un momento");
 
     try {
       // Enviamos el "nombreCertificado" ya validado y sanitizado al backend mediante los query params
@@ -215,21 +208,16 @@ const CoursesState = ({ children }) => {
       fileDownload(res.data, fileName);
 
       // Mensaje de éxito
-      Swal.fire({
-        icon: "success",
-        title: "¡Reconocimiento generado correctamente!",
-        text: "Tu reconocimiento ha sido descargado con éxito.",
-        confirmButtonText: "Aceptar",
-      });
+      alerts.success(
+        "¡Reconocimiento generado correctamente!",
+        "Tu reconocimiento ha sido descargado con éxito.",
+      );
     } catch (error) {
       console.error("Ocurrió un error al descargar el reconocimiento:", error);
-
-      Swal.fire({
-        icon: "error",
-        title: "Error al generar el reconocimiento",
-        text: "Ocurrió un problema al descargar el reconocimiento. Intenta nuevamente.",
-        confirmButtonText: "Cerrar",
-      });
+      alerts.error(
+        "Upps!",
+        "Hubo un problema al generar tu reconocimiento, intenta de nuevo más tarde o contacta a soporte",
+      );
     }
   };
 

@@ -1,69 +1,29 @@
 import React, { useContext, useEffect, useState } from "react";
 import { Paper, Stack, Skeleton, Box } from "@mui/material";
 import StoriesAvatar from "../../components/Stories/StoriesAvatar";
-import MethodGet from "../../config/Service";
 import StoryViewerModal from "../../components/Stories/StoryViewerModal";
 import UploadStoryModal from "../../components/Stories/UploadStoryModal";
 import AuthContext from "../../context/Auth/AuthContext";
+import StoriesContext from "../../context/stories/StoriesContext";
 
 const LIGHT_PINK = "#FFF0F6";
 const BORDER_PINK = "#FCE4EC";
 
 const Stories = () => {
+  const { stories, getFeedStories, loading } = useContext(StoriesContext);
   const { usuario } = useContext(AuthContext);
   const currentUser = usuario;
-  const [storiesFeed, setStoriesFeed] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [selectedGroup, setSelectedGroup] = useState(null);
   const [isViewerOpen, setIsViewerOpen] = useState(false);
   const [isUploadOpen, setIsUploadOpen] = useState(false);
-  const fetchStories = async () => {
-    try {
-      const res = await MethodGet("/stories/feed");
-      setStoriesFeed(res.data || []);
-    } catch (error) {
-      console.error("Error al traer el feed de historias:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
+
   useEffect(() => {
-    fetchStories();
+    getFeedStories();
   }, []);
 
   const handleSelectStoryGroup = (group) => {
     setSelectedGroup(group);
     setIsViewerOpen(true);
-  };
-  const handleStoryViewed = (userId, storyId) => {
-    setStoriesFeed((prevFeed) =>
-      prevFeed.map((group) => {
-        if (group.userId === userId) {
-          const updatedStories = group.stories.map((s) =>
-            s.id === storyId ? { ...s, isSeen: true } : s
-          );
-          const hasUnseen = updatedStories.some((s) => !s.isSeen);
-          return { ...group, stories: updatedStories, hasUnseen };
-        }
-        return group;
-      })
-    );
-  };
-
-  // 2. Marca todo el grupo como visto al finalizar
-  const handleAllStoriesViewed = (userId) => {
-    setStoriesFeed((prevFeed) =>
-      prevFeed.map((group) => {
-        if (group.userId === userId) {
-          const updatedStories = group.stories.map((s) => ({
-            ...s,
-            isSeen: true,
-          }));
-          return { ...group, stories: updatedStories, hasUnseen: false };
-        }
-        return group;
-      })
-    );
   };
 
   return (
@@ -127,7 +87,7 @@ const Stories = () => {
               </Box>
             ))
           : /* 3. Lista de historias activas de las usuarias */
-            storiesFeed.map((group) => (
+            stories.map((group) => (
               <StoriesAvatar
                 key={group.userId}
                 story={group}
@@ -138,15 +98,13 @@ const Stories = () => {
       <UploadStoryModal
         open={isUploadOpen}
         onClose={() => setIsUploadOpen(false)}
-        onStoryUploaded={fetchStories} // Vuelve a cargar el feed cuando publica exitosamente
+        onStoryUploaded={getFeedStories} // Vuelve a cargar el feed cuando publica exitosamente
       />
       <StoryViewerModal
         open={isViewerOpen}
         onClose={() => setIsViewerOpen(false)}
         storyGroup={selectedGroup}
-        onStoryViewed={handleStoryViewed}
-        onAllStoriesViewed={handleAllStoriesViewed}
-        fetchStories={fetchStories}
+        fetchStories={getFeedStories}
       />
     </Paper>
   );

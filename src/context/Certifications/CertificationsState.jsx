@@ -7,6 +7,7 @@ import {
   SEND_ENTREGABLE,
   SHOW_CERTIFICATION_DETAILS,
 } from "../../types";
+import { alerts } from "../../utils/Alerts";
 import clienteAxios from "../../config/Axios";
 import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
@@ -53,15 +54,10 @@ const CertificationsState = ({ children }) => {
   const sendEntregable = async (data) => {
     try {
       // 1️⃣ Mostrar loading
-      Swal.fire({
-        title: "Enviando entregable...",
-        text: "Por favor espera mientras se suben las imágenes",
-        allowOutsideClick: false,
-        allowEscapeKey: false,
-        didOpen: () => {
-          Swal.showLoading();
-        },
-      });
+      alerts.loading(
+        "Subiendo imagenes",
+        "Espera mientras se suben las imagenes, no actualices ni abandones la pagina",
+      );
 
       const res = await clienteAxios.post("/module-submission", data, {
         headers: { "Content-Type": "multipart/form-data" },
@@ -77,13 +73,11 @@ const CertificationsState = ({ children }) => {
       });
 
       // 4️⃣ Mostrar éxito
-      await Swal.fire({
-        icon: "success",
-        title: "¡Entregado!",
-        text: "La tarea se entregó de manera exitosa.",
-        timer: 1500,
-        showConfirmButton: false,
-      });
+      await alerts.success(
+        "¡Entregado!",
+        "La tarea se ha entregado de manera exitosa",
+      );
+
       navigate(-1);
       return res.data;
     } catch (error) {
@@ -94,12 +88,7 @@ const CertificationsState = ({ children }) => {
         error.response?.data?.message ||
         "Ocurrió un error al enviar el entregable.";
 
-      await Swal.fire({
-        icon: "error",
-        title: "Error",
-        text: message,
-        confirmButtonColor: "#d33",
-      });
+      await alerts.error("Upps, hubo un problema", message);
 
       console.log(error, "No se envió el entregable");
       throw error;
@@ -151,15 +140,10 @@ const CertificationsState = ({ children }) => {
     if (!isConfirmed || !nombreCertificado) return;
 
     // Iniciamos la carga
-    Swal.fire({
-      title: "Construyendo certificado...",
-      text: "Por favor espera un momento.",
-      allowOutsideClick: false,
-      allowEscapeKey: false,
-      didOpen: () => {
-        Swal.showLoading();
-      },
-    });
+    alerts.loading(
+      "Preparando certificado",
+      "Por favor espera unos segundos mientras se personaliza tu certificado!",
+    );
 
     try {
       // Enviamos el nombre validado al backend
@@ -170,22 +154,16 @@ const CertificationsState = ({ children }) => {
         res.data,
         `Certificado-${nombreCertificado}-${Date.now()}.pdf`,
       );
-
-      Swal.fire({
-        icon: "success",
-        title: "¡Certificado generado!",
-        text: "Se ha descargado correctamente.",
-        confirmButtonText: "Aceptar",
-        confirmButtonColor: "#e91e63",
-      });
+      alerts.success(
+        "¡Certificado Generado!",
+        "Tu certificado se ha descargado correctamente!",
+      );
     } catch (error) {
       console.error("Error al descargar:", error);
-      Swal.fire({
-        icon: "error",
-        title: "Error",
-        text: "No pudimos generar el archivo. Intenta de nuevo.",
-        confirmButtonText: "Cerrar",
-      });
+      alerts.error(
+        "Upps! Hubo un problema!",
+        "No se logro generar tu certificado, intenta de nuevo mas tarde o contacta a soporte!",
+      );
     }
   };
   const DownloadDiploma = async (id, name) => {
@@ -219,16 +197,7 @@ const CertificationsState = ({ children }) => {
     });
 
     if (!isConfirmed || !nombreDiploma) return;
-
-    Swal.fire({
-      title: "Construyendo diploma...",
-      text: "Por favor espera un momento.",
-      allowOutsideClick: false,
-      allowEscapeKey: false,
-      didOpen: () => {
-        Swal.showLoading();
-      },
-    });
+    alerts.loading("Preparando diploma!", "Por favor espera unos segundos");
 
     try {
       // Usamos nombreDiploma que es el valor final validado
@@ -237,23 +206,16 @@ const CertificationsState = ({ children }) => {
       const res = await clienteAxios.get(url, { responseType: "blob" });
 
       fileDownload(res.data, `diploma-${nombreDiploma}-${Date.now()}.pdf`);
-
-      Swal.fire({
-        icon: "success",
-        title: "¡Diploma generado correctamente!",
-        text: "Tu diploma ha sido descargado con éxito.",
-        confirmButtonText: "Aceptar",
-        confirmButtonColor: "#e91e63",
-      });
+      alerts.success(
+        "¡Diploma generado correctamente!",
+        "Tu diploma ha sido descargado con éxito.",
+      );
     } catch (error) {
       console.error("Ocurrió un error al descargar el diploma:", error);
-
-      Swal.fire({
-        icon: "error",
-        title: "Error al generar el diploma",
-        text: "Ocurrió un problema al descargar el diploma. Intenta nuevamente.",
-        confirmButtonText: "Cerrar",
-      });
+      alerts.error(
+        "Upps! Hubo un problema al generar el diploma!",
+        "Ocurrió un problema al descargar el diploma. Intenta nuevamente más tarde o contacta a soporte!",
+      );
     }
   };
 

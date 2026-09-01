@@ -1,10 +1,4 @@
-import React, {
-  useCallback,
-  useEffect,
-  useReducer,
-  useContext,
-  useState,
-} from "react";
+import React, { useEffect, useReducer } from "react";
 import AuthContext from "./AuthContext";
 import AuthReducer from "./AuthReducer";
 import MethodGet, { MethodPost, MethodPut } from "../../config/Service";
@@ -13,10 +7,7 @@ import { disconnectSocket, getSocket, initSocket } from "../../socket";
 import { SHOW_ERRORS_API, types } from "../../types";
 import Swal from "sweetalert2";
 import clienteAxios from "../../config/Axios";
-import {
-  CUSTOMER_LOGIN_MUTATION,
-  CUSTOMER_CREATE_MUTATION,
-} from "./grapql/auth";
+import { alerts } from "../../utils/Alerts";
 // import { shopifyFetch } from "../../containers/Store/ShopifyClient";
 import { useNavigate } from "react-router-dom";
 const AuthState = (props) => {
@@ -96,7 +87,7 @@ const AuthState = (props) => {
       const { data } = await MethodGet("/auth/me");
       localStorage.setItem(
         "savedBirthDate",
-        data.user.birthDate === null ? false : true
+        data.user.birthDate === null ? false : true,
       );
       dispatch({
         type: types.OBTENER_USUARIO,
@@ -258,14 +249,17 @@ const AuthState = (props) => {
   const ChangePhoto = async (file) => {
     const formData = new FormData();
     formData.append("file", file);
-
+    alerts.loading(
+      "Subiendo Foto de perfil",
+      "Por favor no actualices, ni abandones la pagina hasta completar el proceso!",
+    );
     try {
       const res = await clienteAxios.post(
         "/auth/uploadProfileImage",
         formData,
         {
           headers: { "Content-Type": "multipart/form-data" },
-        }
+        },
       );
 
       const profileImageUrl = getProfileImageUrl(res.data.profileImage);
@@ -275,24 +269,15 @@ const AuthState = (props) => {
         type: types.USER_CHANGEPHOTO,
         payload: { profileImage: profileImageUrl },
       });
-
-      Swal.fire({
-        title: "Correcto!!",
-        text: res.data.msg,
-        timer: 3000,
-        showConfirmButton: false,
-        icon: "success",
-      });
+      alerts.success(
+        "Correcto!!",
+        "Tu foto de perfil, se ha cargado correctamente!",
+      );
     } catch (error) {
-      console.log(error, "el error");
-
-      console.log("respuesta incorrecta");
-
-      Swal.fire({
-        title: "Error",
-        icon: "error",
-        text: error?.response?.data?.message || "No se pudo subir la imagen",
-      });
+      alerts.error(
+        "Upps!",
+        "Ocurrio un problema al cargar tu imagen, intenta nuevamente o contacta a soporte",
+      );
       dispatch({ type: SHOW_ERRORS_API });
     }
   };

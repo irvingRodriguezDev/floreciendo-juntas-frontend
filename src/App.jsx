@@ -21,6 +21,7 @@ import StoresState from "./context/Stores/StoresState";
 import ChatState from "./context/Chat/ChatState";
 import { GoogleMapsProvider } from "./context/GoogleMaps/GoogleMapsProvider";
 import InstallPWABanner from "./components/InstallPWABanner";
+import StoriesState from "./context/stories/StoriesState";
 // Carga asíncrona de la clave pública
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_KEY);
 
@@ -44,9 +45,11 @@ function App() {
                                 <CertificationsState>
                                   <StoresState>
                                     <ChatState>
-                                      <ScrollTop />
-                                      <AppRouter />
-                                      <InstallPWABanner />
+                                      <StoriesState>
+                                        <ScrollTop />
+                                        <AppRouter />
+                                        <InstallPWABanner />
+                                      </StoriesState>
                                     </ChatState>
                                   </StoresState>
                                 </CertificationsState>

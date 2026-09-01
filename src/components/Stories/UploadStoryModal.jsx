@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import {
   Modal,
   Box,
@@ -10,59 +10,119 @@ import {
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import PhotoCameraIcon from "@mui/icons-material/PhotoCamera";
-import clienteAxios from "../../config/Axios";
 import { alerts } from "../../utils/Alerts";
-const UploadStoryModal = ({ open, onClose, onStoryUploaded }) => {
+import { convertHeicToJpeg } from "../../utils/ConvertHeicToJpeg";
+import StoriesContext from "../../context/stories/StoriesContext";
+import InputStyles from "../../utils/InputStyles";
+const MAX_VIDEO_DURATION = 45; // Segundos máximos permitidos
+
+const UploadStoryModal = ({ open, onClose }) => {
+  const { addStoriContent } = useContext(StoriesContext);
+
   const [selectedFile, setSelectedFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
+  const [mediaType, setMediaType] = useState("image"); // "image" | "video"
   const [caption, setCaption] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // Manejar la selección del archivo local
-  const handleFileChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
+  // Limpieza de ObjectURL al desmontar o cambiar preview
+  useEffect(() => {
+    return () => {
+      if (previewUrl) URL.revokeObjectURL(previewUrl);
+    };
+  }, [previewUrl]);
+
+  const handleFileChange = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Resetear el input para permitir seleccionar el mismo archivo si se desea
+    e.target.value = "";
+
+    // Limpiar preview anterior si existía
+    if (previewUrl) {
+      URL.revokeObjectURL(previewUrl);
+      setPreviewUrl(null);
+    }
+
+    const isVideo =
+      file.type.startsWith("video/") || /\.(mov|mp4|webm)$/i.test(file.name);
+    const isHeicImage =
+      file.type === "image/heic" ||
+      file.type === "image/heif" ||
+      /\.(heic|heif)$/i.test(file.name);
+
+    if (isVideo) {
+      // Validar duración del video en el navegador
+      const tempVideoUrl = URL.createObjectURL(file);
+      const videoElement = document.createElement("video");
+      videoElement.preload = "metadata";
+      videoElement.src = tempVideoUrl;
+
+      videoElement.onloadedmetadata = () => {
+        URL.revokeObjectURL(tempVideoUrl); // Liberar la URL temporal de validación
+
+        if (videoElement.duration > MAX_VIDEO_DURATION + 0.9) {
+          handleClose();
+          alerts.error(
+            "Video muy largo",
+            `Las historias pueden durar máximo ${MAX_VIDEO_DURATION} segundos.`,
+          );
+          return;
+        }
+
+        setSelectedFile(file);
+        setMediaType("video");
+        setPreviewUrl(URL.createObjectURL(file)); // URL final para la vista previa
+      };
+
+      videoElement.onerror = () => {
+        URL.revokeObjectURL(tempVideoUrl);
+        alerts.error(
+          "Error de video",
+          "No se pudo procesar el archivo de video. Intenta con otro formato.",
+        );
+      };
+    } else if (isHeicImage) {
+      try {
+        const converted = await convertHeicToJpeg(file);
+        setSelectedFile(converted);
+        setMediaType("image");
+        setPreviewUrl(URL.createObjectURL(converted));
+      } catch (error) {
+        console.error("Error al convertir la imagen HEIC:", error);
+        alerts.error("Error", "No se pudo procesar la imagen HEIC.");
+      }
+    } else {
       setSelectedFile(file);
+      setMediaType("image");
       setPreviewUrl(URL.createObjectURL(file));
     }
   };
 
-  // Limpiar estados al cerrar o resetear
   const handleClose = () => {
+    if (previewUrl) URL.revokeObjectURL(previewUrl);
     setSelectedFile(null);
     setPreviewUrl(null);
+    setMediaType("image");
     setCaption("");
     setLoading(false);
     onClose();
   };
 
-  // Enviar el formulario a Node.js mediante FormData
   const handleSubmit = async () => {
-    if (!selectedFile) return;
+    if (!selectedFile || loading) return;
 
     setLoading(true);
-    const formData = new FormData();
-    formData.append("file", selectedFile); // Debe coincidir con uploadS3.single('file') en el backend
-    formData.append("caption", caption);
 
     try {
-      const response = await clienteAxios.post("/stories", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
-      if (response.status === 201 || response.status === 200) {
-        alerts.success("Correcto", "Tu historia se publico correctamente!");
-      }
-
-      if (onStoryUploaded) {
-        onStoryUploaded(); // Refresca el feed de historias en el componente padre
-      }
+      await addStoriContent(selectedFile, caption, mediaType);
       handleClose();
     } catch (error) {
       alerts.error(
         "Upps, hubo un problema",
-        "No se logro subir tu historia, intenta de nuevo"
+        "No se logró subir tu historia, intenta de nuevo",
       );
-      console.error("Error al publicar la historia:", error);
     } finally {
       setLoading(false);
     }
@@ -72,28 +132,17 @@ const UploadStoryModal = ({ open, onClose, onStoryUploaded }) => {
     <Modal
       open={open}
       onClose={handleClose}
-      sx={{
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        backdropFilter: "blur(6px)",
-      }}
+      sx={{ display: "flex", alignItems: "center", justifyContent: "center" }}
     >
       <Box
         sx={{
-          position: "relative",
           width: { xs: "90vw", sm: "400px" },
-          maxHeight: "85vh",
           bgcolor: "background.paper",
           borderRadius: "20px",
           p: 3,
-          boxShadow: "0px 10px 30px rgba(0,0,0,0.2)",
-          display: "flex",
-          flexDirection: "column",
           outline: "none",
         }}
       >
-        {/* Encabezado */}
         <Box
           sx={{
             display: "flex",
@@ -103,14 +152,18 @@ const UploadStoryModal = ({ open, onClose, onStoryUploaded }) => {
           }}
         >
           <Typography variant='h6' sx={{ fontWeight: 700, color: "#D82E7A" }}>
-            Compartir Diseño
+            Compartir Historia
           </Typography>
-          <IconButton onClick={handleClose} disabled={loading} size='small'>
+          <IconButton
+            onClick={handleClose}
+            disabled={loading}
+            size='small'
+            sx={{ color: "#d82e7a" }}
+          >
             <CloseIcon />
           </IconButton>
         </Box>
 
-        {/* Zona de Selección / Previsualización */}
         {!previewUrl ? (
           <Box
             component='label'
@@ -124,16 +177,11 @@ const UploadStoryModal = ({ open, onClose, onStoryUploaded }) => {
               justifyContent: "center",
               cursor: "pointer",
               bgcolor: "#FFF0F6",
-              transition: "all 0.2s ease-in-out",
-              "&:hover": {
-                bgcolor: "#FCE4EC",
-                transform: "scale(0.99)",
-              },
             }}
           >
             <input
               type='file'
-              accept='image/*'
+              accept='image/*,video/mp4,video/quicktime,video/webm'
               hidden
               onChange={handleFileChange}
             />
@@ -142,7 +190,7 @@ const UploadStoryModal = ({ open, onClose, onStoryUploaded }) => {
               variant='body2'
               sx={{ fontWeight: 600, color: "#D82E7A" }}
             >
-              Toca para seleccionar tu foto
+              Selecciona una foto o video
             </Typography>
           </Box>
         ) : (
@@ -153,19 +201,39 @@ const UploadStoryModal = ({ open, onClose, onStoryUploaded }) => {
               borderRadius: "16px",
               overflow: "hidden",
               mb: 2,
+              bgcolor: "black",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
             }}
           >
-            <Box
-              component='img'
-              src={previewUrl}
-              alt='Preview'
-              sx={{
-                width: "100%",
-                height: "100%",
-                objectFit: "cover",
-              }}
-            />
-            {/* Botón para cambiar la foto si se equivocó */}
+            {mediaType === "video" ? (
+              <Box
+                component='video'
+                src={previewUrl}
+                controls
+                autoPlay
+                loop
+                muted
+                playsInline
+                sx={{
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "contain",
+                }}
+              />
+            ) : (
+              <Box
+                component='img'
+                src={previewUrl}
+                alt='Preview'
+                sx={{
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "contain",
+                }}
+              />
+            )}
             <Button
               component='label'
               size='small'
@@ -175,15 +243,13 @@ const UploadStoryModal = ({ open, onClose, onStoryUploaded }) => {
                 top: 10,
                 right: 10,
                 bgcolor: "rgba(0,0,0,0.6)",
-                color: "white",
-                textTransform: "none",
                 "&:hover": { bgcolor: "rgba(0,0,0,0.8)" },
               }}
             >
               Cambiar
               <input
                 type='file'
-                accept='image/*'
+                accept='image/*,video/mp4,video/quicktime,video/webm'
                 hidden
                 onChange={handleFileChange}
               />
@@ -191,36 +257,27 @@ const UploadStoryModal = ({ open, onClose, onStoryUploaded }) => {
           </Box>
         )}
 
-        {/* Campo opcional de Leyenda */}
         {previewUrl && (
           <TextField
-            placeholder='Añade una breve descripción a tu diseño...'
-            variant='outlined'
+            placeholder='Añade una descripción...'
             fullWidth
             size='small'
             multiline
             rows={2}
             value={caption}
+            sx={InputStyles}
             onChange={(e) => setCaption(e.target.value)}
-            inputProps={{ maxLength: 150 }}
-            sx={{
-              mt: 2,
-              "& .MuiOutlinedInput-root": {
-                borderRadius: "12px",
-                "&.Mui-focused fieldset": { borderColor: "#D82E7A" },
-              },
-            }}
           />
         )}
 
-        {/* Acciones */}
         <Box
           sx={{ mt: 3, display: "flex", justifyContent: "flex-end", gap: 1 }}
         >
           <Button
             onClick={handleClose}
             disabled={loading}
-            sx={{ color: "text.secondary", textTransform: "none" }}
+            color='error'
+            variant='contained'
           >
             Cancelar
           </Button>
@@ -228,20 +285,10 @@ const UploadStoryModal = ({ open, onClose, onStoryUploaded }) => {
             variant='contained'
             disabled={!selectedFile || loading}
             onClick={handleSubmit}
-            sx={{
-              bgcolor: "#D82E7A",
-              color: "white",
-              borderRadius: "12px",
-              px: 3,
-              textTransform: "none",
-              fontWeight: 600,
-              "&:hover": { bgcolor: "#B82264" },
-            }}
+            sx={{ bgcolor: "#D82E7A", color: "white" }}
           >
             {loading ? (
-              <>
-                Subiendo <CircularProgress size={24} color='inherit' />
-              </>
+              <CircularProgress size={20} color='inherit' />
             ) : (
               "Publicar"
             )}

@@ -113,6 +113,7 @@ const CommunityState = ({ children }) => {
   const createPostCommunity = async (data) => {
     Swal.fire({
       title: "Publicando...",
+      text: "Espera unos segundos, no recargues ni abandones la pagina",
       allowOutsideClick: false,
       didOpen: () => {
         Swal.showLoading();

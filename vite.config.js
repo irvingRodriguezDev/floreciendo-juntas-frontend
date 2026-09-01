@@ -94,7 +94,7 @@ export default defineConfig({
     chunkSizeWarningLimit: 5000,
   },
   server: {
-    allowedHosts: ["cam-consolidated-blogging-meat.trycloudflare.com"],
+    allowedHosts: ["far-helen-unlike-testimony.trycloudflare.com"],
     port: 5173,
   },
 });

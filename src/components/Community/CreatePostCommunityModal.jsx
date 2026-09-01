@@ -26,6 +26,7 @@ import PinnedPostOptions from "./PinnedPostOptions";
 import MediaPreviewList from "./MediaPreviewList";
 import { colors } from "../../utils/QuillModules";
 import { alerts } from "../../utils/Alerts";
+import { convertHeicToJpeg } from "../../utils/ConvertHeicToJpeg";
 
 // Custom Link para ReactQuill
 const Link = ReactQuill.Quill.import("formats/link");
@@ -93,7 +94,8 @@ export default function CreatePostModal({ open, handleClose, defaultType }) {
 
   const contentLength = plainContent.length;
 
-  const handleFiles = (e) => {
+  // 🔽 Manejo correcto de archivos incluyendo conversión HEIC ➔ JPEG
+  const handleFiles = async (e) => {
     const files = Array.from(e.target.files);
     if (media.length + files.length > MAX_FILES) {
       alerts.error(
@@ -104,16 +106,39 @@ export default function CreatePostModal({ open, handleClose, defaultType }) {
     }
 
     const validFiles = [];
-    for (const file of files) {
+
+    for (let file of files) {
       const isVideo = file.type.startsWith("video");
-      const maxSize = isVideo ? 50 * 1024 * 1024 : 10 * 1024 * 1024;
+      const isHeicImage =
+        file.type === "image/heic" ||
+        file.type === "image/heif" ||
+        /\.(heic|heif)$/i.test(file.name);
+
+      const maxSize = isVideo ? 70 * 1024 * 1024 : 10 * 1024 * 1024;
 
       if (file.size > maxSize) {
+        handleClose();
         alerts.error(
           "Archivo muy pesado",
-          `${file.name} supera el peso máximo permitido (${isVideo ? "50MB" : "10MB"}).`,
+          `${file.name} supera el peso máximo permitido (${isVideo ? "70MB" : "10MB"}).`,
         );
         continue;
+      }
+
+      // Si es una imagen de iPhone / Apple en formato HEIC/HEIF
+      if (isHeicImage) {
+        try {
+          const convertedFile = await convertHeicToJpeg(file);
+          file = convertedFile; // Reemplazamos el archivo por el nuevo Blob/File JPEG
+        } catch (error) {
+          handleClose();
+          console.error("Error al convertir la imagen HEIC:", error);
+          alerts.error(
+            "Error al procesar imagen",
+            `No se pudo convertir ${file.name}.`,
+          );
+          continue;
+        }
       }
 
       validFiles.push({
@@ -124,7 +149,7 @@ export default function CreatePostModal({ open, handleClose, defaultType }) {
     }
 
     setMedia((prev) => [...prev, ...validFiles]);
-    e.target.value = null;
+    e.target.value = null; // Reiniciamos el input file para permitir volver a seleccionar el mismo archivo si se desea
   };
 
   const removeMedia = (index) => {
@@ -143,6 +168,7 @@ export default function CreatePostModal({ open, handleClose, defaultType }) {
 
   const handleSubmit = async () => {
     if (!title.trim() || plainContent.length === 0) {
+      handleClose();
       alerts.error(
         "Campos incompletos",
         "El título y el contenido son obligatorios.",
@@ -151,11 +177,12 @@ export default function CreatePostModal({ open, handleClose, defaultType }) {
     }
 
     if (plainContent.length > MAX_CONTENT) {
+      handleClose();
       alerts.error("Límite excedido", "Has superado el máximo de caracteres.");
       return;
     }
 
-    // 💡 REMOVER ESTILOS EN ANCHO RIGIDOS PEGADOS DE OTROS SITIOS ANTES DE SUBIR
+    // Remover estilos de ancho rígidos pegados de otros sitios
     const cleanContentHtml = content.replace(/style="[^"]*width:[^"]*"/gi, "");
 
     setLoading(true);
@@ -238,7 +265,7 @@ export default function CreatePostModal({ open, handleClose, defaultType }) {
                         display: "inline-flex",
                         alignItems: "center",
                         gap: "3px",
-                        color: "text.primary", // O el color que prefieras para el nombre
+                        color: "text.primary",
                       }}
                     >
                       {usuario?.name?.split(" ")[0] || "Usuario"}
@@ -267,7 +294,7 @@ export default function CreatePostModal({ open, handleClose, defaultType }) {
               />
             </Box>
 
-            {/* Opciones de Anclaje (Solo Admins) */}
+            {/* Opciones de Anclaje */}
             {usuario?.roleId === 1 && (
               <PinnedPostOptions
                 isPinned={isPinned}
@@ -276,7 +303,7 @@ export default function CreatePostModal({ open, handleClose, defaultType }) {
               />
             )}
 
-            {/* Campos de Título y Editor */}
+            {/* Título y Editor */}
             <Box sx={{ display: "flex", flexDirection: "column", gap: 1.5 }}>
               <TextField
                 placeholder='Escribe un título llamativo...'
@@ -291,7 +318,6 @@ export default function CreatePostModal({ open, handleClose, defaultType }) {
                     fontSize: "1.2rem",
                     fontWeight: 700,
                     color: themeColors.textDark,
-                    // Garantiza que el input de título no genere desbordamiento horizontal
                     width: "100%",
                     wordBreak: "break-word",
                   },
@@ -305,7 +331,7 @@ export default function CreatePostModal({ open, handleClose, defaultType }) {
                 {title.length}/{MAX_TITLE}
               </Typography>
 
-              {/* Editor ReactQuill con Ajustes de Responsividad */}
+              {/* Editor ReactQuill */}
               <Box
                 sx={{
                   width: "100%",
@@ -324,14 +350,13 @@ export default function CreatePostModal({ open, handleClose, defaultType }) {
                     overflowY: "auto",
                     fontFamily: "inherit",
                   },
-                  // 🔴 ESTILOS CRÍTICOS DENTRO DEL ÁREA DE TEXTO DEL EDITOR 🔴
                   "& .ql-editor": {
                     minHeight: "180px",
                     fontSize: { xs: "0.9rem", sm: "0.95rem" },
                     color: "#374151",
-                    wordBreak: "break-word", // Rompe palabras hiperlargas
-                    overflowWrap: "anywhere", // Evita desbordamientos
-                    whiteSpace: "pre-wrap", // Mantiene los saltos de línea al escribir
+                    wordBreak: "break-word",
+                    overflowWrap: "anywhere",
+                    whiteSpace: "pre-wrap",
                     maxWidth: "100%",
                     "& p": {
                       lineHeight: "1.6",
@@ -391,7 +416,7 @@ export default function CreatePostModal({ open, handleClose, defaultType }) {
                       type='file'
                       hidden
                       multiple
-                      accept='image/*'
+                      accept='image/*,.heic,.heif'
                       onChange={handleFiles}
                     />
                   </IconButton>

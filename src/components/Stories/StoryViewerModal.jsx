@@ -5,43 +5,45 @@ import React, {
   useRef,
   useContext,
 } from "react";
-import { Modal, Box, Typography } from "@mui/material";
+import { Modal, Box, Typography, IconButton } from "@mui/material";
 import { MethodPost } from "../../config/Service";
 import AuthContext from "../../context/Auth/AuthContext";
 import HeaderViewModal from "./HeaderViewModal";
 import ViewersFloating from "./ViewersFloating";
 import ViewersCounter from "./ViewersCounter";
 import BarAnswers from "./BarAnswers";
-
+import StoriesContext from "../../context/stories/StoriesContext";
+import VolumeOffIcon from "@mui/icons-material/VolumeOff";
+import VolumeUpIcon from "@mui/icons-material/VolumeUp";
 const STORY_DURATION = 7000;
 const QUICK_REACTIONS = ["❤️", "🌸", "😍", "👏", "😮"];
 
-const StoryViewerModal = ({
-  open,
-  onClose,
-  storyGroup,
-  onStoryViewed,
-  onAllStoriesViewed,
-  fetchStories,
-}) => {
+const StoryViewerModal = ({ open, onClose, storyGroup, fetchStories }) => {
   const { usuario } = useContext(AuthContext);
+
+  // 2. Traer métodos del StoriesContext
+  const { markStoriAsViwed, markAllStoriesAsViewed } =
+    useContext(StoriesContext);
+
   const [currentIndex, setCurrentIndex] = useState(0);
   const [progress, setProgress] = useState(0);
-  const [localStories, setLocalStories] = useState([]);
   const [isImageLoaded, setIsImageLoaded] = useState(false);
 
   const [replyText, setReplyText] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const [sendingMessage, setSendingMessage] = useState(false);
-
-  // Estado para controlar las burbujas flotantes temporales
   const [floatingViewers, setFloatingViewers] = useState([]);
-
+  const [isMuted, setIsMuted] = useState(true);
+  const videoRef = useRef(null);
   const viewedStoriesRef = useRef(new Set());
 
+  // Historias tomadas directamente de la prop o un array vacío por seguridad
+  const stories = storyGroup?.stories || [];
+  const currentStory = stories[currentIndex];
+
+  // Reiniciar visor al abrir o cambiar de grupo
   useEffect(() => {
-    if (open && storyGroup?.stories) {
-      setLocalStories(storyGroup.stories);
+    if (open && storyGroup) {
       setCurrentIndex(0);
       setProgress(0);
       setIsImageLoaded(false);
@@ -52,9 +54,7 @@ const StoryViewerModal = ({
     }
   }, [open, storyGroup]);
 
-  const currentStory = localStories[currentIndex];
-
-  // Disparar las burbujas flotantes al cambiar de historia si hay espectadores
+  // Burbujas flotantes
   useEffect(() => {
     if (!open || !currentStory?.viewers?.length) {
       setFloatingViewers([]);
@@ -62,8 +62,8 @@ const StoryViewerModal = ({
     }
 
     const maxViewers = 13;
-    const staggerDelay = 400; // Delay entre cada espectador
-    const animDuration = 2400; // Duración de la animación CSS floatUp
+    const staggerDelay = 400;
+    const animDuration = 2400;
 
     const viewersToFloat = currentStory.viewers
       .slice(0, maxViewers)
@@ -78,7 +78,6 @@ const StoryViewerModal = ({
 
     setFloatingViewers(viewersToFloat);
 
-    // Cálculo dinámico para esperar a que la última burbuja complete su ciclo de animación
     const totalDuration =
       (viewersToFloat.length - 1) * staggerDelay + animDuration;
 
@@ -97,19 +96,20 @@ const StoryViewerModal = ({
     setIsTyping(false);
     setFloatingViewers([]);
 
-    if (currentIndex < localStories.length - 1) {
+    if (currentIndex < stories.length - 1) {
       setCurrentIndex((prev) => prev + 1);
     } else {
-      if (onAllStoriesViewed && storyGroup?.userId) {
-        onAllStoriesViewed(storyGroup.userId);
+      // 3. Marcar todo el grupo como visto en el Context al llegar al final
+      if (storyGroup?.userId) {
+        markAllStoriesAsViewed(storyGroup.userId);
       }
       onClose();
     }
   }, [
     currentIndex,
-    localStories.length,
+    stories.length,
     storyGroup?.userId,
-    onAllStoriesViewed,
+    markAllStoriesAsViewed,
     onClose,
   ]);
 
@@ -122,7 +122,7 @@ const StoryViewerModal = ({
     setCurrentIndex((prev) => (prev > 0 ? prev - 1 : 0));
   }, []);
 
-  // Registrar Vista individual en BD
+  // 4. Registrar Vista individual utilizando el Context
   useEffect(() => {
     if (!open || !currentStory) return;
 
@@ -133,22 +133,17 @@ const StoryViewerModal = ({
 
       MethodPost(`/stories/${storyId}/view`)
         .then(() => {
-          setLocalStories((prev) =>
-            prev.map((s) => (s.id === storyId ? { ...s, isSeen: true } : s))
-          );
-
-          if (onStoryViewed) {
-            onStoryViewed(storyGroup.userId, storyId);
-          }
+          // Actualiza el Reducer global de forma optimista
+          markStoriAsViwed(storyId, storyGroup.userId);
         })
         .catch((err) => {
           console.error("Error al registrar vista:", err);
           viewedStoriesRef.current.delete(storyId);
         });
     }
-  }, [open, currentIndex, currentStory, storyGroup?.userId, onStoryViewed]);
+  }, [open, currentIndex, currentStory, storyGroup?.userId, markStoriAsViwed]);
 
-  // Temporizador Automático con pausa
+  // Temporizador Automático
   useEffect(() => {
     if (!open || !currentStory || !isImageLoaded || isTyping) return;
 
@@ -197,7 +192,9 @@ const StoryViewerModal = ({
   if (!open || !currentStory) return null;
 
   const isOwner = usuario && usuario.id === storyGroup.userId;
-
+  const isVideo =
+    currentStory?.type === "video" ||
+    /\.(mp4|mov|webm)$/i.test(currentStory?.mediaUrl);
   return (
     <Modal
       open={open}
@@ -234,7 +231,7 @@ const StoryViewerModal = ({
             gap: "4px",
           }}
         >
-          {localStories.map((s, index) => {
+          {stories.map((s, index) => {
             let widthValue = 0;
             if (index < currentIndex) widthValue = 100;
             else if (index === currentIndex) widthValue = progress;
@@ -287,20 +284,91 @@ const StoryViewerModal = ({
         </Box>
 
         {/* IMAGEN DE LA HISTORIA */}
+        {/* CONTENEDOR DE IMAGEN CON FONDO DIFUMINADO */}
         <Box
-          component='img'
-          loading='lazy'
-          key={currentStory.id || currentStory.mediaUrl}
-          src={currentStory.mediaUrl}
-          alt='Story content'
-          onLoad={() => setIsImageLoaded(true)}
           sx={{
+            position: "relative",
             width: "100%",
             height: "100%",
-            objectFit: "cover",
+            overflow: "hidden",
+            bgcolor: "black",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
           }}
-        />
+        >
+          {/* 1. Imagen de Fondo (Crea el efecto Blur/Ambiental) */}
+          <Box
+            component='img'
+            key={`bg-${currentStory.id || currentStory.mediaUrl}`}
+            src={currentStory.mediaUrl}
+            alt='Background blur'
+            sx={{
+              position: "absolute",
+              width: "100%",
+              height: "100%",
+              objectFit: "cover",
+              filter: "blur(20px) brightness(0.6)",
+              transform: "scale(1.1)", // Evita bordes blancos por el blur
+              zIndex: 1,
+            }}
+          />
 
+          {/* 2. Imagen Principal (Se muestra completa sin recortes ni zoom) */}
+          {isVideo ? (
+            <Box
+              component='video'
+              ref={videoRef}
+              key={currentStory.id || currentStory.mediaUrl}
+              src={currentStory.mediaUrl}
+              autoPlay
+              playsInline
+              muted={isMuted}
+              onTimeUpdate={(e) => {
+                const { currentTime, duration } = e.target;
+                if (duration) setProgress((currentTime / duration) * 100);
+              }}
+              onEnded={handleNext}
+              sx={{
+                position: "relative",
+                zIndex: 2,
+                width: "100%",
+                height: "100%",
+                objectFit: "contain",
+              }}
+            />
+          ) : (
+            <Box
+              component='img'
+              key={currentStory.id || currentStory.mediaUrl}
+              src={currentStory.mediaUrl}
+              onLoad={() => setIsImageLoaded(true)}
+              sx={{
+                position: "relative",
+                zIndex: 2,
+                width: "100%",
+                height: "100%",
+                objectFit: "contain",
+              }}
+            />
+          )}
+        </Box>
+        {isVideo && (
+          <IconButton
+            onClick={() => setIsMuted(!isMuted)}
+            sx={{
+              position: "absolute",
+              top: 70,
+              right: 12,
+              zIndex: 12,
+              color: "white",
+              bgcolor: "rgba(0, 0, 0, 0.5)",
+              "&:hover": { bgcolor: "rgba(0, 0, 0, 0.7)" },
+            }}
+          >
+            {isMuted ? <VolumeOffIcon /> : <VolumeUpIcon />}
+          </IconButton>
+        )}
         {/* CAPTION */}
         {currentStory.caption && (
           <Box
@@ -326,7 +394,7 @@ const StoryViewerModal = ({
           </Box>
         )}
 
-        {/* CAPA DE ESPECTADORES FLOTANTES (EFECTO FLY-UP HASTA 40%) */}
+        {/* BUBBLES Y VISTAS */}
         {isOwner && floatingViewers.length > 0 && (
           <ViewersFloating
             floatingViewers={floatingViewers}
@@ -334,10 +402,9 @@ const StoryViewerModal = ({
           />
         )}
 
-        {/* CONTEO DE VISTAS ESTÁTICO ESTILO TIKTOK */}
         {isOwner && <ViewersCounter currentStory={currentStory} />}
 
-        {/* BARRA INFERIOR DE RESPUESTAS (Oculta si es el propietario) */}
+        {/* RESPUESTAS */}
         {!isOwner && (
           <BarAnswers
             QUICK_REACTIONS={QUICK_REACTIONS}
