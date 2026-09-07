@@ -25,7 +25,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import MethodGet from "../../config/Service";
 import clienteAxios from "../../config/Axios";
 import Swal from "sweetalert2";
-
+import { alerts } from "../../utils/alerts";
 const PRIMARY_PINK = "#E53888";
 
 const modalStyle = {
@@ -285,16 +285,8 @@ export default function FormacionDetalleModal({ open, handleClose, id }) {
     const formData = new FormData();
     formData.append("evidence", file);
     formData.append("moduleFormationId", moduloId);
-
-    Swal.fire({
-      title: "Subiendo evidencia...",
-      text: "Por favor espera un momento.",
-      allowOutsideClick: false,
-      allowEscapeKey: false,
-      didOpen: () => {
-        Swal.showLoading();
-      },
-    });
+    handleClose(); // Cerrar modal mientras se sube la evidencia
+    alerts.loading("Subiendo evidencia...", "Por favor espera un momento.");
 
     try {
       let url = `/formations/submit-delivery/${moduloId}`;

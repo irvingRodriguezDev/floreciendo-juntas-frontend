@@ -216,7 +216,7 @@ const Header = () => {
             <Box
               component='img'
               src={
-                "https://cdn.floreciendojuntas.com/production/statics/LOGOTIPO+FLORECIENDO+JUNTAS+negro.png"
+                "https://cdn.floreciendojuntas.com/production/statics/LOGOTIPO+FLORECIENDO+JUNTAS+negro.webp"
               }
               alt='Logo Floreciendo Juntas'
               sx={{

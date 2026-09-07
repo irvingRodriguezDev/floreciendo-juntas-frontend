@@ -14,7 +14,7 @@ import {
   SET_POSTS,
   UPDATE_REACTIONS,
 } from "../../types";
-
+import { alerts } from "../../utils/Alerts";
 const PostsState = ({ children }) => {
   const initialState = {
     posts: [],
@@ -79,7 +79,7 @@ const PostsState = ({ children }) => {
   // ===============================
   const getPosts = async (id, page = 1, rowsPerPage = 10) => {
     const res = await MethodGet(
-      `/community/posts/course/${id}?page=${page}&limit=${rowsPerPage}`
+      `/community/posts/course/${id}?page=${page}&limit=${rowsPerPage}`,
     );
 
     dispatch({
@@ -93,9 +93,19 @@ const PostsState = ({ children }) => {
   };
 
   const createPost = async (data) => {
+    alerts.loading(
+      "Subiendo contenido",
+      "Espera unos segundos mientras se carga tu publicación, por ahora no abandones ni recargues la pagina",
+    );
     const res = await clienteAxios.post(`/community/posts`, data, {
       headers: { "Content-Type": "multipart/form-data" },
     });
+    if (res.status === 201) {
+      alerts.success(
+        "Listo",
+        "Se han compartido tus dudas con la comunidad del curso",
+      );
+    }
 
     // Optimistic update local
     dispatch({ type: ADD_POST, payload: res.data });
@@ -126,7 +136,7 @@ const PostsState = ({ children }) => {
 
   const getReactions = async (postId) => {
     const { data } = await MethodGet(
-      `/community/reactions/summary?postId=${postId}`
+      `/community/reactions/summary?postId=${postId}`,
     );
 
     dispatch({
@@ -138,7 +148,7 @@ const PostsState = ({ children }) => {
   const getReactionsForPosts = async (postIds) => {
     const idsParam = postIds.join(",");
     const { data } = await MethodGet(
-      `/community/reactions/summary/multiple?postIds=${idsParam}&userId=${usuarioId}`
+      `/community/reactions/summary/multiple?postIds=${idsParam}&userId=${usuarioId}`,
     );
 
     dispatch({

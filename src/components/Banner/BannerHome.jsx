@@ -1,25 +1,12 @@
-import { Box, Typography, Button, Stack, useTheme } from "@mui/material";
-import PlayCircleOutlineIcon from "@mui/icons-material/PlayCircleOutline";
-import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
+import { Box, Typography, Stack } from "@mui/material";
 import VideoModal from "./VideoModal";
-import { Link } from "react-router-dom";
-import AuthContext from "../../context/Auth/AuthContext";
-import { useContext } from "react";
 import HeroActionButton from "../HeroActionButton";
 import HeroDescription from "../HeroDescription";
 
-const BannerHome = ({ onExploreCourses, onRegister }) => {
-  const theme = useTheme();
-  const { usuario, autenticado } = useContext(AuthContext);
+const BannerHome = () => {
   const videoSource =
     "https://floreciendojuntas1.s3.us-east-2.amazonaws.com/production/statics/Floreciendo+Juntas+Plataforma+(1).mov";
-  const handleScrollToCourses = () => {
-    const element = document.getElementById("seccion-cursos");
-    if (element) {
-      element.scrollIntoView({ behavior: "smooth" });
-    }
-  };
-  const tieneMembresiaActiva = usuario?.isSubscribed || usuario?.roleId === 4;
+
   return (
     <Box
       sx={{
@@ -63,7 +50,7 @@ const BannerHome = ({ onExploreCourses, onRegister }) => {
           right: "2%",
           width: { md: "280px", lg: "340px" },
           height: { md: "280px", lg: "340px" },
-          backgroundImage: `url("https://cdn.floreciendojuntas.com/production/statics/FLOR+ROSA+CONVEN.png")`,
+          backgroundImage: `url("https://cdn.floreciendojuntas.com/production/statics/FLOR-ROSA-CONVEN.webp")`,
           backgroundSize: "contain",
           backgroundRepeat: "no-repeat",
           opacity: 0.85,
@@ -79,7 +66,7 @@ const BannerHome = ({ onExploreCourses, onRegister }) => {
           left: "-2%",
           width: "300px",
           height: "300px",
-          backgroundImage: `url("https://cdn.floreciendojuntas.com/production/statics/GERBERA+MAGENTA+desenfoque.png")`,
+          backgroundImage: `url("https://cdn.floreciendojuntas.com/production/statics/GERBERA-MAGENTA-desenfoque.webp")`,
           backgroundSize: "contain",
           backgroundRepeat: "no-repeat",
           opacity: 0.8,
@@ -217,7 +204,7 @@ const BannerHome = ({ onExploreCourses, onRegister }) => {
         >
           <Box
             component='img'
-            src='https://cdn.floreciendojuntas.com/production/statics/caro.jpg'
+            src='https://cdn.floreciendojuntas.com/production/statics/caro.webp'
             alt='Carolina Tavera'
             sx={{
               width: "100%",

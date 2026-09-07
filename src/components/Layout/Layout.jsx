@@ -6,7 +6,6 @@ import SalonCartDrawer from "../Layout/CartSidebar";
 import AuthContext from "../../context/Auth/AuthContext";
 import CartContext from "../../context/Cart/CartContext";
 import { requestNotificationPermission } from "../../utils/requestNotificationPermission";
-import flor from "../../assets/images/flor.jpeg";
 import PremiumWhatsApp from "../CustomWhatsApp";
 import clienteAxios from "../../config/Axios";
 import FormBirthDate from "./FormBirthDate";
@@ -241,7 +240,7 @@ const Layout = ({ children }) => {
         <PremiumWhatsApp
           phoneNumber='525514960787'
           accountName='Soporte Floreciendo Juntas'
-          avatar={flor}
+          avatar={`https://cdn.floreciendojuntas.com/production/statics/FLOR-ROSA-CONVEN.webp`}
           bottom={110}
         />
       </Box>

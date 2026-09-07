@@ -1,17 +1,12 @@
-import { Grid, Paper, Typography } from "@mui/material";
-import React from "react";
+import { Grid } from "@mui/material";
 import Layout from "../../components/Layout/Layout";
 import BannerHome from "../../components/Banner/BannerHome";
-import About from "../../components/About/About";
 import Systems from "../Systems/Systems";
 import NewCourses from "../../components/courses/newCourses/NewCourses";
 import TopCourses from "../../components/courses/topCourses/TopCourses";
 import WhyChooseUsSection from "../../components/WhyChose/WhyChoseUsSection";
-import LatestEventsSection from "../../components/events/LatestEventsSections";
 import SocialLinks from "../../components/SocialLinks/SocialLinks";
 import RifaSalonSuenos from "../../components/Raffle/Raffle";
-import FullScreenVideo from "../../components/FullScreenVideo";
-import VideoFull from "../../components/fullscreen/VideoFull";
 import LatestWinners from "../winners/LatestWinners";
 const Home = () => {
   return (

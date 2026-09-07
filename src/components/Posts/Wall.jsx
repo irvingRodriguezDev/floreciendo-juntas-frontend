@@ -1,44 +1,34 @@
-import React, { useContext, useEffect, useState } from "react";
-import {
-  Box,
-  Typography,
-  Button,
-  Stack,
-  Grid,
-  useTheme,
-  useMediaQuery,
-  Avatar,
-} from "@mui/material";
+import React, { useContext, useEffect, useState, useCallback } from "react";
+import { Box, Typography, Button, Stack, Avatar } from "@mui/material";
 import CreateIcon from "@mui/icons-material/Create";
 import ForumIcon from "@mui/icons-material/Forum";
 import PostCard from "./PostCard";
 import CreatePostModal from "./CreatePostModal";
 import PostsContext from "../../context/Posts/PostsContext";
-import AuthContext from "../../context/Auth/AuthContext"; // Importado para el avatar de la alumna
+import AuthContext from "../../context/Auth/AuthContext";
 import PinkSpinner from "../Loading/PinkSpinner";
 import Pagination from "../Pagination/Pagination";
 
 const Wall = ({ courseId, isAuthenticating, isSubscribed }) => {
   const { getPosts, posts, totalPages } = useContext(PostsContext);
   const { usuario } = useContext(AuthContext);
-  const theme = useTheme();
 
   const [page, setPage] = useState(1);
   const [rowsPerPage] = useState(10);
   const [loading, setLoading] = useState(false);
   const [openModal, setOpenModal] = useState(false);
 
-  useEffect(() => {
+  // Memoizamos la función para evitar ejecuciones o ciclos infinitos en useEffect
+  const fetchPosts = useCallback(async () => {
     if (!courseId || !isSubscribed) return;
+    setLoading(true);
+    await getPosts(courseId, page, rowsPerPage);
+    setLoading(false);
+  }, [courseId, page, rowsPerPage, isSubscribed, getPosts]);
 
-    const fetchPosts = async () => {
-      setLoading(true);
-      await getPosts(courseId, page, rowsPerPage);
-      setLoading(false);
-    };
-
+  useEffect(() => {
     fetchPosts();
-  }, [courseId, page, rowsPerPage, isSubscribed]);
+  }, []);
 
   const handlePageChange = (newPage) => {
     if (newPage >= 1 && newPage <= totalPages && newPage !== page) {
@@ -46,12 +36,21 @@ const Wall = ({ courseId, isAuthenticating, isSubscribed }) => {
     }
   };
 
-  const handleCreatePost = () => setOpenModal(false);
+  // 🛡️ Callback para cuando la publicación se creó exitosamente en la API
+  const handlePostCreated = async () => {
+    setOpenModal(false);
+    // Si estábamos en una página mayor a 1, regresamos a la primera para ver la nueva publicación
+    if (page !== 1) {
+      setPage(1);
+    } else {
+      await fetchPosts();
+    }
+  };
 
   return (
     <Box
       sx={{
-        maxWidth: "760px", // Ancho óptimo de lectura tipo feed editorial
+        maxWidth: "760px",
         mx: "auto",
         px: { xs: 2, sm: 3 },
         pt: 2,
@@ -59,14 +58,16 @@ const Wall = ({ courseId, isAuthenticating, isSubscribed }) => {
       }}
     >
       <Stack spacing={3}>
-        {/* 📝 BARRA DE CREACIÓN ESTILO SOCIAL PREMIUM */}
+        {/* 📝 BARRA DE CREACIÓN */}
         {isSubscribed && (
           <Box
             sx={{
               p: 2,
               borderRadius: "20px",
-              backgroundColor: "#fff",
-              border: "1px solid #F3F4F6",
+              backgroundColor: "rgba(255, 255, 255, 0.9)",
+              backdropFilter: "blur(12px)",
+              border: "1px solid rgba(255, 255, 255, 0.8)",
+              boxShadow: "0 10px 30px -10px rgba(163, 11, 93, 0.08)",
               display: "flex",
               alignItems: "center",
               gap: 2,
@@ -76,12 +77,12 @@ const Wall = ({ courseId, isAuthenticating, isSubscribed }) => {
               src={usuario?.avatar_url}
               alt={usuario?.name}
               sx={{
-                bgcolor: "#FFF5F7",
-                color: "#E53888",
-                fontWeight: "bold",
+                bgcolor: "#FFF0F5",
+                color: "#D72E79",
+                fontWeight: 800,
                 fontSize: "14px",
-                width: 40,
-                height: 40,
+                width: 42,
+                height: 42,
               }}
             >
               {usuario?.name?.charAt(0).toUpperCase()}
@@ -92,18 +93,19 @@ const Wall = ({ courseId, isAuthenticating, isSubscribed }) => {
               onClick={() => setOpenModal(true)}
               sx={{
                 justifyContent: "flex-start",
-                backgroundColor: "#F9FAFB",
-                color: "#9CA3AF",
-                borderRadius: "14px",
+                backgroundColor: "#FFF0F6",
+                color: "#71717A",
+                borderRadius: "50px",
                 py: 1.2,
-                px: 2,
+                px: 2.5,
                 textTransform: "none",
-                fontSize: "0.95rem",
-                border: "1px solid #F3F4F6",
+                fontSize: "0.92rem",
+                border: "1px solid rgba(215, 46, 121, 0.15)",
+                transition: "all 0.25s ease",
                 "&:hover": {
-                  backgroundColor: "#FFF5F7",
-                  borderColor: "#FCE7F3",
-                  color: "#E53888",
+                  backgroundColor: "#FFE4EF",
+                  borderColor: "rgba(215, 46, 121, 0.3)",
+                  color: "#D72E79",
                 },
               }}
             >
@@ -112,15 +114,21 @@ const Wall = ({ courseId, isAuthenticating, isSubscribed }) => {
 
             <Button
               onClick={() => setOpenModal(true)}
+              aria-label='Crear publicación'
               sx={{
                 minWidth: "auto",
                 width: 42,
                 height: 42,
-                borderRadius: "12px",
-                backgroundColor: "#FFF5F7",
-                color: "#E53888",
+                borderRadius: "50%",
+                backgroundColor: "#FFF0F6",
+                color: "#D72E79",
+                border: "1px solid rgba(215, 46, 121, 0.2)",
                 flexShrink: 0,
-                "&:hover": { backgroundColor: "#FCE7F3" },
+                transition: "all 0.2s ease",
+                "&:hover": {
+                  backgroundColor: "#D72E79",
+                  color: "#FFFFFF",
+                },
               }}
             >
               <CreateIcon sx={{ fontSize: "18px" }} />
@@ -128,7 +136,7 @@ const Wall = ({ courseId, isAuthenticating, isSubscribed }) => {
           </Box>
         )}
 
-        {/* 🔹 SECCIÓN DE CONTENIDO PRINCIPAL (FEED / LOADER) */}
+        {/* 🔹 SECCIÓN DE CONTENIDO PRINCIPAL */}
         <Box>
           {loading ? (
             <Box
@@ -141,24 +149,19 @@ const Wall = ({ courseId, isAuthenticating, isSubscribed }) => {
                 gap: 2,
               }}
             >
-              <PinkSpinner />
-              <Typography
-                variant='caption'
-                sx={{ color: "#9CA3AF", fontWeight: 600 }}
-              >
-                Cargando el muro de la comunidad...
-              </Typography>
+              <PinkSpinner label='Cargando muro de la comunidad...' />
             </Box>
           ) : posts.length === 0 ? (
-            /* ❄️ COMPONENTE ROMPER EL HIELO INTEGRADO Y PREMIUM */
+            /* ❄️ ESTADO VACÍO (ROMPER EL HIELO) */
             <Box
               textAlign='center'
               sx={{
-                py: 8,
+                py: 7,
                 px: 4,
-                backgroundColor: "#fff",
-                borderRadius: "24px",
-                border: "1px dashed #E5E7EB",
+                backgroundColor: "rgba(255, 255, 255, 0.8)",
+                backdropFilter: "blur(12px)",
+                borderRadius: "28px",
+                border: "1.5px dashed rgba(215, 46, 121, 0.25)",
                 display: "flex",
                 flexDirection: "column",
                 alignItems: "center",
@@ -169,12 +172,13 @@ const Wall = ({ courseId, isAuthenticating, isSubscribed }) => {
                   width: 64,
                   height: 64,
                   borderRadius: "50%",
-                  backgroundColor: "#FFF5F7",
-                  color: "#E53888",
+                  backgroundColor: "#FFF0F6",
+                  color: "#D72E79",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
                   mb: 2.5,
+                  boxShadow: "0 8px 20px rgba(215, 46, 121, 0.15)",
                 }}
               >
                 <ForumIcon sx={{ fontSize: "28px" }} />
@@ -183,10 +187,10 @@ const Wall = ({ courseId, isAuthenticating, isSubscribed }) => {
               <Typography
                 variant='h6'
                 sx={{
-                  color: "#1F2937",
+                  color: "#2C1820",
                   fontWeight: 800,
                   mb: 1,
-                  fontSize: "1.15rem",
+                  fontSize: "1.2rem",
                 }}
               >
                 El muro de la clase está listo
@@ -195,33 +199,33 @@ const Wall = ({ courseId, isAuthenticating, isSubscribed }) => {
               <Typography
                 variant='body2'
                 sx={{
-                  color: "#6B7280",
-                  maxW: "420px",
+                  color: "#71717A",
+                  maxWidth: "420px",
                   mx: "auto",
                   mb: 3,
-                  lineHeight: 1.5,
+                  lineHeight: 1.6,
                 }}
               >
                 Todavía no hay publicaciones aquí. Sé la primera en compartir
-                tus prácticas o resolver tus dudas con las instructoras de
-                Wapizima.
+                tus prácticas o resolver tus dudas con las instructoras.
               </Typography>
 
               {isSubscribed && (
                 <Button
-                  variant='outlined'
+                  variant='contained'
                   onClick={() => setOpenModal(true)}
                   sx={{
-                    borderColor: "#E53888",
-                    color: "#E53888",
-                    borderRadius: "12px",
-                    px: 3,
-                    py: 1,
-                    fontWeight: "bold",
+                    borderRadius: "50px",
+                    px: 3.5,
+                    py: 1.2,
+                    fontWeight: 800,
                     textTransform: "none",
+                    background:
+                      "linear-gradient(135deg, #FF4B93 0%, #D72E79 100%)",
+                    boxShadow: "0 8px 20px rgba(215, 46, 121, 0.25)",
                     "&:hover": {
-                      borderColor: "#C2185B",
-                      backgroundColor: "#FFF5F7",
+                      background:
+                        "linear-gradient(135deg, #D72E79 0%, #B81D60 100%)",
                     },
                   }}
                 >
@@ -231,20 +235,20 @@ const Wall = ({ courseId, isAuthenticating, isSubscribed }) => {
             </Box>
           ) : (
             <>
-              {/* Feed con PostCard Limpio */}
+              {/* FEED DE PUBLICACIONES */}
               <Box sx={{ width: "100%" }}>
                 <PostCard posts={posts} />
               </Box>
 
-              {/* Contenedor de Paginación Editorial */}
+              {/* PAGINACIÓN EDITORIAL */}
               {totalPages > 1 && (
                 <Box
                   sx={{
                     display: "flex",
                     justifyContent: "center",
                     mt: 4,
-                    pt: 2,
-                    borderTop: "1px solid #F3F4F6",
+                    pt: 3,
+                    borderTop: "1px solid rgba(215, 46, 121, 0.1)",
                   }}
                 >
                   <Pagination
@@ -259,12 +263,12 @@ const Wall = ({ courseId, isAuthenticating, isSubscribed }) => {
         </Box>
       </Stack>
 
-      {/* Modales */}
+      {/* MODAL DE CREACIÓN DE POST */}
       <CreatePostModal
         open={openModal}
         onClose={() => setOpenModal(false)}
         courseId={courseId}
-        onSubmit={handleCreatePost}
+        onPostSuccess={handlePostCreated}
       />
     </Box>
   );

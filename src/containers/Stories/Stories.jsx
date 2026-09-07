@@ -11,14 +11,16 @@ const BORDER_PINK = "#FCE4EC";
 
 const Stories = () => {
   const { stories, getFeedStories, loading } = useContext(StoriesContext);
-  const { usuario } = useContext(AuthContext);
+  const { usuario, autenticado } = useContext(AuthContext);
   const currentUser = usuario;
   const [selectedGroup, setSelectedGroup] = useState(null);
   const [isViewerOpen, setIsViewerOpen] = useState(false);
   const [isUploadOpen, setIsUploadOpen] = useState(false);
 
   useEffect(() => {
-    getFeedStories();
+    if (autenticado) {
+      getFeedStories();
+    }
   }, []);
 
   const handleSelectStoryGroup = (group) => {

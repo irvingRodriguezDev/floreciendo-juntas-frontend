@@ -16,7 +16,9 @@ export default defineConfig({
         short_name: "Floreciendo",
         description: "Comunidad de emprendimiento y aprendizaje",
         start_url: "/",
+        scope: "/", // 👈 OBLIGATORIO: Define que toda la web vive dentro de la PWA
         display: "standalone",
+        display_override: ["standalone", "fullscreen"], // 👈 OBLIGATORIO PARA iOS: Refuerza el modo App
         orientation: "portrait",
         background_color: "#FAF8F9",
         theme_color: "#D72E79",
@@ -40,7 +42,6 @@ export default defineConfig({
             purpose: "maskable",
           },
         ],
-        // 📸 Agregamos este bloque para limpiar los avisos de Richer UI:
         screenshots: [
           {
             src: "/750x1334.png",
@@ -59,9 +60,13 @@ export default defineConfig({
         ],
       },
       workbox: {
-        // Aumentamos el margen a 15 MB para precargar el bundle sin bloqueos de compilación
         maximumFileSizeToCacheInBytes: 15 * 1024 * 1024,
         globPatterns: ["**/*.{js,css,html,ico,png,svg,woff2}"],
+
+        // 👈 OBLIGATORIO PARA SPA EN iOS: Redirige las navegaciones de ruta a index.html
+        navigateFallback: "/index.html",
+        navigateFallbackDenylist: [/^\/api/], // Evita interceptar peticiones a tu API backend
+
         runtimeCaching: [
           {
             urlPattern: /^https:\/\/.*(jpg|jpeg|png|webp|svg|gif).*/i,
@@ -90,11 +95,10 @@ export default defineConfig({
     }),
   ],
   build: {
-    // Evita advertencias molestas en consola por el tamaño de los archivos al empaquetar
     chunkSizeWarningLimit: 5000,
   },
   server: {
-    allowedHosts: ["far-helen-unlike-testimony.trycloudflare.com"],
+    allowedHosts: ["twiki-complex-linear-sticky.trycloudflare.com"],
     port: 5173,
   },
 });

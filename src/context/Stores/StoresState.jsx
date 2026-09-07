@@ -16,6 +16,7 @@ import {
 } from "../../types";
 import Swal from "sweetalert2";
 import clienteAxios from "../../config/Axios";
+import { alerts } from "../../utils/alerts";
 /**Importar componente token headers */
 
 const StoresState = ({ children }) => {
@@ -43,16 +44,7 @@ const StoresState = ({ children }) => {
       });
   };
   const createStoreUser = (data) => {
-    Swal.fire({
-      title: "Creando tu tienda...",
-      text: "Estamos registrando tu punto de distribución, por favor espera.",
-      allowOutsideClick: false,
-      allowEscapeKey: false,
-      showConfirmButton: false,
-      didOpen: () => {
-        Swal.showLoading(); // Muestra el spinner oficial de SweetAlert2
-      },
-    });
+    alerts.loading("Creando tu tienda...", "Por favor espera un momento.");
 
     let url = `/stores`;
 

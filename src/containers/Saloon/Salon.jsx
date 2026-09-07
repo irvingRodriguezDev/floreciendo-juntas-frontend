@@ -2,13 +2,14 @@ import Layout from "../../components/Layout/Layout";
 import { Box, Grid, Typography } from "@mui/material";
 import DreamSalonSlider from "../../components/Banner/DreamSaloonBanner";
 import DreamSalonFeatures from "../../components/Sections/DreamSaloonFeautures";
-import { motion } from "framer-motion";
 import ProductCard from "../../components/Products/ProductCard";
 import ProductsContext from "../../context/Products/ProductsContext";
 import { useContext, useEffect, useState } from "react";
 import SearchCourse from "../../components/courses/SearchCourses";
 import Pagination from "../../components/Pagination/Pagination";
+import PinkSpinner from "../../components/Loading/PinkSpinner";
 import { useDebounce } from "use-debounce";
+
 const Salon = () => {
   const { products, getAllProducts, currentPage, totalPages } =
     useContext(ProductsContext);
@@ -17,18 +18,25 @@ const Salon = () => {
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(false);
   const [debouncedSearch] = useDebounce(search, 500);
+
+  // 💡 CORRECCIÓN 1: Regresar a la página 1 cuando el usuario escribe en el buscador
+  useEffect(() => {
+    setPage(1);
+  }, [debouncedSearch]);
+
   useEffect(() => {
     const fetchProducts = async () => {
       setLoading(true);
       await getAllProducts(
         debouncedSearch.trim() === "" ? page : undefined,
         debouncedSearch.trim() === "" ? rowsPerPage : undefined,
-        debouncedSearch
+        debouncedSearch,
       );
       setLoading(false);
     };
     fetchProducts();
   }, [page, rowsPerPage, debouncedSearch]);
+
   const handlePageChange = (newPage) => {
     if (newPage >= 1 && newPage <= totalPages && newPage !== page) {
       setPage(newPage);
@@ -47,15 +55,15 @@ const Salon = () => {
         </Grid>
         <Grid size={12} sx={{ marginBottom: -15 }}>
           <Box
-            component={motion.div}
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            viewport={{ once: true }}
             sx={{
               textAlign: "center",
               py: { xs: 6, md: 8 },
               px: { xs: 3, md: 6 },
+              animation: "fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards",
+              "@keyframes fadeInUp": {
+                "0%": { opacity: 0, transform: "translateY(20px)" },
+                "100%": { opacity: 1, transform: "translateY(0)" },
+              },
             }}
           >
             <Typography
@@ -103,6 +111,7 @@ const Salon = () => {
           </Box>
         </Grid>
       </Grid>
+
       <Grid
         container
         spacing={3}
@@ -122,17 +131,34 @@ const Salon = () => {
             placeholder={"Ej: Esmaltero teddy"}
           />
         </Grid>
-        {products.map((p) => (
-          <Grid
-            size={{ xs: 12, sm: 6, md: 4, lg: 4, xl: 3 }}
-            sx={{ padding: { xs: "20px" } }}
-            key={p.id}
-          >
-            <ProductCard product={p} />
+
+        {/* 💡 CORRECCIÓN 2 & 3: Manejo de carga y estado vacío con feedback visual */}
+        {loading ? (
+          <Grid size={12} sx={{ py: 8, textAlign: "center" }}>
+            <PinkSpinner label='Buscando productos ideales...' />
           </Grid>
-        ))}
+        ) : products.length > 0 ? (
+          products.map((p) => (
+            <Grid
+              size={{ xs: 12, sm: 6, md: 4, lg: 4, xl: 3 }}
+              sx={{ padding: { xs: "20px" } }}
+              key={p.id}
+            >
+              <ProductCard product={p} />
+            </Grid>
+          ))
+        ) : (
+          <Grid size={12} sx={{ py: 8, textAlign: "center" }}>
+            <Typography
+              sx={{ color: "#71717A", fontSize: "1.1rem", fontWeight: 600 }}
+            >
+              No encontramos productos con esa búsqueda 🌸
+            </Typography>
+          </Grid>
+        )}
       </Grid>
-      {search === "" && (
+
+      {search === "" && !loading && totalPages > 1 && (
         <Grid container justifyContent='center' sx={{ paddingBottom: 5 }}>
           <Pagination
             currentPage={currentPage}

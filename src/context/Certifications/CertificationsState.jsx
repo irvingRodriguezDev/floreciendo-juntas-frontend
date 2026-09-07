@@ -7,11 +7,11 @@ import {
   SEND_ENTREGABLE,
   SHOW_CERTIFICATION_DETAILS,
 } from "../../types";
-import { alerts } from "../../utils/Alerts";
 import clienteAxios from "../../config/Axios";
 import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
 import fileDownload from "js-file-download";
+import { alerts } from "../../utils/alerts";
 const CertificationsState = ({ children }) => {
   const initialState = {
     certifications: [],

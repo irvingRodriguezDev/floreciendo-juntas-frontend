@@ -130,7 +130,7 @@ export default function CartSidebar({ open, onClose }) {
             </Typography>
           ) : (
             activeCart &&
-            activeCart.items.map((item) => (
+            activeCart.items?.map((item) => (
               <CartItem key={item.id || item.productId} item={item} />
             ))
           )}

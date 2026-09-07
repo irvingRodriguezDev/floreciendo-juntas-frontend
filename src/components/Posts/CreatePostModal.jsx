@@ -8,28 +8,48 @@ import {
   Button,
   IconButton,
   Box,
-  Typography,
   Stack,
+  CircularProgress,
 } from "@mui/material";
 import AttachFileIcon from "@mui/icons-material/AttachFile";
 import DeleteIcon from "@mui/icons-material/Delete";
 import CloseIcon from "@mui/icons-material/Close";
+import SendIcon from "@mui/icons-material/Send";
+import { useSnackbar } from "notistack";
 import PostsContext from "../../context/Posts/PostsContext";
+import { convertImageToWebp } from "../../utils/convertImageToWebP";
 
-const CreatePostModal = ({ open, onClose, courseId }) => {
+const CreatePostModal = ({ open, onClose, courseId, onPostSuccess }) => {
   const { createPost } = useContext(PostsContext);
+  const { enqueueSnackbar } = useSnackbar();
+
   const [content, setContent] = useState("");
   const [image, setImage] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false); // 🛡️ BLOQUEO DE DUPLICADOS
 
-  const handleChangeImage = (e) => {
+  const handleChangeImage = async (e) => {
     const file = e.target.files[0];
     if (file) {
-      if (image?.urlPhoto) URL.revokeObjectURL(image.urlPhoto);
+      try {
+        // Convierte cualquier JPG/PNG/HEIC a WebP optimizado
+        console.log("convirtiendo");
 
-      setImage({
-        urlPhoto: URL.createObjectURL(file),
-        file,
-      });
+        const webpFile = await convertImageToWebp(file, {
+          maxWidth: 1920,
+          maxHeight: 1920,
+          quality: 0.85,
+        });
+
+        if (image?.urlPhoto) URL.revokeObjectURL(image.urlPhoto);
+
+        setImage({
+          urlPhoto: URL.createObjectURL(webpFile),
+          file: webpFile,
+        });
+        console.log(" se ha convertido");
+      } catch (err) {
+        console.error("Error optimizando imagen:", err);
+      }
     }
     e.target.value = null;
   };
@@ -40,57 +60,81 @@ const CreatePostModal = ({ open, onClose, courseId }) => {
   };
 
   const handleClose = () => {
+    if (isSubmitting) return; // Evita cerrar el modal mientras se envía
     setContent("");
     handleDeleteImage();
     onClose();
   };
 
-  // 🔥 Limpieza en el desmontaje para evitar fugas de memoria
   useEffect(() => {
     return () => {
       if (image?.urlPhoto) URL.revokeObjectURL(image.urlPhoto);
     };
   }, [image]);
 
-  const handleSubmit = async () => {
-    if (!content.trim() && !image) return;
+  const handleSubmit = async (e) => {
+    if (e) e.preventDefault();
+    if ((!content.trim() && !image) || isSubmitting) return;
 
-    const formData = new FormData();
-    formData.append("courseId", courseId);
-    formData.append("content", content);
+    setIsSubmitting(true); // 🔒 1. Bloqueo inmediato contra doble clic
 
-    if (image) {
-      formData.append("attachment", image.file);
+    try {
+      const formData = new FormData();
+      formData.append("courseId", courseId);
+      formData.append("content", content.trim());
+
+      if (image) {
+        formData.append("attachment", image.file);
+      }
+      handleClose();
+      await createPost(formData);
+      enqueueSnackbar("Publicación compartida en el muro 💗", {
+        variant: "success",
+      });
+
+      handleClose();
+
+      // 🔄 2. Notificar al componente Wall para refrescar la lista una sola vez
+      if (onPostSuccess) {
+        onPostSuccess();
+      }
+    } catch (error) {
+      enqueueSnackbar(
+        "Ocurrió un error al compartir tus dudas/avances. Inténtalo de nuevo.",
+        {
+          variant: "error",
+        },
+      );
+    } finally {
+      setIsSubmitting(false); // 🔓 Desbloqueo al finalizar
     }
-
-    await createPost(formData);
-    handleClose();
   };
 
-  const isFormValid = content.trim() || image;
+  const isFormValid = (content.trim() || image) && !isSubmitting;
 
   return (
     <Dialog
       open={open}
       onClose={handleClose}
       fullWidth
-      maxWidth='sm' // Ajustado a SM para que se vea más compacto y estético estilo app móvil de lujo
+      maxWidth='sm'
       PaperProps={{
         sx: {
-          borderRadius: "24px",
-          backgroundColor: "#ffffff",
-          boxShadow: "none",
-          border: "1px solid #F3F4F6",
+          borderRadius: "28px",
+          backgroundColor: "rgba(255, 255, 255, 0.98)",
+          backdropFilter: "blur(16px)",
+          boxShadow: "0 25px 50px -12px rgba(163, 11, 93, 0.25)",
+          border: "1px solid rgba(255, 255, 255, 0.8)",
           p: 1,
         },
       }}
     >
-      {/* Cabecera con botón de cerrar integrado */}
+      {/* Cabecera */}
       <DialogTitle
         sx={{
           fontWeight: 800,
-          color: "#1F2937",
-          fontSize: "1.15rem",
+          color: "#2C1820",
+          fontSize: "1.2rem",
           pt: 2,
           pb: 1,
           display: "flex",
@@ -99,7 +143,11 @@ const CreatePostModal = ({ open, onClose, courseId }) => {
         }}
       >
         <span>Crear publicación</span>
-        <IconButton onClick={handleClose} sx={{ color: "#9CA3AF" }}>
+        <IconButton
+          onClick={handleClose}
+          disabled={isSubmitting}
+          sx={{ color: "#71717A" }}
+        >
           <CloseIcon sx={{ fontSize: "20px" }} />
         </IconButton>
       </DialogTitle>
@@ -108,21 +156,23 @@ const CreatePostModal = ({ open, onClose, courseId }) => {
         <TextField
           multiline
           fullWidth
+          disabled={isSubmitting}
           minRows={4}
           maxRows={8}
-          placeholder='¿Qué quieres compartir hoy con la comunidad Wapizima?...'
+          placeholder='Comparte dudas y/o avances en el curso'
           value={content}
           onChange={(e) => setContent(e.target.value)}
           variant='outlined'
           sx={{
             "& .MuiOutlinedInput-root": {
-              borderRadius: "16px",
-              backgroundColor: "#F9FAFB", // Fondo gris ultra limpio en lugar de rosa saturado
+              borderRadius: "20px",
+              backgroundColor: "#FFF0F6",
               p: 2,
               fontSize: "0.95rem",
-              "& fieldset": { borderColor: "#E5E7EB" },
-              "&:hover fieldset": { borderColor: "#F472B6" },
-              "&.Mui-focused fieldset": { borderColor: "#E53888" },
+              color: "#2C1820",
+              "& fieldset": { borderColor: "rgba(215, 46, 121, 0.15)" },
+              "&:hover fieldset": { borderColor: "rgba(215, 46, 121, 0.3)" },
+              "&.Mui-focused fieldset": { borderColor: "#D72E79" },
             },
           }}
         />
@@ -139,22 +189,25 @@ const CreatePostModal = ({ open, onClose, courseId }) => {
             type='file'
             id='modal-file-input'
             hidden
+            disabled={isSubmitting}
             onChange={handleChangeImage}
           />
           <label htmlFor='modal-file-input'>
             <Button
               component='span'
+              disabled={isSubmitting}
               startIcon={<AttachFileIcon sx={{ fontSize: "18px" }} />}
               sx={{
-                backgroundColor: "#FFF5F7",
-                color: "#E53888",
-                borderRadius: "12px",
+                backgroundColor: "#FFF0F6",
+                color: "#D72E79",
+                borderRadius: "50px",
                 textTransform: "none",
-                fontWeight: "bold",
+                fontWeight: 800,
                 fontSize: "13px",
-                px: 2,
+                px: 2.5,
                 py: 0.8,
-                "&:hover": { backgroundColor: "#FCE7F3" },
+                border: "1px solid rgba(215, 46, 121, 0.2)",
+                "&:hover": { backgroundColor: "#FFE4EF" },
               }}
             >
               Foto de práctica
@@ -166,10 +219,10 @@ const CreatePostModal = ({ open, onClose, courseId }) => {
         {image && (
           <Box
             sx={{
-              mt: 3,
+              mt: 2.5,
               position: "relative",
               width: "100%",
-              borderRadius: "16px",
+              borderRadius: "20px",
               overflow: "hidden",
             }}
           >
@@ -181,20 +234,21 @@ const CreatePostModal = ({ open, onClose, courseId }) => {
                 width: "100%",
                 maxHeight: "300px",
                 objectFit: "cover",
-                borderRadius: "16px",
-                backgroundColor: "#F9FAFB",
-                border: "1px solid #E5E7EB",
+                borderRadius: "20px",
+                backgroundColor: "#FFF0F6",
+                border: "1px solid rgba(215, 46, 121, 0.15)",
               }}
             />
             <IconButton
               onClick={handleDeleteImage}
+              disabled={isSubmitting}
               sx={{
                 position: "absolute",
                 top: 12,
                 right: 12,
-                backgroundColor: "rgba(31, 41, 55, 0.7)", // Fondo oscuro semitransparente profesional
+                backgroundColor: "rgba(44, 24, 32, 0.75)",
                 color: "#ffffff",
-                "&:hover": { backgroundColor: "rgba(31, 41, 55, 0.9)" },
+                "&:hover": { backgroundColor: "rgba(44, 24, 32, 0.9)" },
                 width: 32,
                 height: 32,
               }}
@@ -208,20 +262,21 @@ const CreatePostModal = ({ open, onClose, courseId }) => {
       <DialogActions
         sx={{
           px: 3,
-          pb: 2,
-          pt: 2,
+          pb: 2.5,
+          pt: 1.5,
           justifyContent: "flex-end",
           gap: 1.5,
         }}
       >
         <Button
           onClick={handleClose}
+          disabled={isSubmitting}
           sx={{
-            color: "#6B7280",
+            color: "#71717A",
             fontWeight: 700,
             textTransform: "none",
             fontSize: "0.95rem",
-            borderRadius: "12px",
+            borderRadius: "50px",
           }}
         >
           Cancelar
@@ -230,27 +285,34 @@ const CreatePostModal = ({ open, onClose, courseId }) => {
           variant='contained'
           onClick={handleSubmit}
           disabled={!isFormValid}
+          startIcon={
+            isSubmitting ? (
+              <CircularProgress size={18} color='inherit' />
+            ) : (
+              <SendIcon sx={{ fontSize: 16 }} />
+            )
+          }
           sx={{
-            backgroundColor: "#E53888",
-            color: "white",
-            borderRadius: "14px",
-            px: 4,
+            borderRadius: "50px",
+            px: 3.5,
             py: 1,
-            fontWeight: "bold",
+            fontWeight: 800,
             textTransform: "none",
             fontSize: "0.95rem",
-            boxShadow: "none",
+            background: "linear-gradient(135deg, #FF4B93 0%, #D72E79 100%)",
+            boxShadow: "0 6px 18px rgba(215, 46, 121, 0.28)",
+            transition: "all 0.25s ease",
             "&:hover": {
-              backgroundColor: "#C2185B",
-              boxShadow: "none",
+              background: "linear-gradient(135deg, #D72E79 0%, #B81D60 100%)",
+              boxShadow: "0 8px 22px rgba(215, 46, 121, 0.38)",
             },
             "&.Mui-disabled": {
-              backgroundColor: "#F3F4F6",
-              color: "#9CA3AF",
+              backgroundColor: "#E4E4E7",
+              color: "#A1A1AA",
             },
           }}
         >
-          Publicar en el muro
+          {isSubmitting ? "Publicando..." : "Publicar en el muro"}
         </Button>
       </DialogActions>
     </Dialog>

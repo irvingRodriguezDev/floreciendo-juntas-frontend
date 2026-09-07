@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import MethodGet from "../../config/Service";
 import {
   Paper,
@@ -16,12 +16,14 @@ import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import clienteAxios from "../../config/Axios";
 import { alerts } from "../../utils/Alerts";
 import WishModal from "./WishModal";
+import AuthContext from "../../context/Auth/AuthContext";
 
 const MAIN_PINK = "#D72E79";
 const LIGHT_PINK = "#FFF0F6";
 const BORDER_PINK = "#FCE4EC";
 
 const Birthdays = () => {
+  const { autenticado } = useContext(AuthContext);
   const [cumpleaneras, setCumpleaneras] = useState([]);
   const [loading, setLoading] = useState(true);
   const [wishedUsers, setWishedUsers] = useState([]);
@@ -46,16 +48,18 @@ const Birthdays = () => {
     setWishedUsers(savedWishes);
 
     const url = "/auth/cumpleaneras";
-    MethodGet(url)
-      .then((res) => {
-        setCumpleaneras(res.data.users || []);
-      })
-      .catch((error) => {
-        console.error("Ocurrió un error al obtener las cumpleañeras:", error);
-      })
-      .finally(() => {
-        setLoading(false);
-      });
+    if (autenticado) {
+      MethodGet(url)
+        .then((res) => {
+          setCumpleaneras(res.data.users || []);
+        })
+        .catch((error) => {
+          console.error("Ocurrió un error al obtener las cumpleañeras:", error);
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+    }
   }, []);
 
   const handleWishBirthday = async (userId, userName) => {
