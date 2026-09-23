@@ -1,11 +1,10 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Box, Typography } from "@mui/material";
+import { Box, Typography, CircularProgress } from "@mui/material";
 import WorkbookSection from "../../../components/courses/WorkbookSection";
 import RecognitionSection from "../../../components/courses/RecognitionSection";
-import ActionsButtonsCourse from "../../../components/courses/ActionsButtons";
 import { useCourseProgress } from "../../../hooks/useCourseProgress";
-import { useHlsPlayer } from "../../../hooks/useHlsPlayer";
 import ProgressCourse from "../../../components/courses/ProgressCourse";
+import VideoJSPlayer from "./VideoJSPlayer";
 
 const VideoPlayer = ({
   userId,
@@ -20,7 +19,7 @@ const VideoPlayer = ({
   activeVideo,
 }) => {
   const [isPlaying, setIsPlaying] = useState(false);
-  const videoRef = useHlsPlayer(src);
+  const playerInstanceRef = useRef(null);
   const apiTickCounterRef = useRef(0);
 
   const {
@@ -32,15 +31,20 @@ const VideoPlayer = ({
     getGlobalProgress,
   } = useCourseProgress({ userId, courseId, allVideos, activeVideo });
 
-  // Cronómetro de guardado periódico (5s Local, 15s API)
+  // Cronómetro para sincornizar y guardar el progreso en background
   useEffect(() => {
     if (certificateEnabled || !userId || !courseId) return;
 
     const interval = setInterval(() => {
-      const video = videoRef.current;
-      if (!video || video.paused) return;
+      const player = playerInstanceRef.current;
+      // Validamos que el reproductor esté activo y reproduciendo
+      if (!player || player.paused() || player.ended()) return;
 
-      handleTick(video);
+      // Extraemos de forma segura el tag <video> nativo manejado por Video.js
+      const rawVideo = player.tech({ IWillNotUseThisInPlugins: true })?.el_;
+      if (rawVideo) {
+        handleTick(rawVideo);
+      }
 
       apiTickCounterRef.current += 5;
       if (apiTickCounterRef.current >= 15) {
@@ -58,23 +62,38 @@ const VideoPlayer = ({
     handleTick,
     getGlobalProgress,
     updateBackendProgress,
-    videoRef,
   ]);
 
-  const handlePlayPause = () => {
-    const video = videoRef.current;
-    if (!video) return;
-    video.paused ? video.play() : video.pause();
+  // Handler cuando la instancia de Video.js está lista
+  const handlePlayerReady = (player) => {
+    playerInstanceRef.current = player;
   };
 
+  // Evento Play
+  const handlePlay = () => {
+    setIsPlaying(true);
+  };
+
+  // Evento Pause (Sincroniza progreso inmediatamente)
   const handlePause = () => {
     setIsPlaying(false);
-    syncCurrentProgress(videoRef.current, false);
+    const rawVideo = playerInstanceRef.current?.tech({
+      IWillNotUseThisInPlugins: true,
+    })?.el_;
+    if (rawVideo) {
+      syncCurrentProgress(rawVideo, false);
+    }
   };
 
+  // Evento Ended (Marca el video como completado)
   const handleEnded = () => {
     setIsPlaying(false);
-    syncCurrentProgress(videoRef.current, true);
+    const rawVideo = playerInstanceRef.current?.tech({
+      IWillNotUseThisInPlugins: true,
+    })?.el_;
+    if (rawVideo) {
+      syncCurrentProgress(rawVideo, true);
+    }
   };
 
   const safeUserName = usuario?.name ?? "";
@@ -84,37 +103,56 @@ const VideoPlayer = ({
       <Box
         sx={{
           position: "relative",
-          borderRadius: 2,
+          borderRadius: 3,
           overflow: "hidden",
           backgroundColor: "#000",
+          boxShadow: "0 10px 30px rgba(0,0,0,0.15)",
+          minHeight: { xs: 220, sm: 380, md: 450 },
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
         }}
       >
-        <video
-          ref={videoRef}
-          preload='metadata'
-          controls
-          controlsList='nodownload noremoteplayback'
-          disablePictureInPicture
-          poster={poster}
-          onPlay={() => setIsPlaying(true)}
-          onPause={handlePause}
-          onEnded={handleEnded}
-          style={{ width: "100%", aspectRatio: "16/9", display: "block" }}
-        />
-
-        <ActionsButtonsCourse
-          handlePlayPause={handlePlayPause}
-          isPlaying={isPlaying}
-        />
+        {src ? (
+          <VideoJSPlayer
+            src={src}
+            poster={poster}
+            onReady={handlePlayerReady}
+            onPlay={handlePlay}
+            onPause={handlePause}
+            onEnded={handleEnded}
+          />
+        ) : (
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              gap: 2,
+              color: "#fff",
+            }}
+          >
+            <CircularProgress size={40} sx={{ color: "#D62D78" }} />
+            <Typography variant='body2' sx={{ color: "rgba(255,255,255,0.7)" }}>
+              Cargando lección...
+            </Typography>
+          </Box>
+        )}
       </Box>
 
-      <Box sx={{ mt: 3, p: 2, borderRadius: 3, backgroundColor: "#FFF6F9" }}>
-        <Typography fontWeight={700} sx={{ mb: 1, color: "#1F2937" }}>
+      {/* Información del Video y Progreso del Curso */}
+      <Box sx={{ mt: 3, p: 2.5, borderRadius: 3, backgroundColor: "#FFF6F9" }}>
+        <Typography
+          fontWeight={700}
+          variant='h6'
+          sx={{ mb: 1, color: "#1F2937" }}
+        >
           {title}
         </Typography>
         <ProgressCourse progress={progress} />
       </Box>
 
+      {/* Secciones adicionales */}
       {workbookUrl !== null && <WorkbookSection workbookUrl={workbookUrl} />}
 
       {certificateEnabled && hasCertificate && safeUserName && (

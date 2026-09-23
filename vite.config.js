@@ -98,7 +98,7 @@ export default defineConfig({
     chunkSizeWarningLimit: 5000,
   },
   server: {
-    allowedHosts: ["twiki-complex-linear-sticky.trycloudflare.com"],
+    allowedHosts: ["charter-sleep-wiley-substantially.trycloudflare.com"],
     port: 5173,
   },
 });
