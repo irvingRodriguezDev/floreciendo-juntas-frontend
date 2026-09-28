@@ -1,0 +1,70 @@
+/* Variables CSS (opcional pero recomendado para mantener la consistencia) */
+:root {
+  --primary-color: #d82e7a;
+  --secondary-color: #fce4ec; /* Rosa muy claro, útil para fondos/hover */
+  --text-color: #333;
+  --disabled-color: #f0f0f0;
+}
+
+.pagination-container {
+  display: flex;
+  justify-content: center;
+  align-items: center; /* Alinea verticalmente los elementos */
+  margin-top: 30px;
+  gap: 8px; /* Aumentamos el espacio entre los botones */
+  font-family: "Arial", sans-serif; /* Puedes cambiar la fuente */
+}
+
+.pagination-button {
+  /* Forma y tamaño */
+  background-color: white;
+  color: var(--text-color);
+  border: 1px solid #ddd;
+  padding: 8px 14px; /* Un poco más de padding horizontal */
+  min-width: 40px; /* Ancho mínimo para consistencia */
+  text-align: center;
+
+  /* Estilo visual */
+  cursor: pointer;
+  border-radius: 6px; /* Bordes ligeramente más redondeados */
+  transition: all 0.3s ease; /* Transición suave para todos los cambios */
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05); /* Sombra muy sutil */
+}
+
+/* Estilo de Hover y Focus */
+.pagination-button:hover:not(:disabled) {
+  background-color: var(
+    --secondary-color
+  ); /* Fondo rosa claro al pasar el ratón */
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  transform: translateY(-1px); /* Efecto 3D sutil */
+}
+
+/* Estado Activo: el botón de la página actual */
+.pagination-button.active {
+  background-color: var(--primary-color); /* Color base vibrante */
+  color: white;
+  border-color: var(--primary-color);
+  font-weight: bold;
+  box-shadow: 0 3px 6px rgba(216, 46, 122, 0.3); /* Sombra con el color principal */
+}
+
+/* Botones Anterior y Siguiente */
+.pagination-button:first-child,
+.pagination-button:last-child {
+  padding: 8px 18px;
+  min-width: 90px;
+}
+
+/* Estado Deshabilitado */
+.pagination-button:disabled {
+  background-color: var(--disabled-color);
+  color: #aaa;
+  border-color: #eee;
+  cursor: not-allowed;
+  opacity: 1; /* Quitamos la opacidad para un look más "gris" */
+  box-shadow: none;
+  transform: none;
+}

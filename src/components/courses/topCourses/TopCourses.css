@@ -1,60 +1,51 @@
-.top-movies-container {
-  padding: 20px;
-  color: white;
-  background: #0000;
-}
-
-.movies-list {
-  display: flex;
-  gap: 40px;
-  flex-wrap: wrap;
-}
-
-.movie-card {
+/* Contenedor estilo Netflix */
+.nf-card-container {
   position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
 }
 
-.movie-rank {
+/* Número gigante (outline) */
+.nf-number {
   position: absolute;
-  font-size: 18rem;
-  font-weight: 800;
-  left: -20px;
-  top: 50%;
+  top: 80%;
+  left: -80px;
   transform: translateY(-50%);
-  z-index: 1;
-  color: gray;
-
-  /* 👇 Glass effect SOLO en el número */
-  background: rgba(238, 158, 234, 0.2);
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  /* Opcional: contorno para mejor visibilidad */
-  -webkit-text-stroke: 2px rgba(255, 255, 255, 0.3);
-  padding: 15px 25px;
+  color: #fff;
+  -webkit-text-stroke: 8px #fff; /* color outline rosado */
+  opacity: 0.9;
+  z-index: 3;
+  pointer-events: none;
 }
 
-.movie-img {
+/* Imagen */
+.nf-image {
+  width: 85%;
+  border-radius: 12px;
+  position: relative;
+  z-index: 2;
+  transition: transform 0.25s ease;
   width: 300px;
-  height: 200px;
-  border-radius: 8px;
-  object-fit: cover;
-  margin-left: 100px;
-  z-index: 2;
+  height: 380px;
 }
 
-.movie-title {
-  margin-top: 10px;
-  font-size: 2rem;
-  text-align: center;
-  z-index: 2;
-  margin-left: 100px;
-  font-weight: bold;
+.nf-card-container:hover .nf-image {
+  transform: scale(1.05);
 }
-.title {
-  text-align: left;
+
+/* Badge estilo netflix */
+.nf-badge {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  background: #ff0059;
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-size: 0.72rem;
   font-weight: bold;
-  font-size: xx-large;
+  color: white;
+  z-index: 3;
+  margin-bottom: 8px;
+  margin-left: 5px;
 }
