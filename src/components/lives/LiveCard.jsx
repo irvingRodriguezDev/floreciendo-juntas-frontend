@@ -69,7 +69,7 @@ const LiveCard = ({ live, i, PRIMARY_PINK = "#D63384" }) => {
         sx={{
           position: "relative",
           width: "100%",
-          pt: "62%",
+          pt: "100%",
           backgroundColor: "#FFF0F5",
           overflow: "hidden",
         }}
