@@ -8,6 +8,7 @@ import WhyChooseUsSection from "../../components/WhyChose/WhyChoseUsSection";
 import SocialLinks from "../../components/SocialLinks/SocialLinks";
 import RifaSalonSuenos from "../../components/Raffle/Raffle";
 import LatestWinners from "../winners/LatestWinners";
+import NextSorteo from "../winners/NextSorteo";
 const Home = () => {
   return (
     <Layout>
