@@ -146,6 +146,22 @@ const SubscriptionForm = ({ userId }) => {
               return;
             }
 
+            if (
+              status === 400 &&
+              msg?.includes("Este número ingresado ya esta registrado")
+            ) {
+              // setIsLoginMode(true);
+              Swal.fire({
+                title: "¡Número ya registrado!",
+                text: "Este número ya está asociado a otra cuenta. Por favor, utiliza otro número.",
+                icon: "warning",
+                confirmButtonColor: BRAND.roseVelvet,
+              });
+
+              setLoading(false);
+              return;
+            }
+
             throw new Error(msg || "Error al registrar la cuenta.");
           }
 
