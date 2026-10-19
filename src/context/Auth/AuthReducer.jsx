@@ -10,24 +10,20 @@ export default (state, action) => {
       };
 
     case types.REGISTRO_EXITOSO:
-      localStorage.setItem("token", action.payload.token);
       return {
         ...state,
         autenticado: true,
         cargando: false,
         isAuthenticating: true,
         usuario: action.payload.user,
-        token: action.payload.token, // Mantener el token en el estado
       };
     case types.LOGIN_EXITOSO:
-      localStorage.setItem("token", action.payload.token);
       return {
         ...state,
         autenticado: true,
         cargando: true,
         isAuthenticating: true,
         usuario: action.payload.user,
-        token: action.payload.token,
       };
     case types.RESET_PASSWORD:
     case types.UPDATE_USER:

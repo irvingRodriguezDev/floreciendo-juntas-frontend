@@ -98,7 +98,7 @@ export default defineConfig({
     chunkSizeWarningLimit: 5000,
   },
   server: {
-    allowedHosts: ["charter-sleep-wiley-substantially.trycloudflare.com"],
+    allowedHosts: ["meyer-framed-photography-legislative.trycloudflare.com"],
     port: 5173,
   },
 });

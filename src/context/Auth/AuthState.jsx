@@ -76,13 +76,6 @@ const AuthState = (props) => {
   const usuarioAutenticado = async () => {
     dispatch({ type: types.INICIO_AUTENTICACION });
 
-    const token = localStorage.getItem("token");
-    if (!token) {
-      dispatch({ type: types.LOGIN_ERROR });
-      return false;
-    }
-    tokenAuth(token);
-
     try {
       const { data } = await MethodGet("/auth/me");
       localStorage.setItem(
@@ -115,15 +108,7 @@ const AuthState = (props) => {
         password: datos.password,
         captchaToken: tokenCaptcha,
       });
-      const token = res.data.token;
-
-      if (!token) {
-        throw new Error("Token no recibido");
-      }
-
-      localStorage.setItem("token", token);
-      tokenAuth(token);
-
+      await new Promise((resolve) => setTimeout(resolve, 100));
       // 3️⃣ Estado global
       dispatch({
         type: types.LOGIN_EXITOSO,
@@ -131,7 +116,7 @@ const AuthState = (props) => {
       });
 
       // 4️⃣ Socket: cerrar y crear nuevo
-      initSocket(token, res.data?.usuario);
+      initSocket(null, res.data?.usuario);
 
       // 5️⃣ Obtener usuario autenticado
       await usuarioAutenticado();
@@ -160,11 +145,7 @@ const AuthState = (props) => {
     try {
       // 1️⃣ Registro en TU backend
       const res = await MethodPost("/auth/register", data);
-      const token = res.data.token;
-
-      localStorage.setItem("token", token);
-      tokenAuth(token);
-
+      await new Promise((resolve) => setTimeout(resolve, 100));
       // 3️⃣ Estado global
       dispatch({
         type: types.REGISTRO_EXITOSO,

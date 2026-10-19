@@ -6,15 +6,11 @@ const clienteAxios = axios.create({
   headers: {
     "Content-Type": "application/json",
   },
+  withCredentials: true, // 👈 CRUCIAL: Obliga al navegador a enviar y recibir cookies HttpOnly
 });
 
-clienteAxios.interceptors.request.use((config) => {
-  const token = localStorage.getItem("token");
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
-});
+// ❌ YA NO NECESITAMOS EL INTERCEPTOR DE REQUEST PARA EL TOKEN BEARER
+// (La cookie viaja sola de forma automática y segura por el navegador)
 
 let isRedirecting = false;
 
@@ -32,11 +28,9 @@ clienteAxios.interceptors.response.use(
     const isCheckAuthRequest = url.includes("/auth/me"); // 👈 Tu endpoint exacto
 
     if (status === 401) {
-      // Limpiamos el token expirado/inválido
-      localStorage.removeItem("token");
+      // ❌ YA NO USAMOS localStorage.removeItem("token") porque la cookie la borra/expira el backend
 
       // Si el 401 viene de intentar iniciar sesión o de verificar el token al cargar la app:
-      // SIMPLEMENTE IGNORAMOS LA REDIRECCIÓN Y REJECTAMOS LA PROMESA.
       if (isLoginRequest || isCheckAuthRequest) {
         return Promise.reject(error);
       }
