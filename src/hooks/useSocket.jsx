@@ -1,49 +1,36 @@
 import { useEffect, useRef, useCallback } from "react";
-import { initSocket, getSocket, disconnectSocket } from "../socket";
+import { initSocket, getSocket } from "../socket";
 
 const useSocket = ({
   onPostCreated,
   onCommentCreated,
   onReactionUpdated,
-  token,
 } = {}) => {
   const socketRef = useRef(null);
 
   useEffect(() => {
-    // 1. Inicialización
-    if (token) {
-      socketRef.current = initSocket(token);
-    }
-
+    // 1. Inicialización global con la cookie HttpOnly automática
+    socketRef.current = initSocket();
     const s = socketRef.current;
     if (!s) return;
 
-    // 2. Registro de eventos (usando los nombres que coinciden con tu backend)
-    // Nota: Asegúrate que los nombres sean los mismos que emite el server
+    // 2. Registro de eventos
     if (onPostCreated) s.on("postCommunityCreated", onPostCreated);
     if (onCommentCreated) s.on("createCommentPostCommunity", onCommentCreated);
     if (onReactionUpdated) s.on("postLikeToggled", onReactionUpdated);
 
-    s.on("connect", () => console.log("🟢 Socket conectado:", s.id));
-    s.on("connect_error", (err) => {
-      console.error("🔴 Socket Error:", err.message);
-      // Si el error es de Auth, initSocket ya debería manejar el disconnect
-    });
-
-    // 3. Limpieza (Cleanup)
+    // 3. Limpieza (Cleanup) de los listeners específicos al desmontar el componente
     return () => {
       if (s) {
-        s.off("postCommunityCreated", onPostCreated);
-        s.off("createCommentPostCommunity", onCommentCreated);
-        s.off("postLikeToggled", onReactionUpdated);
-        s.off("connect");
-        s.off("connect_error");
-        // No desconectamos aquí para que el socket persista entre navegaciones
+        if (onPostCreated) s.off("postCommunityCreated", onPostCreated);
+        if (onCommentCreated)
+          s.off("createCommentPostCommunity", onCommentCreated);
+        if (onReactionUpdated) s.off("postLikeToggled", onReactionUpdated);
+        // Mantenemos la decisión correcta: NO desconectamos la instancia
+        // global aquí para que siga viva en las demás vistas de la app.
       }
     };
-    // 💡 IMPORTANTE: Si onPostCreated no viene de un useCallback,
-    // este efecto se ejecutará en CADA render.
-  }, [token, onPostCreated, onCommentCreated, onReactionUpdated]);
+  }, [onPostCreated, onCommentCreated, onReactionUpdated]);
 
   // 4. Emitir usando useCallback para que la función sea estable
   const emit = useCallback((event, payload) => {

@@ -3,10 +3,9 @@ import { messaging } from "../firebase";
 import { MethodPost } from "../config/Service";
 import { getBrowserName } from "./getBrowserName";
 
-export const requestNotificationPermission = async (
-  tokenAuth,
-  userId = null,
-) => {
+// Ya no necesitamos recibir un 'userId' como parámetro,
+// el backend sabrá quién es la usuaria gracias a la cookie HttpOnly.
+export const requestNotificationPermission = async () => {
   try {
     if (!messaging) {
       console.warn(
@@ -51,42 +50,30 @@ export const requestNotificationPermission = async (
     }
 
     const storedToken = localStorage.getItem("fcm_token");
-    const storedUserId = localStorage.getItem("fcm_user_id");
     const device = getBrowserName();
 
     /**
-     * 🛑 Solo omitir la petición si:
-     * 1. El token es idéntico
-     * 2. Y ADEMÁS el usuario guardado es EXACTAMENTE el mismo
+     * 🛑 Solo omitir la petición si el token FCM es exactamente el mismo guardado previamente
      */
-    if (
-      currentToken === storedToken &&
-      String(userId) === String(storedUserId)
-    ) {
-      console.log("ℹ️ El token FCM ya está vinculado al usuario actual.");
+    if (currentToken === storedToken) {
+      console.log("ℹ️ El token FCM ya está vinculado en este dispositivo.");
       return;
     }
 
-    // 🚀 Enviar al backend para vincular o reasignar el token al usuario actual
+    // 🚀 Enviar al backend.
+    // Al usar MethodPost (que internamente usa tu clienteAxios con withCredentials: true),
+    // la cookie HttpOnly viajará automáticamente sin necesidad de headers manuales.
     await MethodPost(`/save-notification-token`, {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${tokenAuth}`,
-      },
       token: currentToken,
       device,
       browserId,
     });
 
-    // Guardar tanto el token como el ID del usuario para el cual se registró
+    // Guardar el token en localStorage para evitar peticiones repetidas innecesarias
     localStorage.setItem("fcm_token", currentToken);
-    if (userId) {
-      localStorage.setItem("fcm_user_id", userId);
-    }
 
     console.log(
-      "✅ Token FCM registrado/actualizado en el backend para el usuario:",
-      userId,
+      "✅ Token FCM registrado/actualizado en el backend exitosamente.",
     );
   } catch (error) {
     console.error("🔥 Error en requestNotificationPermission:", error);

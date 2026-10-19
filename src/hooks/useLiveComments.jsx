@@ -2,7 +2,8 @@ import { useEffect, useState, useRef, useContext, useCallback } from "react";
 import MethodGet, { MethodPost } from "../config/Service";
 import AuthContext from "../context/Auth/AuthContext";
 
-export const useLiveComments = (liveId, roomArn, tokenAuth) => {
+// 👈 Ya no recibimos tokenAuth como parámetro
+export const useLiveComments = (liveId, roomArn) => {
   const { usuario } = useContext(AuthContext);
   const [comments, setComments] = useState([]);
   const [isConnected, setIsConnected] = useState(false);
@@ -31,11 +32,12 @@ export const useLiveComments = (liveId, roomArn, tokenAuth) => {
     };
 
     fetchInitialComments();
-  }, [liveId, tokenAuth]);
+  }, [liveId]); // 👈 Quitamos tokenAuth de las dependencias
 
   // 2. Conectar a Amazon IVS Chat con Reconexión Automática & Fetch de Token Dinámico
   useEffect(() => {
-    if (!liveId || !roomArn || !tokenAuth) return;
+    // 👈 Quitamos la validación de tokenAuth, ahora solo dependemos de liveId y roomArn
+    if (!liveId || !roomArn) return;
 
     isMountedRef.current = true;
 
@@ -50,7 +52,7 @@ export const useLiveComments = (liveId, roomArn, tokenAuth) => {
       }
 
       try {
-        // Pedir Token Fresco a la API de Node.js
+        // Pedir Token Fresco a la API de Node.js (la cookie HttpOnly viaja sola)
         const res = await MethodPost("/lives/chat-token", { roomArn: roomArn });
 
         if (!res?.data?.token) {
@@ -118,7 +120,6 @@ export const useLiveComments = (liveId, roomArn, tokenAuth) => {
 
         ws.onerror = (err) => {
           console.error("❌ Error en IVS Chat WebSocket:", err);
-          // onerror es seguido por onclose, por lo que onclose maneja la reconexión
         };
 
         socketRef.current = ws;
@@ -153,14 +154,13 @@ export const useLiveComments = (liveId, roomArn, tokenAuth) => {
         clearTimeout(reconnectTimeoutRef.current);
       }
       if (socketRef.current) {
-        // Desvincular handlers antes de cerrar para evitar llamadas tras desmontar
         socketRef.current.onclose = null;
         socketRef.current.onerror = null;
         socketRef.current.close();
         socketRef.current = null;
       }
     };
-  }, [liveId, roomArn, tokenAuth]);
+  }, [liveId, roomArn]); // 👈 Quitamos tokenAuth de las dependencias
 
   // ✉️ Función para enviar un comentario (Optimizada con useCallback)
   const sendComment = useCallback(
@@ -188,7 +188,7 @@ export const useLiveComments = (liveId, roomArn, tokenAuth) => {
         socketRef.current.send(JSON.stringify(payload));
       }
 
-      // B) Respaldar en BD en segundo plano
+      // B) Respaldar en BD en segundo plano (La cookie viaja sola en MethodPost)
       try {
         await MethodPost(`/lives/create-comment/${liveId}`, {
           message: trimmedMessage,

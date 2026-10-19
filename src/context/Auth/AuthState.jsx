@@ -2,18 +2,18 @@ import React, { useEffect, useReducer } from "react";
 import AuthContext from "./AuthContext";
 import AuthReducer from "./AuthReducer";
 import MethodGet, { MethodPost, MethodPut } from "../../config/Service";
-import tokenAuth from "../../config/TokenAuth";
+// ❌ Eliminado: tokenAuth ya no se necesita
 import { disconnectSocket, getSocket, initSocket } from "../../socket";
 import { SHOW_ERRORS_API, types } from "../../types";
 import Swal from "sweetalert2";
 import clienteAxios from "../../config/Axios";
 import { alerts } from "../../utils/Alerts";
-// import { shopifyFetch } from "../../containers/Store/ShopifyClient";
 import { useNavigate } from "react-router-dom";
+
 const AuthState = (props) => {
   const navigate = useNavigate();
+
   const initialState = {
-    token: localStorage.getItem("token"),
     autenticado: false,
     isAuthenticating: true,
     usuario: null,
@@ -30,18 +30,19 @@ const AuthState = (props) => {
 
   const [state, dispatch] = useReducer(AuthReducer, initialState);
 
-  var token = "";
-  // ✅ USAR UN USEEFFECT PARA EL SOCKET
+  // ✅ 1. Manejo reactivo del Socket según la autenticación
   useEffect(() => {
-    token = localStorage.getItem("token");
-    if (token) {
-      initSocket(token);
+    // Leemos 'autenticado' desde el 'state'
+    if (state.autenticado) {
+      initSocket(); // La cookie HttpOnly se enviará sola
+    } else {
+      disconnectSocket();
     }
 
     return () => {
-      disconnectSocket(); // Limpiar al desmontar
+      disconnectSocket();
     };
-  }, []);
+  }, [state.autenticado]);
 
   /**
    * 🔹 Forzar recarga de imagen para evitar cache del navegador
@@ -49,12 +50,12 @@ const AuthState = (props) => {
   const getProfileImageUrl = (url) => {
     if (!url) return null;
     const cleanUrl = url.replace(/\\"/g, "").replace(/^"|"$/g, "").trim();
-    return `${cleanUrl}?t=${new Date().getTime()}`; // forzar reload
+    return `${cleanUrl}?t=${new Date().getTime()}`;
   };
 
   // 🔹 Escuchar evento de actualización de imagen
   useEffect(() => {
-    const socket = getSocket(); // Usa el getter en lugar de la variable del cuerpo
+    const socket = getSocket();
     if (!socket || !state.usuario) return;
 
     const handleProfileImageUpdated = (data) => {
@@ -68,20 +69,23 @@ const AuthState = (props) => {
 
     socket.on("profileImageUpdated", handleProfileImageUpdated);
     return () => socket.off("profileImageUpdated", handleProfileImageUpdated);
-  }, [state.usuario]); // Solo depende del usuario
+  }, [state.usuario]);
 
   /**
-   * 🔹 Obtener usuario autenticado
+   * 🔹 Obtener usuario autenticado (Llamada inicial a /auth/me)
    */
   const usuarioAutenticado = async () => {
     dispatch({ type: types.INICIO_AUTENTICACION });
 
     try {
+      // Axios envía la cookie HttpOnly automáticamente
       const { data } = await MethodGet("/auth/me");
+
       localStorage.setItem(
         "savedBirthDate",
-        data.user.birthDate === null ? false : true,
+        data.user.birthDate === null ? "false" : "true",
       );
+
       dispatch({
         type: types.OBTENER_USUARIO,
         payload: {
@@ -102,23 +106,22 @@ const AuthState = (props) => {
    */
   const iniciarSesion = async (datos, tokenCaptcha) => {
     try {
-      // 1️⃣ Login en TU backend
+      // 1️⃣ El backend responde con res.cookie("token", ...)
       const res = await MethodPost("/auth/login", {
         email: datos.email,
         password: datos.password,
         captchaToken: tokenCaptcha,
       });
+
       await new Promise((resolve) => setTimeout(resolve, 100));
-      // 3️⃣ Estado global
+
+      // 2️⃣ Estado global
       dispatch({
         type: types.LOGIN_EXITOSO,
         payload: res.data,
       });
 
-      // 4️⃣ Socket: cerrar y crear nuevo
-      initSocket(null, res.data?.usuario);
-
-      // 5️⃣ Obtener usuario autenticado
+      // 3️⃣ Obtener información fresca del usuario (y activar state.autenticado = true)
       await usuarioAutenticado();
 
       return true;
@@ -143,10 +146,9 @@ const AuthState = (props) => {
    */
   const registerUser = async (data) => {
     try {
-      // 1️⃣ Registro en TU backend
       const res = await MethodPost("/auth/register", data);
       await new Promise((resolve) => setTimeout(resolve, 100));
-      // 3️⃣ Estado global
+
       dispatch({
         type: types.REGISTRO_EXITOSO,
         payload: res.data,
@@ -245,7 +247,6 @@ const AuthState = (props) => {
 
       const profileImageUrl = getProfileImageUrl(res.data.profileImage);
 
-      //Dispatch para actualizar estado
       dispatch({
         type: types.USER_CHANGEPHOTO,
         payload: { profileImage: profileImageUrl },
@@ -266,21 +267,27 @@ const AuthState = (props) => {
   /**
    * 🔹 Cerrar sesión
    */
-  const cerrarSesion = () => {
-    // 1. Desconectar sockets y eventos
-    disconnectSocket();
+  const cerrarSesion = async () => {
+    try {
+      // OPCIONAL: Endpoint en backend para res.clearCookie("token")
+      await MethodPost("/auth/logout");
+    } catch (e) {
+      // Si falla o no existe el endpoint, continuamos con el flujo del cliente
+    } finally {
+      // 1. Desconectar socket
+      disconnectSocket();
 
-    // 2. Limpiar Storage
-    localStorage.removeItem("user_id");
-    localStorage.removeItem("token");
-    localStorage.removeItem("customerAccessToken");
-    localStorage.removeItem("fcm_user_id");
-    // 3. Disparar estado global
-    dispatch({ type: types.CERRAR_SESION });
+      // 2. Limpiar Storages secundarios
+      localStorage.removeItem("user_id");
+      localStorage.removeItem("customerAccessToken");
+      localStorage.removeItem("fcm_user_id");
 
-    // 4. Redirección limpia
-    // Usar replace evita que puedan darle "atrás" en el navegador hacia la vista protegida
-    navigate("/", { replace: true });
+      // 3. Actualizar estado global
+      dispatch({ type: types.CERRAR_SESION });
+
+      // 4. Redirección limpia
+      navigate("/", { replace: true });
+    }
   };
 
   /**
@@ -299,12 +306,10 @@ const AuthState = (props) => {
         }).then(() => (window.location = "/iniciar-sesion"));
       })
       .catch((error) => {
-        console.log(error, "el error 372");
-
         Swal.fire({
           title: "Error",
           text:
-            error.response.data.message ||
+            error.response?.data?.message ||
             "Ocurrió un error al recuperar la contraseña, intenta más tarde!",
           icon: "error",
           timer: 2000,
@@ -312,6 +317,10 @@ const AuthState = (props) => {
         });
       });
   };
+
+  /**
+   * 🔹 Logout Global (por expiración de sesión)
+   */
   const logoutGlobal = () => {
     localStorage.clear();
     disconnectSocket();
@@ -332,7 +341,6 @@ const AuthState = (props) => {
   return (
     <AuthContext.Provider
       value={{
-        token: state.token,
         autenticado: state.autenticado,
         isAuthenticating: state.isAuthenticating,
         usuario: state.usuario,

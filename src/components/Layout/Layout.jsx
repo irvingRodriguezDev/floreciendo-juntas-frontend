@@ -50,10 +50,7 @@ const Layout = ({ children }) => {
   useEffect(() => {
     if (!autenticado || !usuario) return;
 
-    const token = localStorage.getItem("token");
-    if (token) {
-      requestNotificationPermission(token);
-    }
+    requestNotificationPermission();
 
     const savedBirthDate = localStorage.getItem("savedBirthDate");
 

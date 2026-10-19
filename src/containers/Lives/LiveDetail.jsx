@@ -112,11 +112,9 @@ const LiveDetalle = () => {
 
   // ── IVS Viewers & Comentarios ──
   const viewers = useIvsViewers(id, live?.aws_channel_arn);
-  const tokenAuth = localStorage.getItem("token");
   const { comments, sendComment, isConnected } = useLiveComments(
     live?.id,
     live?.chatRoomArn || import.meta.env.VITE_AWS_IVS_CHAT_ROOM_ARN,
-    tokenAuth,
   );
 
   // ── Fetch Inicial ──

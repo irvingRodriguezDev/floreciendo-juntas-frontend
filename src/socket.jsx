@@ -3,15 +3,12 @@ import { io } from "socket.io-client";
 const SOCKET_URL = import.meta.env.VITE_SOCKET_URL;
 let socket = null;
 
-export const initSocket = (token, usuario = null) => {
-  if (!token) {
-    disconnectSocket();
-    return null;
-  }
+// Ya no necesitamos recibir 'usuario' ni 'token' como parámetro
+export const initSocket = () => {
+  disconnectSocket();
 
-  // 1. Si ya existe el socket y está conectado, solo actualizamos el token
+  // 1. Si ya existe el socket y está conectado, no necesitamos recrearlo
   if (socket?.connected) {
-    socket.auth = { token, userId: usuario?.id };
     return socket;
   }
 
@@ -23,18 +20,19 @@ export const initSocket = (token, usuario = null) => {
   socket = io(SOCKET_URL, {
     path: "/socket.io",
     transports: ["websocket"],
-    // Quitamos forceNew para permitir que la librería gestione la eficiencia
-    auth: { token },
     autoConnect: true,
     reconnection: true,
     reconnectionAttempts: 10,
-    timeout: 10000, // Bajamos un poco el timeout para fallar rápido
+    timeout: 10000,
+    withCredentials: true, // 👈 CRUCIAL: Obligatorio para que el navegador mande la cookie HttpOnly
   });
 
   // Listeners básicos
   socket.on("connect", () => console.log("🟢 Conectado:", socket.id));
 
   socket.on("connect_error", (err) => {
+    console.log(err, "el error del websocket");
+
     console.error("🔴 Error:", err.message);
     if (err.message.includes("AuthError") || err.message.includes("token")) {
       disconnectSocket();
@@ -49,7 +47,7 @@ export const getSocket = () => socket;
 
 export const disconnectSocket = () => {
   if (socket) {
-    socket.off(); // Es más limpio que removeAllListeners()
+    socket.off(); // Limpia los listeners de forma segura
     socket.disconnect();
     socket = null;
   }
