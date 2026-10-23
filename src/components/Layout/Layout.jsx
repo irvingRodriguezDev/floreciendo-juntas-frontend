@@ -235,7 +235,7 @@ const Layout = ({ children }) => {
       >
         {children}
         <PremiumWhatsApp
-          phoneNumber='525514960787'
+          phoneNumbers={["525514960787", "527221334367"]}
           accountName='Soporte Floreciendo Juntas'
           avatar={`https://cdn.floreciendojuntas.com/production/statics/FLOR-ROSA-CONVEN.webp`}
           bottom={110}
