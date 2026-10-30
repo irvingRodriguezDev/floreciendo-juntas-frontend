@@ -9,22 +9,34 @@ import SocialLinks from "../../components/SocialLinks/SocialLinks";
 import RifaSalonSuenos from "../../components/Raffle/Raffle";
 import LatestWinners from "../winners/LatestWinners";
 import NextSorteo from "../winners/NextSorteo";
+import HeroDescription from "../../components/HeroDescription";
 const Home = () => {
   return (
     <Layout>
       <Grid container spacing={2} sx={{ mt: 5, padding: "25px" }}>
+        
+        <Grid size={12}>
+          <HeroDescription />
+        </Grid>
+
+        <Grid size={12}>
+          <NewCourses />
+        </Grid>
+        <Grid size={12} id='seccion-cursos'>
+          <TopCourses />
+        </Grid>
         <Grid size={12}>
           <BannerHome />
         </Grid>
         <Grid size={12}>
           <LatestWinners />
         </Grid>
-        <Grid size={12} id='seccion-cursos'>
+        {/* <Grid size={12} id='seccion-cursos'>
           <TopCourses />
-        </Grid>
-        <Grid size={12}>
+        </Grid> */}
+        {/* <Grid size={12}>
           <NewCourses />
-        </Grid>
+        </Grid> */}
         <Grid size={12}>
           <Systems />
         </Grid>
