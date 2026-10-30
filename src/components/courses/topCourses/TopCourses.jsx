@@ -78,6 +78,7 @@ const TopCourses = () => {
               variant='overline'
               sx={{
                 color: "#E53888", // Usamos el color principal para que resalte
+                fontStyle: 'italic',
                 letterSpacing: "4px", // Más espaciado para estilo moderno
                 fontWeight: 700,
                 textTransform: "uppercase",

@@ -114,6 +114,7 @@ const LatestWinners = () => {
                 component='h2'
                 sx={{
                   fontWeight: 900,
+                  fontStyle: 'italic',
                   color: "#FFFFFF",
                   lineHeight: 1.15,
                   fontSize: { xs: "2.1rem", sm: "2.8rem", md: "3.4rem" },

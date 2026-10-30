@@ -98,6 +98,7 @@ const NewCourses = () => {
             variant='overline'
             sx={{
               color: "#E53888",
+              fontStyle: 'italic',
               letterSpacing: "4px",
               fontWeight: 700,
               textTransform: "uppercase",

@@ -112,6 +112,7 @@ const SocialCards = () => {
             component='h2'
             sx={{
               fontWeight: 900,
+              fontStyle: 'italic',
               color: "#1F2937",
               lineHeight: 1.15,
               fontSize: { xs: "2.1rem", sm: "2.8rem", md: "3.5rem" },

@@ -117,6 +117,7 @@ const Systems = () => {
             variant='h3'
             sx={{
               fontWeight: 900,
+              fontStyle: 'italic',
               lineHeight: 1.15,
               textAlign: "center",
               color: "#111111",
