@@ -62,7 +62,7 @@ const HeroButtons = () => {
               backgroundColor: "#FFF",
               color: "#E83E8C",
               fontWeight: 800,
-              fontSize: "1rem",
+              fontSize: "0.8rem",
               padding: "12px 28px",
               borderRadius: "50px",
               boxShadow: "0px 8px 20px rgba(0,0,0,0.15)",
@@ -79,7 +79,7 @@ const HeroButtons = () => {
       )}
 
       {/* 2. BOTÓN SECUNDARIO: Siempre visible para hacer scroll a los cursos */}
-      <Button
+      {/* <Button
         variant='outlined'
         size='large'
         onClick={handleScrollToCourses}
@@ -100,7 +100,7 @@ const HeroButtons = () => {
         }}
       >
         Explorar Cursos
-      </Button>
+      </Button> */}
     </Stack>
   );
 };

@@ -164,17 +164,17 @@ const BannerHome = () => {
         </Typography>
 
         {/* Descripción de la Propuesta de Valor */}
-        <HeroDescription />
+        {/* <HeroDescription /> */}
 
         {/* BOTONES DE ACCIÓN (NUEVO E IMPRESCINDIBLE PARA CONVERSIÓN) */}
-        <Stack
+        {/* <Stack
           direction={{ xs: "column", sm: "row" }}
           spacing={2}
           justifyContent={{ xs: "center", md: "flex-start" }}
           alignItems='center'
         >
           <HeroActionButton />
-        </Stack>
+        </Stack> */}
       </Box>
 
       {/* ---- CONTENIDO DERECHO (FOTO CAROLINA + VIDEO) ---- */}
