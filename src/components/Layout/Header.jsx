@@ -30,6 +30,7 @@ import FornitureIcon from "../icons/FornitureIcon";
 import NotificationsBell from "../Notifications/NotificationsBell";
 import HeaderMessageBadge from "../Chat/HeaderMessageBadge";
 import InboxDrawer from "../Chat/InboxDrawer";
+import { useHoliday } from "../../context/Holiday/HolidayContext";
 /* Menu items (igual que antes) */
 const menuItems = [
   { name: "Comunidad", path: "/comunidad", auth: "both" },
@@ -42,6 +43,7 @@ const menuItems = [
 
 const Header = () => {
   const theme = useTheme();
+  const { isHolidayMode, toggleHolidayMode } = useHoliday();
   const [open, setOpen] = useState(false);
   const [openCart, setOpenCart] = useState(false);
   const [openCartShopify, setOpenCartShopify] = useState(false);

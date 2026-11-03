@@ -1,11 +1,18 @@
 import React, { useContext, useEffect, useState } from "react";
-import { Box, Typography, IconButton, Stack, Button } from "@mui/material";
+import {
+  Box,
+  Typography,
+  IconButton,
+  Stack,
+  Button,
+  alpha,
+} from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import AutoAwesomeIcon from "@mui/icons-material/AutoAwesome";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Autoplay } from "swiper/modules";
-import { useNavigate } from "react-router-dom"; // 👈 Usamos useNavigate en lugar de Link
+import { useNavigate } from "react-router-dom";
 
 import "swiper/css";
 import "swiper/css/navigation";
@@ -30,53 +37,27 @@ const Systems = () => {
     <Box
       sx={{
         background: `
-          linear-gradient(180deg, #FFF0F5 0%, #FFFFFF 100%),
-          radial-gradient(circle at 10% 20%, rgba(229, 56, 136, 0.08), transparent 40%)
+          linear-gradient(180deg, #FFFFFF 0%, #FFF0F5 100%),
+          radial-gradient(circle at top left, rgba(232,62,140,0.06), transparent 70%)
         `,
-        py: { xs: 5, md: 9 },
+        py: { xs: 6, md: 10 },
         px: { xs: 2, sm: 4, md: 6 },
         position: "relative",
-        borderRadius: { xs: "24px", md: "36px" },
+        borderRadius: "32px",
         overflow: "hidden",
+        border: "1px solid",
+        borderColor: alpha("#E53888", 0.08),
+        boxShadow: "0 20px 40px rgba(232, 62, 140, 0.04)",
       }}
     >
-      {/* 💧 MARCA DE AGUA EDITORIAL */}
-      <Typography
-        variant='h1'
-        sx={{
-          position: "absolute",
-          top: { xs: "20px", md: "0px" },
-          left: "50%",
-          transform: "translateX(-50%)",
-          fontWeight: 900,
-          color: "rgba(229, 56, 136, 0.06)",
-          fontSize: {
-            xs: "4.2rem",
-            sm: "7rem",
-            md: "10rem",
-            lg: "13rem",
-          },
-          lineHeight: 1,
-          whiteSpace: "nowrap",
-          zIndex: 0,
-          pointerEvents: "none",
-          textTransform: "uppercase",
-          letterSpacing: "-3px",
-          userSelect: "none",
-        }}
-      >
-        10 SECRETOS
-      </Typography>
-
       {/* CONTENEDOR PRINCIPAL */}
       <Box sx={{ position: "relative", zIndex: 1 }}>
-        {/* 🌸 CABECERA ELEGANTE SIN FRAMER-MOTION */}
-        <Stack
-          alignItems='center'
+        {/* 🌸 CABECERA MODERNA Y ELEGANTE */}
+        <Box
           sx={{
+            textAlign: "center",
             mb: { xs: 4, md: 6 },
             px: 2,
-            // Animación CSS ligera nativa en lugar de framer-motion
             animation: "fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards",
             "@keyframes fadeInUp": {
               "0%": { opacity: 0, transform: "translateY(20px)" },
@@ -84,66 +65,74 @@ const Systems = () => {
             },
           }}
         >
-          <Box
+          {/* Badge superior minimalista */}
+          <Stack
+            direction='row'
+            spacing={1}
+            alignItems='center'
+            justifyContent='center'
+            sx={{ mb: 1.5 }}
+          >
+            <Box
+              sx={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 1,
+                backgroundColor: alpha("#E53888", 0.1),
+                color: "#E53888",
+                px: 2,
+                py: 0.6,
+                borderRadius: "50px",
+                fontSize: "0.8rem",
+                fontWeight: 700,
+                letterSpacing: "1px",
+                textTransform: "uppercase",
+              }}
+            >
+              <AutoAwesomeIcon sx={{ fontSize: "1rem" }} />
+              <span>El camino al éxito</span>
+            </Box>
+          </Stack>
+
+          {/* Título Principal Limpio y Potente */}
+          <Typography
+            variant='h2'
             sx={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: 1,
-              px: 2,
-              py: 0.6,
-              borderRadius: "30px",
-              backgroundColor: "rgba(229, 56, 136, 0.08)",
-              border: "1px solid rgba(229, 56, 136, 0.15)",
+              color: "#2B1B24",
+              fontWeight: 900,
+              fontSize: { xs: "2rem", sm: "2.8rem", md: "3.5rem" },
+              letterSpacing: "-0.02em",
+              textTransform: "uppercase",
+              lineHeight: 1.1,
               mb: 1.5,
             }}
           >
-            <AutoAwesomeIcon sx={{ fontSize: 16, color: "#E53888" }} />
-            <Typography
-              variant='overline'
-              sx={{
-                color: "#E53888",
-                fontWeight: 800,
-                textTransform: "uppercase",
-                letterSpacing: "2.5px",
-                fontSize: "0.75rem",
-                lineHeight: 1,
-              }}
-            >
-              El camino al éxito
-            </Typography>
-          </Box>
-
-          <Typography
-            variant='h3'
-            sx={{
-              fontWeight: 900,
-              fontStyle: 'italic',
-              lineHeight: 1.15,
-              textAlign: "center",
-              color: "#111111",
-              fontSize: { xs: "1.9rem", sm: "2.7rem", md: "3.4rem" },
-              maxWidth: "800px",
-              letterSpacing: "-0.8px",
-            }}
-          >
-            PARA SER UNA{" "}
+            Los 10{" "}
             <Box
               component='span'
               sx={{
-                background: "linear-gradient(135deg, #FF4B93 0%, #D72E79 100%)",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
+                color: "#E53888",
                 position: "relative",
-                display: "inline-block",
               }}
             >
-              MANICURISTA
-            </Box>{" "}
-            EXITOSA
+              Secretos
+            </Box>
           </Typography>
-        </Stack>
 
-        {/* 🎠 CARROUSEL OPTIMIZADO CON AUTOPLAY Y TOUCH MEJORADO */}
+          {/* Línea decorativa sutil */}
+          <Box
+            sx={{
+              width: "60px",
+              height: "4px",
+              backgroundColor: "#E53888",
+              margin: "0 auto",
+              borderRadius: "2px",
+              opacity: 0.8,
+            }}
+          />
+        </Box>
+
+        {/* 🎠 CARRUSEL OPTIMIZADO CON AUTOPLAY Y TOUCH MEJORADO */}
         <Box
           sx={{
             position: "relative",
@@ -198,23 +187,23 @@ const Systems = () => {
                 aria-label='Anterior'
                 sx={{
                   position: "absolute",
-                  left: { sm: -10, md: -15 },
-                  top: "50%",
+                  left: { sm: -5, md: 5 },
+                  top: "45%",
                   transform: "translateY(-50%)",
-                  backgroundColor: "rgba(255, 255, 255, 0.92)",
-                  color: "#D72E79",
-                  backdropFilter: "blur(12px)",
-                  boxShadow: "0 12px 28px rgba(215, 46, 121, 0.2)",
-                  border: "1.5px solid rgba(255, 255, 255, 0.8)",
-                  transition: "all 0.25s cubic-bezier(0.16, 1, 0.3, 1)",
+                  backgroundColor: "rgba(255, 255, 255, 0.95)",
+                  color: "#E53888",
+                  backdropFilter: "blur(8px)",
+                  boxShadow: "0 8px 20px rgba(229, 56, 136, 0.18)",
+                  border: "1px solid rgba(229, 56, 136, 0.2)",
+                  transition: "all 0.3s ease",
                   "&:hover": {
-                    backgroundColor: "#D72E79",
-                    color: "#FFFFFF",
+                    backgroundColor: "#E53888",
+                    color: "white",
                     transform: "translateY(-50%) scale(1.08)",
                   },
                   zIndex: 10,
-                  width: 46,
-                  height: 46,
+                  width: 48,
+                  height: 48,
                   display: { xs: "none", sm: "flex" },
                 }}
               >
@@ -226,23 +215,23 @@ const Systems = () => {
                 aria-label='Siguiente'
                 sx={{
                   position: "absolute",
-                  right: { sm: -10, md: -15 },
-                  top: "50%",
+                  right: { sm: -5, md: 5 },
+                  top: "45%",
                   transform: "translateY(-50%)",
-                  backgroundColor: "rgba(255, 255, 255, 0.92)",
-                  color: "#D72E79",
-                  backdropFilter: "blur(12px)",
-                  boxShadow: "0 12px 28px rgba(215, 46, 121, 0.2)",
-                  border: "1.5px solid rgba(255, 255, 255, 0.8)",
-                  transition: "all 0.25s cubic-bezier(0.16, 1, 0.3, 1)",
+                  backgroundColor: "rgba(255, 255, 255, 0.95)",
+                  color: "#E53888",
+                  backdropFilter: "blur(8px)",
+                  boxShadow: "0 8px 20px rgba(229, 56, 136, 0.18)",
+                  border: "1px solid rgba(229, 56, 136, 0.2)",
+                  transition: "all 0.3s ease",
                   "&:hover": {
-                    backgroundColor: "#D72E79",
-                    color: "#FFFFFF",
+                    backgroundColor: "#E53888",
+                    color: "white",
                     transform: "translateY(-50%) scale(1.08)",
                   },
                   zIndex: 10,
-                  width: 46,
-                  height: 46,
+                  width: 48,
+                  height: 48,
                   display: { xs: "none", sm: "flex" },
                 }}
               >
@@ -253,25 +242,25 @@ const Systems = () => {
         </Box>
 
         {/* 🚀 BOTÓN CTA: NAVEGACIÓN PROGRAMÁTICA (MANTIENE PWA EN FULLSCREEN) */}
-        <Box sx={{ textAlign: "center", mt: { xs: 3, md: 5 } }}>
+        <Box sx={{ textAlign: "center", mt: { xs: 4, md: 6 } }}>
           <Button
-            onClick={() => navigate("/secretos")} // 👈 SOLUCIÓN PWA: Cero tags <a>
+            onClick={() => navigate("/secretos")}
             variant='contained'
             endIcon={<ArrowForwardIcon />}
             sx={{
-              background: "linear-gradient(135deg, #FF4B93 0%, #D72E79 100%)",
+              backgroundColor: "#E53888",
               color: "#FFFFFF",
               fontWeight: 700,
-              fontSize: { xs: "0.9rem", md: "1rem" },
-              padding: "12px 32px",
+              fontSize: { xs: "0.95rem", md: "1.05rem" },
+              padding: "12px 36px",
               borderRadius: "50px",
               textTransform: "none",
-              boxShadow: "0 8px 22px rgba(215, 46, 121, 0.35)",
-              transition: "all 0.25s ease",
+              boxShadow: "0 8px 25px rgba(229, 56, 136, 0.35)",
+              transition: "all 0.3s ease",
               "&:hover": {
-                background: "linear-gradient(135deg, #D72E79 0%, #B81D60 100%)",
+                backgroundColor: "#C2256F",
                 transform: "translateY(-2px)",
-                boxShadow: "0 12px 28px rgba(215, 46, 121, 0.45)",
+                boxShadow: "0 12px 30px rgba(229, 56, 136, 0.45)",
               },
               "&:active": {
                 transform: "scale(0.97)",

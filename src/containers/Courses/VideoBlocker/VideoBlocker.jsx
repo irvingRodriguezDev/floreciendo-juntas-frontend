@@ -1,16 +1,23 @@
 import React from "react";
-import { Box, Typography } from "@mui/material";
+import { Box, Typography, Button } from "@mui/material";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
-import SubscriptionForm from "../../../components/Payment/SubscriptionButton"; // Ajusta la ruta
+import CreditCardIcon from "@mui/icons-material/CreditCard";
+import SubscriptionForm from "../../../components/Payment/SubscriptionButton";
 
 const PRIMARY_PINK = "#E53888";
 
-const VideoBlocker = ({ userId, title }) => {
+const VideoBlocker = ({
+  userId,
+  title,
+  isPastDue,
+  handleUpdatePayment,
+  loadingPortal,
+}) => {
   return (
     <Box
       sx={{
         width: "100%",
-        minHeight: { xs: "auto", md: 520 }, // Flexible y proporcionado
+        minHeight: { xs: "auto", md: 520 },
         py: { xs: 6, md: 8 },
         px: { xs: 3, sm: 4 },
         display: "flex",
@@ -26,7 +33,7 @@ const VideoBlocker = ({ userId, title }) => {
         overflow: "hidden",
       }}
     >
-      {/* Ícono de Candado Editorial */}
+      {/* Ícono de Candado */}
       <Box
         sx={{
           width: 64,
@@ -55,10 +62,10 @@ const VideoBlocker = ({ userId, title }) => {
           lineHeight: 1.2,
         }}
       >
-        Contenido Exclusivo
+        {isPastDue ? "Actualización de pago pendiente" : "Contenido Exclusivo"}
       </Typography>
 
-      {/* Subtítulo informativo */}
+      {/* Subtítulo informativo adaptado */}
       <Typography
         variant='body1'
         sx={{
@@ -70,7 +77,16 @@ const VideoBlocker = ({ userId, title }) => {
           lineHeight: 1.6,
         }}
       >
-        {title ? (
+        {isPastDue ? (
+          <>
+            Tu último pago de renovación para ver{" "}
+            <strong style={{ color: PRIMARY_PINK }}>
+              "{title || "esta clase"}"
+            </strong>{" "}
+            no pudo procesarse. Actualiza tus datos para recuperar el acceso al
+            instante.
+          </>
+        ) : title ? (
           <>
             Para ver la clase{" "}
             <strong style={{ color: PRIMARY_PINK }}>"{title}"</strong> y acceder
@@ -81,9 +97,34 @@ const VideoBlocker = ({ userId, title }) => {
         )}
       </Typography>
 
-      {/* Formulario de Suscripción / Botón Stripe */}
+      {/* 💳 Renderizado condicional: Si está en past_due mostramos botón de actualizar tarjeta; si no, el botón de compra normal */}
       <Box sx={{ width: "100%", maxWidth: 360, mb: 2 }}>
-        <SubscriptionForm userId={userId} />
+        {isPastDue ? (
+          <Button
+            onClick={handleUpdatePayment}
+            disabled={loadingPortal}
+            variant='contained'
+            fullWidth
+            startIcon={<CreditCardIcon />}
+            sx={{
+              backgroundColor: PRIMARY_PINK,
+              color: "#FFF",
+              fontWeight: 800,
+              borderRadius: "16px",
+              py: 1.5,
+              textTransform: "none",
+              fontSize: "1rem",
+              boxShadow: "0 8px 20px rgba(229, 56, 136, 0.25)",
+              "&:hover": {
+                backgroundColor: "#C2256F",
+              },
+            }}
+          >
+            {loadingPortal ? "Abriendo portal..." : "Actualizar mi tarjeta"}
+          </Button>
+        ) : (
+          <SubscriptionForm userId={userId} />
+        )}
       </Box>
 
       {/* Indicador de Seguridad */}
@@ -96,6 +137,7 @@ const VideoBlocker = ({ userId, title }) => {
           display: "flex",
           alignItems: "center",
           gap: "4px",
+          mt: 1,
         }}
       >
         🔒 Pago seguro procesado por Stripe

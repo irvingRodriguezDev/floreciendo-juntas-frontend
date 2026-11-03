@@ -2,7 +2,7 @@ import { Box, Typography, Stack } from "@mui/material";
 import { motion } from "framer-motion";
 import RadioButtonCheckedIcon from "@mui/icons-material/RadioButtonChecked";
 
-const MotionBox = motion(Box);
+const MotionBox = motion.create(Box);
 
 const LiveHeader = ({ live }) => {
   const isLive = live?.status === "live";

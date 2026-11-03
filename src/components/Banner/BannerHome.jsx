@@ -1,40 +1,54 @@
-import { Box, Typography, Stack } from "@mui/material";
-import VideoModal from "./VideoModal";
-import HeroActionButton from "../HeroActionButton";
-import HeroDescription from "../HeroDescription";
+import React, { useContext } from "react";
+import { Box, Typography, Button, alpha } from "@mui/material";
+import { motion } from "framer-motion";
+import LocalActivityIcon from "@mui/icons-material/LocalActivity";
+import AuthContext from "../../context/Auth/AuthContext";
 
-const BannerHome = () => {
-  const videoSource =
-    "https://floreciendojuntas1.s3.us-east-2.amazonaws.com/production/statics/Floreciendo+Juntas+Plataforma+(1).mov";
+const BannerHome = ({ onSubscribeClick }) => {
+  const { autenticado, usuario } = useContext(AuthContext);
+
+  // Si ya está suscrita, no mostramos este banner de venta
+  const isSubscribed =
+    autenticado &&
+    (Number(usuario?.isSubscribed) === 1 || usuario?.isSubscribed === true);
+
+  if (isSubscribed) {
+    return null;
+  }
 
   return (
     <Box
+      component={motion.div}
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.5 }}
       sx={{
+        width: "100%",
+        background: "linear-gradient(135deg, #FF70B3 0%, #E83E8C 100%)",
+        borderRadius: "24px",
+        p: { xs: 3, md: 4 },
+        my: 4,
         display: "flex",
         flexDirection: { xs: "column", md: "row" },
         alignItems: "center",
         justifyContent: "space-between",
-        minHeight: "50vh",
-        // Gradiente para dar profundidad y un toque más elegante
-        background:
-          "linear-gradient(135deg, #FF69B4 0%, #F971AF 50%, #E83E8C 100%)",
-        padding: { xs: 3, sm: 5, md: 6 },
+        gap: 3,
         position: "relative",
         overflow: "hidden",
-        borderRadius: "24px",
-        boxShadow: "0px 15px 35px rgba(249, 113, 175, 0.25)",
+        boxShadow: "0px 10px 30px rgba(232, 62, 140, 0.2)",
+        border: "1px solid",
+        borderColor: alpha("#FFF", 0.3),
       }}
     >
-      {/* --- ELEMENTOS DECORATIVOS AMBIENTALES --- */}
-
-      {/* Resplandor suave de fondo */}
+      {/* Círculo decorativo ambiental */}
       <Box
         sx={{
           position: "absolute",
-          top: "-20%",
+          top: "-50%",
           left: "-10%",
-          width: "500px",
-          height: "500px",
+          width: "250px",
+          height: "250px",
           borderRadius: "50%",
           background:
             "radial-gradient(circle, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0) 70%)",
@@ -42,192 +56,73 @@ const BannerHome = () => {
         }}
       />
 
-      {/* Flores Flotantes de la Marca */}
-      <Box
-        sx={{
-          position: "absolute",
-          top: "2%",
-          right: "2%",
-          width: { md: "280px", lg: "340px" },
-          height: { md: "280px", lg: "340px" },
-          backgroundImage: `url("https://cdn.floreciendojuntas.com/production/statics/FLOR-ROSA-CONVEN.webp")`,
-          backgroundSize: "contain",
-          backgroundRepeat: "no-repeat",
-          opacity: 0.85,
-          display: { xs: "none", md: "block" },
-          pointerEvents: "none",
-        }}
-      />
-
-      <Box
-        sx={{
-          position: "absolute",
-          bottom: "-10%",
-          left: "-2%",
-          width: "300px",
-          height: "300px",
-          backgroundImage: `url("https://cdn.floreciendojuntas.com/production/statics/GERBERA-MAGENTA-desenfoque.webp")`,
-          backgroundSize: "contain",
-          backgroundRepeat: "no-repeat",
-          opacity: 0.8,
-          display: { xs: "none", md: "block" },
-          pointerEvents: "none",
-        }}
-      />
-
-      {/* ---- CONTENIDO IZQUIERDO (TEXTO Y CTAs) ---- */}
-      <Box
-        sx={{
-          flex: 1.2,
-          textAlign: { xs: "center", md: "left" },
-          zIndex: 2,
-          pr: { md: 4 },
-        }}
-      >
-        {/* Badge superior */}
+      {/* Texto descriptivo */}
+      <Box sx={{ textAlign: { xs: "center", md: "left" }, zIndex: 1 }}>
         <Typography
           variant='subtitle2'
           sx={{
-            color: "#FFF",
+            color: "#FFE2F0",
             fontWeight: 800,
-            letterSpacing: "2px",
-            mb: 1.5,
+            letterSpacing: "1.5px",
             textTransform: "uppercase",
-            opacity: 0.95,
-            fontSize: "0.85rem",
+            fontSize: "0.75rem",
+            mb: 0.5,
           }}
         >
-          ✨ Tu Camino al Éxito
+          🌸 Membresía Exclusiva
         </Typography>
-
-        {/* Título Principal */}
         <Typography
-          variant='h3'
-          component='h1'
-          color='white'
+          variant='h5'
           sx={{
+            color: "#FFFFFF",
             fontWeight: 900,
-            mb: 2.5,
-            lineHeight: 1.15,
-            fontSize: { xs: "1.9rem", sm: "3rem", md: "3.4rem" },
-            textShadow: "0px 4px 12px rgba(0,0,0,0.12)",
+            fontSize: { xs: "1.25rem", md: "1.5rem" },
+            lineHeight: 1.2,
+            mb: 0.5,
           }}
         >
-          LA COMUNIDAD #1 DE
-          <br />
-          <span
-            style={{
-              position: "relative",
-              display: "inline-block",
-              marginTop: "4px",
-            }}
-          >
-            EMPRENDEDORAS
-            <Box
-              component='span'
-              sx={{
-                position: "absolute",
-                left: 0,
-                bottom: "4px",
-                width: "100%",
-                height: "10px",
-                backgroundColor: "rgba(255, 255, 255, 0.35)",
-                zIndex: -1,
-                borderRadius: "4px",
-              }}
-            />
-          </span>
-          <br />
-          DE LA{" "}
-          <span
-            style={{
-              position: "relative",
-              display: "inline-block",
-              marginTop: "4px",
-            }}
-          >
-            BELLEZA
-            <Box
-              component='span'
-              sx={{
-                position: "absolute",
-                left: 0,
-                bottom: "4px",
-                width: "100%",
-                height: "10px",
-                backgroundColor: "rgba(255, 255, 255, 0.35)",
-                zIndex: -1,
-                borderRadius: "4px",
-              }}
-            />
-          </span>
+          Desbloquea todos los cursos y clases en vivo por solo{" "}
+          <span style={{ color: "#FFECB3" }}>$200 MXN/mes</span>
         </Typography>
-
-        {/* Descripción de la Propuesta de Valor */}
-        {/* <HeroDescription /> */}
-
-        {/* BOTONES DE ACCIÓN (NUEVO E IMPRESCINDIBLE PARA CONVERSIÓN) */}
-        {/* <Stack
-          direction={{ xs: "column", sm: "row" }}
-          spacing={2}
-          justifyContent={{ xs: "center", md: "flex-start" }}
-          alignItems='center'
+        <Typography
+          variant='body2'
+          sx={{
+            color: "rgba(255, 255, 255, 0.9)",
+            fontSize: { xs: "0.9rem", md: "0.95rem" },
+          }}
         >
-          <HeroActionButton />
-        </Stack> */}
+          Participa en rifas mensuales y haz crecer tu negocio de belleza hoy
+          mismo.
+        </Typography>
       </Box>
 
-      {/* ---- CONTENIDO DERECHO (FOTO CAROLINA + VIDEO) ---- */}
-      <Box
-        sx={{
-          flex: 0.9,
-          display: "flex",
-          justifyContent: "left",
-          alignItems: "center",
-          position: "relative",
-          marginTop: { xs: 5, md: 0 },
-          zIndex: 2,
-        }}
-      >
-        {/* Contenedor con marco brillante */}
-        <Box
+      {/* Botón de Acción Directa */}
+      <Box sx={{ zIndex: 1, width: { xs: "100%", md: "auto" }, flexShrink: 0 }}>
+        <Button
+          variant='contained'
+          onClick={onSubscribeClick}
+          startIcon={<LocalActivityIcon />}
           sx={{
-            position: "relative",
-            width: "100%",
-            maxWidth: { xs: 280, sm: 360, md: 420 },
-            borderRadius: "50%",
-            padding: "8px",
-            background:
-              "linear-gradient(180deg, rgba(255,255,255,0.6) 0%, rgba(255,255,255,0.1) 100%)",
-            boxShadow: "0px 20px 40px rgba(0, 0, 0, 0.2)",
+            backgroundColor: "#FFFFFF",
+            color: "#C2185B",
+            fontWeight: 800,
+            fontSize: "0.95rem",
+            textTransform: "none",
+            borderRadius: "50px",
+            px: 4,
+            py: 1.5,
+            width: { xs: "100%", md: "auto" },
+            boxShadow: "0px 6px 20px rgba(0, 0, 0, 0.15)",
+            transition: "all 0.3s ease",
+            "&:hover": {
+              backgroundColor: "#FFF0F5",
+              transform: "translateY(-2px)",
+              boxShadow: "0px 8px 25px rgba(0, 0, 0, 0.25)",
+            },
           }}
         >
-          <Box
-            component='img'
-            src='https://cdn.floreciendojuntas.com/production/statics/caro.webp'
-            alt='Carolina Tavera'
-            sx={{
-              width: "100%",
-              height: "auto",
-              borderRadius: "50%",
-              objectFit: "cover",
-              display: "block",
-            }}
-          />
-        </Box>
-
-        {/* Botón Flotante para el Video Modal */}
-        <Box
-          position='absolute'
-          sx={{
-            bottom: "50%",
-            zIndex: 10,
-            transform: "translateY(50%)",
-            left: { xs: "38%", md: "22%" },
-          }}
-        >
-          <VideoModal buttonText='Ver Introducción' videoUrl={videoSource} />
-        </Box>
+          ¡Unirme Ahora!
+        </Button>
       </Box>
     </Box>
   );

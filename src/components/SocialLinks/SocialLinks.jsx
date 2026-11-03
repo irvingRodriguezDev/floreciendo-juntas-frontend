@@ -1,11 +1,12 @@
 import React from "react";
-import { Box, Typography, Card, Stack, Grid } from "@mui/material";
+import { Box, Typography, Card, Stack, Grid, alpha } from "@mui/material";
 import { motion } from "framer-motion";
+import ShareRoundedIcon from "@mui/icons-material/ShareRounded";
+import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 
 import FacebookIcon from "../icons/FacebookIcon";
 import InstagramIcon from "../icons/InstagramIcon";
 import TiktokIcon from "../icons/TiktokIcon";
-import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 
 const MotionCard = motion.create(Card);
 
@@ -39,100 +40,103 @@ const SocialCards = () => {
       sx={{
         width: "100%",
         background: `
-          linear-gradient(180deg, #FFF0F5 0%, #FFFFFF 100%),
-          radial-gradient(circle at top left, rgba(255, 200, 220, 0.25), transparent 60%)
+          linear-gradient(180deg, #FFFFFF 0%, #FFF0F5 100%),
+          radial-gradient(circle at top left, rgba(232,62,140,0.06), transparent 70%)
         `,
         borderRadius: "32px",
         py: { xs: 6, md: 10 },
         px: { xs: 2, sm: 4, md: 6 },
         position: "relative",
         overflow: "hidden",
+        border: "1px solid",
+        borderColor: alpha("#E53888", 0.08),
+        boxShadow: "0 20px 40px rgba(232, 62, 140, 0.04)",
       }}
     >
-      {/* 💧 TEXTO DE FONDO (MARCA DE AGUA) */}
-      <Typography
-        variant='h1'
-        sx={{
-          position: "absolute",
-          top: { xs: "35px", md: "15px" },
-          left: "50%",
-          transform: "translateX(-50%)",
-          fontWeight: 900,
-          color: "rgba(229, 56, 136, 0.094)",
-          fontSize: {
-            xs: "3.9rem",
-            sm: "6rem",
-            md: "7rem",
-            lg: "10rem",
-            xl: "13rem",
-          },
-
-          lineHeight: 1,
-          whiteSpace: "nowrap",
-          zIndex: 0,
-          pointerEvents: "none",
-          textTransform: "uppercase",
-          letterSpacing: "-4px",
-        }}
-      >
-        REDES SOCIALES
-      </Typography>
-
       {/* CONTENEDOR PRINCIPAL */}
       <Box
         sx={{ position: "relative", zIndex: 1, maxWidth: "1300px", mx: "auto" }}
       >
-        {/* 🌸 CABECERA EDITORIAL */}
-        <Stack
-          alignItems='center'
-          sx={{ mb: { xs: 5, md: 7 }, textAlign: "center" }}
+        {/* 🌸 CABECERA MODERNA Y ELEGANTE */}
+        <Box
           component={motion.div}
-          initial={{ opacity: 0, y: 30 }}
+          initial={{ opacity: 0, y: -20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
+          sx={{
+            textAlign: "center",
+            mb: { xs: 5, md: 7 },
+            px: 2,
+          }}
         >
-          <Typography
-            variant='overline'
-            sx={{
-              color: "#E53888",
-              fontWeight: 800,
-              textTransform: "uppercase",
-              letterSpacing: "4px",
-              mb: 1,
-              fontSize: { xs: "12px", md: "14px" },
-              textShadow: "0 2px 4px rgba(255,255,255,0.8)",
-            }}
+          {/* Badge superior minimalista */}
+          <Stack
+            direction='row'
+            spacing={1}
+            alignItems='center'
+            justifyContent='center'
+            sx={{ mb: 1.5 }}
           >
-            Comunidad Wapizima
-          </Typography>
+            <Box
+              sx={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 1,
+                backgroundColor: alpha("#E53888", 0.1),
+                color: "#E53888",
+                px: 2,
+                py: 0.6,
+                borderRadius: "50px",
+                fontSize: "0.8rem",
+                fontWeight: 700,
+                letterSpacing: "1px",
+                textTransform: "uppercase",
+              }}
+            >
+              <ShareRoundedIcon sx={{ fontSize: "1rem" }} />
+              <span>Comunidad Wapizima</span>
+            </Box>
+          </Stack>
 
+          {/* Título Principal Limpio y Potente */}
           <Typography
-            variant='h3'
+            variant='h2'
             component='h2'
             sx={{
+              color: "#2B1B24",
               fontWeight: 900,
-              fontStyle: 'italic',
-              color: "#1F2937",
-              lineHeight: 1.15,
-              fontSize: { xs: "2.1rem", sm: "2.8rem", md: "3.5rem" },
-              letterSpacing: "-1px",
+              fontSize: { xs: "2rem", sm: "2.8rem", md: "3.5rem" },
+              letterSpacing: "-0.02em",
+              textTransform: "uppercase",
+              lineHeight: 1.1,
+              mb: 1.5,
             }}
           >
             Únete a nuestras{" "}
             <Box
               component='span'
               sx={{
-                background: "linear-gradient(135deg, #E53888 0%, #B82E6B 100%)",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-                display: "inline-block",
+                color: "#E53888",
+                position: "relative",
               }}
             >
               Redes Sociales
             </Box>
           </Typography>
-        </Stack>
+
+          {/* Línea decorativa sutil */}
+          <Box
+            sx={{
+              width: "60px",
+              height: "4px",
+              backgroundColor: "#E53888",
+              margin: "0 auto",
+              borderRadius: "2px",
+              opacity: 0.8,
+            }}
+          />
+        </Box>
 
         {/* 🎴 GRID DE CARDS INTERACTIVAS PREMIUM */}
         <Grid container spacing={{ xs: 2.5, md: 3.5 }} justifyContent='center'>
@@ -156,15 +160,15 @@ const SocialCards = () => {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.5, delay: index * 0.1 }}
-                  whileHover={{ y: -8 }}
+                  whileHover={{ y: -6 }}
                   elevation={0}
                   sx={{
                     p: { xs: 2.5, sm: 3 },
                     borderRadius: "24px",
-                    background: "rgba(255, 255, 255, 0.85)",
-                    backdropFilter: "blur(16px)",
-                    border: "1px solid rgba(255, 255, 255, 0.9)",
-                    boxShadow: "0 10px 30px -10px rgba(180, 50, 110, 0.08)",
+                    backgroundColor: "#FFFFFF",
+                    border: "1px solid",
+                    borderColor: alpha("#E53888", 0.12),
+                    boxShadow: "0 10px 30px rgba(0, 0, 0, 0.04)",
                     transition: "all 0.35s cubic-bezier(0.16, 1, 0.3, 1)",
                     display: "flex",
                     flexDirection: "column",
@@ -174,8 +178,8 @@ const SocialCards = () => {
                     position: "relative",
                     overflow: "hidden",
                     "&:hover": {
-                      borderColor: "rgba(229, 56, 136, 0.35)",
-                      boxShadow: "0 20px 40px -12px rgba(229, 56, 136, 0.18)",
+                      borderColor: alpha("#E53888", 0.4),
+                      boxShadow: "0 20px 40px rgba(229, 56, 136, 0.12)",
                       "& .arrow-btn": {
                         backgroundColor: "#E53888",
                         color: "#FFF",
@@ -183,7 +187,7 @@ const SocialCards = () => {
                       },
                       "& .icon-wrapper": {
                         transform: "scale(1.05)",
-                        backgroundColor: "rgba(229, 56, 136, 0.12)",
+                        backgroundColor: alpha("#E53888", 0.15),
                       },
                     },
                   }}
@@ -196,8 +200,9 @@ const SocialCards = () => {
                         width: 58,
                         height: 58,
                         borderRadius: "18px",
-                        background: "rgba(255, 240, 247, 0.8)",
-                        border: "1px solid rgba(229, 56, 136, 0.15)",
+                        backgroundColor: alpha("#E53888", 0.08),
+                        border: "1px solid",
+                        borderColor: alpha("#E53888", 0.15),
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
@@ -213,7 +218,7 @@ const SocialCards = () => {
                         variant='h6'
                         sx={{
                           fontWeight: 800,
-                          color: "#1F2937",
+                          color: "#2B1B24",
                           lineHeight: 1.2,
                           fontSize: "1.1rem",
                           mb: 0.5,
@@ -244,14 +249,15 @@ const SocialCards = () => {
                     sx={{
                       mt: 3,
                       pt: 2,
-                      borderTop: "1px solid rgba(229, 56, 136, 0.08)",
+                      borderTop: "1px solid",
+                      borderColor: alpha("#E53888", 0.08),
                     }}
                   >
                     <Typography
                       variant='caption'
                       sx={{
                         fontWeight: 700,
-                        color: "#6B7280",
+                        color: "#5A4650",
                         fontSize: "12px",
                         letterSpacing: 0.5,
                       }}
@@ -265,7 +271,7 @@ const SocialCards = () => {
                         width: 36,
                         height: 36,
                         borderRadius: "50%",
-                        backgroundColor: "rgba(255, 240, 247, 0.9)",
+                        backgroundColor: alpha("#E53888", 0.08),
                         color: "#E53888",
                         display: "flex",
                         alignItems: "center",

@@ -22,6 +22,8 @@ import Wall from "../../../components/Posts/Wall";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import LessonsList from "./LessonsList";
+import { MethodPost } from "../../../config/Service";
+import { alerts } from "../../../utils/Alerts";
 
 const CourseDetailScreen = () => {
   const { id } = useParams(); // El slug o ID de la URL
@@ -30,7 +32,7 @@ const CourseDetailScreen = () => {
   const { course, getCourseById } = useContext(CoursesContext);
   const { usuario, isAuthenticating, autenticado } = useContext(AuthContext);
   const [activeVideo, setActiveVideo] = useState(null);
-
+  const [loadingPortal, setLoadingPortal] = useState(false);
   /* ==============================
      1. Petición y Reseteo Inmediato
   ============================== */
@@ -51,12 +53,34 @@ const CourseDetailScreen = () => {
   }, [course, courseId]);
 
   // 🚀 Homologación de estado de suscripción/rol
+  const subscriptionStatus = usuario?.subscriptionDetails?.status;
+  const isPastDue = subscriptionStatus === "past_due";
   const isSubscribed =
     Boolean(usuario?.isSubscribed && usuario?.roleId === 4) ||
     Boolean(usuario?.isSubscribed && usuario?.roleId === 1);
-  const isAuthorized = autenticado && isSubscribed;
-  const userId = usuario?.id;
 
+  const isAuthorized = autenticado && isSubscribed && !isPastDue;
+  const userId = usuario?.id;
+  const handleUpdatePayment = async () => {
+    try {
+      setLoadingPortal(true);
+      const { data } = await MethodPost("/billing/portal", {
+        returnUrl: window.location.href,
+      });
+
+      if (data.url) {
+        window.location.href = data.url;
+      }
+    } catch (error) {
+      console.error("Error al redirigir al portal:", error);
+      alerts.error(
+        "Ocurrió un inconveniente",
+        "No pudimos conectar con el sistema de pagos. Por favor intenta de nuevo.",
+      );
+    } finally {
+      setLoadingPortal(false);
+    }
+  };
   const handleVideoSelect = (video) => {
     if (!video) return;
     setActiveVideo(video);
@@ -343,7 +367,13 @@ const CourseDetailScreen = () => {
         ) : (
           /* 🚀 BLOQUEO DE VIDEO */
           <Grid size={{ xs: 12 }}>
-            <VideoBlocker userId={userId ?? null} title={course.title} />
+            <VideoBlocker
+              userId={userId ?? null}
+              title={course.title}
+              isPastDue={isPastDue}
+              handleUpdatePayment={handleUpdatePayment}
+              loadingPortal={loadingPortal}
+            />
           </Grid>
         )}
       </Grid>

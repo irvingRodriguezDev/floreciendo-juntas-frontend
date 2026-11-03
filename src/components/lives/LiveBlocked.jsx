@@ -1,9 +1,17 @@
-import { Backdrop, Button, Card, Typography, Stack } from "@mui/material";
-import { Lock } from "lucide-react";
+import { Backdrop, Button, Card, Typography, Stack, Box } from "@mui/material";
+import { Lock, CreditCard } from "lucide-react";
 import { Link } from "react-router-dom";
 import SubscriptionForm from "../Payment/SubscriptionButton";
 
-const LiveBlocked = ({ autenticado, usuario }) => {
+const PRIMARY_PINK = "#E53888";
+
+const LiveBlocked = ({
+  autenticado,
+  usuario,
+  isPastDue,
+  handleUpdatePayment,
+  loadingPortal,
+}) => {
   return (
     <Backdrop
       open
@@ -26,16 +34,18 @@ const LiveBlocked = ({ autenticado, usuario }) => {
         }}
       >
         <Stack spacing={2} alignItems='center'>
-          <Lock size={52} color='#E53888' />
+          <Lock size={52} color={PRIMARY_PINK} />
 
           <Typography
             sx={{
               fontWeight: 800,
-              color: "#E53888",
+              color: PRIMARY_PINK,
               fontSize: 22,
             }}
           >
-            Live exclusivo para la comunidad Floreciendo Juntas
+            {isPastDue
+              ? "Actualización de pago pendiente"
+              : "Live exclusivo para la comunidad Floreciendo Juntas"}
           </Typography>
 
           <Typography
@@ -45,14 +55,47 @@ const LiveBlocked = ({ autenticado, usuario }) => {
               lineHeight: 1.6,
             }}
           >
-            Unete a este live y forma parte de la comunidad de Floreciendo
-            Juntas.
+            {isPastDue ? (
+              <>
+                Tu último pago de renovación no pudo procesarse. Actualiza tus
+                datos para recuperar el acceso inmediato a este live y
+                transmisiones en vivo.
+              </>
+            ) : (
+              "Únete a este live y forma parte de la comunidad de Floreciendo Juntas."
+            )}
           </Typography>
 
           {autenticado ? (
-            <>
-              <SubscriptionForm userId={usuario?.id} />
-            </>
+            <Box sx={{ width: "100%", mt: 1 }}>
+              {isPastDue ? (
+                <Button
+                  onClick={handleUpdatePayment}
+                  disabled={loadingPortal}
+                  fullWidth
+                  startIcon={<CreditCard size={18} />}
+                  sx={{
+                    background: PRIMARY_PINK,
+                    py: 1.4,
+                    borderRadius: 3,
+                    color: "#fff",
+                    fontWeight: 700,
+                    textTransform: "none",
+                    fontSize: "0.95rem",
+                    boxShadow: "0 4px 12px rgba(229, 56, 136, 0.25)",
+                    "&:hover": {
+                      background: "#D12E78",
+                    },
+                  }}
+                >
+                  {loadingPortal
+                    ? "Abriendo portal..."
+                    : "Actualizar mi tarjeta"}
+                </Button>
+              ) : (
+                <SubscriptionForm userId={usuario?.id} />
+              )}
+            </Box>
           ) : (
             <>
               <Typography
@@ -71,11 +114,12 @@ const LiveBlocked = ({ autenticado, usuario }) => {
                 fullWidth
                 sx={{
                   mt: 1,
-                  background: "#E53888",
+                  background: PRIMARY_PINK,
                   py: 1.3,
                   borderRadius: 3,
                   color: "#fff",
                   fontWeight: 600,
+                  textTransform: "none",
                   "&:hover": {
                     background: "#D12E78",
                   },

@@ -22,6 +22,7 @@ import ChatState from "./context/Chat/ChatState";
 import { GoogleMapsProvider } from "./context/GoogleMaps/GoogleMapsProvider";
 import InstallPWABanner from "./components/InstallPWABanner";
 import StoriesState from "./context/stories/StoriesState";
+import { HolidayProvider } from "./context/Holiday/HolidayContext";
 // Carga asíncrona de la clave pública
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_KEY);
 
@@ -30,41 +31,43 @@ function App() {
   return (
     <Elements stripe={stripePromise}>
       <GoogleMapsProvider>
-        <AuthState>
-          <NotificationsState>
-            <CommunityState>
-              <UserState>
-                <SystemState>
-                  <CoursesState>
-                    <PostsState>
-                      <EventsState>
-                        <ProductsState>
-                          <CartState>
-                            <OrdersState>
-                              <LivesState>
-                                <CertificationsState>
-                                  <StoresState>
-                                    <ChatState>
-                                      <StoriesState>
-                                        <ScrollTop />
-                                        <AppRouter />
-                                        <InstallPWABanner />
-                                      </StoriesState>
-                                    </ChatState>
-                                  </StoresState>
-                                </CertificationsState>
-                              </LivesState>
-                            </OrdersState>
-                          </CartState>
-                        </ProductsState>
-                      </EventsState>
-                    </PostsState>
-                  </CoursesState>
-                </SystemState>
-              </UserState>
-            </CommunityState>
-          </NotificationsState>
-        </AuthState>
+        <HolidayProvider>
+          <AuthState>
+            <NotificationsState>
+              <CommunityState>
+                <UserState>
+                  <SystemState>
+                    <CoursesState>
+                      <PostsState>
+                        <EventsState>
+                          <ProductsState>
+                            <CartState>
+                              <OrdersState>
+                                <LivesState>
+                                  <CertificationsState>
+                                    <StoresState>
+                                      <ChatState>
+                                        <StoriesState>
+                                          <ScrollTop />
+                                          <AppRouter />
+                                          <InstallPWABanner />
+                                        </StoriesState>
+                                      </ChatState>
+                                    </StoresState>
+                                  </CertificationsState>
+                                </LivesState>
+                              </OrdersState>
+                            </CartState>
+                          </ProductsState>
+                        </EventsState>
+                      </PostsState>
+                    </CoursesState>
+                  </SystemState>
+                </UserState>
+              </CommunityState>
+            </NotificationsState>
+          </AuthState>
+        </HolidayProvider>
       </GoogleMapsProvider>
     </Elements>
   );

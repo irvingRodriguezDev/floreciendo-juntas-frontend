@@ -1,9 +1,19 @@
-import { Backdrop, Box, Paper, Stack, Typography } from "@mui/material";
+import { Backdrop, Box, Paper, Typography, Button } from "@mui/material";
 import React from "react";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
+import CreditCardIcon from "@mui/icons-material/CreditCard";
 import SubscriptionForm from "../../components/Payment/SubscriptionButton";
 import { Link } from "react-router-dom";
-const BlockScreen = ({ autenticado, usuario }) => {
+
+const PRIMARY_PINK = "#E53888";
+
+const BlockScreen = ({
+  autenticado,
+  usuario,
+  isPastDue,
+  handleUpdatePayment,
+  loadingPortal,
+}) => {
   return (
     <Backdrop
       open
@@ -42,7 +52,7 @@ const BlockScreen = ({ autenticado, usuario }) => {
             height: 60,
             borderRadius: "20px",
             backgroundColor: "#FFF5F7",
-            color: "#E53888",
+            color: PRIMARY_PINK,
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
@@ -57,22 +67,52 @@ const BlockScreen = ({ autenticado, usuario }) => {
           variant='h5'
           sx={{ fontWeight: 900, color: "#1F2937", mb: 1 }}
         >
-          Comunidad Privada
+          {isPastDue ? "Actualización de pago pendiente" : "Comunidad Privada"}
         </Typography>
 
         <Typography
           variant='body2'
           sx={{ color: "#4B5563", mb: 2.5, lineHeight: 1.5 }}
         >
-          Suscríbete para interactuar con la comunidad, publicar tus dudas, ver
-          trabajos y participar en dinámicas en vivo.
+          {isPastDue ? (
+            <>
+              Tu último pago de renovación no pudo procesarse. Actualiza tus
+              datos para recuperar el acceso inmediato a la comunidad,
+              publicaciones y lives.
+            </>
+          ) : (
+            "Suscríbete para interactuar con la comunidad, publicar tus dudas, ver trabajos y participar en dinámicas en vivo."
+          )}
         </Typography>
 
-        {/* Minilista de beneficios */}
-
-        {/* ⚡ PAGO DIRECTO INCRUSTADO EN 1 CLIC */}
+        {/* 💳 Renderizado condicional según el estado past_due */}
         <Box sx={{ width: "100%", mb: 1.5 }}>
-          <SubscriptionForm userId={usuario?.id || null} />
+          {isPastDue ? (
+            <Button
+              onClick={handleUpdatePayment}
+              disabled={loadingPortal}
+              variant='contained'
+              fullWidth
+              startIcon={<CreditCardIcon />}
+              sx={{
+                backgroundColor: PRIMARY_PINK,
+                color: "#FFF",
+                fontWeight: 800,
+                borderRadius: "16px",
+                py: 1.5,
+                textTransform: "none",
+                fontSize: "1rem",
+                boxShadow: "0 8px 20px rgba(229, 56, 136, 0.25)",
+                "&:hover": {
+                  backgroundColor: "#C2256F",
+                },
+              }}
+            >
+              {loadingPortal ? "Abriendo portal..." : "Actualizar mi tarjeta"}
+            </Button>
+          ) : (
+            <SubscriptionForm userId={usuario?.id || null} />
+          )}
         </Box>
 
         <Typography
@@ -97,7 +137,7 @@ const BlockScreen = ({ autenticado, usuario }) => {
                 to='/iniciar-sesion'
                 variant='caption'
                 sx={{
-                  color: "#E53888",
+                  color: PRIMARY_PINK,
                   fontWeight: "bold",
                   textDecoration: "none",
                   "&:hover": { textDecoration: "underline" },

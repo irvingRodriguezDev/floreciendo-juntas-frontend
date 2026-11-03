@@ -2,6 +2,8 @@ import React, { useContext, useEffect, useState } from "react";
 import { Box, useTheme } from "@mui/material";
 import { motion } from "framer-motion";
 import { useParams, useNavigate } from "react-router-dom";
+import clienteAxios from "../../config/Axios";
+import Swal from "sweetalert2";
 
 // Contexts & Hooks
 import AuthContext from "../../context/Auth/AuthContext";
@@ -109,6 +111,7 @@ const LiveDetalle = () => {
   const livePhase = useLiveSockets(id, live?.status);
 
   const [commentsVisible, setCommentsVisible] = useState(true);
+  const [loadingPortal, setLoadingPortal] = useState(false);
 
   // ── IVS Viewers & Comentarios ──
   const viewers = useIvsViewers(id, live?.aws_channel_arn);
@@ -124,6 +127,38 @@ const LiveDetalle = () => {
     }
   }, [id, live, getLiveById]);
 
+  // 💳 Validación de Suscripción y Estado de Pago
+  const subscriptionStatus = usuario?.subscriptionDetails?.status;
+  const isPastDue = subscriptionStatus === "past_due";
+  const isSubscribed = Boolean(usuario?.isSubscribed);
+
+  // 🔒 Bloquear si no está suscrito o si el pago está vencido (past_due)
+  const shouldBlockLive = !autenticado || !isSubscribed || isPastDue;
+
+  // 🔄 Función para redireccionar al Portal de Stripe (Actualizar Tarjeta)
+  const handleUpdatePayment = async () => {
+    try {
+      setLoadingPortal(true);
+      const { data } = await clienteAxios.post("/billing/portal", {
+        returnUrl: window.location.href,
+      });
+
+      if (data.url) {
+        window.location.href = data.url;
+      }
+    } catch (error) {
+      console.error("Error al redirigir al portal:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Ocurrió un inconveniente",
+        text: "No pudimos conectar con el sistema de pagos. Por favor intenta de nuevo.",
+        confirmButtonColor: "#E53888",
+      });
+    } finally {
+      setLoadingPortal(false);
+    }
+  };
+
   if (isAuthenticating || !live) {
     return (
       <PinkSpinner
@@ -136,7 +171,6 @@ const LiveDetalle = () => {
     );
   }
 
-  const isSubscribed = Boolean(usuario?.isSubscribed);
   const isScheduled = livePhase === "scheduled" && live.status === "scheduled";
 
   // Modos donde el reproductor sigue visible
@@ -206,9 +240,15 @@ const LiveDetalle = () => {
                   />
                 </motion.div>
 
-                {/* Paywall Overlay */}
-                {showSidebar && (!autenticado || !isSubscribed) && (
-                  <LiveBlocked autenticado={autenticado} usuario={usuario} />
+                {/* Paywall Overlay para el reproductor */}
+                {showSidebar && shouldBlockLive && (
+                  <LiveBlocked
+                    autenticado={autenticado}
+                    usuario={usuario}
+                    isPastDue={isPastDue}
+                    handleUpdatePayment={handleUpdatePayment}
+                    loadingPortal={loadingPortal}
+                  />
                 )}
 
                 {/* Overlay transmisión finalizada */}
@@ -221,8 +261,14 @@ const LiveDetalle = () => {
               {/* Sidebar de comentarios o Paywall State */}
               {showSidebar && (
                 <Box className='comments-sidebar'>
-                  {!autenticado || !isSubscribed ? (
-                    <ChatBlockedState autenticado={autenticado} />
+                  {shouldBlockLive ? (
+                    <ChatBlockedState
+                      autenticado={autenticado}
+                      usuario={usuario}
+                      isPastDue={isPastDue}
+                      handleUpdatePayment={handleUpdatePayment}
+                      loadingPortal={loadingPortal}
+                    />
                   ) : (
                     <LiveCommentsSidebar
                       liveId={live.id}

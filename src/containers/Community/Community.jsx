@@ -1,20 +1,43 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import { Typography, Grid, Paper, Box, Stack } from "@mui/material";
 import Layout from "../../components/Layout/Layout";
 import AuthContext from "../../context/Auth/AuthContext";
 import CommunityRulesAccordion from "./CommunityRulesAccordeon";
 import TabsTypeCommunity from "../../components/Community/TabsTypeCommunity";
 import BlockScreen from "./BlockScreen";
+import { MethodPost } from "../../config/Service";
+import { alerts } from "../../utils/Alerts";
 
 const Community = () => {
   const { autenticado, usuario } = useContext(AuthContext);
-
+  const [loadingPortal, setLoadingPortal] = useState(false);
   // Sincronizado con la verificación de rol y suscripción
+  const subscriptionStatus = usuario?.subscriptionDetails?.status;
+  const isPastDue = subscriptionStatus === "past_due";
   const isSuscribed =
     Boolean(usuario?.isSubscribed && usuario?.roleId === 4) ||
     Boolean(usuario?.isSubscribed && usuario?.roleId === 1);
-  const isAuthorized = autenticado && isSuscribed;
+  const isAuthorized = autenticado && isSuscribed && !isPastDue;
+  const handleUpdatePayment = async () => {
+    try {
+      setLoadingPortal(true);
+      const { data } = await MethodPost("/billing/portal", {
+        returnUrl: window.location.href,
+      });
 
+      if (data.url) {
+        window.location.href = data.url;
+      }
+    } catch (error) {
+      console.error("Error al redirigir al portal:", error);
+      alerts.error(
+        "Ocurrió un inconveniente",
+        "No pudimos conectar con el sistema de pagos. Por favor intenta de nuevo.",
+      );
+    } finally {
+      setLoadingPortal(false);
+    }
+  };
   return (
     <Layout>
       <Box
@@ -107,7 +130,13 @@ const Community = () => {
 
         {/* BLOQUEO LOCALIZADO */}
         {!isAuthorized && (
-          <BlockScreen autenticado={autenticado} usuario={usuario} />
+          <BlockScreen
+            autenticado={autenticado}
+            usuario={usuario}
+            isPastDue={isPastDue}
+            loadingPortal={loadingPortal}
+            handleUpdatePayment={handleUpdatePayment}
+          />
         )}
       </Box>
     </Layout>

@@ -1,8 +1,12 @@
 import React from "react";
-import { Box, CardMedia, Typography } from "@mui/material";
+import { Box, CardMedia, Typography, alpha } from "@mui/material";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
+import ArrowForwardRoundedIcon from "@mui/icons-material/ArrowForwardRounded";
+import AccessTimeRoundedIcon from "@mui/icons-material/AccessTimeRounded";
 import Progress from "../../Progress/Progress";
+import dayjs from "dayjs";
+import "dayjs/locale/es"; // Asegúrate de tener configurado dayjs en español si lo deseas
 
 const NewCourseCard = ({ course, hasProgress }) => {
   return (
@@ -17,41 +21,89 @@ const NewCourseCard = ({ course, hasProgress }) => {
       <Box
         component={motion.div}
         whileHover={{
-          y: -6,
-          borderColor: "#F472B6",
+          y: -8,
+          scale: 1.02,
         }}
-        transition={{ duration: 0.2, ease: "easeInOut" }}
+        transition={{ duration: 0.3, ease: [0.25, 1, 0.5, 1] }}
         sx={{
-          borderRadius: "24px",
+          borderRadius: "22px",
           overflow: "hidden",
-          backgroundColor: "#fff",
-          border: "1px solid #F3F4F6",
+          backgroundColor: "#FFFFFF",
+          border: "1px solid",
+          borderColor: alpha("#E53888", 0.12),
           cursor: "pointer",
           display: "flex",
           flexDirection: "column",
           height: "100%",
-          boxShadow: "none",
-          transition: "border-color 0.2s ease",
+          boxShadow: "0 10px 30px rgba(229, 56, 136, 0.06)",
+          transition: "box-shadow 0.3s ease, border-color 0.3s ease",
+          "&:hover": {
+            borderColor: alpha("#E53888", 0.4),
+            boxShadow: "0 20px 40px rgba(229, 56, 136, 0.15)",
+          },
           p: 1.5,
         }}
       >
-        {/* Imagen del Curso */}
-        <Box sx={{ width: "100%", position: "relative" }}>
+        {/* IMAGEN DEL CURSO CON BADGE FLOTANTE */}
+        <Box
+          sx={{
+            width: "100%",
+            position: "relative",
+            overflow: "hidden",
+            borderRadius: "16px",
+          }}
+        >
           <CardMedia
             component='img'
             image={course.cover_image_url}
             alt={course.title}
             sx={{
               width: "100%",
-              aspectRatio: "3 / 4",
+              aspectRatio: "1 / 1",
               objectFit: "cover",
-              borderRadius: "16px",
               backgroundColor: "#FFF5F7",
+              transition: "transform 0.5s ease",
+              ".MuiBox-root:hover &": {
+                transform: "scale(1.05)",
+              },
             }}
           />
+
+          {/* Badge Flotante de Publicación (Efecto Cristal) */}
+          <Box
+            sx={{
+              position: "absolute",
+              top: 10,
+              left: 10,
+              backgroundColor: "rgba(255, 255, 255, 0.85)",
+              backdropFilter: "blur(8px)",
+              borderRadius: "50px",
+              px: 1.5,
+              py: 0.5,
+              display: "flex",
+              alignItems: "center",
+              gap: 0.5,
+              boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
+            }}
+          >
+            <AccessTimeRoundedIcon
+              sx={{ fontSize: "0.9rem", color: "#E53888" }}
+            />
+            <Typography
+              component='span'
+              sx={{
+                fontSize: "0.7rem",
+                fontWeight: 700,
+                color: "#2B1B24",
+                textTransform: "capitalize",
+              }}
+            >
+              {dayjs(course.createdAt).fromNow()}
+            </Typography>
+          </Box>
         </Box>
 
-        {/* Contenido de la Tarjeta */}
+        {/* CONTENIDO DE LA TARJETA */}
         <Box
           sx={{
             p: 1.5,
@@ -73,36 +125,66 @@ const NewCourseCard = ({ course, hasProgress }) => {
             <Typography
               sx={{
                 fontWeight: 800,
-                fontSize: "0.95rem",
-                lineHeight: 1.35,
-                color: "#1F2937",
+                fontSize: "1rem",
+                lineHeight: 1.4,
+                color: "#2B1B24",
                 display: "-webkit-box",
                 WebkitLineClamp: 2,
                 WebkitBoxOrient: "vertical",
                 overflow: "hidden",
                 textOverflow: "ellipsis",
-                minHeight: "2.6rem",
+                minHeight: "2.8rem",
+                mb: 1.5,
               }}
             >
               {course.title}
             </Typography>
           </Box>
 
-          {/* Bloque Inferior: Lecciones y CTA */}
-          <Typography
-            variant='caption'
+          {/* Bloque Inferior: Lecciones y CTA Dinámico */}
+          <Box
             sx={{
-              color: "#E91E63",
-              fontWeight: "bold",
-              mt: 1.5,
               display: "flex",
               alignItems: "center",
               justifyContent: "space-between",
+              pt: 1.5,
+              borderTop: "1px solid",
+              borderColor: alpha("#E53888", 0.08),
             }}
           >
-            <span>{course.videosCount || 0} Lecciones</span>
-            <span>Ver →</span>
-          </Typography>
+            <Typography
+              variant='caption'
+              sx={{
+                color: "#5A4650",
+                fontWeight: 600,
+                fontSize: "0.8rem",
+                backgroundColor: "#FFF0F4",
+                px: 1.2,
+                py: 0.5,
+                borderRadius: "8px",
+              }}
+            >
+              {course.videosCount || 0} Lecciones
+            </Typography>
+
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                gap: 0.5,
+                color: "#E53888",
+                fontWeight: 700,
+                fontSize: "0.85rem",
+                transition: "transform 0.2s ease",
+                "&:hover": {
+                  transform: "translateX(4px)",
+                },
+              }}
+            >
+              <span>Ver curso</span>
+              <ArrowForwardRoundedIcon sx={{ fontSize: "1rem" }} />
+            </Box>
+          </Box>
         </Box>
       </Box>
     </Link>
