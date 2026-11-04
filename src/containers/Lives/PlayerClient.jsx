@@ -8,12 +8,14 @@ import {
 } from "@mui/material";
 import { motion, AnimatePresence } from "framer-motion";
 import WifiOffRoundedIcon from "@mui/icons-material/WifiOffRounded";
+import Snowfall from "react-snowfall"; // 🎄 Importamos Snowfall para modo fullscreen
 
 import DetailsInfoLive from "./DetailsInfoLive";
 import MutedOptions from "./MutedOptions";
 import AlertNetwordConnection from "./AlertNetwordConnection";
 import ToggleCommentsBtn from "./ToggleCommentsBtn";
 import { useIvsLivePlayer } from "../../hooks/useIvsLivePlayer";
+import { useHoliday } from "../../context/Holiday/HolidayContext"; // 🎄 Hook navideño
 
 const COMMENTS_DRAWER_WIDTH = 340;
 
@@ -38,10 +40,11 @@ const PlayerCliente = ({
   commentsVisible,
   onToggleComments,
   viewers,
-  isReconnecting = false, // Prop para sincronizar con la fase reconnecting de LiveDetalle
+  isReconnecting = false,
 }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const { isHolidayMode } = useHoliday(); // 🎄 Estado global de navidad
 
   const [muted, setMuted] = useState(true);
   const [showMuteNotice, setShowMuteNotice] = useState(true);
@@ -56,15 +59,12 @@ const PlayerCliente = ({
     handleReloadPlayer,
   } = useIvsLivePlayer(playbackUrl);
 
-  // Manejar el reinicio/sincronización del reproductor al reconectar la señal
   useEffect(() => {
     if (!isReconnecting && ivsPlayerRef.current) {
-      // Re-sincronizar el player con el borde en vivo cuando vuelve la señal
       handleReloadPlayer();
     }
   }, [isReconnecting, handleReloadPlayer]);
 
-  // Manejo de temporizador del aviso de mute
   const startMuteNoticeTimer = () => {
     if (muteTimerRef.current) clearTimeout(muteTimerRef.current);
     setShowMuteNotice(true);
@@ -118,7 +118,17 @@ const PlayerCliente = ({
     : isPortraitMobile
       ? "9/16"
       : "16/9";
+  const [snowflakeImage, setSnowflakeImage] = useState(null);
+  useEffect(() => {
+    // Creamos un elemento de imagen en memoria con un SVG limpio o una URL de tu CDN
+    const image = document.createElement("img");
+    // Puedes usar un enlace SVG en base64 de un copo estilizado o una URL de tu CDN
+    image.src = "https://www.svgrepo.com/show/184599/snowflake-snow.svg"; // Ejemplo: Emoji oficial de copo de nieve en alta calidad
 
+    image.onload = () => {
+      setSnowflakeImage(image);
+    };
+  }, []);
   return (
     <Box
       sx={{
@@ -134,6 +144,24 @@ const PlayerCliente = ({
         userSelect: "none",
       }}
     >
+      {/* 🎄 EFECTO DE NIEVE DENTRO DEL REPRODUCTOR (Se activa en Fullscreen si el modo navideño está prendido) */}
+      {isHolidayMode && isFullscreen && (
+        <Snowfall
+          snowflakeCount={85} // Cantidad equilibrada para que se vea elegante y no sature
+          images={snowflakeImage ? [snowflakeImage] : undefined} // Usamos nuestra imagen personalizada
+          radius={[8, 18]} // Tamaño variable de los copos (mínimo y máximo en pixeles)
+          speed={[0.5, 2.0]} // Velocidad de caída suave y relajada
+          wind={[-0.5, 1.5]} // Ligero movimiento de viento lateral realista
+          style={{
+            position: "fixed",
+            width: "100%",
+            height: "100%",
+            zIndex: 1500, // Por debajo de modales y menús importantes, pero visible en la app
+            pointerEvents: "none", // Permite hacer clic en los botones y cursos a través de la nieve
+          }}
+        />
+      )}
+
       <div key={playbackUrl} style={{ width: "100%", height: "100%" }}>
         <video
           ref={videoRef}

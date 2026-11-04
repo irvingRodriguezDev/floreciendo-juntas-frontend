@@ -307,30 +307,6 @@ const LiveDetalle = () => {
               )}
             </Box>
           )}
-          {isHolidayMode && (
-            <Box
-              sx={{
-                position: "absolute",
-                left: 0,
-                bottom: 25,
-                marginBottom: 15,
-                display: "flex",
-                justifyContent: "flex-end",
-              }}
-            >
-              <Box
-                component='img'
-                src='https://cdn.floreciendojuntas.com/production/statics/xmas/teddy-xmas.png'
-                alt='Campanas Navideñas'
-                sx={{
-                  width: { xs: 90, sm: 110, md: 150, lg: 200 },
-                  height: { xs: 90, sm: 110, md: 150, lg: 200 },
-                  objectFit: "contain", // Asegura que la imagen mantenga su proporción sin deformarse
-                  zIndex: 30,
-                }}
-              />
-            </Box>
-          )}
         </Box>
 
         {/* Información adicional */}

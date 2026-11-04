@@ -126,7 +126,7 @@ const Layout = ({ children }) => {
             position: "fixed",
             width: "100%",
             height: "100%",
-            zIndex: 150, // Por debajo de modales y menús importantes, pero visible en la app
+            zIndex: 1500, // Por debajo de modales y menús importantes, pero visible en la app
             pointerEvents: "none", // Permite hacer clic en los botones y cursos a través de la nieve
           }}
         />
