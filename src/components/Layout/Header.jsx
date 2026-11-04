@@ -43,7 +43,7 @@ const menuItems = [
 
 const Header = () => {
   const theme = useTheme();
-  const { isHolidayMode, toggleHolidayMode } = useHoliday();
+  const { isHolidayMode } = useHoliday();
   const [open, setOpen] = useState(false);
   const [openCart, setOpenCart] = useState(false);
   const [openCartShopify, setOpenCartShopify] = useState(false);
@@ -218,7 +218,9 @@ const Header = () => {
             <Box
               component='img'
               src={
-                "https://cdn.floreciendojuntas.com/production/statics/LOGOTIPO+FLORECIENDO+JUNTAS+negro.webp"
+                isHolidayMode
+                  ? "https://cdn.floreciendojuntas.com/production/statics/xmas/logo-fj-XMAS.png"
+                  : "https://cdn.floreciendojuntas.com/production/statics/LOGOTIPO+FLORECIENDO+JUNTAS+negro.webp"
               }
               alt='Logo Floreciendo Juntas'
               sx={{

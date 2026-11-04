@@ -6,6 +6,7 @@ import SchoolIcon from "@mui/icons-material/School";
 import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
 import VerifiedIcon from "@mui/icons-material/Verified";
 import image from "../../assets/images/Captura-de-pantalla-2025-11-24-a-la_s_-1.26.37 p.m. (1).webp";
+import { useHoliday } from "../../context/Holiday/HolidayContext";
 
 // Datos de las características
 const features = [
@@ -74,7 +75,7 @@ const FeatureItem = ({ icon: Icon, title, description }) => (
 
 const WhyChooseUsSection = () => {
   const theme = useTheme();
-
+  const { isHolidayMode } = useHoliday();
   return (
     <Box
       sx={{
@@ -92,6 +93,52 @@ const WhyChooseUsSection = () => {
         boxShadow: "0 20px 40px rgba(232, 62, 140, 0.04)",
       }}
     >
+      {isHolidayMode && (
+        <Box
+          sx={{
+            position: "absolute",
+            marginTop: { xs: -5, lg: -9 },
+            display: "flex",
+            left: 0,
+            justifyContent: "flex-start",
+          }}
+        >
+          <Box
+            component='img'
+            src='https://cdn.floreciendojuntas.com/production/statics/xmas/bota-xmas.webp'
+            alt='Campanas Navideñas'
+            sx={{
+              width: { xs: 100, sm: 110, md: 150, lg: 200 },
+              height: { xs: 100, sm: 110, md: 150, lg: 200 },
+              objectFit: "contain", // Asegura que la imagen mantenga su proporción sin deformarse
+              opacity: 0.5,
+            }}
+          />
+        </Box>
+      )}
+      {isHolidayMode && (
+        <Box
+          sx={{
+            position: "absolute",
+            marginTop: { xs: -5, lg: -10 },
+            display: "flex",
+            right: 0,
+            justifyContent: "flex-end",
+          }}
+        >
+          <Box
+            component='img'
+            src='https://cdn.floreciendojuntas.com/production/statics/xmas/deco-xmas.png'
+            alt='Campanas Navideñas'
+            sx={{
+              opacity: 0.7,
+              width: { xs: 100, sm: 110, md: 150, lg: 200 },
+              height: { xs: 100, sm: 110, md: 150, lg: 200 },
+              objectFit: "contain", // Asegura que la imagen mantenga su proporción sin deformarse
+            }}
+          />
+        </Box>
+      )}
       <Grid
         container
         spacing={6}

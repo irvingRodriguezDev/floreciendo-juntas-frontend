@@ -2,8 +2,10 @@ import React from "react";
 import { Box, Typography, Container, Stack } from "@mui/material";
 import { motion } from "framer-motion";
 import underline from "../../assets/svg/underline.svg";
+import { useHoliday } from "../../context/Holiday/HolidayContext";
 
 const SecretsBanner = () => {
+  const { isHolidayMode } = useHoliday();
   return (
     <Box
       component={motion.section}
@@ -21,6 +23,50 @@ const SecretsBanner = () => {
           "radial-gradient(circle at 50% 30%, #FFF0F6 0%, #FAF7F8 70%)",
       }}
     >
+      {isHolidayMode && (
+        <Box
+          sx={{
+            position: "absolute",
+            marginTop: { xs: -6, lg: -10 },
+            display: "flex",
+            left: { xs: 0 },
+            justifyContent: "flex-start",
+          }}
+        >
+          <Box
+            component='img'
+            src='https://cdn.floreciendojuntas.com/production/statics/xmas/teddy-xmas.png'
+            alt='Campanas Navideñas'
+            sx={{
+              width: { xs: 90, sm: 110, md: 150, lg: 200 },
+              height: { xs: 90, sm: 110, md: 150, lg: 200 },
+              objectFit: "contain", // Asegura que la imagen mantenga su proporción sin deformarse
+            }}
+          />
+        </Box>
+      )}
+      {isHolidayMode && (
+        <Box
+          sx={{
+            position: "absolute",
+            marginTop: { xs: -6, lg: -10 },
+            display: "flex",
+            justifyContent: "flex-end",
+            right: 0,
+          }}
+        >
+          <Box
+            component='img'
+            src='https://cdn.floreciendojuntas.com/production/statics/xmas/campanas-xmas.png'
+            alt='Campanas Navideñas'
+            sx={{
+              width: { xs: 90, sm: 110, md: 150, lg: 200 },
+              height: { xs: 90, sm: 110, md: 150, lg: 200 },
+              objectFit: "contain", // Asegura que la imagen mantenga su proporción sin deformarse
+            }}
+          />
+        </Box>
+      )}
       {/* 🌸 WATERMARK DE FONDO EDITORIAL */}
       <Typography
         sx={{

@@ -1,6 +1,6 @@
 import React, { useContext, useEffect } from "react";
 import Layout from "../../components/Layout/Layout";
-import { Box, Grid, Typography, Container } from "@mui/material";
+import { Box, Grid, Typography, Container, alpha } from "@mui/material";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 
@@ -8,6 +8,7 @@ import { Link } from "react-router-dom";
 import floralPath from "../../assets/svg/floral-path.svg";
 import SecretsBanner from "../../components/Banner/SecretsBanner";
 import SystemContext from "../../context/System/SystemContext";
+import { useHoliday } from "../../context/Holiday/HolidayContext"; // 🎄 Importamos el hook navideño
 
 // --- VARIANTS DE FRAMER MOTION ---
 const cardVariants = {
@@ -25,6 +26,7 @@ const cardVariants = {
 
 const Secrets = () => {
   const { systems, getAllSystems } = useContext(SystemContext);
+  const { isHolidayMode } = useHoliday(); // 🎄 Estado global de navidad
 
   useEffect(() => {
     getAllSystems();
@@ -44,28 +46,6 @@ const Secrets = () => {
           overflow: "hidden",
         }}
       >
-        {/* 🌸 WATERMARK DE FONDO PRINCIPAL (Efecto BBM2027) */}
-        {/* <Typography
-          sx={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            fontSize: { xs: "12vw", md: "11vw" },
-            fontWeight: 900,
-            color: "#A30B5D",
-            opacity: 0.075,
-            whiteSpace: "nowrap",
-            userSelect: "none",
-            pointerEvents: "none",
-            letterSpacing: "0.05em",
-            textTransform: "uppercase",
-            zIndex: 0,
-          }}
-        >
-          FLORECER <br /> JUNTAS
-        </Typography> */}
-
         {/* 🪷 CAMINO FLORAL */}
         <Box
           sx={{
@@ -130,7 +110,7 @@ const Secrets = () => {
                       boxShadow:
                         "0 15px 35px -10px rgba(163, 11, 93, 0.07), 0 5px 15px rgba(0, 0, 0, 0.02)",
                       transition: "all 0.4s cubic-bezier(0.16, 1, 0.3, 1)",
-                      overflow: "hidden",
+                      overflow: "visible", // Cambiado a 'visible' para permitir que el gorrito sobresalga elegantemente
                       "&:hover": {
                         backgroundColor: "rgba(255, 255, 255, 0.95)",
                         boxShadow:
@@ -147,6 +127,26 @@ const Secrets = () => {
                       },
                     }}
                   >
+                    {/* 🎄 GORRITO NAVIDEÑO EN LA ESQUINA SUPERIOR IZQUIERDA */}
+                    {isHolidayMode && (
+                      <Box
+                        component='img'
+                        src='https://cdn.floreciendojuntas.com/production/statics/xmas/gorro-xmas-teddy.png'
+                        alt='Gorro Navideño'
+                        sx={{
+                          position: "absolute",
+                          top: "-22px",
+                          left: "-18px",
+                          width: "72px",
+                          height: "72px",
+                          transform: "rotate(-25deg)",
+                          zIndex: 10,
+                          pointerEvents: "none",
+                          filter: "drop-shadow(0 4px 6px rgba(0,0,0,0.12))",
+                        }}
+                      />
+                    )}
+
                     {/* 🔢 NÚMERO WATERMARK ESTILO EDITORIAL */}
                     <Typography
                       className='secret-number'
@@ -161,7 +161,7 @@ const Secrets = () => {
                         opacity: 0.089,
                         userSelect: "none",
                         transition: "all 0.5s ease",
-                        fontFamily: "revert-layer", // Toque sofisticado
+                        fontFamily: "revert-layer",
                       }}
                     >
                       {String(index + 1).padStart(2, "#")}
@@ -169,7 +169,6 @@ const Secrets = () => {
 
                     {/* 📝 CONTENIDO PRINCIPAL */}
                     <Box sx={{ zIndex: 1 }}>
-                      {/* Subtítulo / Tag sutil para enfocar la temática */}
                       <Typography
                         variant='caption'
                         sx={{
@@ -239,10 +238,8 @@ const Secrets = () => {
                           transition: "transform 0.3s ease",
                           color: "#a30b5d",
                           fontSize: "1rem",
-                          "&": {
-                            ".MuiBox-root:hover &": {
-                              transform: "translateX(5px)",
-                            },
+                          ".MuiBox-root:hover &": {
+                            transform: "translateX(5px)",
                           },
                         }}
                       >
@@ -256,6 +253,50 @@ const Secrets = () => {
           </Grid>
         </Container>
       </Box>
+      {isHolidayMode && (
+        <Box
+          sx={{
+            position: "absolute",
+            marginTop: { xs: -6, lg: -10 },
+            display: "flex",
+            left: { xs: 0 },
+            justifyContent: "flex-start",
+          }}
+        >
+          <Box
+            component='img'
+            src='https://cdn.floreciendojuntas.com/production/statics/xmas/sferas-xmas.png'
+            alt='Campanas Navideñas'
+            sx={{
+              width: { xs: 90, sm: 110, md: 150, lg: 200 },
+              height: { xs: 90, sm: 110, md: 150, lg: 200 },
+              objectFit: "contain", // Asegura que la imagen mantenga su proporción sin deformarse
+            }}
+          />
+        </Box>
+      )}
+      {isHolidayMode && (
+        <Box
+          sx={{
+            position: "absolute",
+            marginTop: { xs: -6, lg: -10 },
+            display: "flex",
+            justifyContent: "flex-end",
+            right: 0,
+          }}
+        >
+          <Box
+            component='img'
+            src='https://cdn.floreciendojuntas.com/production/statics/xmas/arbol-x%2B.png'
+            alt='Campanas Navideñas'
+            sx={{
+              width: { xs: 90, sm: 110, md: 150, lg: 200 },
+              height: { xs: 90, sm: 110, md: 150, lg: 200 },
+              objectFit: "contain", // Asegura que la imagen mantenga su proporción sin deformarse
+            }}
+          />
+        </Box>
+      )}
     </Layout>
   );
 };

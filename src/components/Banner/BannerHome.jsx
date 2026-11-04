@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import LocalActivityIcon from "@mui/icons-material/LocalActivity";
 import AuthContext from "../../context/Auth/AuthContext";
 
-const BannerHome = ({ onSubscribeClick }) => {
+const BannerHome = () => {
   const { autenticado, usuario } = useContext(AuthContext);
 
   // Si ya está suscrita, no mostramos este banner de venta
@@ -15,6 +15,9 @@ const BannerHome = ({ onSubscribeClick }) => {
   if (isSubscribed) {
     return null;
   }
+  const onSubscribeClick = () => {
+    window.location.href = "/suscribirme";
+  };
 
   return (
     <Box

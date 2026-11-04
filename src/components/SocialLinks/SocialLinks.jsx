@@ -7,6 +7,7 @@ import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import FacebookIcon from "../icons/FacebookIcon";
 import InstagramIcon from "../icons/InstagramIcon";
 import TiktokIcon from "../icons/TiktokIcon";
+import { useHoliday } from "../../context/Holiday/HolidayContext";
 
 const MotionCard = motion.create(Card);
 
@@ -35,6 +36,7 @@ const socialData = [
 ];
 
 const SocialCards = () => {
+  const { isHolidayMode } = useHoliday();
   return (
     <Box
       sx={{
@@ -139,7 +141,11 @@ const SocialCards = () => {
         </Box>
 
         {/* 🎴 GRID DE CARDS INTERACTIVAS PREMIUM */}
-        <Grid container spacing={{ xs: 2.5, md: 3.5 }} justifyContent='center'>
+        <Grid
+          container
+          spacing={{ xs: 2.5, md: 3.5 }}
+          sx={{ justifyContent: "center" }}
+        >
           {socialData.map((item, index) => (
             <Grid size={{ xs: 12, sm: 6, md: 4 }} key={item.id}>
               <Box
@@ -160,7 +166,7 @@ const SocialCards = () => {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.5, delay: index * 0.1 }}
-                  whileHover={{ y: -6 }}
+                  whileHover={{ y: isHolidayMode ? null : -6 }}
                   elevation={0}
                   sx={{
                     p: { xs: 2.5, sm: 3 },
@@ -176,7 +182,8 @@ const SocialCards = () => {
                     height: "100%",
                     minHeight: "160px",
                     position: "relative",
-                    overflow: "hidden",
+                    // Cambiado a 'visible' o 'initial' para permitir que el gorrito sobresalga estéticamente de la esquina
+                    overflow: "visible",
                     "&:hover": {
                       borderColor: alpha("#E53888", 0.4),
                       boxShadow: "0 20px 40px rgba(229, 56, 136, 0.12)",
@@ -192,6 +199,26 @@ const SocialCards = () => {
                     },
                   }}
                 >
+                  {/* 🎄 GORRITO NAVIDEÑO POSICIONADO EXACTAMENTE EN LA ESQUINA SUPERIOR IZQUIERDA */}
+                  {isHolidayMode && (
+                    <Box
+                      component='img'
+                      src='https://cdn.floreciendojuntas.com/production/statics/xmas/gorro-xmas-teddy.png'
+                      alt='Gorro Navideño'
+                      sx={{
+                        position: "absolute",
+                        top: "-26px",
+                        left: "-24px",
+                        width: "80px",
+                        height: "80px",
+                        transform: "rotate(-25deg)",
+                        zIndex: 10,
+                        pointerEvents: "none",
+                        filter: "drop-shadow(0 4px 6px rgba(0,0,0,0.1))",
+                      }}
+                    />
+                  )}
+
                   {/* ICONO + TEXTO */}
                   <Stack direction='row' alignItems='center' spacing={2.5}>
                     <Box

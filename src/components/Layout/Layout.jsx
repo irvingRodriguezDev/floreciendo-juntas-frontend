@@ -13,11 +13,15 @@ import BirthdayBanner from "./BirthdayBanner"; // 🎂 Importamos el nuevo banne
 import Swal from "sweetalert2";
 import { alerts } from "../../utils/Alerts";
 import { launchSuccessConfetti } from "../../utils/ShowConfetti";
+import HolidaySwitch from "./HolidaySwitch";
+import { useHoliday } from "../../context/Holiday/HolidayContext";
+import HolidayGarland from "./HolidayGarland";
+import Snowfall from "react-snowfall";
 const Layout = ({ children }) => {
   const [openSalonCart, setOpenSalonCart] = useState(false);
   const { autenticado, usuario } = useContext(AuthContext);
   const { cart, guest_cart, getUserCart } = useContext(CartContext);
-
+  const { isHolidayMode } = useHoliday();
   const [openBirthModal, setOpenBirthModal] = useState(false);
   const [showBirthdayBanner, setShowBirthdayBanner] = useState(false);
 
@@ -93,11 +97,40 @@ const Layout = ({ children }) => {
       "Tu fecha de cumpleaños se ha guardado correctamente.",
     );
   };
+  const [snowflakeImage, setSnowflakeImage] = useState(null);
+
+  useEffect(() => {
+    // Creamos un elemento de imagen en memoria con un SVG limpio o una URL de tu CDN
+    const image = document.createElement("img");
+    // Puedes usar un enlace SVG en base64 de un copo estilizado o una URL de tu CDN
+    image.src = "https://www.svgrepo.com/show/184599/snowflake-snow.svg"; // Ejemplo: Emoji oficial de copo de nieve en alta calidad
+
+    image.onload = () => {
+      setSnowflakeImage(image);
+    };
+  }, []);
 
   return (
     <Box display='flex' flexDirection='column' minHeight='100vh'>
       {/* HEADER */}
       <Header />
+      {isHolidayMode && <HolidayGarland />}
+      {isHolidayMode && (
+        <Snowfall
+          snowflakeCount={85} // Cantidad equilibrada para que se vea elegante y no sature
+          images={snowflakeImage ? [snowflakeImage] : undefined} // Usamos nuestra imagen personalizada
+          radius={[8, 18]} // Tamaño variable de los copos (mínimo y máximo en pixeles)
+          speed={[0.5, 2.0]} // Velocidad de caída suave y relajada
+          wind={[-0.5, 1.5]} // Ligero movimiento de viento lateral realista
+          style={{
+            position: "fixed",
+            width: "100%",
+            height: "100%",
+            zIndex: 150, // Por debajo de modales y menús importantes, pero visible en la app
+            pointerEvents: "none", // Permite hacer clic en los botones y cursos a través de la nieve
+          }}
+        />
+      )}
       {/* 🎂 MODAL PARA CAPTURAR CUMPLEAÑOS */}
       <FormBirthDate
         open={openBirthModal}

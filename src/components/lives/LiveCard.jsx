@@ -4,9 +4,11 @@ import { useNavigate } from "react-router-dom"; // 👈 Usamos useNavigate para 
 import RadioButtonCheckedIcon from "@mui/icons-material/RadioButtonChecked";
 import CalendarTodayOutlinedIcon from "@mui/icons-material/CalendarTodayOutlined";
 import FormatDate from "../../utils/FormatDate";
+import { useHoliday } from "../../context/Holiday/HolidayContext"; // 🎄 Importamos el hook navideño
 
 const LiveCard = ({ live, i, PRIMARY_PINK = "#D63384" }) => {
   const navigate = useNavigate();
+  const { isHolidayMode } = useHoliday(); // 🎄 Estado del modo navidad
 
   const handleCardClick = () => {
     navigate(`/detalle-live/${live.id}`);
@@ -19,7 +21,8 @@ const LiveCard = ({ live, i, PRIMARY_PINK = "#D63384" }) => {
       sx={{
         height: "100%",
         borderRadius: "24px",
-        overflow: "hidden",
+        // Cambiado a "visible" para permitir que el gorrito navideño sobresalga de la esquina
+        overflow: "visible",
         backgroundColor: "rgba(255, 255, 255, 0.85)",
         backdropFilter: "blur(12px)",
         WebkitBackdropFilter: "blur(12px)",
@@ -64,6 +67,26 @@ const LiveCard = ({ live, i, PRIMARY_PINK = "#D63384" }) => {
         },
       }}
     >
+      {/* 🎄 GORRITO NAVIDEÑO EN LA ESQUINA SUPERIOR IZQUIERDA DE LA CARD */}
+      {isHolidayMode && (
+        <Box
+          component='img'
+          src='https://cdn.floreciendojuntas.com/production/statics/xmas/gorro-xmas-teddy.png'
+          alt='Gorro Navideño'
+          sx={{
+            position: "absolute",
+            top: "-22px",
+            left: "-18px",
+            width: "72px",
+            height: "72px",
+            transform: "rotate(-25deg)",
+            zIndex: 10,
+            pointerEvents: "none",
+            filter: "drop-shadow(0 4px 6px rgba(0,0,0,0.12))",
+          }}
+        />
+      )}
+
       {/* 🖼️ MINIATURA / MEDIA */}
       <Box
         sx={{
@@ -72,6 +95,8 @@ const LiveCard = ({ live, i, PRIMARY_PINK = "#D63384" }) => {
           pt: "100%",
           backgroundColor: "#FFF0F5",
           overflow: "hidden",
+          borderTopLeftRadius: "24px",
+          borderTopRightRadius: "24px",
         }}
       >
         <CardMedia

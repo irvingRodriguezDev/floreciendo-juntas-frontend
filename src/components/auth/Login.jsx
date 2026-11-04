@@ -128,7 +128,7 @@ const Login = () => {
       <Box
         sx={{
           minHeight: "100vh",
-          background: "linear-gradient(135deg, #FFF0F5 0%, #FCE7F3 100%)",
+          background: "linear-gradient(135deg, #FDF1F6 0%, #FEF3F9 100%)",
           position: "relative",
           overflow: "hidden",
           display: "flex",

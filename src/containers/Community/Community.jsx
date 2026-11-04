@@ -7,6 +7,7 @@ import TabsTypeCommunity from "../../components/Community/TabsTypeCommunity";
 import BlockScreen from "./BlockScreen";
 import { MethodPost } from "../../config/Service";
 import { alerts } from "../../utils/Alerts";
+import { useHoliday } from "../../context/Holiday/HolidayContext";
 
 const Community = () => {
   const { autenticado, usuario } = useContext(AuthContext);
@@ -38,8 +39,52 @@ const Community = () => {
       setLoadingPortal(false);
     }
   };
+  const { isHolidayMode } = useHoliday();
   return (
     <Layout>
+      {isHolidayMode && (
+        <Box
+          sx={{
+            position: "absolute",
+            marginTop: { xs: -6, sm: -6, md: -10, lg: -5 },
+            display: "flex",
+            justifyContent: "flex-start",
+          }}
+        >
+          <Box
+            component='img'
+            src='https://cdn.floreciendojuntas.com/production/statics/xmas/campanas-xmas.png'
+            alt='Campanas Navideñas'
+            sx={{
+              width: { xs: 90, sm: 110, md: 150, lg: 200 },
+              height: { xs: 90, sm: 110, md: 150, lg: 200 },
+              objectFit: "contain", // Asegura que la imagen mantenga su proporción sin deformarse
+            }}
+          />
+        </Box>
+      )}
+      {isHolidayMode && (
+        <Box
+          sx={{
+            position: "absolute",
+            marginTop: { xs: -6, sm: -6, md: -10, lg: -5 },
+            display: "flex",
+            right: 0,
+            justifyContent: "flex-end",
+          }}
+        >
+          <Box
+            component='img'
+            src='https://cdn.floreciendojuntas.com/production/statics/xmas/campanas-xmas.png'
+            alt='Campanas Navideñas'
+            sx={{
+              width: { xs: 90, sm: 110, md: 150, lg: 200 },
+              height: { xs: 90, sm: 110, md: 150, lg: 200 },
+              objectFit: "contain", // Asegura que la imagen mantenga su proporción sin deformarse
+            }}
+          />
+        </Box>
+      )}
       <Box
         sx={{
           py: { xs: 2, sm: 3 },

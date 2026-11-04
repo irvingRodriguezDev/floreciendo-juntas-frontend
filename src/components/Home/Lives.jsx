@@ -21,6 +21,7 @@ import "swiper/css/pagination";
 import AuthContext from "../../context/Auth/AuthContext";
 import LivesContext from "../../context/Lives/LivesContext";
 import LiveCard from "../lives/LiveCard";
+import { useHoliday } from "../../context/Holiday/HolidayContext";
 
 const Lives = () => {
   const { lives, getAllLives } = useContext(LivesContext);
@@ -39,10 +40,10 @@ const Lives = () => {
   }, [usuario, autenticado]);
 
   const lightYellow = "#ffecb3";
-
+  const { isHolidayMode } = useHoliday();
   return (
     <>
-      {lives.length > 2 ? (
+      {lives.length > 0 ? (
         <Box
           sx={{
             background: `
@@ -60,6 +61,49 @@ const Lives = () => {
           }}
         >
           {/* 🌸 ENCABEZADO MODERNO Y ELEGANTE */}
+          {isHolidayMode && (
+            <Box
+              sx={{
+                position: "absolute",
+                marginTop: { xs: -6, sm: -6, md: -10, lg: -10 },
+                display: "flex",
+                justifyContent: "flex-start",
+              }}
+            >
+              <Box
+                component='img'
+                src='https://cdn.floreciendojuntas.com/production/statics/xmas/campanas-xmas.png'
+                alt='Campanas Navideñas'
+                sx={{
+                  width: { xs: 90, sm: 110, md: 150, lg: 200 },
+                  height: { xs: 90, sm: 110, md: 150, lg: 200 },
+                  objectFit: "contain", // Asegura que la imagen mantenga su proporción sin deformarse
+                }}
+              />
+            </Box>
+          )}
+          {isHolidayMode && (
+            <Box
+              sx={{
+                position: "absolute",
+                marginTop: { xs: -6, sm: -6, md: -10, lg: -10 },
+                display: "flex",
+                right: 0,
+                justifyContent: "flex-end",
+              }}
+            >
+              <Box
+                component='img'
+                src='https://cdn.floreciendojuntas.com/production/statics/xmas/campanas-xmas.png'
+                alt='Campanas Navideñas'
+                sx={{
+                  width: { xs: 90, sm: 110, md: 150, lg: 200 },
+                  height: { xs: 90, sm: 110, md: 150, lg: 200 },
+                  objectFit: "contain", // Asegura que la imagen mantenga su proporción sin deformarse
+                }}
+              />
+            </Box>
+          )}
           <Box
             component={motion.div}
             initial={{ opacity: 0, y: -20 }}
@@ -322,6 +366,53 @@ const Lives = () => {
               Explorar próximas clases
             </Button>
           </Box>
+
+          {isHolidayMode && (
+            <Box
+              sx={{
+                position: "absolute",
+                marginTop: { xs: -6, sm: -6, md: -10, lg: -10 },
+                display: "flex",
+                left: 0,
+                bottom: 0,
+                justifyContent: "flex-end",
+              }}
+            >
+              <Box
+                component='img'
+                src='https://cdn.floreciendojuntas.com/production/statics/xmas/arbol-x%2B.png'
+                alt='Campanas Navideñas'
+                sx={{
+                  width: { xs: 90, sm: 110, md: 150, lg: 200 },
+                  height: { xs: 90, sm: 110, md: 150, lg: 200 },
+                  objectFit: "contain", // Asegura que la imagen mantenga su proporción sin deformarse
+                }}
+              />
+            </Box>
+          )}
+          {isHolidayMode && (
+            <Box
+              sx={{
+                position: "absolute",
+                marginTop: { xs: -6, sm: -6, md: -10, lg: -10 },
+                display: "flex",
+                right: 0,
+                bottom: 2,
+                justifyContent: "flex-end",
+              }}
+            >
+              <Box
+                component='img'
+                src='https://cdn.floreciendojuntas.com/production/statics/xmas/teddy-xmas.png'
+                alt='Campanas Navideñas'
+                sx={{
+                  width: { xs: 90, sm: 110, md: 150, lg: 200 },
+                  height: { xs: 90, sm: 110, md: 150, lg: 200 },
+                  objectFit: "contain", // Asegura que la imagen mantenga su proporción sin deformarse
+                }}
+              />
+            </Box>
+          )}
         </Box>
       ) : (
         <></>

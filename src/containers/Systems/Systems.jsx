@@ -20,9 +20,11 @@ import "swiper/css/navigation";
 import SystemContext from "../../context/System/SystemContext";
 import PinkSpinner from "../../components/Loading/PinkSpinner";
 import SystemCard from "./SystemCard";
+import { useHoliday } from "../../context/Holiday/HolidayContext"; // 🎄 Importamos el hook navideño
 
 const Systems = () => {
   const { getAllSystems, systems } = useContext(SystemContext);
+  const { isHolidayMode } = useHoliday(); // 🎄 Estado del modo navidad
   const navigate = useNavigate();
 
   // Callback refs para vincular los botones personalizados de Swiper
@@ -50,8 +52,38 @@ const Systems = () => {
         boxShadow: "0 20px 40px rgba(232, 62, 140, 0.04)",
       }}
     >
+      {/* 🎄 LISTÓN CON MOÑO NAVIDEÑO SUPERIOR (Opcional decorativo si está activo el modo) */}
+      {isHolidayMode && (
+        <Box
+          sx={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            width: "100%",
+            display: "flex",
+            justifyContent: "center",
+            zIndex: 2,
+            pointerEvents: "none",
+            opacity: 0.95,
+          }}
+        >
+          <Box
+            component='img'
+            src='https://cdn.floreciendojuntas.com/production/statics/xmas/mono-xmas.png' // Sube tu imagen del moño a tu CDN o ruta estática
+            alt='Moño Navideño'
+            sx={{
+              width: "100%",
+              maxWidth: "1000px",
+              height: "auto",
+              objectFit: "contain",
+              filter: "drop-shadow(0 4px 8px rgba(0,0,0,0.08))",
+            }}
+          />
+        </Box>
+      )}
+
       {/* CONTENEDOR PRINCIPAL */}
-      <Box sx={{ position: "relative", zIndex: 1 }}>
+      <Box sx={{ position: "relative", zIndex: 1, mt: isHolidayMode ? 3 : 0 }}>
         {/* 🌸 CABECERA MODERNA Y ELEGANTE */}
         <Box
           sx={{
@@ -241,7 +273,7 @@ const Systems = () => {
           )}
         </Box>
 
-        {/* 🚀 BOTÓN CTA: NAVEGACIÓN PROGRAMÁTICA (MANTIENE PWA EN FULLSCREEN) */}
+        {/* 🚀 BOTÓN CTA: NAVEGACIÓN PROGRAMÁTICA */}
         <Box sx={{ textAlign: "center", mt: { xs: 4, md: 6 } }}>
           <Button
             onClick={() => navigate("/secretos")}
@@ -271,6 +303,29 @@ const Systems = () => {
           </Button>
         </Box>
       </Box>
+      {isHolidayMode && (
+        <Box
+          sx={{
+            position: "absolute",
+            left: 0,
+            bottom: 0,
+            display: "flex",
+            justifyContent: "flex-start",
+          }}
+        >
+          <Box
+            component='img'
+            src='https://cdn.floreciendojuntas.com/production/statics/xmas/arbol-x%2B.png'
+            alt='Campanas Navideñas'
+            sx={{
+              width: { xs: 100, sm: 110, md: 150, lg: 200 },
+              height: { xs: 100, sm: 110, md: 150, lg: 200 },
+              objectFit: "contain", // Asegura que la imagen mantenga su proporción sin deformarse
+              zIndex: 30,
+            }}
+          />
+        </Box>
+      )}
     </Box>
   );
 };

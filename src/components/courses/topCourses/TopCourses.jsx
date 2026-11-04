@@ -8,11 +8,12 @@ import { Link } from "react-router-dom";
 import CoursesContext from "../../../context/Courses/CoursesContext";
 import TopCourseCard from "./TopCourseCard";
 import AuthContext from "../../../context/Auth/AuthContext";
+import { useHoliday } from "../../../context/Holiday/HolidayContext";
 
 const TopCourses = () => {
   const { usuario, autenticado } = useContext(AuthContext);
   const { getTopTenCourses, topCourses } = useContext(CoursesContext);
-
+  const { isHolidayMode } = useHoliday();
   useEffect(() => {
     if (usuario && autenticado) {
       getTopTenCourses(usuario, autenticado);
@@ -50,6 +51,50 @@ const TopCourses = () => {
           px: 2,
         }}
       >
+        {isHolidayMode && (
+          <Box
+            sx={{
+              position: "absolute",
+              marginTop: { xs: -6, lg: -10 },
+              display: "flex",
+              left: { xs: 0 },
+              justifyContent: "flex-start",
+            }}
+          >
+            <Box
+              component='img'
+              src='https://cdn.floreciendojuntas.com/production/statics/xmas/teddy-xmas.png'
+              alt='Campanas Navideñas'
+              sx={{
+                width: { xs: 90, sm: 110, md: 150, lg: 200 },
+                height: { xs: 90, sm: 110, md: 150, lg: 200 },
+                objectFit: "contain", // Asegura que la imagen mantenga su proporción sin deformarse
+              }}
+            />
+          </Box>
+        )}
+        {isHolidayMode && (
+          <Box
+            sx={{
+              position: "absolute",
+              marginTop: { xs: -6, lg: -10 },
+              display: "flex",
+              justifyContent: "flex-end",
+              right: 0,
+            }}
+          >
+            <Box
+              component='img'
+              src='https://cdn.floreciendojuntas.com/production/statics/xmas/campanas-xmas.png'
+              alt='Campanas Navideñas'
+              sx={{
+                width: { xs: 90, sm: 110, md: 150, lg: 200 },
+                height: { xs: 90, sm: 110, md: 150, lg: 200 },
+                objectFit: "contain", // Asegura que la imagen mantenga su proporción sin deformarse
+              }}
+            />
+          </Box>
+        )}
         {/* Badge superior minimalista */}
         <Stack
           direction='row'
@@ -133,11 +178,9 @@ const TopCourses = () => {
           {topCourses &&
             topCourses.map((course, index) => {
               return (
-                <TopCourseCard
-                  key={course.id || index}
-                  course={course}
-                  index={index}
-                />
+                <Grid size={{ xs: 12, sm: 6, md: 4, lg: 3 }} key={index}>
+                  <TopCourseCard course={course} index={index} />
+                </Grid>
               );
             })}
         </Grid>
@@ -177,6 +220,29 @@ const TopCourses = () => {
           </Box>
         </motion.div>
       </Box>
+      {isHolidayMode && (
+        <Box
+          sx={{
+            position: "absolute",
+            right: 0,
+            bottom: 0,
+            display: "flex",
+            justifyContent: "flex-end",
+          }}
+        >
+          <Box
+            component='img'
+            src='https://cdn.floreciendojuntas.com/production/statics/xmas/sferas-xmas.png'
+            alt='Campanas Navideñas'
+            sx={{
+              width: { xs: 90, sm: 110, md: 150, lg: 200 },
+              height: { xs: 90, sm: 110, md: 150, lg: 200 },
+              objectFit: "contain", // Asegura que la imagen mantenga su proporción sin deformarse
+              zIndex: 30,
+            }}
+          />
+        </Box>
+      )}
     </Box>
   );
 };

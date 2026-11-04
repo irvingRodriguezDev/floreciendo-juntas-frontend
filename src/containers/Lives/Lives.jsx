@@ -7,11 +7,13 @@ import LivesContext from "../../context/Lives/LivesContext";
 import LiveCard from "../../components/lives/LiveCard";
 import SkeletonLive from "../../components/lives/SkeletonLive";
 import LivesEmpty from "../../components/lives/LivesEmpty";
+import { useHoliday } from "../../context/Holiday/HolidayContext"; // 🎄 Importamos el hook navideño
 
 const PRIMARY_PINK = "#E53888";
 
 const LivesPage = () => {
   const { lives = [], getAllLives } = useContext(LivesContext);
+  const { isHolidayMode } = useHoliday(); // 🎄 Estado global de navidad
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -31,9 +33,31 @@ const LivesPage = () => {
 
   return (
     <Layout>
-      <Box sx={{ minHeight: "100vh", pb: { xs: 8, md: 12 } }}>
+      <Box
+        sx={{ minHeight: "100vh", pb: { xs: 8, md: 12 }, position: "relative" }}
+      >
         {/* 🌸 BANNER PRINCIPAL */}
         <LivesBanner />
+
+        {/* 🎄 RECURSO GRÁFICO NAVIDEÑO (Esferas flotantes decorativas en la esquina superior derecha) */}
+        {isHolidayMode && (
+          <Box
+            component='img'
+            src='https://cdn.floreciendojuntas.com/production/statics/xmas/sferas-xmas.png' // Asegúrate de tener tu URL o asset de esferas
+            alt='Esferas Navideñas'
+            sx={{
+              position: "absolute",
+              top: { xs: "10px", md: "20px" },
+              right: { xs: "10px", md: "40px" },
+              width: { xs: "70px", sm: "110px", md: "140px" },
+              height: "auto",
+              pointerEvents: "none",
+              zIndex: 5,
+              filter: "drop-shadow(0 6px 10px rgba(0,0,0,0.15))",
+              transform: "rotate(5deg)",
+            }}
+          />
+        )}
 
         {/* ⏳ ESTADO DE CARGA (SKELETONS) */}
         {loading && (

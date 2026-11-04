@@ -17,6 +17,7 @@ import clienteAxios from "../../config/Axios";
 import { alerts } from "../../utils/Alerts";
 import WishModal from "./WishModal";
 import AuthContext from "../../context/Auth/AuthContext";
+import { useHoliday } from "../../context/Holiday/HolidayContext";
 
 const MAIN_PINK = "#D72E79";
 const LIGHT_PINK = "#FFF0F6";
@@ -94,7 +95,7 @@ const Birthdays = () => {
     cumpleaneras.length > 0 && cumpleaneras.length < 10
       ? [...cumpleaneras, ...cumpleaneras, ...cumpleaneras]
       : cumpleaneras;
-
+  const { isHolidayMode } = useHoliday();
   return (
     <>
       {cumpleaneras && (
@@ -108,9 +109,27 @@ const Birthdays = () => {
               border: `1px solid ${BORDER_PINK}`,
               boxShadow: "0px 8px 20px rgba(215, 46, 121, 0.08)",
               mb: 3,
-              overflow: "hidden", // Oculta las tarjetas que salen del contenedor
+              overflow: "visible", // Oculta las tarjetas que salen del contenedor
             }}
           >
+            {isHolidayMode && (
+              <Box
+                component='img'
+                src='https://cdn.floreciendojuntas.com/production/statics/xmas/gorro-xmas-teddy.png'
+                alt='Gorro Navideño'
+                sx={{
+                  position: "absolute",
+                  top: "-0px",
+                  left: "-24px",
+                  width: "80px",
+                  height: "80px",
+                  transform: "rotate(-25deg)",
+                  zIndex: 10,
+                  pointerEvents: "none",
+                  filter: "drop-shadow(0 4px 6px rgba(0,0,0,0.1))",
+                }}
+              />
+            )}
             {/* Encabezado del Widget */}
             <Stack
               direction='row'

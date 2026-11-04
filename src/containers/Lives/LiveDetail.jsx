@@ -12,6 +12,7 @@ import { useLiveComments } from "../../hooks/useLiveComments";
 import { useIvsViewers } from "../../hooks/useIvsViewers";
 import { useFullscreenHandler } from "../../hooks/useFullscreenHandler";
 import { useLiveSockets } from "../../hooks/useLiveSockets";
+import { useHoliday } from "../../context/Holiday/HolidayContext"; // 🎄 Importamos el hook navideño
 
 // Components
 import Layout from "../../components/Layout/Layout";
@@ -102,6 +103,7 @@ const LiveDetalle = () => {
   // ── Contexts ──
   const { getLiveById, live } = useContext(LivesContext);
   const { usuario, isAuthenticating, autenticado } = useContext(AuthContext);
+  const { isHolidayMode } = useHoliday(); // 🎄 Estado global de navidad
 
   // ── Custom Hooks ──
   const { containerRef, isFullscreen, handleFullscreen } =
@@ -191,8 +193,30 @@ const LiveDetalle = () => {
           mx: "auto",
           px: { xs: 0, sm: 3 },
           py: { xs: 0, sm: 2 },
+          position: "relative", // Permite posicionar elementos decorativos absolutos si es necesario
         }}
       >
+        {/* 🎄 RECURSO GRÁFICO NAVIDEÑO ADICIONAL (Esferas o adorno superior sutil) */}
+        {isHolidayMode && (
+          <Box
+            component='img'
+            src='https://cdn.floreciendojuntas.com/production/statics/xmas/sferas-xmas.png'
+            alt='Esferas Navideñas'
+            sx={{
+              display: { xs: "none", md: "block" },
+              position: "absolute",
+              top: "-10px",
+              right: "24px",
+              width: "120px",
+              height: "auto",
+              pointerEvents: "none",
+              zIndex: 5,
+              filter: "drop-shadow(0 4px 8px rgba(0,0,0,0.1))",
+              transform: "rotate(4deg)",
+            }}
+          />
+        )}
+
         {/* Encabezado */}
         <Box sx={{ px: { xs: 2, sm: 0 }, mt: { xs: 2, sm: 0 } }}>
           <LiveHeader live={live} onFullscreen={handleFullscreen} />
@@ -281,6 +305,30 @@ const LiveDetalle = () => {
                   )}
                 </Box>
               )}
+            </Box>
+          )}
+          {isHolidayMode && (
+            <Box
+              sx={{
+                position: "absolute",
+                left: 0,
+                bottom: 25,
+                marginBottom: 15,
+                display: "flex",
+                justifyContent: "flex-end",
+              }}
+            >
+              <Box
+                component='img'
+                src='https://cdn.floreciendojuntas.com/production/statics/xmas/teddy-xmas.png'
+                alt='Campanas Navideñas'
+                sx={{
+                  width: { xs: 90, sm: 110, md: 150, lg: 200 },
+                  height: { xs: 90, sm: 110, md: 150, lg: 200 },
+                  objectFit: "contain", // Asegura que la imagen mantenga su proporción sin deformarse
+                  zIndex: 30,
+                }}
+              />
             </Box>
           )}
         </Box>

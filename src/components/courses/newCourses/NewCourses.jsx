@@ -22,11 +22,12 @@ import NewCourseCard from "./NewCourseCard";
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
+import { useHoliday } from "../../../context/Holiday/HolidayContext";
 
 const NewCourses = () => {
   const { courses, getLastestCourses } = useContext(CoursesContext);
   const { usuario, autenticado } = useContext(AuthContext);
-
+  const { isHolidayMode } = useHoliday();
   // Estados para vincular Swiper con los botones personalizados sin bugs de ref
   const [prevEl, setPrevEl] = useState(null);
   const [nextEl, setNextEl] = useState(null);
@@ -58,6 +59,28 @@ const NewCourses = () => {
         boxShadow: "0 20px 40px rgba(232, 62, 140, 0.04)",
       }}
     >
+      {/**Decoracion navideña */}
+      {isHolidayMode && (
+        <Box
+          sx={{
+            position: "absolute",
+            marginTop: { xs: -6, sm: -6, md: -10, lg: -10 },
+            display: "flex",
+            justifyContent: "flex-start",
+          }}
+        >
+          <Box
+            component='img'
+            src='https://cdn.floreciendojuntas.com/production/statics/xmas/campanas-xmas.png'
+            alt='Campanas Navideñas'
+            sx={{
+              width: { xs: 90, sm: 110, md: 150, lg: 200 },
+              height: { xs: 90, sm: 110, md: 150, lg: 200 },
+              objectFit: "contain", // Asegura que la imagen mantenga su proporción sin deformarse
+            }}
+          />
+        </Box>
+      )}
       {/* 🌸 ENCABEZADO MODERNO Y ELEGANTE */}
       <Box
         component={motion.div}
@@ -141,7 +164,11 @@ const NewCourses = () => {
 
       {/* ————— CONTENIDO / SWIPER ————— */}
       <Box
-        sx={{ position: "relative", maxWidth: "100%", px: { xs: 2, md: 4 } }}
+        sx={{
+          position: "relative",
+          maxWidth: "100%",
+          px: { xs: 2, md: 4 },
+        }}
       >
         {!courses || courses.length === 0 ? (
           /* Mensaje vacío cuando no hay nuevos cursos */
@@ -206,7 +233,7 @@ const NewCourses = () => {
             }}
             navigation={{ prevEl, nextEl }}
             style={{
-              padding: "16px 0",
+              padding: "35px 35px",
               maxWidth: "1500px",
               margin: "0 auto",
               paddingBottom: "30px",
@@ -318,6 +345,29 @@ const NewCourses = () => {
           Explorar todos los cursos
         </Button>
       </Box>
+      {isHolidayMode && (
+        <Box
+          sx={{
+            position: "absolute",
+            right: 0,
+            bottom: 0,
+            display: "flex",
+            justifyContent: "flex-end",
+          }}
+        >
+          <Box
+            component='img'
+            src='https://cdn.floreciendojuntas.com/production/statics/xmas/arbol-x%2B.png'
+            alt='Campanas Navideñas'
+            sx={{
+              width: { xs: 90, sm: 110, md: 150, lg: 200 },
+              height: { xs: 90, sm: 110, md: 150, lg: 200 },
+              objectFit: "contain", // Asegura que la imagen mantenga su proporción sin deformarse
+              zIndex: 10,
+            }}
+          />
+        </Box>
+      )}
     </Box>
   );
 };

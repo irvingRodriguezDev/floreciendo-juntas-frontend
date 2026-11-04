@@ -7,8 +7,13 @@ import AccessTimeRoundedIcon from "@mui/icons-material/AccessTimeRounded";
 import Progress from "../../Progress/Progress";
 import dayjs from "dayjs";
 import "dayjs/locale/es"; // Asegúrate de tener configurado dayjs en español si lo deseas
+import { useHoliday } from "../../../context/Holiday/HolidayContext";
+
+const MotionBox = motion.create(Box);
 
 const NewCourseCard = ({ course, hasProgress }) => {
+  const { isHolidayMode } = useHoliday();
+
   return (
     <Link
       to={`/detalle-curso/${course.id}`}
@@ -18,16 +23,16 @@ const NewCourseCard = ({ course, hasProgress }) => {
         display: "block",
       }}
     >
-      <Box
-        component={motion.div}
+      <MotionBox
         whileHover={{
-          y: -8,
-          scale: 1.02,
+          y: isHolidayMode ? null : -8,
+          scale: isHolidayMode ? null : 1.02,
         }}
         transition={{ duration: 0.3, ease: [0.25, 1, 0.5, 1] }}
         sx={{
           borderRadius: "22px",
-          overflow: "hidden",
+          // Cambiado a 'visible' para permitir que el gorrito sobresalga de la esquina
+          overflow: "visible",
           backgroundColor: "#FFFFFF",
           border: "1px solid",
           borderColor: alpha("#E53888", 0.12),
@@ -42,8 +47,29 @@ const NewCourseCard = ({ course, hasProgress }) => {
             boxShadow: "0 20px 40px rgba(229, 56, 136, 0.15)",
           },
           p: 1.5,
+          position: "relative", // Clave para que el absolute del gorrito se ancle aquí
         }}
       >
+        {/* 🎄 GORRITO NAVIDEÑO EN LA ESQUINA SUPERIOR IZQUIERDA DE LA CARD */}
+        {isHolidayMode && (
+          <Box
+            component='img'
+            src='https://cdn.floreciendojuntas.com/production/statics/xmas/gorro-xmas-teddy.png'
+            alt='Gorro Navideño'
+            sx={{
+              position: "absolute",
+              top: "-26px",
+              left: "-24px",
+              width: "80px",
+              height: "80px",
+              transform: "rotate(-25deg)",
+              zIndex: 10,
+              pointerEvents: "none",
+              filter: "drop-shadow(0 4px 6px rgba(0,0,0,0.1))",
+            }}
+          />
+        )}
+
         {/* IMAGEN DEL CURSO CON BADGE FLOTANTE */}
         <Box
           sx={{
@@ -186,7 +212,7 @@ const NewCourseCard = ({ course, hasProgress }) => {
             </Box>
           </Box>
         </Box>
-      </Box>
+      </MotionBox>
     </Link>
   );
 };

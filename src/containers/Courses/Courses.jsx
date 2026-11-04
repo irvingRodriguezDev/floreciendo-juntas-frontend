@@ -1,6 +1,6 @@
 import Layout from "../../components/Layout/Layout";
 import { motion } from "framer-motion";
-import { Grid } from "@mui/material";
+import { Box, Grid } from "@mui/material";
 import SearchCourse from "../../components/courses/SearchCourses";
 import CoursesBanner from "../../components/Banner/CoursesBanner";
 import CoursesContext from "../../context/Courses/CoursesContext";
@@ -10,6 +10,7 @@ import Pagination from "../../components/Pagination/Pagination";
 import Spinner from "../../components/Common/Spinner";
 import { useDebounce } from "use-debounce";
 import PinkSpinner from "../../components/Loading/PinkSpinner";
+import { useHoliday } from "../../context/Holiday/HolidayContext";
 const Courses = () => {
   const {
     courses,
@@ -45,10 +46,57 @@ const Courses = () => {
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
   };
+  const { isHolidayMode } = useHoliday();
   return (
     <Layout>
       {/* Banner y Buscador */}
       <Grid container spacing={2}>
+        {isHolidayMode && (
+          <Box
+            sx={{
+              position: "absolute",
+              marginTop: { xs: -6, lg: 0 },
+              display: "flex",
+              left: { xs: 0 },
+              justifyContent: "flex-start",
+            }}
+          >
+            <Box
+              component='img'
+              src='https://cdn.floreciendojuntas.com/production/statics/xmas/teddy-xmas.png'
+              alt='Campanas Navideñas'
+              sx={{
+                width: { xs: 90, sm: 110, md: 150, lg: 200 },
+                height: { xs: 90, sm: 110, md: 150, lg: 200 },
+                objectFit: "contain", // Asegura que la imagen mantenga su proporción sin deformarse
+                zIndex: 50,
+              }}
+            />
+          </Box>
+        )}
+        {isHolidayMode && (
+          <Box
+            sx={{
+              position: "absolute",
+              marginTop: { xs: -6, lg: 0 },
+              display: "flex",
+              justifyContent: "flex-end",
+              right: 0,
+            }}
+          >
+            <Box
+              component='img'
+              src='https://cdn.floreciendojuntas.com/production/statics/xmas/campanas-xmas.png'
+              alt='Campanas Navideñas'
+              sx={{
+                width: { xs: 90, sm: 110, md: 150, lg: 200 },
+                height: { xs: 90, sm: 110, md: 150, lg: 200 },
+                objectFit: "contain", // Asegura que la imagen mantenga su proporción sin deformarse
+                zIndex: 50,
+              }}
+            />
+          </Box>
+        )}
         <Grid size={12}>
           <CoursesBanner />
         </Grid>
