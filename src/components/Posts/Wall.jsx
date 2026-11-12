@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState, useCallback } from "react";
+import React, { useContext, useEffect, useState, useCallback, useRef } from "react";
 import { Box, Typography, Button, Stack, Avatar } from "@mui/material";
 import CreateIcon from "@mui/icons-material/Create";
 import ForumIcon from "@mui/icons-material/Forum";
@@ -17,6 +17,7 @@ const Wall = ({ courseId, isAuthenticating, isSubscribed }) => {
   const [rowsPerPage] = useState(10);
   const [loading, setLoading] = useState(false);
   const [openModal, setOpenModal] = useState(false);
+  const postsRef = useRef(null);
 
   // Memoizamos la función para evitar ejecuciones o ciclos infinitos en useEffect
   const fetchPosts = useCallback(async () => {
@@ -28,11 +29,17 @@ const Wall = ({ courseId, isAuthenticating, isSubscribed }) => {
 
   useEffect(() => {
     fetchPosts();
-  }, []);
+  }, [courseId, page, rowsPerPage, isSubscribed]);
 
   const handlePageChange = (newPage) => {
     if (newPage >= 1 && newPage <= totalPages && newPage !== page) {
       setPage(newPage);
+      setTimeout(() => {
+        postsRef.current?.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
+      }, 100);
     }
   };
 
@@ -236,7 +243,7 @@ const Wall = ({ courseId, isAuthenticating, isSubscribed }) => {
           ) : (
             <>
               {/* FEED DE PUBLICACIONES */}
-              <Box sx={{ width: "100%" }}>
+              <Box ref={postsRef} sx={{ width: "100%" }}>
                 <PostCard posts={posts} />
               </Box>
 
