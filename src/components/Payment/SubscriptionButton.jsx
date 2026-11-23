@@ -9,8 +9,9 @@ import {
   IconButton,
   CircularProgress,
   Grid,
+  Checkbox,
 } from "@mui/material";
-import { Visibility, VisibilityOff, WhatsApp } from "@mui/icons-material";
+import { CheckBox, Visibility, VisibilityOff, WhatsApp } from "@mui/icons-material";
 import { MethodPost } from "../../config/Service";
 import AuthContext from "../../context/Auth/AuthContext";
 import Swal from "sweetalert2";
@@ -69,6 +70,7 @@ const SubscriptionForm = ({ userId }) => {
   const [lastpath, setLastPath] = useState(lastPathLocal ?? null);
   const [loading, setLoading] = useState(false);
   const [selectedPriceId] = useState(PRICE_RECURRING);
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
 
   const [isLoginMode, setIsLoginMode] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -199,6 +201,15 @@ const SubscriptionForm = ({ userId }) => {
       } else {
         // 💡 Si YA estaba autenticado desde antes en el contexto
         userObj = usuario; // Asumiendo que obtienes 'usuario' de tu AuthContext
+      }
+
+      // Guardar la aceptación de Términos y Condiciones
+      if (acceptedTerms) {
+        await MethodPost("/auth/acceptTerms", {});
+
+        if (userObj) {
+          userObj.termsAccepted = true;
+        }
       }
 
       // -----------------------------------------------------------------
@@ -430,6 +441,91 @@ const SubscriptionForm = ({ userId }) => {
               />
             </Grid>
           </Grid>
+          <Grid
+            container
+            spacing={1}
+            alignItems="center"
+            sx={{ mt: 1 }}
+          >
+            <Grid>
+              <Checkbox
+                checked={acceptedTerms}
+                onChange={(e) => setAcceptedTerms(e.target.checked)}
+                sx={{
+                  color: BRAND.roseVelvet,
+                  "&.Mui-checked": {
+                    color: BRAND.roseVelvet,
+                  },
+                }}
+              />
+            </Grid>
+
+            <Grid size="grow">
+              <Typography
+                sx={{
+                  fontSize: "0.82rem",
+                  color: BRAND.textMuted,
+                  cursor: "pointer",
+                }}
+                onClick={() => setAcceptedTerms(!acceptedTerms)}
+              >
+                Acepto los{" "}
+                <Box
+                  component="span"
+                  sx={{
+                    color: BRAND.roseVelvet,
+                    fontWeight: 600,
+                  }}
+                >
+                  <Button
+                    variant="text"
+                    href="/terminos-y-condiciones"
+                    target="_blank"
+                    sx={{
+                      fontSize: "0.82rem",
+                      color: BRAND.roseVelvet,
+                      fontWeight: 600,
+                      textTransform: "none",
+                      p: 0,
+                      "&:hover": {
+                        textDecoration: "underline",
+                        bgcolor: "transparent",
+                      },
+                    }}
+                  >
+                    Términos y Condiciones
+                  </Button>
+                </Box>
+                {/* {" "}y la{" "}
+                <Box
+                  component="span"
+                  sx={{
+                    color: BRAND.roseVelvet,
+                    fontWeight: 600,
+                  }}
+                >
+                  <Button
+                    variant="text"
+                    href="/politica-de-privacidad"
+                    target="_blank"
+                    sx={{
+                      fontSize: "0.82rem",
+                      color: BRAND.roseVelvet,
+                      fontWeight: 600,
+                      textTransform: "none",
+                      p: 0,
+                      "&:hover": {
+                        textDecoration: "underline",
+                        bgcolor: "transparent",
+                      },
+                    }}
+                  >
+                    Política de Privacidad
+                  </Button>
+                </Box> */}
+              </Typography>
+            </Grid>
+          </Grid>
 
           <Typography
             onClick={() => setIsLoginMode(!isLoginMode)}
@@ -455,7 +551,7 @@ const SubscriptionForm = ({ userId }) => {
         type='submit'
         variant='contained'
         fullWidth
-        disabled={loading}
+        disabled={loading || (!autenticado && !acceptedTerms)}
         sx={{
           py: 1.8,
           fontSize: "0.9rem",
