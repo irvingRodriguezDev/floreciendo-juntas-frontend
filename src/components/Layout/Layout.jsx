@@ -17,13 +17,19 @@ import HolidaySwitch from "./HolidaySwitch";
 import { useHoliday } from "../../context/Holiday/HolidayContext";
 import HolidayGarland from "./HolidayGarland";
 import Snowfall from "react-snowfall";
+import TermsAndConditions from "./Header/TermsAndConditions";
 const Layout = ({ children }) => {
   const [openSalonCart, setOpenSalonCart] = useState(false);
   const { autenticado, usuario } = useContext(AuthContext);
   const { cart, guest_cart, getUserCart } = useContext(CartContext);
   const { isHolidayMode } = useHoliday();
   const [openBirthModal, setOpenBirthModal] = useState(false);
+  const [openTermsModal, setOpenTermsModal] = useState(false);
+  const [termsAcceptedLocal, setTermsAcceptedLocal] = useState(false);
   const [showBirthdayBanner, setShowBirthdayBanner] = useState(false);
+
+  const hasAcceptedTerms =
+    Boolean(usuario?.termsAccepted) || termsAcceptedLocal;
 
   useEffect(() => {
     if (autenticado) {
@@ -56,12 +62,24 @@ const Layout = ({ children }) => {
 
     requestNotificationPermission();
 
+    // Primero verificamos los términos y condiciones
+    if (!hasAcceptedTerms) {
+      setOpenTermsModal(true);
+      setOpenBirthModal(false);
+      return;
+    }
+
+    setOpenTermsModal(false);
+
+    // Después verificamos la fecha de cumpleaños
     const savedBirthDate = localStorage.getItem("savedBirthDate");
 
     if (!usuario?.birthDate && savedBirthDate !== "true") {
       setOpenBirthModal(true);
+    } else {
+      setOpenBirthModal(false);
     }
-  }, [autenticado, usuario]);
+  }, [autenticado, usuario, hasAcceptedTerms]);
 
   const subscriptionDetails = usuario?.subscriptionDetails;
   const [loadingPortal, setLoadingPortal] = useState(false);
@@ -95,6 +113,16 @@ const Layout = ({ children }) => {
     alerts.success(
       "¡Exitoso!",
       "Tu fecha de cumpleaños se ha guardado correctamente.",
+    );
+  };
+
+  const handleTermsSuccess = () => {
+    setTermsAcceptedLocal(true);
+    setOpenTermsModal(false);
+
+    alerts.success(
+      "¡Gracias!",
+      "Has aceptado nuestros Términos y Condiciones.",
     );
   };
   const [snowflakeImage, setSnowflakeImage] = useState(null);
@@ -136,6 +164,20 @@ const Layout = ({ children }) => {
         open={openBirthModal}
         onClose={() => setOpenBirthModal(false)}
         onSuccess={handleBirthDateSuccess}
+      />
+
+      {/*  MODAL PARA LOS TERMINOS Y CONDICIONES */}
+      <TermsAndConditions
+        open={autenticado && !hasAcceptedTerms && openTermsModal}
+        onClose={() => {
+          // No permitir cerrar el modal sin aceptar
+          if (hasAcceptedTerms) {
+            setOpenTermsModal(false);
+          }
+        }}
+        onSuccess={handleTermsSuccess}
+        // termsUrl="TU_URL_DE_TERMINOS"
+        // privacyUrl="TU_URL_DE_PRIVACIDAD"
       />
 
       {/* 🎈 BANNER DE FELIZ CUMPLEAÑOS */}
